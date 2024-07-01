@@ -1,35 +1,51 @@
 import './App.css'
-import MAGiEDisplay from "./components/MAGiEDisplay.tsx";
 import {useEffect, useState} from "react";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import {getMenu} from "./puzzleApi.ts";
 import {Menu} from "./Menu.ts";
+import MenuDisplay from "./components/MenuDisplay.tsx";
+import LevelMenu from "./components/LevelMenu.tsx";
+import LevelPlay from "./components/LevelPlay.tsx";
 
 function App() {
-  const [menu, setMenu] = useState<Menu | null>(null);
+  var [menu, setMenu] = useState<Menu | null>(null);
 
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const menuData = await getMenu('AbandonedMall');
+        const menuData = await getMenu('BigGame_fromJSON');
         setMenu(menuData);
       } catch (error) {
         console.error('Failed to fetch menu data:', error)
+        return <h2>Error</h2>
       }
     };
 
     fetchMenu();
   }, [])
 
-  const category = menu?.categories['Into Mall Jail'];
-
-  if (!category) {
-    return <h1>Loading...</h1>;
-  }
-
   return (
     <>
       <h1>MAGiE</h1>
-      {menu && <MAGiEDisplay bits={category.levels[0].puzzles[0].init} encodingWidth={13} clue={category.levels[0].puzzles[0].clue} />}
+      <Router>
+        <Routes>
+          <Route path="/" element={
+            <>
+              {menu && <MenuDisplay
+                prompt={<p>Select a category:</p>}
+                options={Object.keys(menu.categories)}
+                basePath="/category"/>
+              }
+            </>
+          }/>
+          <Route path="/category/:categoryName" element={
+            <LevelMenu menu={menu}/>
+          } />
+          <Route path="category/:categoryName/levels/:levelNumber" element={
+            <LevelPlay menu={menu} />
+          } />
+        </Routes>
+      </Router>
     </>
   )
 }

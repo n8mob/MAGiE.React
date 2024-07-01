@@ -1,19 +1,15 @@
 import React from 'react';
-import CheckboxMatrix from './CheckboxMatrix';
 
 interface Props {
-  bits: string;
-  encodingWidth: number;
-  clue: string[];
+  lines: string[]
 }
 
-const MAGiEDisplay: React.FC<Props> = ({bits, encodingWidth, clue}) => {
+const MAGiEDisplay: React.FC<Props> = ({lines}) => {
   return (
     <div>
-      <div className="clue">
-        {clue.map(clueLine => <p>{clueLine}</p>)}
+      <div className="display">
+        {lines.map(clueLine => <p>{clueLine}</p>)}
       </div>
-      <CheckboxMatrix bits={bits} encodingWidth={encodingWidth}/>
     </div>
   );
 }
