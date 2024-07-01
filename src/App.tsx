@@ -6,6 +6,7 @@ import {Menu} from "./Menu.ts";
 import MenuDisplay from "./components/MenuDisplay.tsx";
 import LevelMenu from "./components/LevelMenu.tsx";
 import LevelPlay from "./components/LevelPlay.tsx";
+import LevelStart from "./components/LevelStart.tsx";
 
 function App() {
   var [menu, setMenu] = useState<Menu | null>(null);
@@ -42,6 +43,9 @@ function App() {
             <LevelMenu menu={menu}/>
           } />
           <Route path="category/:categoryName/levels/:levelNumber" element={
+            <LevelStart menu={menu} />
+          } />
+          <Route path="category/:categoryName/levels/:levelNumber/puzzle/:puzzleId" element={
             <LevelPlay menu={menu} />
           } />
         </Routes>
