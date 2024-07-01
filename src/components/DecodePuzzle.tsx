@@ -11,7 +11,7 @@ const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle}) => {
   }
 
   return <>
-    <h3>This is a decoding puzzle.</h3>
+    {[...puzzle.init].map((char, index) => <input type="checkbox" key={index} checked={char == '1'} />)}
   </>
 }
 

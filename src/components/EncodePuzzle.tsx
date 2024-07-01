@@ -10,8 +10,10 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
     return null;
   }
 
+  const bits = [...puzzle.init];
+
   return <>
-    <h3>This is an encoding puzzle.</h3>
+    {bits.map((char, index) => <input type="checkbox" key={index} checked={char == '1'} />)}
   </>
 }
 
