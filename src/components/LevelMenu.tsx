@@ -22,6 +22,7 @@ const LevelMenu: React.FC<LevelMenuProps> = (
   }
 
   const category: Category = menu.categories[categoryName];
+  const levelBaseUri = `/category/${encodeURIComponent(categoryName)}/levels`;
 
   return <Fragment>
     <div className="display">
@@ -29,7 +30,7 @@ const LevelMenu: React.FC<LevelMenuProps> = (
       <ol>
         {category.levels.map((level: Level) => {
           const levelName = level.levelName.join("\n");
-          return <Link to={`/category/${categoryName}/levels/${level.levelNumber}`}>
+          return <Link to={`${levelBaseUri}/${level.levelNumber}/puzzle/0`}>
             <li>{levelName}</li>
           </Link>
         })}

@@ -2,6 +2,8 @@ export interface Puzzle {
   init: string;
   clue: string[];
   winText: string[];
+  type: string;
+  encoding: string;
 }
 
 export interface Level {
