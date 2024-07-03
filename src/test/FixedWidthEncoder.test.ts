@@ -1,5 +1,5 @@
 import {FixedWidth} from "../Encoding.ts";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, beforeEach} from "vitest";
 
 const hexadecimal = {
   '0': 0,
@@ -21,8 +21,13 @@ const hexadecimal = {
 };
 
 describe('FixedWidthEncoder', () => {
+  let encoder: FixedWidth;
+
+  beforeEach(() => {
+    encoder = new FixedWidth(4, hexadecimal);
+  });
+
   it('should reverse the encoding to get the decoding', () => {
-    const encoder = new FixedWidth(4, hexadecimal);
     expect(encoder.encoding).toEqual(hexadecimal);
     expect(encoder.decoding).toEqual({
         0: '0',
@@ -45,7 +50,6 @@ describe('FixedWidthEncoder', () => {
   });
 
   it('should encode a single character correctly', () => {
-    const encoder = new FixedWidth(4, hexadecimal);
     const decoded = 'A';
     const encoded = '1010';
 
@@ -53,16 +57,13 @@ describe('FixedWidthEncoder', () => {
   });
 
   it('should encode a string correctly', () => {
-    const encoder = new FixedWidth(4, hexadecimal);
     const decoded = 'A1B2';
-
     const encoded = '1010000110110010';
 
     expect(encoder.encodeText(decoded)).equal(encoded);
   });
 
   it('should decode a single character correctly', () => {
-    const encoder = new FixedWidth(4, hexadecimal);
     const decoded = 'A';
     const encoded = '1010';
 
@@ -70,7 +71,6 @@ describe('FixedWidthEncoder', () => {
   });
 
   it('should decode a string correctly', () => {
-    const encoder = new FixedWidth(4, hexadecimal);
     const decoded = 'A1B2';
     const encoded = '1010000110110010';
     expect(encoder.decodeText(encoded)).equal(decoded);
