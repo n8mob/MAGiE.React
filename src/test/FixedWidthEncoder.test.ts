@@ -21,15 +21,15 @@ const hexadecimal = {
 };
 
 describe('FixedWidthEncoder', () => {
-  let encoder: FixedWidth;
+  let unitUnderTest: FixedWidth;
 
   beforeEach(() => {
-    encoder = new FixedWidth(4, hexadecimal);
+    unitUnderTest = new FixedWidth(4, hexadecimal);
   });
 
   it('should reverse the encoding to get the decoding', () => {
-    expect(encoder.encoding).toEqual(hexadecimal);
-    expect(encoder.decoding).toEqual({
+    expect(unitUnderTest.encoding).toEqual(hexadecimal);
+    expect(unitUnderTest.decoding).toEqual({
         0: '0',
         1: '1',
         2: '2',
@@ -53,26 +53,26 @@ describe('FixedWidthEncoder', () => {
     const decoded = 'A';
     const encoded = '1010';
 
-    expect(encoder.encodeChar(decoded)).equal(encoded);
+    expect(unitUnderTest.encodeChar(decoded)).equal(encoded);
   });
 
   it('should encode a string correctly', () => {
     const decoded = 'A1B2';
     const encoded = '1010000110110010';
 
-    expect(encoder.encodeText(decoded)).equal(encoded);
+    expect(unitUnderTest.encodeText(decoded)).equal(encoded);
   });
 
   it('should decode a single character correctly', () => {
     const decoded = 'A';
     const encoded = '1010';
 
-    expect(encoder.decodeChar(encoded)).equal(decoded);
+    expect(unitUnderTest.decodeChar(encoded)).equal(decoded);
   });
 
   it('should decode a string correctly', () => {
     const decoded = 'A1B2';
     const encoded = '1010000110110010';
-    expect(encoder.decodeText(encoded)).equal(decoded);
+    expect(unitUnderTest.decodeText(encoded)).equal(decoded);
   });
 });

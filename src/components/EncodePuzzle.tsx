@@ -10,10 +10,12 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
     return null;
   }
 
-  const bits = [...puzzle.init];
+  const bits = [...puzzle.encoding.encodeText(puzzle.init)];
 
   return <>
-    {bits.map((char, index) => <input type="checkbox" key={index} checked={char == '1'} />)}
+    {bits.map((char, index) =>
+      <input type="checkbox" key={index} defaultChecked={char == '1'} />
+    )}
   </>
 }
 
