@@ -6,6 +6,10 @@ export interface BinaryEncoding {
   decodeChar(encoded: string): string;
 
   encodeChar(decoded: string): string;
+
+  encodeAndSplit(decoded: string): Generator<string, void, unknown>;
+
+  splitBits(bits: string): Generator<string, string, unknown>;
 }
 
 class FixedWidth implements BinaryEncoding {
@@ -15,6 +19,13 @@ class FixedWidth implements BinaryEncoding {
   private readonly defaultEncoded: number = 0;
   private readonly defaultDecoded: string = '?';
 
+  /**
+   * @param width The width of each encoded character in bits. This value is used by `splitBits`.
+   * @param encoding A mapping from characters to their encoded values.
+   * @param decoding Optional. A mapping from encoded values to their respective characters.
+   * @param defaultEncoded Optional. The default value used when encoding an unknown character.
+   * @param defaultDecoded Optional. The default character used when decoding an unknown value.
+   */
   constructor(
     width: number,
     encoding: Record<string, number>,
@@ -59,6 +70,32 @@ class FixedWidth implements BinaryEncoding {
 
   encodeText(decoded: string): string {
     return [...decoded].map(char => this.encodeChar(char)).join('');
+  }
+
+  /**
+   * Yields chunked strings of bits by splitting the given string
+   * into chunks of the width defined for this `FixedWidth` encoding.
+   * @param bits The string of bits to be split.
+   * @returns A generator yielding chunks of bits.
+   * @see constructor for the `width` parameter.
+   */
+  * splitBits(bits: string): Generator<string, string, unknown> {
+    let start = 0;
+    let end = 0;
+
+    while (start < bits.length) {
+      end = start + this.width;
+      yield bits.slice(start, end);
+      start = end;
+    }
+
+    return bits.slice(start);
+  }
+
+  * encodeAndSplit(decoded: string): Generator<string, void, unknown> {
+    for (const char of decoded) {
+      yield this.encodeChar(char);
+    }
   }
 }
 
