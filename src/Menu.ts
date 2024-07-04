@@ -7,8 +7,10 @@ export interface EncodingData {
 
 export interface FixedEncodingData extends EncodingData {
   type: "fixed";
-  width: number;
-  encoding: Record<string, number>;
+  encoding: {
+    width: number;
+    encodingMap: Record<string, number>
+  };
 }
 
 export type EncodingSymbol = string;

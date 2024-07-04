@@ -19,7 +19,8 @@ function App() {
         Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
           if (encodingData.type == "fixed") {
             const fixedEncoding = encodingData as FixedEncodingData;
-            menuData.encodingProviders[encodingName] = new FixedWidth(fixedEncoding.width, fixedEncoding.encoding);
+            menuData.encodingProviders[encodingName] = new FixedWidth(
+              fixedEncoding.encoding.width, fixedEncoding.encoding.encodingMap);
           }
         });
 
