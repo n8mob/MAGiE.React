@@ -22,7 +22,8 @@ export interface VariableEncodingData extends EncodingData {
 export interface Puzzle {
   init: string;
   clue: string[];
-  winText: string[];
+  winText: string;
+  winMessage: string[];
   type: "Encode" | "Decode";
   encoding_name: string;
   encoding: BinaryEncoding;

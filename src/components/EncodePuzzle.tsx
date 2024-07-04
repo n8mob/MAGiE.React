@@ -70,6 +70,9 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
 
   function handleSubmitClick() {
     console.log(`decoded: ${puzzle?.encoding.decodeText(bits)}`);
+    if (puzzle?.encoding.decodeText(bits) == puzzle?.winText) {
+      alert("You win!");
+    }
   }
 }
 
