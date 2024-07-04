@@ -53,17 +53,18 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   }
 
   return <>
-    <div id="encodingInputs">
+    <div className="encodingInputs stickyContainer">
       <p>
-        <input type="button" value="0" onClick={() => setBits(bits + "0")}/>
-        <input type="button" value="1" onClick={() => setBits(bits + "1")}/>
-        <input type="button" value="Backspace" onClick={() => setBits(bits.slice(0, -1))}/>
+        <input type="button" className="bitInput" value="0" onClick={() => setBits(bits + "0")}/>
+        <input type="button" className="bitInput" value="1" onClick={() => setBits(bits + "1")}/>
+        <input type="button" className="bitInput" value="⌫" onClick={() => setBits(bits.slice(0, -1))}/>
       </p>
     </div>
     {bitsByChar.map((char, charIndex) => {
         return <p key={`char${charIndex}`}>
           {[...char].map((bit, bitIndex) => (
             <input type="checkbox"
+                   className="bit-checkbox"
                    key={`bit${bitIndex}`}
                    value={bit}
                    checked={bit == "1"}
@@ -75,11 +76,11 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
         </p>
       }
     )}
-    <div id="encodingInputs">
+    <div className="encodingInputs">
       <p>
-        <input type="button" value="0" onClick={() => setBits(bits + "0")}/>
-        <input type="button" value="1" onClick={() => setBits(bits + "1")}/>
-        <input type="button" value="Backspace" onClick={() => setBits(bits.slice(0, -1))}/>
+        <input type="button" className="bitInput" value="0" onClick={() => setBits(bits + "0")}/>
+        <input type="button" className="bitInput" value="1" onClick={() => setBits(bits + "1")}/>
+        <input type="button" className="bitInput" value="⌫" onClick={() => setBits(bits.slice(0, -1))}/>
       </p>
       <p>
         <input type="button" value="Submit" onClick={handleSubmitClick}/>

@@ -77,7 +77,6 @@ const LevelPlay: React.FC<LevelPlayProps> = (
   }
 
   function handleWin() {
-    alert(currentPuzzle?.winMessage.join(' '));
     setWinMessage(currentPuzzle?.winMessage || ["CORRECT!"])
     setHasWon(true);
   }

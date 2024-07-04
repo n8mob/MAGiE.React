@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {Menu} from "./Menu.ts";
 
-const API_BASE_URL = 'http://puzzleeditor2020.local:62443/menus';
+const API_BASE_URL = '/puzzle-api';
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
   try {

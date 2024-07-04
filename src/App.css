@@ -14,11 +14,15 @@ p {
   letter-spacing: 1px;
 }
 
-div.display > p, li, button {
+div.display > p, li, input {
   font-family: "Verily Serif Mono", "Courier", monospace;
   text-align: justify;
   text-transform: uppercase;
   margin: 1px;
+}
+
+div.encodingInputs > button {
+  padding: 10px;
 }
 
 .logo {
@@ -60,4 +64,19 @@ div.display > p, li, button {
 .bit-checkbox {
   width: 30px;
   height: 30px;
+}
+
+.stickyContainer {
+  position: sticky;
+  top: 0; /* Adjust this value as needed */
+  z-index: 10; /* Ensure it's above other content */
+}
+
+input[type="button"] {
+  margin: 8px;
+  min-height: 40px;
+  min-width: 40px;
+  font-size: x-large;
+  font-weight: bold;
+  padding: 15px 20px;
 }
