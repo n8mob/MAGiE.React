@@ -16,6 +16,8 @@ const LevelPlay: React.FC<LevelPlayProps> = (
   const categoryName = decodeURIComponent(useParams().categoryName || "");
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [level, setLevel] = useState<Level | null>(null);
+  const [winMessage, setWinMessage] = useState<string[]>([]);
+  const [hasWon, setHasWon] = useState(false);
 
 
   useEffect(() => {
@@ -65,9 +67,33 @@ const LevelPlay: React.FC<LevelPlayProps> = (
       <div className="display">
         {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
       </div>
-      <EncodePuzzle puzzle={currentPuzzle} />
-      <DecodePuzzle puzzle={currentPuzzle} />
+      <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin}/>
+      <DecodePuzzle puzzle={currentPuzzle}/>
+      <div className="display">
+        {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
+      </div>
+      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext}/>}
     </>
+  }
+
+  function handleWin() {
+    alert(currentPuzzle?.winMessage.join(' '));
+    setWinMessage(currentPuzzle?.winMessage || ["CORRECT!"])
+    setHasWon(true);
+  }
+
+  function goNext() {
+    if (!level || !currentPuzzle) {
+      return;
+    }
+    const nextPuzzleIndex = level.puzzles.indexOf(currentPuzzle) + 1;
+    if (nextPuzzleIndex < level.puzzles.length) {
+      setCurrentPuzzle(level.puzzles[nextPuzzleIndex]);
+      setWinMessage([]);
+      setHasWon(false);
+    } else {
+      alert('End of level');
+    }
   }
 }
 

@@ -2,10 +2,11 @@ import {Puzzle} from "../Menu.ts";
 import React, {useEffect, useState} from "react";
 
 interface EncodePuzzleProps {
-  puzzle?: Puzzle
+  puzzle?: Puzzle;
+  onWin: () => void;
 }
 
-const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
+const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   const [bits, setBits] = useState("");
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
   function handleSubmitClick() {
     console.log(`decoded: ${puzzle?.encoding.decodeText(bits)}`);
     if (puzzle?.encoding.decodeText(bits) == puzzle?.winText) {
-      alert("You win!");
+      onWin?.();
     }
   }
 }
