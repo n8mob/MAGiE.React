@@ -1,4 +1,4 @@
-import {BinaryEncoding} from "./Encoding.ts";
+import {BinaryEncoding} from "./BinaryEncoding.ts";
 
 export interface EncodingData {
   type: "variable" | "fixed";
