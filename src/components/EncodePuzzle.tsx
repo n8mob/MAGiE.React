@@ -26,19 +26,6 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
     nextBits = bitSplitter?.next();
   }
 
-  function handleBitClick(event: React.ChangeEvent<HTMLInputElement>) {
-    if (!event) {
-      return;
-    } else {
-      const bitIndex = parseInt(event.currentTarget.getAttribute("data-bitindex") || "0");
-      const charIndex = parseInt(event.currentTarget.getAttribute("data-charindex") || "0");
-      const newBits = [...bitsByChar[charIndex]];
-      newBits[bitIndex] = event.currentTarget.checked ? "1" : "0";
-      bitsByChar[charIndex] = newBits.join('');
-      setBits(bitsByChar.join(''));
-    }
-  }
-
   return <>
     {bitsByChar.map((char, charIndex) => {
         return <p key={`char${charIndex}`}>
@@ -59,13 +46,31 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle}) => {
       <p>
         <input type="button" value="0" onClick={() => setBits(bits + "0")}/>
         <input type="button" value="1" onClick={() => setBits(bits + "1")}/>
+        <input type="button" value="Backspace" onClick={() => setBits(bits.slice(0, -1))}/>
       </p>
       <p>
         <input type="button" value="Submit"
-               onClick={() => console.log(`decoded: ${puzzle?.encoding.decodeText(bits)}`)}/>
+               onClick={handleSubmitClick} />
       </p>
     </div>
   </>;
+
+  function handleBitClick(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!event) {
+      return;
+    } else {
+      const bitIndex = parseInt(event.currentTarget.getAttribute("data-bitindex") || "0");
+      const charIndex = parseInt(event.currentTarget.getAttribute("data-charindex") || "0");
+      const newBits = [...bitsByChar[charIndex]];
+      newBits[bitIndex] = event.currentTarget.checked ? "1" : "0";
+      bitsByChar[charIndex] = newBits.join('');
+      setBits(bitsByChar.join(''));
+    }
+  }
+
+  function handleSubmitClick() {
+    console.log(`decoded: ${puzzle?.encoding.decodeText(bits)}`);
+  }
 }
 
 export default EncodePuzzle;
