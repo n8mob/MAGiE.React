@@ -18,6 +18,31 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
     }
   }, [puzzle]);
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "0":
+          setBits(bits + "0");
+          break;
+        case "1":
+          setBits(bits + "1");
+          break;
+        case "Backspace":
+          setBits(bits.slice(0, -1));
+          event.preventDefault(); // Prevent the default back navigation in browsers
+          break;
+        default:
+          break; // Ignore other keys
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [bits]); // Depend on bits to ensure the latest state is used
+
   const bitSplitter = puzzle?.encoding.splitBits(bits);
   let nextBits = bitSplitter?.next();
   const bitsByChar: string[] = [];
@@ -28,6 +53,13 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   }
 
   return <>
+    <div id="encodingInputs">
+      <p>
+        <input type="button" value="0" onClick={() => setBits(bits + "0")}/>
+        <input type="button" value="1" onClick={() => setBits(bits + "1")}/>
+        <input type="button" value="Backspace" onClick={() => setBits(bits.slice(0, -1))}/>
+      </p>
+    </div>
     {bitsByChar.map((char, charIndex) => {
         return <p key={`char${charIndex}`}>
           {[...char].map((bit, bitIndex) => (
@@ -50,8 +82,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
         <input type="button" value="Backspace" onClick={() => setBits(bits.slice(0, -1))}/>
       </p>
       <p>
-        <input type="button" value="Submit"
-               onClick={handleSubmitClick} />
+        <input type="button" value="Submit" onClick={handleSubmitClick}/>
       </p>
     </div>
   </>;
