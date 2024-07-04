@@ -21,7 +21,7 @@ export interface Puzzle {
   init: string;
   clue: string[];
   winText: string[];
-  type: string;
+  type: "Encode" | "Decode";
   encoding_name: string;
   encoding: BinaryEncoding;
 }

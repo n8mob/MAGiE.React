@@ -2,7 +2,7 @@ import './App.css'
 import {useEffect, useState} from "react";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import {getMenu} from "./puzzleApi.ts";
-import {FixedEncodingData, Menu, VariableEncodingData} from "./Menu.ts";
+import {FixedEncodingData, Menu} from "./Menu.ts";
 import MenuDisplay from "./components/MenuDisplay.tsx";
 import LevelMenu from "./components/LevelMenu.tsx";
 import LevelPlay from "./components/LevelPlay.tsx";
