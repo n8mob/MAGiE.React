@@ -1,6 +1,6 @@
-import {BinaryEncoding} from "./BinaryEncoding.ts";
+import {BinaryEncoder} from "./BinaryEncoder.ts";
 
-class FixedWidth implements BinaryEncoding {
+class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
   public readonly encoding: Record<string, number>;
   public readonly decoding: Record<number, string>;
@@ -35,29 +35,29 @@ class FixedWidth implements BinaryEncoding {
     this.defaultDecoded = defaultDecoded;
   }
 
-  decodeChar(bits: string): string {
-    const encoded = parseInt(bits, 2);
+  decodeChar(encodedChar: string): string {
+    const encoded = parseInt(encodedChar, 2);
     return encoded in this.decoding
       ? this.decoding[encoded]
       : this.defaultDecoded;
   }
 
-  encodeChar(char: string): string {
-    return char in this.encoding
-      ? this.encoding[char].toString(2).padStart(this.width, '0')
+  encodeChar(charToEncode: string): string {
+    return charToEncode in this.encoding
+      ? this.encoding[charToEncode].toString(2).padStart(this.width, '0')
       : this.defaultEncoded.toString(2).padStart(this.width, '0');
   }
 
-  decodeText(encoded: string): string {
+  decodeText(encodedText: string): string {
     const decoded: string[] = [];
-    for (let i = 0; i < encoded.length; i += this.width) {
-      decoded.push(this.decodeChar(encoded.slice(i, i + this.width)));
+    for (let i = 0; i < encodedText.length; i += this.width) {
+      decoded.push(this.decodeChar(encodedText.slice(i, i + this.width)));
     }
     return decoded.join('');
   }
 
-  encodeText(decoded: string): string {
-    return [...decoded].map(char => this.encodeChar(char)).join('');
+  encodeText(textToEncode: string): string {
+    return [...textToEncode].map(char => this.encodeChar(char)).join('');
   }
 
   /**
@@ -67,7 +67,7 @@ class FixedWidth implements BinaryEncoding {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  * splitBits(bits: string): Generator<string, string, unknown> {
+  *splitBits(bits: string): Generator<string, string, unknown> {
     let start = 0;
     let end = 0;
 
@@ -80,11 +80,11 @@ class FixedWidth implements BinaryEncoding {
     return bits.slice(start);
   }
 
-  * encodeAndSplit(decoded: string): Generator<string, void, unknown> {
+  *encodeAndSplit(decoded: string): Generator<string, void, unknown> {
     for (const char of decoded) {
       yield this.encodeChar(char);
     }
   }
 }
 
-export {FixedWidth};
+export {FixedWidthEncoder};

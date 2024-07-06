@@ -6,7 +6,7 @@ import {FixedEncodingData, Menu} from "./Menu.ts";
 import MenuDisplay from "./components/MenuDisplay.tsx";
 import LevelMenu from "./components/LevelMenu.tsx";
 import LevelPlay from "./components/LevelPlay.tsx";
-import {FixedWidth} from "./Encoding.ts";
+import {FixedWidthEncoder} from "./FixedWidthEncoder.ts";
 
 function App() {
   const [menu, setMenu] = useState<Menu | null>(null);
@@ -19,7 +19,7 @@ function App() {
         Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
           if (encodingData.type == "fixed") {
             const fixedEncoding = encodingData as FixedEncodingData;
-            menuData.encodingProviders[encodingName] = new FixedWidth(
+            menuData.encodingProviders[encodingName] = new FixedWidthEncoder(
               fixedEncoding.encoding.width, fixedEncoding.encoding.encodingMap);
           }
         });

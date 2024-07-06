@@ -1,4 +1,4 @@
-import {BinaryEncoding} from "./BinaryEncoding.ts";
+import {BinaryEncoder} from "./BinaryEncoder.ts";
 
 export interface EncodingData {
   type: "variable" | "fixed";
@@ -26,7 +26,7 @@ export interface Puzzle {
   winMessage: string[];
   type: "Encode" | "Decode";
   encoding_name: string;
-  encoding: BinaryEncoding;
+  encoding: BinaryEncoder;
 }
 
 export interface Level {
@@ -43,5 +43,5 @@ export interface Category {
 export interface Menu {
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
-  encodingProviders: Record<string, BinaryEncoding>;
+  encodingProviders: Record<string, BinaryEncoder>;
 }

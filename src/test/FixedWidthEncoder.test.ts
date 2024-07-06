@@ -1,4 +1,4 @@
-import {FixedWidth} from "../Encoding.ts";
+import {FixedWidthEncoder} from "../FixedWidthEncoder.ts";
 import {describe, expect, it, beforeEach} from "vitest";
 
 const hexadecimal = {
@@ -21,10 +21,10 @@ const hexadecimal = {
 };
 
 describe('FixedWidthEncoder', () => {
-  let unitUnderTest: FixedWidth;
+  let unitUnderTest: FixedWidthEncoder;
 
   beforeEach(() => {
-    unitUnderTest = new FixedWidth(4, hexadecimal);
+    unitUnderTest = new FixedWidthEncoder(4, hexadecimal);
   });
 
   it('should reverse the encoding to get the decoding', () => {
