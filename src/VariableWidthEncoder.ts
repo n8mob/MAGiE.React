@@ -61,7 +61,7 @@ class VariableWidthEncoder implements BinaryEncoder {
 
   decodeText(encoded: string): string {
     const tokens = [];
-    const bitSplitter = this.splitBits(encoded);
+    const bitSplitter = this.splitEncodedBits(encoded);
     let nextBits = bitSplitter.next();
     while (!nextBits.done) {
       tokens.push(this.decodeChar(nextBits.value));
@@ -77,8 +77,12 @@ class VariableWidthEncoder implements BinaryEncoder {
     }
   }
 
-  *splitBits(bits: string): Generator<string, string, unknown>{
+  *splitEncodedBits(bits: string): Generator<string, string, unknown>{
     let tokenStart = 0;
+    if (!bits) {
+      return "";
+    }
+
     while (tokenStart < bits.length) {
       const tokenSymbol = bits[tokenStart];
       const nextSymbol = Object.keys(this.encoding).filter(symbol => symbol != tokenSymbol)[0];

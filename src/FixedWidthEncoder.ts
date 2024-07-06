@@ -67,7 +67,7 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  *splitBits(bits: string): Generator<string, string, unknown> {
+  *splitEncodedBits(bits: string): Generator<string, string, unknown> {
     let start = 0;
     let end = 0;
 

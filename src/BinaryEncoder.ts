@@ -9,6 +9,6 @@ export interface BinaryEncoder {
 
   encodeAndSplit(decoded: string): Generator<string, void, unknown>;
 
-  splitBits(bits: string): Generator<string, string, unknown>;
+  splitEncodedBits(bits: string): Generator<string, string, unknown>;
 }
 

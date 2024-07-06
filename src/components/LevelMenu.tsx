@@ -11,7 +11,7 @@ const LevelMenu: React.FC<LevelMenuProps> = (
   {
     menu,
   }) => {
-  const { categoryName} = useParams();
+  const {categoryName} = useParams();
 
   if (categoryName === undefined) {
     return <><h2>No category given</h2></>;
@@ -30,9 +30,11 @@ const LevelMenu: React.FC<LevelMenuProps> = (
       <ol>
         {category.levels.map((level: Level) => {
           const levelName = level.levelName.join("\n");
-          return <Link to={`${levelBaseUri}/${level.levelNumber}/puzzle/0`}>
-            <li>{levelName}</li>
-          </Link>
+          return <li key={categoryName + "_level_" + level.sort_order}>
+            <Link to={`${levelBaseUri}/${level.levelNumber}/puzzle/0`}>
+              {levelName}
+            </Link>
+          </li>
         })}
       </ol>
     </div>

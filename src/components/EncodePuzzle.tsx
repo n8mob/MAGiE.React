@@ -43,13 +43,15 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
     };
   }, [bits]); // Depend on bits to ensure the latest state is used
 
-  const bitSplitter = puzzle?.encoding.splitBits(bits);
-  let nextBits = bitSplitter?.next();
   const bitsByChar: string[] = [];
+  if (bits !== undefined) {
+    const bitSplitter = puzzle?.encoding.splitEncodedBits(bits);
+    let nextBits = bitSplitter?.next();
 
-  while (nextBits && !nextBits?.done) {
-    bitsByChar.push(nextBits.value);
-    nextBits = bitSplitter?.next();
+    while (nextBits && !nextBits?.done) {
+      bitsByChar.push(nextBits.value);
+      nextBits = bitSplitter?.next();
+    }
   }
 
   return <>

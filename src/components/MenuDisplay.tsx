@@ -18,7 +18,7 @@ const MenuDisplay: React.FC<MenuProps> = (
     <div className="display">
       <h3>{prompt}</h3>
       <ol>
-        {options.map(menuLine => (<li>
+        {options.map(menuLine => (<li key={menuLine}>
           <Link to={`${basePath}/${encodeURIComponent(menuLine)}`}>{menuLine}</Link>
         </li>))}
       </ol>
