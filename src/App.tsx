@@ -31,9 +31,7 @@ function App() {
         Object.values(menuData.categories).map((category) => {
           category.levels.map((level) => {
             level.puzzles.map((puzzle) => {
-              if (puzzle.type == "Encode") {
-                puzzle.encoding = menuData.encodingProviders[puzzle.encoding_name];
-              }
+              puzzle.encoding = menuData.encodingProviders[puzzle.encoding_name];
             });
           });
         });

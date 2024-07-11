@@ -20,6 +20,11 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
+      // Ignore key presses in input fields (text box)
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
       switch (event.key) {
         case "0":
           setBits(bits + "0");
