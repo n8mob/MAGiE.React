@@ -68,7 +68,7 @@ const LevelPlay: React.FC<LevelPlayProps> = (
         {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
       </div>
       <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin}/>
-      <DecodePuzzle puzzle={currentPuzzle}/>
+      <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin}/>
       <div className="display">
         {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
       </div>

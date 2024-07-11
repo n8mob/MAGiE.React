@@ -2,16 +2,20 @@ import {Puzzle} from "../Menu.ts";
 import React from "react";
 
 interface DecodePuzzleProps {
-  puzzle?: Puzzle
+  puzzle?: Puzzle,
+  onWin: () => void;
 }
 
 const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle}) => {
   if (!puzzle || puzzle.type != "Decode") {
-    return null;
+    return;
   }
 
   return <>
-    {[...puzzle.init].map((char, index) => <input type="checkbox" key={index} checked={char == '1'} />)}
+    {[...puzzle.winText].map((char, index) =>
+      <input type="checkbox" key={`winText-${index}`} checked={char == '1'}/>)
+    }
+    <input type="text" id="decodeInput" value={puzzle.init}/>
   </>
 }
 
