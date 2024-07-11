@@ -32,7 +32,7 @@ const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, onWin, displayWidth}
   return <>
     {[...winningBits].map((char, index) => (
       <React.Fragment key={`winText-${index}`}>
-        <input type="checkbox" checked={char == '1'} />
+        <input type="checkbox" className="bit-checkbox" checked={char == '1'} />
         {(index + 1) % displayWidth == 0 && <br/>}
       </React.Fragment>
     ))}
