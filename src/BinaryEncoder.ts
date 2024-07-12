@@ -1,3 +1,6 @@
+import FullJudgment from "./FullJudgment";
+import {Bits, Chars} from "./CharJudgment.ts";
+
 export interface BinaryEncoder {
   decodeText(encodedText: string): string;
 
@@ -10,5 +13,9 @@ export interface BinaryEncoder {
   encodeAndSplit(decoded: string): Generator<string, void, unknown>;
 
   splitEncodedBits(bits: string): Generator<string, string, unknown>;
+
+  judgeBits(guessBits: string, winBits: string): FullJudgment<Bits>;
+
+  judgeText(guessText: string, winText: string): FullJudgment<Chars>;
 }
 

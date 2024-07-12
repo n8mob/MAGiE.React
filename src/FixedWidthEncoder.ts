@@ -1,4 +1,6 @@
 import {BinaryEncoder} from "./BinaryEncoder.ts";
+import {Bits, Chars} from "./CharJudgment.ts";
+import FullJudgment from "./FullJudgment.ts";
 
 class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
@@ -67,7 +69,7 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  *splitEncodedBits(bits: string): Generator<string, string, unknown> {
+  * splitEncodedBits(bits: string): Generator<string, string> {
     let start = 0;
     let end = 0;
 
@@ -80,11 +82,20 @@ class FixedWidthEncoder implements BinaryEncoder {
     return bits.slice(start);
   }
 
-  *encodeAndSplit(decoded: string): Generator<string, void, unknown> {
+  * encodeAndSplit(decoded: string): Generator<string, void> {
     for (const char of decoded) {
       yield this.encodeChar(char);
     }
   }
+
+  judgeBits(guessBits: string, winBits: string): FullJudgment<Bits> {
+    throw new Error(`Method not implemented.\t'guessBits': ${guessBits}\t'winBits': ${winBits}`);
+  }
+
+  judgeText(guessText: string, winText: string): FullJudgment<Chars> {
+    throw new Error(`Method not implemented.\t'guessText': ${guessText}\t'winText': ${winText}`);
+  }
+
 }
 
 export {FixedWidthEncoder};
