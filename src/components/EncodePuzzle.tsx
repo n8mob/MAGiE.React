@@ -1,52 +1,71 @@
 import {Puzzle} from "../Menu.ts";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useReducer, useState} from "react";
+import FullJudgment from "../FullJudgment.ts";
+import {Bits} from "../CharJudgment.ts";
 
 interface EncodePuzzleProps {
   puzzle?: Puzzle;
   onWin: () => void;
 }
 
+function bitsReducer(
+  bits: string,
+  update: {
+    action: string;
+    value: string;
+  }): string {
+  switch (update.action) {
+    case "0":
+    case "1":
+      return bits + update.action;
+    case "Backspace":
+      return bits.slice(0, -1);
+    case "Update":
+      return update.value;
+    default:
+      return bits;
+  }
+}
+
 const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
-  const [bits, setBits] = useState("");
+  const [bits, dispatch] = useReducer(bitsReducer, "");
+  const [judgment, setJudgment] = useState(new FullJudgment<Bits>(false, "", []));
 
   useEffect(() => {
     if (!puzzle || puzzle.type != "Encode") {
       return;
     } else {
-      const splitBits: string[] = [...puzzle.encoding.encodeAndSplit(puzzle.init)];
-      setBits(splitBits.join(''));
+      dispatch({action: "Update", value: puzzle.encoding.encodeText(puzzle.init)});
     }
   }, [puzzle]);
 
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      // Ignore key presses in input fields (text box)
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-        return;
-      }
+      const handleKeyPress = (event: KeyboardEvent) => {
+        // Ignore key presses in input fields (text box)
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+          return;
+        } else {
+          switch (event.key) {
+            case "0":
+            case "1":
+            case "Backspace":
+              dispatch({action: event.key, value: event.key});
+              event.preventDefault(); // Prevent the default back navigation in browsers
+              break;
+            default:
+              break; // Ignore other keys
+          }
+        }
+      };
 
-      switch (event.key) {
-        case "0":
-          setBits(bits + "0");
-          break;
-        case "1":
-          setBits(bits + "1");
-          break;
-        case "Backspace":
-          setBits(bits.slice(0, -1));
-          event.preventDefault(); // Prevent the default back navigation in browsers
-          break;
-        default:
-          break; // Ignore other keys
-      }
-    };
+      window.addEventListener("keydown", handleKeyPress);
 
-    window.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [bits]); // Depend on bits to ensure the latest state is used
+      return () => {
+        window.removeEventListener("keydown", handleKeyPress);
+      };
+    }, [bits]
+  )
+  ; // Depend on bits to ensure the latest state is used
 
   if (!puzzle || puzzle.type != "Encode") {
     return;
@@ -66,32 +85,41 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   return <>
     <div className="encodingInputs stickyContainer">
       <p>
-        <input type="button" className="bitInput" value="0" onClick={() => setBits(bits + "0")}/>
-        <input type="button" className="bitInput" value="1" onClick={() => setBits(bits + "1")}/>
-        <input type="button" className="bitInput" value="⌫" onClick={() => setBits(bits.slice(0, -1))}/>
+        <input type="button" className="bitInput" value="0" onClick={() => dispatch({action: "0", value: "0"})}/>
+        <input type="button" className="bitInput" value="1" onClick={() => dispatch({action: "1", value: "1"})}/>
+        <input type="button" className="bitInput" value="⌫"
+               onClick={() => dispatch({action: "Backspace", value: "Backspace"})}/>
       </p>
     </div>
     {bitsByChar.map((char, charIndex) => {
+        let className: string = "bit-checkbox";
+        if (judgment && judgment.charJudgments && judgment.charJudgments.length > charIndex) {
+          className += (judgment.charJudgments[charIndex].isCharCorrect ? " correct" : " incorrect");
+        } else {
+          className += " unknown";
+        }
         return <p key={`char${charIndex}`}>
           {[...char].map((bit, bitIndex) => (
-            <input type="checkbox"
-                   className="bit-checkbox"
-                   key={`bit${bitIndex}`}
-                   value={bit}
-                   checked={bit == "1"}
-                   data-charindex={charIndex}
-                   data-bitindex={bitIndex}
-                   onChange={(e) => handleBitClick(e)}
-            />
+            <label className={`${className} bit-checkbox`} key={`bit${bitIndex}`}>
+              <input type="checkbox"
+                     value={bit}
+                     checked={bit == "1"}
+                     data-charindex={charIndex}
+                     data-bitindex={bitIndex}
+                     onChange={(e) => handleBitClick(e)}
+              />
+              <span></span> {/* This span is used for custom checkbox styling */}
+            </label>
           ))}
-        </p>
+        </p>;
       }
     )}
     <div className="encodingInputs">
       <p>
-        <input type="button" className="bitInput" value="0" onClick={() => setBits(bits + "0")}/>
-        <input type="button" className="bitInput" value="1" onClick={() => setBits(bits + "1")}/>
-        <input type="button" className="bitInput" value="⌫" onClick={() => setBits(bits.slice(0, -1))}/>
+        <input type="button" className="bitInput" value="0" onClick={() => dispatch({action: "0", value: "0"})}/>
+        <input type="button" className="bitInput" value="1" onClick={() => dispatch({action: "1", value: "1"})}/>
+        <input type="button" className="bitInput" value="⌫"
+               onClick={() => dispatch({action: "Backspace", value: "Backspace"})}/>
       </p>
       <p>
         <input type="button" value="Submit" onClick={handleSubmitClick}/>
@@ -102,20 +130,28 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   function handleBitClick(event: React.ChangeEvent<HTMLInputElement>) {
     if (!event) {
       return;
-    } else {
-      const bitIndex = parseInt(event.currentTarget.getAttribute("data-bitindex") || "0");
-      const charIndex = parseInt(event.currentTarget.getAttribute("data-charindex") || "0");
-      const newBits = [...bitsByChar[charIndex]];
-      newBits[bitIndex] = event.currentTarget.checked ? "1" : "0";
-      bitsByChar[charIndex] = newBits.join('');
-      setBits(bitsByChar.join(''));
     }
+
+    const bitIndex = parseInt(event.currentTarget.getAttribute("data-bitindex") || "0");
+    const charIndex = parseInt(event.currentTarget.getAttribute("data-charindex") || "0");
+    const newBits = [...bitsByChar[charIndex]];
+    newBits[bitIndex] = event.currentTarget.checked ? "1" : "0";
+    bitsByChar[charIndex] = newBits.join('');
+    dispatch({action: "Update", value: bitsByChar.join('')});
   }
 
   function handleSubmitClick() {
-    console.log(`decoded: ${puzzle?.encoding.decodeText(bits)}`);
-    if (puzzle?.encoding.decodeText(bits) == puzzle?.winText) {
-      onWin?.();
+    if (!puzzle) {
+      console.error('Missing puzzle');
+      return;
+    } else {
+      const winBits = puzzle.encoding.encodeText(puzzle.winText);
+      const newJudgment = puzzle.encoding.judgeBits(bits, winBits);
+      if (newJudgment.isCorrect) {
+        onWin?.();
+      } else {
+        setJudgment(newJudgment);
+      }
     }
   }
 }

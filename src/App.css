@@ -31,9 +31,11 @@ div.encodingInputs > button {
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -61,9 +63,43 @@ div.encodingInputs > button {
   color: #888;
 }
 
-.bit-checkbox {
-  width: 30px;
+.bit-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.bit-checkbox span::before {
+  content: "\2713"; /* Unicode check mark */
+  display: block;
+  text-align: center;
+  line-height: 30px; /* Adjust based on your design */
+}
+
+input[type="checkbox"]:checked + span::before {
+  color: black; /* Show check mark when checked */
+}
+
+.bit-checkbox.unknown span::before,
+.bit-checkbox.incorrect span::before {
+  content: "\2717"; /* Unicode cross mark for different states, if desired */
+}
+
+.bit-checkbox span {
   height: 30px;
+  width: 30px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.bit-checkbox.unknown span {
+  background-color: #d4b759;
+}
+
+.bit-checkbox.incorrect span {
+  background-color: #5c287a;
+}
+
+.bit-checkbox.correct span {
+  background-color: #228181;
 }
 
 .stickyContainer {

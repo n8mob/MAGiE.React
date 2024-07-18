@@ -169,6 +169,11 @@ class VariableWidthEncoder implements BinaryEncoder {
       }
     }
 
+    if (allCorrect) {
+      if (!nextWin.done || !nextGuess.done) {
+        allCorrect = false;
+      }
+    }
 
     return new FullJudgment<Bits>(
       allCorrect,
