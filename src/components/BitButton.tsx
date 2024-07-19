@@ -2,11 +2,13 @@ import React from "react";
 
 interface BitButtonProps {
   bit: string,
+  rowIndex: number,
+  bitIndex: number,
   isCorrect: boolean,
   onChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
-const BitButton: React.FC<BitButtonProps> = ({bit, isCorrect, onChange}) => {
+const BitButton: React.FC<BitButtonProps> = ({bit, rowIndex, bitIndex, isCorrect, onChange}) => {
   let className = "bit-checkbox bit-button";
   const isBitOn = bit === "1";
   if (isBitOn) {
@@ -21,9 +23,13 @@ const BitButton: React.FC<BitButtonProps> = ({bit, isCorrect, onChange}) => {
 
   return (
     <>
-      <label className={className}></label>
-      <input type="checkbox" checked={isBitOn} onChange={onChange}/>
-      <span></span> {/* This span is used for custom checkbox styling */}
+      <input type="checkbox"
+             className={className}
+             checked={isBitOn}
+             onChange={onChange}
+             data-row-index={rowIndex}
+             data-bit-index={bitIndex}
+      />
     </>
   );
 }

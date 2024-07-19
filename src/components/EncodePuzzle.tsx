@@ -13,7 +13,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   const [guessBits, setGuessBits] = useState("");
   const [winBits, setWinBits] = useState<string>("");
   const [judgment, setJudgment] = useState(new FullJudgment<Bits>(false, "", []));
-  const [bitsByChar, setBitsByChar] = useState<string[]>([]);
+  const [bitRows, setBitRows] = useState<string[]>([]);
 
   // initialize guessBits and winBits when the puzzle changes
   useEffect(() => {
@@ -33,12 +33,12 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
     setGuessBits(guessBits.slice(0, -1));
   }, [guessBits]);
 
-  const updateBit = useCallback((charIndex: number, bitIndex: number, newBitValue: string) => {
-    const prevCharBits = [...bitsByChar[charIndex]];
+  const updateBit = useCallback((bitRowIndex: number, bitIndex: number, newBitValue: string) => {
+    const prevCharBits = [...bitRows[bitRowIndex]];
     prevCharBits[bitIndex] = newBitValue;
-    bitsByChar[charIndex] = prevCharBits.join('');
-    setGuessBits(bitsByChar.join(''));
-  }, [bitsByChar]);
+    bitRows[bitRowIndex] = prevCharBits.join('');
+    setGuessBits(bitRows.join(''));
+  }, [bitRows]);
 
   // Listen for key presses
   useEffect(() => {
@@ -92,7 +92,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
         newBitsByChar.push(nextRow.value.display);
         nextRow = splitRows?.next();
       }
-      setBitsByChar(newBitsByChar);
+      setBitRows(newBitsByChar);
     }
   }, [puzzle, guessBits]);
 
@@ -104,19 +104,19 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
         <input type="button" className="bitInput" value="⌫" onClick={deleteBit}/>
       </p>
     </div>
-    {bitsByChar.map((charBits: string, charIndex: number) => {
+    {bitRows.map((rowBits: string, rowIndex: number) => {
         let isCharCorrect = false;
-        if (judgment && judgment.charJudgments && judgment.charJudgments.length > charIndex) {
-          isCharCorrect = judgment.charJudgments[charIndex].isCharCorrect;
+        if (judgment && judgment.charJudgments && judgment.charJudgments.length > rowIndex) {
+          isCharCorrect = judgment.charJudgments[rowIndex].isCharCorrect;
         }
 
-        return <p key={`char${charIndex}`}>
-          {[...charBits].map((bit, bitIndex) => (
+        return <p key={`char${rowIndex}`}>
+          {[...rowBits].map((bit, bitIndex) => (
             <BitButton
-              key={`${charIndex}-${bitIndex}`}
+              key={`${rowIndex}-${bitIndex}`}
               bit={bit}
-              data-char-index={charIndex}
-              data-bit-index={bitIndex}
+              rowIndex={rowIndex}
+              bitIndex={bitIndex}
               isCorrect={isCharCorrect}
               onChange={handleBitClick}
             />))}
