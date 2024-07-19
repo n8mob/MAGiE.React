@@ -33,6 +33,13 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
     setGuessBits(guessBits.slice(0, -1));
   }, [guessBits]);
 
+  const updateBit = useCallback((charIndex: number, bitIndex: number, newBitValue: string) => {
+    const prevCharBits = [...bitsByChar[charIndex]];
+    prevCharBits[bitIndex] = newBitValue;
+    bitsByChar[charIndex] = prevCharBits.join('');
+    setGuessBits(bitsByChar.join(''));
+  }, [bitsByChar]);
+
   // Listen for key presses
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -134,11 +141,10 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
       return;
     }
 
-    const bitIndex = parseInt(event.currentTarget.getAttribute("data-bit-index") || "0");
     const charIndex = parseInt(event.currentTarget.getAttribute("data-char-index") || "0");
-    const newBits = [...bitsByChar[charIndex]];
-    newBits[bitIndex] = event.currentTarget.checked ? "1" : "0";
-    bitsByChar[charIndex] = newBits.join('');
+    const bitIndex = parseInt(event.currentTarget.getAttribute("data-bit-index") || "0");
+
+    updateBit(charIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
   }
 
   function handleSubmitClick() {
