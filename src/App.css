@@ -64,7 +64,6 @@ div.encodingInputs > button {
 }
 
 .bit-checkbox input[type="checkbox"] {
-  display: none;
 }
 
 .bit-checkbox span::before {

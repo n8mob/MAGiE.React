@@ -1,4 +1,4 @@
-import {BinaryEncoder} from "./BinaryEncoder.ts";
+import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
 import FullJudgment from "./FullJudgment.ts";
 import CharJudgment, {Bits, Chars} from "./CharJudgment.ts";
 
@@ -62,7 +62,7 @@ class VariableWidthEncoder implements BinaryEncoder {
     let prev = "";
     let nextSplit = encodedSplit.next();
 
-    while(!nextSplit.done) {
+    while (!nextSplit.done) {
       const next = nextSplit.value;
       if (prev && prev[prev.length - 1] === next[0] && next[0] !== this.characterSeparator) {
         encodedText += this.characterSeparator;
@@ -123,6 +123,18 @@ class VariableWidthEncoder implements BinaryEncoder {
       tokenStart = tokenEnd;
     }
     return bits.slice(tokenStart);
+  }
+
+  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
+    let display = "";
+    let remaining = bits;
+    while (remaining.length > displayWidth) {
+      display = remaining.slice(0, displayWidth);
+      remaining = remaining.slice(displayWidth);
+      yield new DisplayRow(display, "");
+    }
+    yield new DisplayRow(remaining, "");
+    return;
   }
 
   judgeBits(guessBits: string, winBits: string): FullJudgment<Bits> {
