@@ -1,4 +1,4 @@
-import {BinaryEncoder} from "./BinaryEncoder.ts";
+import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
 import {Bits, Chars} from "./CharJudgment.ts";
 import FullJudgment from "./FullJudgment.ts";
 
@@ -62,6 +62,12 @@ class FixedWidthEncoder implements BinaryEncoder {
     return [...textToEncode].map(char => this.encodeChar(char)).join('');
   }
 
+  * encodeAndSplit(decoded: string): Generator<string, void> {
+    for (const char of decoded) {
+      yield this.encodeChar(char);
+    }
+  }
+
   /**
    * Yields chunked strings of bits by splitting the given string
    * into chunks of the width defined for this `FixedWidth` encoding.
@@ -82,10 +88,24 @@ class FixedWidthEncoder implements BinaryEncoder {
     return bits.slice(start);
   }
 
-  * encodeAndSplit(decoded: string): Generator<string, void> {
-    for (const char of decoded) {
-      yield this.encodeChar(char);
+  /**
+   * Yields a `DisplayRow` for each row of bits in the given string.
+   * @param bits The string of bits to be split.
+   * @param displayWidth The width of each row.
+   * @returns A generator yielding `DisplayRow` objects.
+   */
+  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
+    let start = 0;
+    let end = 0;
+
+    while (start < bits.length) {
+      end = start + displayWidth;
+      const bitsForRow = bits.slice(start, end);
+      yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow));
+      start = end;
     }
+
+    return;
   }
 
   judgeBits(guessBits: string, winBits: string): FullJudgment<Bits> {
