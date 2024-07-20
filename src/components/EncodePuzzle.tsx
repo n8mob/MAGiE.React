@@ -50,7 +50,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
     newDisplayRows.push(...displayRows.slice(bitRowIndex + 1));
     setDisplayRows(newDisplayRows);
 
-    setGuessBits(displayRows.map(displayRow => displayRow.bits).join(''));
+    setGuessBits(newDisplayRows.map(displayRow => displayRow.bits).join(''));
   }, [displayRows, displayWidth, puzzle?.encoding]);
 
   // Listen for key presses
