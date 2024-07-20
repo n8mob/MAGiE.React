@@ -103,10 +103,10 @@ class VariableWidthEncoder implements BinaryEncoder {
    * @implNote omits the character separator
    * @param bits
    */
-  * splitEncodedBits(bits: string): Generator<string, string> {
+  * splitEncodedBits(bits: string): Generator<string, void> {
     let tokenStart = 0;
     if (!bits) {
-      return "";
+      return;
     }
 
     while (tokenStart < bits.length) {
@@ -122,16 +122,18 @@ class VariableWidthEncoder implements BinaryEncoder {
       }
       tokenStart = tokenEnd;
     }
-    return bits.slice(tokenStart);
+    const lastCharacter = bits.slice(tokenStart);
+    yield lastCharacter;
+    return;
   }
 
   * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
-    let display = "";
+    let displayBits = "";
     let remaining = bits;
-    while (remaining.length > displayWidth) {
-      display = remaining.slice(0, displayWidth);
+    while (remaining.length >= displayWidth) {
+      displayBits = remaining.slice(0, displayWidth);
       remaining = remaining.slice(displayWidth);
-      yield new DisplayRow(display, "");
+      yield new DisplayRow(displayBits, "");
     }
     yield new DisplayRow(remaining, "");
     return;

@@ -3,17 +3,19 @@ import React, {useEffect, useState, useCallback} from "react";
 import FullJudgment from "../FullJudgment.ts";
 import {Bits} from "../CharJudgment.ts";
 import BitButton from "./BitButton.tsx";
+import {DisplayRow} from "../BinaryEncoder.ts";
 
 interface EncodePuzzleProps {
   puzzle?: Puzzle;
+  displayWidth: number;
   onWin: () => void;
 }
 
-const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
+const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}) => {
   const [guessBits, setGuessBits] = useState("");
   const [winBits, setWinBits] = useState<string>("");
   const [judgment, setJudgment] = useState(new FullJudgment<Bits>(false, "", []));
-  const [bitRows, setBitRows] = useState<string[]>([]);
+  const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
 
   // initialize guessBits and winBits when the puzzle changes
   useEffect(() => {
@@ -34,11 +36,22 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
   }, [guessBits]);
 
   const updateBit = useCallback((bitRowIndex: number, bitIndex: number, newBitValue: string) => {
-    const prevCharBits = [...bitRows[bitRowIndex]];
-    prevCharBits[bitIndex] = newBitValue;
-    bitRows[bitRowIndex] = prevCharBits.join('');
-    setGuessBits(bitRows.join(''));
-  }, [bitRows]);
+    const rowBits = displayRows[bitRowIndex].bits;
+    const newRowBits = rowBits.slice(0, bitIndex) + newBitValue + rowBits.slice(bitIndex + 1);
+    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
+    const newDisplayRows = displayRows.slice(0, bitRowIndex);
+
+    let newDisplayRow = newDisplayRowSplit?.next();
+    while (newDisplayRow && !newDisplayRow.done) {
+      newDisplayRows.push(newDisplayRow.value);
+      newDisplayRow = newDisplayRowSplit?.next();
+    }
+
+    newDisplayRows.push(...displayRows.slice(bitRowIndex + 1));
+    setDisplayRows(newDisplayRows);
+
+    setGuessBits(displayRows.map(displayRow => displayRow.bits).join(''));
+  }, [displayRows, displayWidth, puzzle?.encoding]);
 
   // Listen for key presses
   useEffect(() => {
@@ -81,20 +94,20 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
     }
   }, [puzzle, guessBits, winBits]);
 
-  // Update bitsByChar when guessBits changes
+  // Update displayRows when guessBits changes
   useEffect(() => {
     if (puzzle && guessBits) {
-      const splitRows = puzzle.encoding.splitForDisplay(guessBits, 13);
+      const splitRows = puzzle.encoding.splitForDisplay(guessBits, displayWidth);
       let nextRow = splitRows?.next();
-      const newBitsByChar: string[] = [];
+      const newBitsByChar: DisplayRow[] = [];
       while (!nextRow.done) {
-        console.log("next row of bits", nextRow.value.display);
-        newBitsByChar.push(nextRow.value.display);
+        console.log("next row of bits", nextRow.value.bits);
+        newBitsByChar.push(nextRow.value);
         nextRow = splitRows?.next();
       }
-      setBitRows(newBitsByChar);
+      setDisplayRows(newBitsByChar);
     }
-  }, [puzzle, guessBits]);
+  }, [puzzle, guessBits, displayWidth]);
 
   return <>
     <div className="encodingInputs stickyContainer">
@@ -104,14 +117,14 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, onWin}) => {
         <input type="button" className="bitInput" value="⌫" onClick={deleteBit}/>
       </p>
     </div>
-    {bitRows.map((rowBits: string, rowIndex: number) => {
+    {displayRows.map((displayRow: DisplayRow, rowIndex: number) => {
         let isCharCorrect = false;
         if (judgment && judgment.charJudgments && judgment.charJudgments.length > rowIndex) {
           isCharCorrect = judgment.charJudgments[rowIndex].isCharCorrect;
         }
 
         return <p key={`char${rowIndex}`}>
-          {[...rowBits].map((bit, bitIndex) => (
+          {[...displayRow.bits].map((bit, bitIndex) => (
             <BitButton
               key={`${rowIndex}-${bitIndex}`}
               bit={bit}

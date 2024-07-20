@@ -2,11 +2,11 @@ import FullJudgment from "./FullJudgment";
 import {Bits, Chars} from "./CharJudgment.ts";
 
 class DisplayRow {
-  display: string;
+  bits: string;
   annotation: string;
 
   constructor(bits: string, annotation: string = "") {
-    this.display = bits;
+    this.bits = bits;
     this.annotation = annotation;
   }
 }
@@ -22,9 +22,9 @@ interface BinaryEncoder {
 
   encodeAndSplit(decoded: string): Generator<string, void, unknown>;
 
-  splitEncodedBits(bits: string): Generator<string, string, unknown>;
+  splitEncodedBits(bits: string): Generator<string, void, unknown>;
 
-  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void>;
+  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void, unknown>;
 
   judgeBits(guessBits: string, winBits: string): FullJudgment<Bits>;
 

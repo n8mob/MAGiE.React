@@ -66,6 +66,7 @@ class FixedWidthEncoder implements BinaryEncoder {
     for (const char of decoded) {
       yield this.encodeChar(char);
     }
+    return;
   }
 
   /**
@@ -75,7 +76,7 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  * splitEncodedBits(bits: string): Generator<string, string> {
+  * splitEncodedBits(bits: string): Generator<string, void> {
     let start = 0;
     let end = 0;
 
@@ -85,7 +86,8 @@ class FixedWidthEncoder implements BinaryEncoder {
       start = end;
     }
 
-    return bits.slice(start);
+    yield bits.slice(start);
+    return;
   }
 
   /**
@@ -97,6 +99,10 @@ class FixedWidthEncoder implements BinaryEncoder {
   * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
     let end = 0;
+
+    if (displayWidth < this.width) {
+      throw new Error(`'displayWidth' must be greater than or equal to the width of the encoding: ${this.width}`);
+    }
 
     while (start < bits.length) {
       end = start + displayWidth;
