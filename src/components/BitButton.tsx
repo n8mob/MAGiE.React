@@ -9,24 +9,16 @@ interface BitButtonProps {
 }
 
 const BitButton: React.FC<BitButtonProps> = ({bit, rowIndex, bitIndex, isCorrect, onChange}) => {
-  let className = "bit-checkbox bit-button";
   const isBitOn = bit === "1";
-  if (isBitOn) {
-    className += " bit-on";
-  }
-
-  if (isCorrect) {
-    className += " bit-correct";
-  } else {
-    className += " bit-incorrect";
-  }
 
   return (
     <>
       <input type="checkbox"
-             className={className}
-             checked={isBitOn}
+             className={"bit-checkbox"}
              onChange={onChange}
+             checked={isBitOn}
+             data-bit-value={bit}
+             data-judgment={isCorrect ? "correct" : "incorrect"}
              data-row-index={rowIndex}
              data-bit-index={bitIndex}
       />

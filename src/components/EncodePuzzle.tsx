@@ -110,7 +110,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }, [puzzle, guessBits, displayWidth]);
 
   return <>
-    <div className="encodingInputs stickyContainer">
+    <div className="encoding-inputs sticky-container">
       <p>
         <input type="button" className="bitInput" value="0" onClick={() => addBit("0")}/>
         <input type="button" className="bitInput" value="1" onClick={() => addBit("1")}/>
@@ -154,10 +154,10 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
       return;
     }
 
-    const charIndex = parseInt(event.currentTarget.getAttribute("data-char-index") || "0");
+    const rowIndex = parseInt(event.currentTarget.getAttribute("data-row-index") || "0");
     const bitIndex = parseInt(event.currentTarget.getAttribute("data-bit-index") || "0");
 
-    updateBit(charIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
+    updateBit(rowIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
   }
 
   function handleSubmitClick() {
