@@ -26,7 +26,7 @@ interface BinaryEncoder {
 
   splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void, unknown>;
 
-  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string, sequenceArgument: never): FullJudgment<T>;
+  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string, splitterArgument: unknown): FullJudgment<T>;
 
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
 }

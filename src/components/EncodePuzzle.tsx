@@ -22,6 +22,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
     if (puzzle && puzzle.type == "Encode") {
       setGuessBits(puzzle.encoding.encodeText(puzzle.init));
       setWinBits(puzzle.encoding.encodeText(puzzle.winText));
+      setJudgment(new FullJudgment(false, "", []));
     }
   }, [puzzle]);
 
@@ -32,13 +33,14 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }, []);
 
   const deleteBit = useCallback(() => {
-    setGuessBits(guessBits.slice(0, -1));
+    const shorterByOne = guessBits.slice(0, -1);
+    setGuessBits(shorterByOne);
   }, [guessBits]);
 
   const updateBit = useCallback((bitRowIndex: number, bitIndex: number, newBitValue: string) => {
     const rowBits = displayRows[bitRowIndex].bits;
     const newRowBits = rowBits.slice(0, bitIndex) + newBitValue + rowBits.slice(bitIndex + 1);
-    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(displayWidth, newRowBits);
+    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
     const newDisplayRows = displayRows.slice(0, bitRowIndex);
 
     let newDisplayRow = newDisplayRowSplit?.next();
@@ -87,17 +89,22 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   // Update judgment when guessBits or winBits changes
   useEffect(() => {
     if (puzzle && guessBits && winBits) {
-      const judgment = puzzle?.encoding.judgeBits(guessBits, puzzle.encoding.encodeText(puzzle.winText));
+      const judgment = puzzle?.encoding.judgeBits(
+        guessBits,
+        puzzle.encoding.encodeText(puzzle.winText),
+        displayWidth
+      );
+
       if (judgment) {
         setJudgment(judgment);
       }
     }
-  }, [puzzle, guessBits, winBits]);
+  }, [puzzle, guessBits, winBits, displayWidth]);
 
   // Update displayRows when guessBits changes
   useEffect(() => {
     if (puzzle && guessBits) {
-      const splitRows = puzzle.encoding.splitForDisplay(displayWidth, guessBits);
+      const splitRows = puzzle.encoding.splitForDisplay(guessBits, displayWidth);
       let nextRow = splitRows?.next();
       const newBitsByChar: DisplayRow[] = [];
       while (!nextRow.done) {
@@ -157,7 +164,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
       console.error('Missing puzzle');
       return;
     } else {
-      const newJudgment = puzzle.encoding.judgeBits(guessBits, winBits);
+      const newJudgment = puzzle.encoding.judgeBits(guessBits, winBits, displayWidth);
       if (newJudgment.isCorrect) {
         onWin?.();
       } else {

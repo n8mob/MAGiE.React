@@ -96,7 +96,7 @@ export default class FixedWidthEncoder implements BinaryEncoder {
    * @param bits The string of bits to be split.
    * @returns A generator yielding `DisplayRow` objects.
    */
-  * splitForDisplay(displayWidth: number, bits: string): Generator<DisplayRow, void, unknown> {
+  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
     let end = 0;
 

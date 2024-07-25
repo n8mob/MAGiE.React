@@ -33,7 +33,7 @@ function App() {
         Object.values(menuData.categories).map((category: Category) => {
           category.levels.map((level: Level) => {
             level.puzzles.map((puzzle: Puzzle) => {
-              puzzle.encoding = menuData.encodingProviders.get(puzzle.encoding_name)!;
+              puzzle.encoding = menuData.encodingProviders[puzzle.encoding_name];
             });
           });
         });

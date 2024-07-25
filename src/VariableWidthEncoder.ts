@@ -176,7 +176,6 @@ export default class VariableWidthEncoder implements BinaryEncoder {
         sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
         nextGuess = guessSplit.next();
       } else {
-        console.log(`nextGuess: ${sequenceGuessBits}\tnextWin: ${nextWin.value}`);
         let sequenceWinBits: string;
         if (nextWin.value instanceof DisplayRow) {
           sequenceWinBits = nextWin.value.bits;
