@@ -1,6 +1,8 @@
-import {BinaryEncoder} from "./BinaryEncoder.ts";
+import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
+import FullJudgment from "./FullJudgment.ts";
+import {CharJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
 
-class FixedWidthEncoder implements BinaryEncoder {
+export default class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
   public readonly encoding: Record<string, number>;
   public readonly decoding: Record<number, string>;
@@ -60,6 +62,13 @@ class FixedWidthEncoder implements BinaryEncoder {
     return [...textToEncode].map(char => this.encodeChar(char)).join('');
   }
 
+  * encodeAndSplit(decoded: string): Generator<string, void> {
+    for (const char of decoded) {
+      yield this.encodeChar(char);
+    }
+    return;
+  }
+
   /**
    * Yields chunked strings of bits by splitting the given string
    * into chunks of the width defined for this `FixedWidth` encoding.
@@ -67,7 +76,7 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  *splitEncodedBits(bits: string): Generator<string, string, unknown> {
+  * splitByChar(bits: string): Generator<string, void> {
     let start = 0;
     let end = 0;
 
@@ -77,14 +86,40 @@ class FixedWidthEncoder implements BinaryEncoder {
       start = end;
     }
 
-    return bits.slice(start);
+    yield bits.slice(start);
+    return;
   }
 
-  *encodeAndSplit(decoded: string): Generator<string, void, unknown> {
-    for (const char of decoded) {
-      yield this.encodeChar(char);
+  /**
+   * Yields a `DisplayRow` for each row of bits in the given string.
+   * @param displayWidth The width of each row.
+   * @param bits The string of bits to be split.
+   * @returns A generator yielding `DisplayRow` objects.
+   */
+  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
+    let start = 0;
+    let end = 0;
+
+    if (displayWidth < this.width) {
+      throw new Error(`'displayWidth' must be greater than or equal to the width of the encoding: ${this.width}`);
     }
-  }
-}
 
-export {FixedWidthEncoder};
+    while (start < bits.length) {
+      end = start + displayWidth;
+      const bitsForRow = bits.slice(start, end);
+      yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow));
+      start = end;
+    }
+
+    return;
+  }
+
+  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string): FullJudgment<T> {
+    throw new Error(`Method not implemented.\t'guessBits': ${guessBits}\t'winBits': ${winBits}`);
+  }
+
+  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
+    throw new Error(`Method not implemented.\t'guessText': ${guessText}\t'winText': ${winText}`);
+  }
+
+}

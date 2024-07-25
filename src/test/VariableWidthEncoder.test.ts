@@ -1,5 +1,7 @@
-import {VariableWidthEncoder} from "../VariableWidthEncoder.ts";
+import VariableWidthEncoder from "../VariableWidthEncoder.ts";
 import {describe, expect, it, beforeEach} from "vitest";
+import {CharJudgment, DisplayRowJudgment} from "../SequenceJudgment.ts";
+import FullJudgment from "../FullJudgment.ts";
 
 const simple3Bit = {
   "1": {
@@ -97,5 +99,79 @@ describe('VariableWidthEncoder', () => {
     const encoded = '1111';
     const actual = unitUnderTest.decodeText(encoded);
     expect(actual).toEqual(expected);
+  });
+
+  it("should decode a string with a space", () => {
+    const encodedSentence = "10011101011000";
+    const expected = "A CAB.";
+    const actual = unitUnderTest.decodeText(encodedSentence);
+    expect(actual).toEqual(expected);
+  });
+
+  it("should encode period after text as '000'", () => {
+    const text = "A CAB.";
+    const expected = "10011101011000";
+    const actual = unitUnderTest.encodeText(text);
+    expect(actual).toEqual(expected);
+  });
+
+  it("should split whenever symbols change", () => {
+    const encoded = "10011101011000"; // 'A CAB.'
+    const expected = ["1", "00", "111", "1", "11", "000"]
+    const actual = [...unitUnderTest.splitByChar(encoded)];
+    expect(actual).toEqual(expected);
+  });
+
+  it("should split encoded text the same as raw bits", () => {
+    const rawBits = "10011101011000";
+    const text = "A CAB.";
+    expect(unitUnderTest.decodeText(rawBits)).toEqual(text);
+
+    const expectedSplit = ["1", "00", "111", "1", "11", "000"]
+
+    const splitFromBits: string[] = [...unitUnderTest.splitByChar(rawBits)];
+    expect(splitFromBits).toEqual(expectedSplit);
+
+    const splitFromText = [...unitUnderTest.encodeAndSplit(text)];
+    expect(splitFromText).toEqual(splitFromBits);
+    expect(splitFromText).toEqual(expectedSplit);
+  });
+
+  it("should judge a single correct character", () => {
+    const guessBits = "1111";
+    const bitJudgments = "1111";
+    const winBits = "1111"
+    const rowJudgment = new DisplayRowJudgment(guessBits, bitJudgments);
+    const expected = new FullJudgment(
+      true,
+      guessBits,
+      [rowJudgment]);
+    const actual = unitUnderTest.judgeBits(guessBits, winBits, 13);
+    expect(actual).toEqual(expected);
+  });
+
+  it("should judge a string of correct characters", () => {
+    const guessText = "A CAB.";
+    const winText = "A CAB.";
+    const expected = new FullJudgment(true, "A CAB.", [
+      new CharJudgment("1", "1"),
+      new CharJudgment("00", "11"),
+      new CharJudgment("111", "111"),
+      new CharJudgment("1", "1"),
+      new CharJudgment("11", "11"),
+      new CharJudgment("000", "111"),
+    ]);
+    const actual = unitUnderTest.judgeText(guessText, winText);
+    expect(actual).toBeInstanceOf(FullJudgment<CharJudgment>);
+    // make sure getCharJudgments is not empty and has the right elements in it.
+    const expectedCharJudgments = expected.getCharJudgments();
+    const actualCharJudgments = actual.getCharJudgments();
+    let nextExpected = expectedCharJudgments.next();
+    let nextActual = actualCharJudgments.next();
+    while (!nextExpected.done) {
+      expect(nextActual.value).toEqual(nextExpected.value);
+      nextActual = actualCharJudgments.next();
+      nextExpected = expectedCharJudgments.next();
+    }
   });
 });
