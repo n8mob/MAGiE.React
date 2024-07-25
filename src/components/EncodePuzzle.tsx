@@ -1,9 +1,9 @@
 import {Puzzle} from "../Menu.ts";
 import React, {useEffect, useState, useCallback} from "react";
 import FullJudgment from "../FullJudgment.ts";
-import {Bits} from "../CharJudgment.ts";
 import BitButton from "./BitButton.tsx";
 import {DisplayRow} from "../BinaryEncoder.ts";
+import {SequenceJudgment} from "../SequenceJudgment.ts";
 
 interface EncodePuzzleProps {
   puzzle?: Puzzle;
@@ -14,7 +14,7 @@ interface EncodePuzzleProps {
 const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}) => {
   const [guessBits, setGuessBits] = useState("");
   const [winBits, setWinBits] = useState<string>("");
-  const [judgment, setJudgment] = useState(new FullJudgment<Bits>(false, "", []));
+  const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
   const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
 
   // initialize guessBits and winBits when the puzzle changes
@@ -38,7 +38,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   const updateBit = useCallback((bitRowIndex: number, bitIndex: number, newBitValue: string) => {
     const rowBits = displayRows[bitRowIndex].bits;
     const newRowBits = rowBits.slice(0, bitIndex) + newBitValue + rowBits.slice(bitIndex + 1);
-    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
+    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(displayWidth, newRowBits);
     const newDisplayRows = displayRows.slice(0, bitRowIndex);
 
     let newDisplayRow = newDisplayRowSplit?.next();
@@ -97,7 +97,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   // Update displayRows when guessBits changes
   useEffect(() => {
     if (puzzle && guessBits) {
-      const splitRows = puzzle.encoding.splitForDisplay(guessBits, displayWidth);
+      const splitRows = puzzle.encoding.splitForDisplay(displayWidth, guessBits);
       let nextRow = splitRows?.next();
       const newBitsByChar: DisplayRow[] = [];
       while (!nextRow.done) {
@@ -110,33 +110,25 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }, [puzzle, guessBits, displayWidth]);
 
   return <>
-    <div className="encoding-inputs sticky-container">
-      <p>
-        <input type="button" className="bitInput" value="0" onClick={() => addBit("0")}/>
-        <input type="button" className="bitInput" value="1" onClick={() => addBit("1")}/>
-        <input type="button" className="bitInput" value="⌫" onClick={deleteBit}/>
-      </p>
-    </div>
-    {displayRows.map((displayRow: DisplayRow, rowIndex: number) => {
-        let isCharCorrect = false;
-        if (judgment && judgment.charJudgments && judgment.charJudgments.length > rowIndex) {
-          isCharCorrect = judgment.charJudgments[rowIndex].isCharCorrect;
+    <div className="display">
+      {[...judgment.sequenceJudgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
+          return <p key={`row${rowIndex}`}>
+            {[...rowJudgment.bitJudgments].map((bitJudgment, bitRowIndex) => {
+              return (
+                <BitButton
+                  key={`${rowIndex}-${bitRowIndex}`}
+                  bit={bitJudgment.bit}
+                  sequenceIndex={bitJudgment.sequenceIndex}
+                  bitIndex={bitJudgment.bitIndex}
+                  isCorrect="unknown"
+                  onChange={handleBitClick}
+                />);
+            })}
+          </p>;
         }
-
-        return <p key={`char${rowIndex}`}>
-          {[...displayRow.bits].map((bit, bitIndex) => (
-            <BitButton
-              key={`${rowIndex}-${bitIndex}`}
-              bit={bit}
-              rowIndex={rowIndex}
-              bitIndex={bitIndex}
-              isCorrect={isCharCorrect}
-              onChange={handleBitClick}
-            />))}
-        </p>;
+      )
       }
-    )
-    }
+    </div>
     <div className="encodingInputs">
       <p>
         <input type="button" className="bitInput" value="0" onClick={() => addBit("0")}/>

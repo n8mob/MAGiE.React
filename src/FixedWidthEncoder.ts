@@ -1,8 +1,8 @@
 import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
-import {Bits, Chars} from "./CharJudgment.ts";
 import FullJudgment from "./FullJudgment.ts";
+import {CharJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
 
-class FixedWidthEncoder implements BinaryEncoder {
+export default class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
   public readonly encoding: Record<string, number>;
   public readonly decoding: Record<number, string>;
@@ -76,7 +76,7 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @returns A generator yielding chunks of bits.
    * @see constructor for the `width` parameter.
    */
-  * splitEncodedBits(bits: string): Generator<string, void> {
+  * splitByChar(bits: string): Generator<string, void> {
     let start = 0;
     let end = 0;
 
@@ -92,11 +92,11 @@ class FixedWidthEncoder implements BinaryEncoder {
 
   /**
    * Yields a `DisplayRow` for each row of bits in the given string.
-   * @param bits The string of bits to be split.
    * @param displayWidth The width of each row.
+   * @param bits The string of bits to be split.
    * @returns A generator yielding `DisplayRow` objects.
    */
-  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
+  * splitForDisplay(displayWidth: number, bits: string): Generator<DisplayRow, void, unknown> {
     let start = 0;
     let end = 0;
 
@@ -114,14 +114,12 @@ class FixedWidthEncoder implements BinaryEncoder {
     return;
   }
 
-  judgeBits(guessBits: string, winBits: string): FullJudgment<Bits> {
+  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string): FullJudgment<T> {
     throw new Error(`Method not implemented.\t'guessBits': ${guessBits}\t'winBits': ${winBits}`);
   }
 
-  judgeText(guessText: string, winText: string): FullJudgment<Chars> {
+  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
     throw new Error(`Method not implemented.\t'guessText': ${guessText}\t'winText': ${winText}`);
   }
 
 }
-
-export {FixedWidthEncoder};

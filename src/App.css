@@ -7,6 +7,8 @@
 
 body {
   font-family: Menlo, Consolas, monospace;
+  font-size: large;
+  background-color: #AEAEAE;
 }
 
 p {
@@ -15,7 +17,6 @@ p {
 }
 
 div.display > p, li, input {
-  font-family: "Verily Serif Mono", "Courier", monospace;
   text-align: justify;
   text-transform: uppercase;
   margin: 1px;
@@ -25,17 +26,22 @@ div.encoding-inputs > button {
   padding: 10px;
 }
 
+div.display {
+  background-color: #AEAEAE;
+}
+
 input.bit-checkbox {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   display: inline-block;
-  width: 64px; /* to match the bit images */
-  height: 64px;
+  width: 32px; /* to match the bit images */
+  height: 32px;
   background-image: url('assets/Bit_off_Yellow.png');
   background-size: cover;
   cursor: pointer; /* "pointer" is the 'this is a link' finger pointer */
   image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
 }
 
 input.bit-checkbox:checked {

@@ -1,14 +1,22 @@
 import React from "react";
+import {Correctness} from "../BitJudgment.ts";
 
 interface BitButtonProps {
   bit: string,
-  rowIndex: number,
+  isCorrect: Correctness,
   bitIndex: number,
-  isCorrect: boolean,
+  sequenceIndex: number | null,
   onChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
-const BitButton: React.FC<BitButtonProps> = ({bit, rowIndex, bitIndex, isCorrect, onChange}) => {
+const BitButton: React.FC<BitButtonProps> = (
+  {
+    bit,
+    isCorrect,
+    bitIndex,
+    onChange,
+    sequenceIndex = null
+  }) => {
   const isBitOn = bit === "1";
 
   return (
@@ -18,8 +26,8 @@ const BitButton: React.FC<BitButtonProps> = ({bit, rowIndex, bitIndex, isCorrect
              onChange={onChange}
              checked={isBitOn}
              data-bit-value={bit}
-             data-judgment={isCorrect ? "correct" : "incorrect"}
-             data-row-index={rowIndex}
+             data-judgment={isCorrect == true ? "correct" : isCorrect == false ? "incorrect" : "unknown"}
+             data-sequence-index={sequenceIndex}
              data-bit-index={bitIndex}
       />
     </>

@@ -1,22 +1,47 @@
-import CharJudgment, {Bits, Chars} from './CharJudgment';
+import {SequenceJudgment} from './SequenceJudgment.ts';
 
-class FullJudgment<T extends Bits | Chars> {
+class FullJudgment<T extends SequenceJudgment> {
   isCorrect: boolean;
-  correctBits: T;
-  charJudgments: CharJudgment<T>[];
+  correctGuess: string;
+  sequenceJudgments: T[];
 
-  constructor(isCorrect: boolean, correctGuess: T, charJudgments: CharJudgment<T>[] | null = null) {
+  constructor(
+    isCorrect: boolean,
+    correctGuess: string,
+    sequenceJudgments: T[]
+    ) {
     this.isCorrect = isCorrect;
-    this.correctBits = correctGuess;
-    this.charJudgments = charJudgments ? charJudgments : [];
+    this.correctGuess = correctGuess;
+    this.sequenceJudgments = sequenceJudgments;
   }
 
-  [Symbol.iterator](): Iterator<CharJudgment<T>> {
+  getCharJudgments() {
     let pointer = 0;
-    const components = this.charJudgments;
+    const components = this.sequenceJudgments;
 
     return {
-      next(): IteratorResult<CharJudgment<T>> {
+      next(): IteratorResult<SequenceJudgment> {
+        if (pointer < components.length) {
+          return {
+            done: false,
+            value: components[pointer++],
+          };
+        } else {
+          return {
+            done: true,
+            value: null,
+          };
+        }
+      },
+    };
+  }
+
+  getRowJudgments() {
+    let pointer = 0;
+    const components = this.sequenceJudgments;
+
+    return {
+      next(): IteratorResult<SequenceJudgment> {
         if (pointer < components.length) {
           return {
             done: false,
