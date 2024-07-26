@@ -103,7 +103,7 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     }
 
     while (start < bits.length) {
-      end = start + displayWidth;
+      end = start + Math.min(displayWidth, this.width);
       const bitsForRow = bits.slice(start, end);
       yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow));
       start = end;
@@ -173,5 +173,4 @@ export default class FixedWidthEncoder implements BinaryEncoder {
       newCharJudgment
     );
   }
-
 }
