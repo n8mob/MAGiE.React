@@ -1,7 +1,7 @@
 import {Puzzle} from "../Menu.ts";
 import React, {useEffect, useState, useCallback} from "react";
 import FullJudgment from "../FullJudgment.ts";
-import BitButton from "./BitButton.tsx";
+import BitButtonMatrix from "./BitButtonMatrix.tsx";
 import {DisplayRow} from "../BinaryEncoder.ts";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
 
@@ -12,19 +12,39 @@ interface EncodePuzzleProps {
 }
 
 const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}) => {
+  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
   const [guessBits, setGuessBits] = useState("");
   const [winBits, setWinBits] = useState<string>("");
   const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
   const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
 
-  // initialize guessBits and winBits when the puzzle changes
+  // Update currentPuzzle when the puzzle prop changes
   useEffect(() => {
-    if (puzzle && puzzle.type == "Encode") {
-      setGuessBits(puzzle.encoding.encodeText(puzzle.init));
-      setWinBits(puzzle.encoding.encodeText(puzzle.winText));
+    setCurrentPuzzle(puzzle);
+    setGuessBits("");
+    setWinBits("");
+    setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
+    setDisplayRows([]);
+  }, [puzzle]);
+
+  // initialize guessBits and winBits when the currentPuzzle changes
+  useEffect(() => {
+    if (currentPuzzle && currentPuzzle.type == "Encode") {
+      console.log("Setting guessBits, winBits, and judgment");
+      const initialGuess = currentPuzzle.encoding.encodeText(currentPuzzle.init);
+      setGuessBits(initialGuess);
+      const newWinText = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
+      setWinBits(newWinText);
       setJudgment(new FullJudgment(false, "", []));
     }
-  }, [puzzle]);
+  }, [currentPuzzle]);
+
+  useEffect(() => {
+      if (currentPuzzle && guessBits) {
+        const newDisplayRows = currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth);
+        setDisplayRows(Array.from(newDisplayRows));
+      }
+    }, [currentPuzzle, guessBits, displayWidth]);
 
   const addBit = useCallback((bit: string) => {
     setGuessBits(previousGuessBits => {
@@ -40,7 +60,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   const updateBit = useCallback((bitRowIndex: number, bitIndex: number, newBitValue: string) => {
     const rowBits = displayRows[bitRowIndex].bits;
     const newRowBits = rowBits.slice(0, bitIndex) + newBitValue + rowBits.slice(bitIndex + 1);
-    const newDisplayRowSplit = puzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
+    const newDisplayRowSplit = currentPuzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
     const newDisplayRows = displayRows.slice(0, bitRowIndex);
 
     let newDisplayRow = newDisplayRowSplit?.next();
@@ -51,9 +71,8 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
 
     newDisplayRows.push(...displayRows.slice(bitRowIndex + 1));
     setDisplayRows(newDisplayRows);
-
     setGuessBits(newDisplayRows.map(displayRow => displayRow.bits).join(''));
-  }, [displayRows, displayWidth, puzzle?.encoding]);
+  }, [displayRows, displayWidth, currentPuzzle?.encoding]);
 
   // Listen for key presses
   useEffect(() => {
@@ -88,54 +107,24 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
 
   // Update judgment when guessBits or winBits changes
   useEffect(() => {
-    if (puzzle && guessBits && winBits) {
-      const judgment = puzzle?.encoding.judgeBits(
+    if (currentPuzzle && guessBits && winBits) {
+      const judgment = currentPuzzle?.encoding.judgeBits(
         guessBits,
-        puzzle.encoding.encodeText(puzzle.winText),
+        winBits,
         displayWidth
       );
 
-      if (judgment) {
-        setJudgment(judgment);
-      }
+      setJudgment(judgment);
     }
-  }, [puzzle, guessBits, winBits, displayWidth]);
-
-  // Update displayRows when guessBits changes
-  useEffect(() => {
-    if (puzzle && guessBits) {
-      const splitRows = puzzle.encoding.splitForDisplay(guessBits, displayWidth);
-      let nextRow = splitRows?.next();
-      const newBitsByChar: DisplayRow[] = [];
-      while (!nextRow.done) {
-        console.log("next row of bits", nextRow.value.bits);
-        newBitsByChar.push(nextRow.value);
-        nextRow = splitRows?.next();
-      }
-      setDisplayRows(newBitsByChar);
-    }
-  }, [puzzle, guessBits, displayWidth]);
+  }, [currentPuzzle, guessBits, winBits, displayWidth]);
 
   return <>
-    <div className="display">
-      {[...judgment.sequenceJudgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
-          return <p key={`row${rowIndex}`}>
-            {[...rowJudgment.bitJudgments].map((bitJudgment, bitRowIndex) => {
-              return (
-                <BitButton
-                  key={`${rowIndex}-${bitRowIndex}`}
-                  bit={bitJudgment.bit}
-                  sequenceIndex={rowIndex}
-                  bitIndex={bitJudgment.bitIndex}
-                  isCorrect={bitJudgment.isCorrect}
-                  onChange={handleBitClick}
-                />);
-            })}
-          </p>;
-        }
-      )
-      }
-    </div>
+    <BitButtonMatrix
+      key={`${currentPuzzle?.init}-${guessBits}`}
+      guessBits={guessBits}
+      judgment={judgment.sequenceJudgments}
+      handleBitClick={handleBitClick}
+    />
     <div className="encodingInputs">
       <p>
         <input type="button" className="bitInput" value="0" onClick={() => addBit("0")}/>
@@ -160,11 +149,11 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }
 
   function handleSubmitClick() {
-    if (!puzzle) {
+    if (!currentPuzzle) {
       console.error('Missing puzzle');
       return;
     } else {
-      const newJudgment = puzzle.encoding.judgeBits(guessBits, winBits, displayWidth);
+      const newJudgment = currentPuzzle.encoding.judgeBits(guessBits, winBits, displayWidth);
       if (newJudgment.isCorrect) {
         onWin?.();
       } else {
