@@ -1,5 +1,6 @@
-import {FixedWidthEncoder} from "../FixedWidthEncoder.ts";
-import {describe, expect, it, beforeEach} from "vitest";
+import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import {beforeEach, describe, expect, it} from "vitest";
+import {SequenceJudgment} from "../SequenceJudgment.ts";
 
 const hexadecimal = {
   '0': 0,
@@ -74,5 +75,18 @@ describe('FixedWidthEncoder', () => {
     const decoded = 'A1B2';
     const encoded = '1010000110110010';
     expect(unitUnderTest.decodeText(encoded)).equal(decoded);
+  });
+
+  describe('judgeBits', () => {
+    it('should judge a single correct character', () => {
+      const guess = '1010';
+      const win = '1010';
+      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win);
+      expect(judgment.isCorrect).toBe(true);
+      expect(judgment.correctGuess).toBe(guess);
+      expect(judgment.sequenceJudgments).toEqual([
+        new SequenceJudgment(guess, "1111")
+      ]);
+    });
   });
 });

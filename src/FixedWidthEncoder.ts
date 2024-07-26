@@ -85,8 +85,6 @@ export default class FixedWidthEncoder implements BinaryEncoder {
       yield bits.slice(start, end);
       start = end;
     }
-
-    yield bits.slice(start);
     return;
   }
 
@@ -115,7 +113,43 @@ export default class FixedWidthEncoder implements BinaryEncoder {
   }
 
   judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string): FullJudgment<T> {
-    throw new Error(`Method not implemented.\t'guessBits': ${guessBits}\t'winBits': ${winBits}`);
+    const sequenceJudgments: T[] = [];
+    const guessSplit = this.splitByChar(guessBits);
+    const winSplit = this.splitByChar(winBits);
+    let nextGuess = guessSplit.next();
+    let nextWin = winSplit.next();
+
+    let allCorrect = true;
+    const correctBits: string[] = [];
+
+    while(!nextGuess.done) {
+      const sequenceGuessBits = nextGuess.value;
+      if (nextWin.done) {
+        allCorrect = false;
+        sequenceJudgments.push(new SequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)) as T);
+        nextGuess = guessSplit.next();
+      } else {
+        const sequenceWinBits = nextWin.value;
+        const bitJudgments: string[] = [];
+        [...sequenceWinBits].map((bit, index) => {
+          const bitIsCorrect = bit === sequenceGuessBits[index];
+          if (allCorrect) {
+            if (bitIsCorrect) {
+              correctBits.push(bit);
+            } else {
+              allCorrect = false;
+            }
+          }
+          bitJudgments.push(bitIsCorrect ? "1" : "0");
+        });
+        sequenceJudgments.push(new SequenceJudgment(sequenceGuessBits, bitJudgments.join("")) as T);
+      }
+
+      nextGuess = guessSplit.next();
+      nextWin = winSplit.next();
+    }
+
+    return new FullJudgment<T>(allCorrect, correctBits.join(''), sequenceJudgments);
   }
 
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
