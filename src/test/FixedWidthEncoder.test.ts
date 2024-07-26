@@ -1,6 +1,6 @@
 import FixedWidthEncoder from "../FixedWidthEncoder.ts";
 import {beforeEach, describe, expect, it} from "vitest";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "../SequenceJudgment.ts";
 
 const hexadecimal = {
   '0': 0,
@@ -87,6 +87,42 @@ describe('FixedWidthEncoder', () => {
       expect(judgment.sequenceJudgments).toEqual([
         new SequenceJudgment(guess, "1111")
       ]);
+    });
+
+    it('should judge two correct display rows', () => {
+      const guess = "11111110";
+      const win = "11111110";
+      const judgment = unitUnderTest.judgeBits<DisplayRowJudgment>(guess, win);
+      expect(judgment.isCorrect).toBe(true);
+      expect(judgment.correctGuess).toBe(guess);
+      const rowJudgments = judgment.getRowJudgments();
+      let nextJudgment = rowJudgments.next();
+      while (!nextJudgment.done) {
+        expect(nextJudgment.value.isSequenceCorrect).toBe(true);
+        nextJudgment = rowJudgments.next();
+      }
+    });
+
+    it('should judge the third character as incorrect', () => {
+      const guess = "000100100100";
+      const win = "000100100011";
+      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win);
+      expect(judgment.isCorrect).toBe(false);
+      expect(judgment.correctGuess).toBe(guess.slice(0, 9));
+      const charJudgments = judgment.getCharJudgments();
+      const firstChar: CharJudgment = charJudgments.next().value;
+      expect(firstChar.isSequenceCorrect).toBe(true);
+      expect(firstChar.guess).toBe(guess.slice(0, 4));
+      const secondChar = charJudgments.next().value;
+      expect(secondChar.isSequenceCorrect).toBe(true);
+      expect(secondChar.guess).toBe(guess.slice(4, 8));
+      const thirdChar = charJudgments.next().value;
+      expect(thirdChar.isSequenceCorrect).toBe(false);
+      expect(thirdChar.guess).toBe(guess.slice(8, 12));
+      expect(thirdChar.bitJudgments[0].isCorrect).toBe(true);
+      expect(thirdChar.bitJudgments[1].isCorrect).toBe(false);
+      expect(thirdChar.bitJudgments[2].isCorrect).toBe(false);
+      expect(thirdChar.bitJudgments[3].isCorrect).toBe(false);
     });
   });
 });
