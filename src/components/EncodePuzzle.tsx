@@ -127,7 +127,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
                   bit={bitJudgment.bit}
                   sequenceIndex={bitJudgment.sequenceIndex}
                   bitIndex={bitJudgment.bitIndex}
-                  isCorrect="unknown"
+                  isCorrect={bitJudgment.isCorrect}
                   onChange={handleBitClick}
                 />);
             })}
