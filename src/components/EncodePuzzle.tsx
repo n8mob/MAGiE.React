@@ -21,6 +21,10 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   // Update currentPuzzle when the puzzle prop changes
   useEffect(() => {
     setCurrentPuzzle(puzzle);
+    setGuessBits("");
+    setWinBits("");
+    setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
+    setDisplayRows([]);
   }, [puzzle]);
 
   // initialize guessBits and winBits when the currentPuzzle changes
@@ -116,7 +120,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
 
   return <>
     <BitButtonMatrix
-      key={guessBits}
+      key={`${currentPuzzle?.init}-${guessBits}`}
       guessBits={guessBits}
       judgment={judgment.sequenceJudgments}
       handleBitClick={handleBitClick}
