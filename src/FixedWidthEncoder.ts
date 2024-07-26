@@ -112,7 +112,11 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return;
   }
 
-  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string): FullJudgment<T> {
+  _judgeBits<T extends SequenceJudgment>(
+    guessBits: string,
+    winBits: string,
+    newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(bits, judgments) as T
+  ): FullJudgment<T> {
     const sequenceJudgments: T[] = [];
     const guessSplit = this.splitByChar(guessBits);
     const winSplit = this.splitByChar(winBits);
@@ -126,7 +130,7 @@ export default class FixedWidthEncoder implements BinaryEncoder {
       const sequenceGuessBits = nextGuess.value;
       if (nextWin.done) {
         allCorrect = false;
-        sequenceJudgments.push(new SequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)) as T);
+        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
         nextGuess = guessSplit.next();
       } else {
         const sequenceWinBits = nextWin.value;
@@ -142,7 +146,7 @@ export default class FixedWidthEncoder implements BinaryEncoder {
           }
           bitJudgments.push(bitIsCorrect ? "1" : "0");
         });
-        sequenceJudgments.push(new SequenceJudgment(sequenceGuessBits, bitJudgments.join("")) as T);
+        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments.join("")));
       }
 
       nextGuess = guessSplit.next();
@@ -152,8 +156,22 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return new FullJudgment<T>(allCorrect, correctBits.join(''), sequenceJudgments);
   }
 
+  judgeBits<T extends SequenceJudgment>(
+    guessBits: string,
+    winBits: string
+  ) {
+    return this._judgeBits<T>(guessBits, winBits);
+  }
+
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
-    throw new Error(`Method not implemented.\t'guessText': ${guessText}\t'winText': ${winText}`);
+    const guessBits = this.encodeText(guessText);
+    const winBits = this.encodeText(winText);
+    const newCharJudgment = (bits: string, bitJudgments: string) => new CharJudgment(bits, bitJudgments);
+    return this._judgeBits<CharJudgment>(
+      guessBits,
+      winBits,
+      newCharJudgment
+    );
   }
 
 }

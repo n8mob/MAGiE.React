@@ -125,4 +125,17 @@ describe('FixedWidthEncoder', () => {
       expect(thirdChar.bitJudgments[3].isCorrect).toBe(false);
     });
   });
+
+  describe('judgeText', () => {
+    it('should judge a single correct character', () => {
+      const guess = 'A';
+      const win = 'A';
+      const judgment = unitUnderTest.judgeText(guess, win);
+      expect(judgment.isCorrect).toBe(true);
+      expect(judgment.correctGuess).toBe('1010');
+      expect(judgment.sequenceJudgments).toEqual([
+        new CharJudgment("1010", "1111")
+      ]);
+    });
+  });
 });
