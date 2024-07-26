@@ -125,7 +125,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
                 <BitButton
                   key={`${rowIndex}-${bitRowIndex}`}
                   bit={bitJudgment.bit}
-                  sequenceIndex={bitJudgment.sequenceIndex}
+                  sequenceIndex={rowIndex}
                   bitIndex={bitJudgment.bitIndex}
                   isCorrect={bitJudgment.isCorrect}
                   onChange={handleBitClick}
@@ -153,7 +153,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
       return;
     }
 
-    const rowIndex = parseInt(event.currentTarget.getAttribute("data-row-index") || "0");
+    const rowIndex = parseInt(event.currentTarget.getAttribute("data-sequence-index") || "0");
     const bitIndex = parseInt(event.currentTarget.getAttribute("data-bit-index") || "0");
 
     updateBit(rowIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
