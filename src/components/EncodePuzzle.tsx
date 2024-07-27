@@ -1,7 +1,7 @@
 import {Puzzle} from "../Menu.ts";
-import React, {useEffect, useState, useCallback} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import FullJudgment from "../FullJudgment.ts";
-import BitButtonMatrix from "./BitButtonMatrix.tsx";
+import DisplayMatrix from "./DisplayMatrix.tsx";
 import {DisplayRow} from "../BinaryEncoder.ts";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
 
@@ -119,12 +119,13 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }, [currentPuzzle, guessBits, winBits, displayWidth]);
 
   return <>
-    <BitButtonMatrix
+    <DisplayMatrix
       key={`${currentPuzzle?.init}-${guessBits}`}
       guessBits={guessBits}
       judgment={judgment.sequenceJudgments}
+      decodedGuess={puzzle?.encoding.decodeText(guessBits) || ""}
       handleBitClick={handleBitClick}
-    />
+      />
     <div className="encodingInputs">
       <p>
         <input type="button" className="bitInput" value="0" onClick={() => addBit("0")}/>
