@@ -6,23 +6,26 @@ import DecodePuzzle from "./DecodePuzzle.tsx";
 
 interface LevelPlayProps {
   menu: Menu | null;
+  setShowBackButton: (show: boolean) => void;
+  setBackPath: (path: string) => void;
 }
 
-const LevelPlay: React.FC<LevelPlayProps> = (
-  {
-    menu,
-  }) => {
-  const {levelNumber, puzzleId} = useParams();
+const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath }) => {
+  const { levelNumber, puzzleId } = useParams();
+  const [level, setLevel] = useState<Level | null>(null);
   const categoryName = decodeURIComponent(useParams().categoryName || "");
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
-  const [level, setLevel] = useState<Level | null>(null);
   const [winMessage, setWinMessage] = useState<string[]>([]);
   const [hasWon, setHasWon] = useState(false);
 
 
   useEffect(() => {
-    if (!categoryName) {
-      console.error('Missing category name');
+    setShowBackButton(true);
+    setBackPath(`/categories/${encodeURIComponent(categoryName)}`);
+  }, [setShowBackButton, setBackPath, categoryName]);
+
+  useEffect(() => {
+    if (!menu || !categoryName || !levelNumber) {
       return;
     }
 
@@ -91,7 +94,13 @@ const LevelPlay: React.FC<LevelPlayProps> = (
       setWinMessage([]);
       setHasWon(false);
     } else {
-      alert('End of level');
+      const genericWinMessge = [
+        "You win!",
+        "You finished",
+        "the level"];
+      const quote = ["."];
+      const closeQuote = [".", "Congrats!"]
+      setWinMessage([...genericWinMessge, ...quote, ...level.levelName, ...closeQuote]);
     }
   }
 }

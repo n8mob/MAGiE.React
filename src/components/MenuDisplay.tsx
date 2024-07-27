@@ -1,18 +1,25 @@
-import React, {Fragment} from "react";
+import React, {Fragment, useEffect} from "react";
 import {Link} from "react-router-dom";
 
 interface MenuProps {
   prompt: JSX.Element;
   options: string[];
   basePath: string;
+  setShowBackButton: (show: boolean) => void;
+  setBackPath: (path: string) => void;
 }
 
 const MenuDisplay: React.FC<MenuProps> = (
   {
     prompt,
     options,
-    basePath
+    basePath,
+    setShowBackButton: setShowBackButton
   }) => {
+  useEffect(() => {
+    setShowBackButton(false);
+  }, [setShowBackButton]);
+
   return (
     <Fragment>
     <div className="display">

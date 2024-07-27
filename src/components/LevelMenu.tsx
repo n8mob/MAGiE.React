@@ -1,28 +1,23 @@
-import React, {Fragment} from "react";
-import {useParams} from "react-router-dom";
-import {Menu, Category, Level} from "../Menu.ts";
-import {Link} from "react-router-dom";
+// In LevelMenu.tsx
+import {Link, useParams} from 'react-router-dom';
+import React, {Fragment, useEffect} from 'react';
+import {Category, Level, Menu} from '../Menu.ts';
 
 interface LevelMenuProps {
   menu: Menu | null;
+  setShowBackButton: (show: boolean) => void;
+  setBackPath: (path: string) => void;
 }
 
-const LevelMenu: React.FC<LevelMenuProps> = (
-  {
-    menu,
-  }) => {
-  const {categoryName} = useParams();
+const LevelMenu: React.FC<LevelMenuProps> = ({ menu, setShowBackButton, setBackPath }) => {
+  const categoryName = decodeURIComponent(useParams().categoryName || "");
+  const category: Category = menu?.categories[categoryName] || {levels: []};
+  const levelBaseUri = `/categories/${encodeURIComponent(categoryName)}/levels`;
 
-  if (categoryName === undefined) {
-    return <><h2>No category given</h2></>;
-  }
-
-  if (!menu || !(categoryName in menu.categories)) {
-    return <><h2>Cannot find category "{categoryName}"</h2></>;
-  }
-
-  const category: Category = menu.categories[categoryName];
-  const levelBaseUri = `/category/${encodeURIComponent(categoryName)}/levels`;
+  useEffect(() => {
+    setShowBackButton(true);
+    setBackPath('/');
+  }, [setBackPath, setShowBackButton]);
 
   return <Fragment>
     <div className="display">
