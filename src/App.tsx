@@ -8,14 +8,17 @@ import LevelMenu from "./components/LevelMenu.tsx";
 import LevelPlay from "./components/LevelPlay.tsx";
 import FixedWidthEncoder from "./FixedWidthEncoder.ts";
 import VariableWidthEncoder from "./VariableWidthEncoder.ts";
+import BackButton from "./components/BackButton.tsx";
 
 function App() {
   const [menu, setMenu] = useState<Menu | null>(null);
+  const [showBackButton, setShowBackButton] = useState(false);
+  const [backPath, setBackPath] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const menuData = await getMenu('BigGame_fromJSON');
+        const menuData = await getMenu('ReactTests');
         menuData.encodingProviders = {};
         Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
           if (encodingData.type == "fixed") {
@@ -49,23 +52,26 @@ function App() {
 
   return (
     <>
-      <h1>MAGiE</h1>
       <Router>
+        {showBackButton && backPath && <BackButton backPath={backPath} />}
+        <h1>MAGiE</h1>
         <Routes>
           <Route path="/" element={
             <>
               {menu && <MenuDisplay
                 prompt={<p>Select a category:</p>}
                 options={Object.keys(menu.categories)}
-                basePath="/category"/>
-              }
+                basePath="/categories"
+                setShowBackButton={setShowBackButton}
+                setBackPath={setBackPath}
+              />}
             </>
           }/>
-          <Route path="/category/:categoryName" element={
-            <LevelMenu menu={menu}/>
+          <Route path="/categories/:categoryName" element={
+            <LevelMenu menu={menu} setShowBackButton={setShowBackButton} setBackPath={setBackPath} />
           }/>
-          <Route path="/category/:categoryName/levels/:levelNumber/puzzle?/:puzzleId" element={
-            <LevelPlay menu={menu}/>
+          <Route path="/categories/:categoryName/levels/:levelNumber/puzzle?/:puzzleId" element={
+            <LevelPlay menu={menu} setShowBackButton={setShowBackButton} setBackPath={setBackPath} />
           }/>
         </Routes>
       </Router>
