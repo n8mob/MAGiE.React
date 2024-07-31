@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Component } from "react";
 import { Puzzle } from "../Menu.ts";
 import BinaryJudge from "../BinaryJudge.ts";
 import FullJudgment from "../FullJudgment.ts";
@@ -11,75 +11,115 @@ interface PuzzleProps {
   onWin: () => void;
 }
 
-const BasePuzzle: React.FC<PuzzleProps> = ({ puzzle, displayWidth, onWin }) => {
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
-  const [judge, setJudge] = useState<BinaryJudge | null>(null);
-  const [guessBits, setGuessBits] = useState("");
-  const [winBits, setWinBits] = useState<string>("");
-  const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
-  const [guessText, setGuessText] = useState<string>("");
+interface PuzzleState {
+  currentPuzzle?: Puzzle;
+  judge: BinaryJudge | null;
+  guessBits: string;
+  winBits: string;
+  judgment: FullJudgment<SequenceJudgment>;
+  guessText: string;
+  updating: boolean;
+}
 
-  // Flag to prevent infinite loop
-  const [updating, setUpdating] = useState(false);
+class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
+  constructor(props: PuzzleProps) {
+    super(props);
+    this.state = {
+      currentPuzzle: props.puzzle,
+      judge: null,
+      guessBits: "",
+      winBits: "",
+      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
+      guessText: "",
+      updating: false,
+    };
+  }
 
-  // Update currentPuzzle when the puzzle gets updated
-  useEffect(() => {
-    setCurrentPuzzle(puzzle);
-    setGuessBits("");
-    setWinBits("");
-    setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
-  }, [puzzle]);
+  componentDidMount() {
+    this.updateCurrentPuzzle(this.props.puzzle);
+  }
 
-  // Update winBits when puzzle changes
-  useEffect(() => {
+  componentDidUpdate(prevProps: PuzzleProps, prevState: PuzzleState) {
+    if (prevProps.puzzle !== this.props.puzzle) {
+      this.updateCurrentPuzzle(this.props.puzzle);
+    }
+
+    if (prevState.guessText !== this.state.guessText && !this.state.updating) {
+      this.updateGuessBits();
+    }
+
+    if (prevState.guessBits !== this.state.guessBits && !this.state.updating) {
+      this.updateGuessText();
+    }
+
+    if (
+      prevState.currentPuzzle !== this.state.currentPuzzle ||
+      prevState.guessBits !== this.state.guessBits ||
+      prevState.winBits !== this.state.winBits ||
+      prevState.judge !== this.state.judge
+    ) {
+      this.updateJudgment();
+    }
+  }
+
+  updateCurrentPuzzle(puzzle: Puzzle) {
+    this.setState({
+      currentPuzzle: puzzle,
+      guessBits: "",
+      winBits: "",
+      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
+    });
+
+    if (puzzle) {
+      const newWinText = puzzle.encoding.encodeText(puzzle.winText);
+      this.setState({ winBits: newWinText });
+    }
+  }
+
+  updateGuessBits() {
+    const { currentPuzzle, guessText } = this.state;
     if (currentPuzzle) {
-      const newWinText = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
-      setWinBits(newWinText);
-    }
-  }, [currentPuzzle]);
-
-  // Update guessBits when guessText changes
-  useEffect(() => {
-    if (!updating && currentPuzzle) {
-      setUpdating(true);
+      this.setState({ updating: true });
       const newGuessBits = currentPuzzle.encoding.encodeText(guessText);
-      setGuessBits(newGuessBits);
-      setUpdating(false);
+      this.setState({ guessBits: newGuessBits, updating: false });
     }
-  }, [guessText, currentPuzzle]);
+  }
 
-  // Update guessText when guessBits changes
-  useEffect(() => {
-    if (!updating && currentPuzzle) {
-      setUpdating(true);
+  updateGuessText() {
+    const { currentPuzzle, guessBits } = this.state;
+    if (currentPuzzle) {
+      this.setState({ updating: true });
       const newGuessText = currentPuzzle.encoding.decodeText(guessBits);
-      setGuessText(newGuessText);
-      setUpdating(false);
+      this.setState({ guessText: newGuessText, updating: false });
     }
-  }, [guessBits, currentPuzzle]);
+  }
 
-  // Update judgment
-  useEffect(() => {
+  updateJudgment() {
+    const { currentPuzzle, judge, winBits, guessBits } = this.state;
     if (currentPuzzle && judge && winBits && guessBits) {
-      const judgment = judge?.judgeBits(guessBits, winBits, displayWidth);
+      const judgment = judge.judgeBits(guessBits, winBits, this.props.displayWidth);
       if (judgment) {
-        setJudgment(judgment);
+        this.setState({ judgment });
       }
     }
-  }, [currentPuzzle, guessBits, winBits, judge]);
+  }
 
-  return (
-    <>
-      <DisplayMatrix
-        key={`${currentPuzzle}-${guessBits}-${judgment}`}
-        guessBits={guessBits}
-        judgments={judgment.sequenceJudgments}
-        decodedGuess={guessText}
-        handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
-      />
-    </>
-  );
-};
+  render() {
+    const { currentPuzzle, guessBits, judgment, guessText } = this.state;
+
+    return (
+      <>
+        <DisplayMatrix
+          key={`${currentPuzzle}-${guessBits}-${judgment}`}
+          guessBits={guessBits}
+          judgments={judgment.sequenceJudgments}
+          decodedGuess={guessText}
+          handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
+        />
+      </>
+    );
+  }
+}
 
 export default BasePuzzle;
 export type { PuzzleProps };
