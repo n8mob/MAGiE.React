@@ -17,7 +17,6 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
   const [winBits, setWinBits] = useState<string>("");
   const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
   const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
-
   // Update currentPuzzle when the puzzle prop changes
   useEffect(() => {
     setCurrentPuzzle(puzzle);
@@ -29,8 +28,7 @@ const EncodePuzzle: React.FC<EncodePuzzleProps> = ({puzzle, displayWidth, onWin}
 
   // initialize guessBits and winBits when the currentPuzzle changes
   useEffect(() => {
-    if (currentPuzzle && currentPuzzle.type == "Encode") {
-      console.log("Setting guessBits, winBits, and judgment");
+    if (currentPuzzle) {
       const initialGuess = currentPuzzle.encoding.encodeText(currentPuzzle.init);
       setGuessBits(initialGuess);
       const newWinText = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
