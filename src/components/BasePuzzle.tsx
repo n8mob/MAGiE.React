@@ -1,8 +1,8 @@
-import { Component } from "react";
-import { Puzzle } from "../Menu.ts";
+import {Component} from "react";
+import {Puzzle} from "../Menu.ts";
 import BinaryJudge from "../BinaryJudge.ts";
 import FullJudgment from "../FullJudgment.ts";
-import { SequenceJudgment } from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../SequenceJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 
 interface PuzzleProps {
@@ -14,16 +14,17 @@ interface PuzzleProps {
 interface PuzzleState {
   currentPuzzle?: Puzzle;
   judge: BinaryJudge | null;
+  guessText: string;
   guessBits: string;
   winBits: string;
   judgment: FullJudgment<SequenceJudgment>;
-  guessText: string;
   updating: boolean;
 }
 
-class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
-  constructor(props: PuzzleProps) {
+abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
+  protected constructor(props: TProps) {
     super(props);
+
     this.state = {
       currentPuzzle: props.puzzle,
       judge: null,
@@ -32,14 +33,14 @@ class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
       guessText: "",
       updating: false,
-    };
+    } as TState;
   }
 
   componentDidMount() {
     this.updateCurrentPuzzle(this.props.puzzle);
   }
 
-  componentDidUpdate(prevProps: PuzzleProps, prevState: PuzzleState) {
+  componentDidUpdate(prevProps: PuzzleProps, prevState: TState) {
     if (prevProps.puzzle !== this.props.puzzle) {
       this.updateCurrentPuzzle(this.props.puzzle);
     }
@@ -62,9 +63,12 @@ class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
     }
   }
 
+  abstract updateJudge(puzzle: Puzzle): void;
+
   updateCurrentPuzzle(puzzle: Puzzle) {
     this.setState({
       currentPuzzle: puzzle,
+      judge: null,
       guessBits: "",
       winBits: "",
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
@@ -73,6 +77,7 @@ class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
     if (puzzle) {
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
       this.setState({ winBits: newWinText });
+      this.updateJudge(puzzle);
     }
   }
 
@@ -111,7 +116,7 @@ class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
       <>
         <DisplayMatrix
           key={`${currentPuzzle}-${guessBits}-${judgment}`}
-          guessBits={guessBits}
+          bits={guessBits}
           judgments={judgment.sequenceJudgments}
           decodedGuess={guessText}
           handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
@@ -122,4 +127,4 @@ class BasePuzzle extends Component<PuzzleProps, PuzzleState> {
 }
 
 export default BasePuzzle;
-export type { PuzzleProps };
+export type { PuzzleProps, PuzzleState };

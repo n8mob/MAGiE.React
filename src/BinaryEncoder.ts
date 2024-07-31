@@ -1,5 +1,4 @@
-import FullJudgment from "./FullJudgment";
-import {CharJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
+import {EncodingType} from "./Menu.ts";
 
 class DisplayRow {
   bits: string;
@@ -12,6 +11,8 @@ class DisplayRow {
 }
 
 interface BinaryEncoder {
+  getType(): EncodingType;
+
   decodeText(encodedText: string): string;
 
   encodeText(textToEncode: string): string;
@@ -20,13 +21,9 @@ interface BinaryEncoder {
 
   encodeChar(charToEncode: string): string;
 
-  splitByChar(bits: string): Generator<string, void, unknown>;
+  splitByChar(bits: string): Generator<string, void>;
 
-  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void, unknown>;
-
-  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string, splitterArgument: unknown): FullJudgment<T>;
-
-  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
+  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void>;
 }
 
 export default BinaryEncoder;

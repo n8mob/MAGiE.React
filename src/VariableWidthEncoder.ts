@@ -1,15 +1,14 @@
 import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
-import FullJudgment from "./FullJudgment.ts";
-import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
+import {EncodingType} from "./Menu.ts";
 
 export type SplitterFunction = (bits: string) => Generator<string | DisplayRow, void>;
 
 export default class VariableWidthEncoder implements BinaryEncoder {
   public readonly encoding: Record<string, Record<string, string>>;
   public readonly decoding: Record<string, Record<string, string>>;
-  private readonly defaultEncoded: string;
-  private readonly defaultDecoded: string;
-  private readonly characterSeparator: string;
+  readonly defaultEncoded: string;
+  readonly defaultDecoded: string;
+  readonly characterSeparator: string;
 
   constructor(
     encoding: Record<string, Record<string, string>>,
@@ -33,6 +32,10 @@ export default class VariableWidthEncoder implements BinaryEncoder {
       this.decoding = decoding;
     }
     this.characterSeparator = characterSeparator;
+  }
+
+  getType(): EncodingType {
+    return "Variable";
   }
 
   findForSymbol(coded: string, coding: Record<string, Record<string, string>>): string | undefined {
@@ -145,88 +148,5 @@ export default class VariableWidthEncoder implements BinaryEncoder {
     }
     yield new DisplayRow(remaining, "");
     return;
-  }
-
-  _judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string,
-    splitter: SplitterFunction,
-    newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(bits, judgments) as T
-  ): FullJudgment<T> {
-    const sequenceJudgments: T[] = [];
-    const guessSplit = splitter(guessBits);
-    const winSplit = splitter(winBits);
-    let nextGuess = guessSplit.next();
-    let nextWin = winSplit.next();
-
-    let allCorrect = true;
-    let correctBits = "";
-    let lastCorrectBit = "";
-
-    while (!nextGuess.done) {
-      let sequenceGuessBits: string;
-      if (nextGuess.value instanceof DisplayRow) {
-        sequenceGuessBits = nextGuess.value.bits;
-      } else {
-        sequenceGuessBits = nextGuess.value;
-      }
-
-      if (nextWin.done) {
-        allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
-        nextGuess = guessSplit.next();
-      } else {
-        let sequenceWinBits: string;
-        if (nextWin.value instanceof DisplayRow) {
-          sequenceWinBits = nextWin.value.bits;
-        } else {
-          sequenceWinBits = nextWin.value;
-        }
-
-        let bitJudgments: string;
-        if (sequenceWinBits === sequenceGuessBits) {
-          bitJudgments = "1".repeat(sequenceGuessBits.length);
-          if (lastCorrectBit !== "") {
-            if (lastCorrectBit === sequenceGuessBits[sequenceGuessBits.length - 1] && sequenceGuessBits !== this.characterSeparator) {
-              correctBits += this.characterSeparator;
-            }
-          }
-          correctBits += sequenceGuessBits;
-          lastCorrectBit = sequenceGuessBits[sequenceGuessBits.length - 1];
-        } else {
-          bitJudgments = [...sequenceWinBits].map((winBit, index) => winBit === sequenceGuessBits[index] ? "1" : "0").join("");
-          allCorrect = false;
-        }
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments));
-        nextGuess = guessSplit.next();
-        nextWin = winSplit.next();
-      }
-    }
-
-    return new FullJudgment<T>(allCorrect, correctBits, sequenceJudgments);
-  }
-
-  judgeBits<T extends DisplayRowJudgment>(guessBits: string, winBits: string, displayRowWidth: number): FullJudgment<T> {
-    const splitter: SplitterFunction = (bits: string) => this.splitForDisplay(bits, displayRowWidth);
-    return this._judgeBits(
-      guessBits,
-      winBits,
-      splitter,
-      (bits, judgments) => new DisplayRowJudgment(bits, judgments) as T
-    );
-  }
-
-  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
-    const guessBits = this.encodeText(guessText);
-    const winBits = this.encodeText(winText);
-
-    const newCharJudgment = (bits: string, judgments: string) => new CharJudgment(bits, judgments);
-    const splitter = (bits: string) => this.splitByChar(bits);
-    return this._judgeBits(
-      guessBits,
-      winBits,
-      splitter,
-      newCharJudgment
-    );
   }
 }

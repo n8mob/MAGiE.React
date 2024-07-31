@@ -1,109 +1,82 @@
-import {Puzzle} from "../Menu.ts";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import FullJudgment from "../FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
-import BinaryJudge from "../BinaryJudge.ts";
+import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
+import {Puzzle} from "../Menu.ts";
 import VariableWidthEncoder from "../VariableWidthEncoder.ts";
-import VariableWidthEncodingJudge from "../VariableWidthEncodingJudge.ts";
-import BasePuzzle from "./BasePuzzle.tsx";
+import VariableWidthDecodingJudge from "../VariableWidthDecodingJudge.ts";
+import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import FixedWidthDecodingJudge from "../FixedWidthDecodingJudge.ts";
 
-interface DecodePuzzleProps {
-  puzzle?: Puzzle;
-  displayWidth: number;
-  onWin: () => void;
-}
+class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+  constructor(props: PuzzleProps) {
+    super(props);
 
-const DecodePuzzle: React.FC<DecodePuzzleProps> extends BasePuzzle = ({puzzle, displayWidth, onWin}) => {
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
-  const [judge, setJudge] = useState<BinaryJudge | null>(null);
-  const [guessText, setGuessText] = useState("");
-  const [guessBits, setGuessBits] = useState("");
-  const [winBits, setWinBits] = useState<string>("");
-  const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
-
-  // Update currentPuzzle when the puzzle prop changes
-  useEffect(() => {
-    setCurrentPuzzle(puzzle);
-    if (puzzle && puzzle.encoding instanceof VariableWidthEncoder) {
-      setJudge(new VariableWidthEncodingJudge(puzzle?.encoding));
-    }
-    setGuessText("");
-    setGuessBits("");
-    setWinBits("");
-    setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
-  }, [puzzle]);
-
-  // initialize guessBits and winBits when the currentPuzzle changes
-  useEffect(() => {
-    if (currentPuzzle) {
-      setGuessText(currentPuzzle.init);
-      const newWinText = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
-      setWinBits(newWinText);
-      setJudgment(new FullJudgment(false, "", []));
-    }
-  }, [currentPuzzle]);
-
-  useEffect(() => {
-    if (currentPuzzle && guessText) {
-      const newGuessBits = currentPuzzle.encoding.encodeText(guessText);
-      setGuessBits(newGuessBits);
-    }
-  }, [currentPuzzle, guessText]);
-
-  // Update judgment when guessBits or winBits changes
-  useEffect(() => {
-    if (currentPuzzle && guessBits && winBits) {
-      const judgment = judge?.judgeBits(
-        guessBits,
-        winBits,
-        displayWidth
-      );
-
-      if (judgment) {
-        setJudgment(judgment);
-      }
-    }
-  }, [currentPuzzle, guessBits, winBits, judge, displayWidth]);
-
-  return <>
-    <DisplayMatrix
-      key={`${currentPuzzle?.init}-${guessBits}`}
-      guessBits={guessBits}
-      judgment={judgment.sequenceJudgments}
-      decodedGuess={puzzle?.encoding.decodeText(guessBits) || ""}
-      handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
-      />
-    <div className="encodingInputs">
-      <p>
-        <input type="text" value={guessText} onChange={handleGuessUpdate}/>
-      </p><p>
-        <input type="button" value="Submit" onClick={handleSubmitClick}/>
-      </p>
-    </div>
-  </>;
-
-  function handleGuessUpdate(event: React.ChangeEvent<HTMLInputElement>) {
-    const newGuessText = event.target.value.toUpperCase();
-    setGuessText(newGuessText);
-    const newGuessBits = currentPuzzle?.encoding.encodeText(newGuessText) || "";
-    setGuessBits(newGuessBits);
+    this.state = {
+      currentPuzzle: props.puzzle,
+      judge: null,
+      guessText: "",
+      guessBits: "",
+      winBits: "",
+      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
+      updating: false,
+    };
   }
 
-  function handleSubmitClick() {
-    if (!currentPuzzle && judge) {
-      console.error('Missing puzzle');
-      return;
+  updateJudge(puzzle: Puzzle) {
+    if (puzzle.encoding instanceof VariableWidthEncoder) {
+      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
+    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
+      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
     } else {
-      const newJudgment = judge?.judgeBits(guessBits, winBits, displayWidth);
-      if (newJudgment) {
-        if (newJudgment.isCorrect) {
-          onWin?.();
-        } else {
-          setJudgment(newJudgment);
-        }
+      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
+    }
+  }
+
+  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newGuessText = event.target.value.toUpperCase();
+    this.setState({ guessText: newGuessText });
+  };
+
+  handleSubmitClick = () => {
+    const { currentPuzzle, judge, guessBits, winBits } = this.state;
+    if (!currentPuzzle || !judge) {
+      console.error('Missing puzzle or judge');
+      return;
+    }
+    const newJudgment = judge.judgeBits(guessBits, winBits, this.props.displayWidth);
+    if (newJudgment) {
+      if (newJudgment.isCorrect) {
+        this.props.onWin?.();
+      } else {
+        this.setState({ judgment: newJudgment });
       }
     }
+  };
+
+  render() {
+    const { currentPuzzle, guessBits, judgment, guessText } = this.state;
+
+    return (
+      <>
+        <DisplayMatrix
+          key={`${currentPuzzle?.init}-${guessBits}`}
+          bits={this.state.winBits}
+          judgments={judgment.sequenceJudgments}
+          decodedGuess={currentPuzzle?.encoding.decodeText(guessBits) || ""}
+          handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
+        />
+        <div className="encodingInputs">
+          <p>
+            <input type="text" value={guessText} onChange={this.handleGuessUpdate} />
+          </p>
+          <p>
+            <input type="button" value="Submit" onClick={this.handleSubmitClick} />
+          </p>
+        </div>
+      </>
+    );
   }
 }
 

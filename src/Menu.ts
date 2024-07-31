@@ -1,5 +1,7 @@
 import BinaryEncoder from "./BinaryEncoder.ts";
 
+export type EncodingType = "Fixed" | "Variable" | "Other";
+
 export interface EncodingData {
   type: "variable" | "fixed";
   encoding: unknown;

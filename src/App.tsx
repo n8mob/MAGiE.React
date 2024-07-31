@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const menuData = await getMenu('DailyPuzzles');
+        const menuData = await getMenu('ReactTests');
         menuData.encodingProviders = {};
         Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
           if (encodingData.type == "fixed") {
