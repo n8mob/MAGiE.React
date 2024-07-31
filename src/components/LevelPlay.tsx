@@ -1,6 +1,6 @@
-import {Menu, Level, Puzzle} from "../Menu.ts";
-import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import { Menu, Level, Puzzle } from "../Menu.ts";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
 
@@ -17,7 +17,6 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [winMessage, setWinMessage] = useState<string[]>([]);
   const [hasWon, setHasWon] = useState(false);
-
 
   useEffect(() => {
     setShowBackButton(true);
@@ -70,12 +69,15 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
       <div className="display">
         {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
       </div>
-      <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13}/>
-      <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13}/>
+      {currentPuzzle.type === "Encode" ? (
+        <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13} />
+      ) : (
+        <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13} />
+      )}
       <div className="display">
         {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
       </div>
-      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext}/>}
+      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext} />}
     </>
   }
 
@@ -96,8 +98,10 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
     } else {
       const genericWinMessge = [
         "You win!",
-        "You finished",
-        "the level"];
+        "You finishos",
+        "puzzles in",
+        "the level"
+      ];
       const quote = ["."];
       const closeQuote = [".", "Congrats!"]
       setWinMessage([...genericWinMessge, ...quote, ...level.levelName, ...closeQuote]);

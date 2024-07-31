@@ -62,13 +62,6 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return [...textToEncode].map(char => this.encodeChar(char)).join('');
   }
 
-  * encodeAndSplit(decoded: string): Generator<string, void> {
-    for (const char of decoded) {
-      yield this.encodeChar(char);
-    }
-    return;
-  }
-
   /**
    * Yields chunked strings of bits by splitting the given string
    * into chunks of the width defined for this `FixedWidth` encoding.

@@ -20,8 +20,6 @@ interface BinaryEncoder {
 
   encodeChar(charToEncode: string): string;
 
-  encodeAndSplit(decoded: string): Generator<string, void, unknown>;
-
   splitByChar(bits: string): Generator<string, void, unknown>;
 
   splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void, unknown>;
