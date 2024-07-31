@@ -3,6 +3,10 @@ import React, {useEffect, useState} from "react";
 import FullJudgment from "../FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
+import BinaryJudge from "../BinaryJudge.ts";
+import VariableWidthEncoder from "../VariableWidthEncoder.ts";
+import VariableWidthEncodingJudge from "../VariableWidthEncodingJudge.ts";
+import BasePuzzle from "./BasePuzzle.tsx";
 
 interface DecodePuzzleProps {
   puzzle?: Puzzle;
@@ -10,8 +14,9 @@ interface DecodePuzzleProps {
   onWin: () => void;
 }
 
-const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, displayWidth, onWin}) => {
+const DecodePuzzle: React.FC<DecodePuzzleProps> extends BasePuzzle = ({puzzle, displayWidth, onWin}) => {
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
+  const [judge, setJudge] = useState<BinaryJudge | null>(null);
   const [guessText, setGuessText] = useState("");
   const [guessBits, setGuessBits] = useState("");
   const [winBits, setWinBits] = useState<string>("");
@@ -20,6 +25,9 @@ const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, displayWidth, onWin}
   // Update currentPuzzle when the puzzle prop changes
   useEffect(() => {
     setCurrentPuzzle(puzzle);
+    if (puzzle && puzzle.encoding instanceof VariableWidthEncoder) {
+      setJudge(new VariableWidthEncodingJudge(puzzle?.encoding));
+    }
     setGuessText("");
     setGuessBits("");
     setWinBits("");
@@ -46,15 +54,17 @@ const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, displayWidth, onWin}
   // Update judgment when guessBits or winBits changes
   useEffect(() => {
     if (currentPuzzle && guessBits && winBits) {
-      const judgment = currentPuzzle?.encoding.judgeBits(
+      const judgment = judge?.judgeBits(
         guessBits,
         winBits,
         displayWidth
       );
 
-      setJudgment(judgment);
+      if (judgment) {
+        setJudgment(judgment);
+      }
     }
-  }, [currentPuzzle, guessBits, winBits, displayWidth]);
+  }, [currentPuzzle, guessBits, winBits, judge, displayWidth]);
 
   return <>
     <DisplayMatrix
@@ -81,15 +91,17 @@ const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, displayWidth, onWin}
   }
 
   function handleSubmitClick() {
-    if (!currentPuzzle) {
+    if (!currentPuzzle && judge) {
       console.error('Missing puzzle');
       return;
     } else {
-      const newJudgment = currentPuzzle.encoding.judgeBits(guessBits, winBits, displayWidth);
-      if (newJudgment.isCorrect) {
-        onWin?.();
-      } else {
-        setJudgment(newJudgment);
+      const newJudgment = judge?.judgeBits(guessBits, winBits, displayWidth);
+      if (newJudgment) {
+        if (newJudgment.isCorrect) {
+          onWin?.();
+        } else {
+          setJudgment(newJudgment);
+        }
       }
     }
   }
