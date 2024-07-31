@@ -1,14 +1,14 @@
 import React from "react";
 import FullJudgment from "../FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
-import {DisplayRow} from "../BinaryEncoder.ts";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
 import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
 import VariableWidthEncodingJudge from "../VariableWidthEncodingJudge.ts";
 import {Puzzle} from "../Menu.ts";
-import VariableWidthEncoder from "../VariableWidthEncoder.ts";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import FixedWidthEncodingJudge from "../FixedWidthEncodingJudge.ts";
-import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 
 interface EncodePuzzleProps extends PuzzleProps {}
 

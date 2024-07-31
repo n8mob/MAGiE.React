@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from "vitest";
-import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthEncodingJudge from "../FixedWidthEncodingJudge.ts";
 import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "../SequenceJudgment.ts";
 

@@ -4,9 +4,9 @@ import DisplayMatrix from "./DisplayMatrix.tsx";
 import {SequenceJudgment} from "../SequenceJudgment.ts";
 import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
 import {Puzzle} from "../Menu.ts";
-import VariableWidthEncoder from "../VariableWidthEncoder.ts";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import VariableWidthDecodingJudge from "../VariableWidthDecodingJudge.ts";
-import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../FixedWidthDecodingJudge.ts";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {

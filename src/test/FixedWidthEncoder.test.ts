@@ -1,4 +1,4 @@
-import FixedWidthEncoder from "../FixedWidthEncoder.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import {beforeEach, describe, expect, it} from "vitest";
 
 const hexadecimal = {

@@ -6,8 +6,8 @@ import {Category, FixedEncodingData, Level, Menu, Puzzle, VariableEncodingData} 
 import MenuDisplay from "./components/MenuDisplay.tsx";
 import LevelMenu from "./components/LevelMenu.tsx";
 import LevelPlay from "./components/LevelPlay.tsx";
-import FixedWidthEncoder from "./FixedWidthEncoder.ts";
-import VariableWidthEncoder from "./VariableWidthEncoder.ts";
+import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
+import VariableWidthEncoder from "./encoding/VariableWidthEncoder.ts";
 import BackButton from "./components/BackButton.tsx";
 
 function App() {

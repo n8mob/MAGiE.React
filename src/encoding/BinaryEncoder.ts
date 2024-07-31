@@ -1,4 +1,4 @@
-import {EncodingType} from "./Menu.ts";
+import {EncodingType} from "../Menu.ts";
 
 class DisplayRow {
   bits: string;

@@ -2,7 +2,7 @@ import {CharJudgment, DisplayRowJudgment} from "../SequenceJudgment.ts";
 import FullJudgment from "../FullJudgment.ts";
 import VariableWidthEncodingJudge from "../VariableWidthEncodingJudge.ts";
 import {beforeEach, describe, expect, it} from "vitest";
-import VariableWidthEncoder from "../VariableWidthEncoder.ts";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 
 describe('VariableWidthEncodingJudge', () => {
   let unitUnderTest: VariableWidthEncodingJudge;

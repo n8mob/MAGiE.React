@@ -1,5 +1,5 @@
 import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
-import {EncodingType} from "./Menu.ts";
+import {EncodingType} from "../Menu.ts";
 
 export type SplitterFunction = (bits: string) => Generator<string | DisplayRow, void>;
 

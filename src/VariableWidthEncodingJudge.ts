@@ -1,8 +1,8 @@
 import BinaryJudge from "./BinaryJudge.ts";
 import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
-import VariableWidthEncoder, {SplitterFunction} from "./VariableWidthEncoder.ts";
+import VariableWidthEncoder, {SplitterFunction} from "./encoding/VariableWidthEncoder.ts";
 import FullJudgment from "./FullJudgment.ts";
-import {DisplayRow} from "./BinaryEncoder.ts";
+import {DisplayRow} from "./encoding/BinaryEncoder.ts";
 
 export default class VariableWidthEncodingJudge implements BinaryJudge {
   public readonly encoder: VariableWidthEncoder;

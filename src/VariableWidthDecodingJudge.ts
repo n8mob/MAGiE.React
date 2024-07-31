@@ -1,7 +1,7 @@
-import VariableWidthEncoder, {SplitterFunction} from "./VariableWidthEncoder.ts";
+import VariableWidthEncoder, {SplitterFunction} from "./encoding/VariableWidthEncoder.ts";
 import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
 import FullJudgment from "./FullJudgment.ts";
-import {DisplayRow} from "./BinaryEncoder.ts";
+import {DisplayRow} from "./encoding/BinaryEncoder.ts";
 
 export default class VariableWidthDecodingJudge {
   private encoder: VariableWidthEncoder;
