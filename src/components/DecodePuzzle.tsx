@@ -34,9 +34,23 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
+  componentDidUpdate(prevProps: PuzzleProps, prevState: PuzzleState) {
+    if (
+      prevState.guessBits !== this.state.guessBits ||
+      prevState.winBits !== this.state.winBits
+    ) {
+      this.setState({})
+    }
+    super.componentDidUpdate(prevProps, prevState);
+  }
+
   handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newGuessText = event.target.value.toUpperCase();
-    this.setState({ guessText: newGuessText });
+    const newState = {
+      guessText: newGuessText,
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
+    }
+    this.setState(newState);
   };
 
   handleSubmitClick = () => {
@@ -50,6 +64,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     if (newJudgment) {
       if (newJudgment.isCorrect) {
         this.props.onWin?.();
+        this.resetForNextPuzzle();
       } else {
         this.setState({ judgment: newJudgment });
       }

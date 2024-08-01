@@ -127,8 +127,11 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     } else {
       const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
       const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
-      if (newJudgment && newJudgment.isCorrect) {
+      if (newJudgment) {
         this.setState({ judgment: newJudgment });
+        if (newJudgment.isCorrect && guessBits.length == winBits.length) {
+          this.props?.onWin();
+        }
       }
     }
   };

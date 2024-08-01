@@ -29,9 +29,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       currentPuzzle: props.puzzle,
       judge: null,
       guessBits: "",
+      guessText: "",
       winBits: "",
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      guessText: "",
       updating: false,
     } as TState;
   }
@@ -43,14 +43,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   componentDidUpdate(prevProps: PuzzleProps, prevState: TState) {
     if (prevProps.puzzle !== this.props.puzzle) {
       this.updateCurrentPuzzle(this.props.puzzle);
-    }
-
-    if (prevState.guessText !== this.state.guessText && !this.state.updating) {
-      this.updateGuessBits();
-    }
-
-    if (prevState.guessBits !== this.state.guessBits && !this.state.updating) {
-      this.updateGuessText();
     }
 
     if (
@@ -65,6 +57,15 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
   abstract updateJudge(puzzle: Puzzle): void;
 
+  resetForNextPuzzle() {
+    this.setState({
+      guessText: "",
+      guessBits: "",
+      winBits: "",
+      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
+    });
+  }
+
   updateCurrentPuzzle(puzzle: Puzzle) {
     this.setState({
       currentPuzzle: puzzle,
@@ -78,24 +79,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       this.updateJudge(puzzle);
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
       this.setState({ winBits: newWinText });
-    }
-  }
-
-  updateGuessBits() {
-    const { currentPuzzle, guessText } = this.state;
-    if (currentPuzzle) {
-      this.setState({ updating: true });
-      const newGuessBits = currentPuzzle.encoding.encodeText(guessText);
-      this.setState({ guessBits: newGuessBits, updating: false });
-    }
-  }
-
-  updateGuessText() {
-    const { currentPuzzle, guessBits } = this.state;
-    if (currentPuzzle) {
-      this.setState({ updating: true });
-      const newGuessText = currentPuzzle.encoding.decodeText(guessBits);
-      this.setState({ guessText: newGuessText, updating: false });
     }
   }
 
