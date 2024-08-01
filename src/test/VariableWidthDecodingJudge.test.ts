@@ -1,6 +1,6 @@
-import {CharJudgment, DisplayRowJudgment} from "../SequenceJudgment.ts";
-import FullJudgment from "../FullJudgment.ts";
-import VariableWidthDecodingJudge from "../VariableWidthDecodingJudge.ts";
+import {CharJudgment, DisplayRowJudgment} from "../judgment/SequenceJudgment.ts";
+import FullJudgment from "../judgment/FullJudgment.ts";
+import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import {beforeEach, describe, expect, it} from "vitest";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 

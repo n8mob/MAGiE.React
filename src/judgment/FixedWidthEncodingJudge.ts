@@ -1,7 +1,7 @@
 import BinaryJudge from "./BinaryJudge.ts";
 import FullJudgment from "./FullJudgment.ts";
 import {SequenceJudgment, CharJudgment} from "./SequenceJudgment.ts";
-import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 
 export default class FixedWidthEncodingJudge implements BinaryJudge {
   public readonly encoder: FixedWidthEncoder;

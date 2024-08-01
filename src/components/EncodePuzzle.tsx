@@ -1,13 +1,13 @@
 import React from "react";
-import FullJudgment from "../FullJudgment.ts";
+import FullJudgment from "../judgment/FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 import {DisplayRow} from "../encoding/BinaryEncoder.ts";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import VariableWidthEncodingJudge from "../VariableWidthEncodingJudge.ts";
+import VariableWidthEncodingJudge from "../judgment/VariableWidthEncodingJudge.ts";
 import {Puzzle} from "../Menu.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import FixedWidthEncodingJudge from "../FixedWidthEncodingJudge.ts";
+import FixedWidthEncodingJudge from "../judgment/FixedWidthEncodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 
 interface EncodePuzzleProps extends PuzzleProps {}
@@ -42,6 +42,35 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     }
   }
 
+  componentDidUpdate(prevProps: PuzzleProps, prevState: EncodePuzzleState) {
+    if (
+      prevState.guessBits !== this.state.guessBits ||
+      prevState.winBits !== this.state.winBits
+    ) {
+      this.updateDisplayRows();
+    }
+
+    super.componentDidUpdate(prevProps, prevState);
+  }
+
+  updateDisplayRows() {
+    const { currentPuzzle, guessBits } = this.state;
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return;
+    }
+
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.props.displayWidth);
+    const displayRows: DisplayRow[] = [];
+    let displayRow = displayRowSplit.next();
+    while (displayRow && !displayRow.done) {
+      displayRows.push(displayRow.value);
+      displayRow = displayRowSplit.next();
+    }
+
+    this.setState({ displayRows });
+  }
+
   addBit = (bit: string) => {
     this.setState((prevState: PuzzleState) => ({
       guessBits: prevState.guessBits + bit,
@@ -56,6 +85,11 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
 
   updateBit = (rowIndex: number, bitIndex: number, bit: string) => {
     const { displayRows, currentPuzzle } = this.state;
+    if (!displayRows || displayRows.length === 0) {
+      console.error('Missing display rows');
+      return;
+    }
+
     const rowBits = displayRows[rowIndex].bits;
     const newRowBits = rowBits.slice(0, bitIndex) + bit + rowBits.slice(bitIndex + 1);
     const newDisplayRowSplit = currentPuzzle?.encoding.splitForDisplay(newRowBits, this.props.displayWidth);

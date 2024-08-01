@@ -1,13 +1,13 @@
 import React from "react";
-import FullJudgment from "../FullJudgment.ts";
+import FullJudgment from "../judgment/FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
 import {Puzzle} from "../Menu.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import VariableWidthDecodingJudge from "../VariableWidthDecodingJudge.ts";
+import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import FixedWidthDecodingJudge from "../FixedWidthDecodingJudge.ts";
+import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
@@ -45,7 +45,8 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       console.error('Missing puzzle or judge');
       return;
     }
-    const newJudgment = judge.judgeBits(guessBits, winBits, this.props.displayWidth);
+    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       if (newJudgment.isCorrect) {
         this.props.onWin?.();

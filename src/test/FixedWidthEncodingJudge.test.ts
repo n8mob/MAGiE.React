@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it} from "vitest";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import FixedWidthEncodingJudge from "../FixedWidthEncodingJudge.ts";
-import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "../SequenceJudgment.ts";
+import FixedWidthEncodingJudge from "../judgment/FixedWidthEncodingJudge.ts";
+import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 const hexadecimal = {
   '0': 0,

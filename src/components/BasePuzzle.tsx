@@ -1,8 +1,8 @@
 import {Component} from "react";
 import {Puzzle} from "../Menu.ts";
-import BinaryJudge from "../BinaryJudge.ts";
-import FullJudgment from "../FullJudgment.ts";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import BinaryJudge from "../judgment/BinaryJudge.ts";
+import FullJudgment from "../judgment/FullJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 
 interface PuzzleProps {
@@ -75,9 +75,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     });
 
     if (puzzle) {
+      this.updateJudge(puzzle);
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
       this.setState({ winBits: newWinText });
-      this.updateJudge(puzzle);
     }
   }
 
@@ -102,7 +102,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   updateJudgment() {
     const { currentPuzzle, judge, winBits, guessBits } = this.state;
     if (currentPuzzle && judge && winBits && guessBits) {
-      const judgment = judge.judgeBits(guessBits, winBits, this.props.displayWidth);
+      const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+      const judgment = judge.judgeBits(guessBits, winBits, splitter);
       if (judgment) {
         this.setState({ judgment });
       }

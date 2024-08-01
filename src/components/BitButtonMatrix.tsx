@@ -1,6 +1,6 @@
 import React from "react";
 import BitButton from "./BitButton.tsx";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 interface BitButtonMatrixProps {
   guessBits: string;

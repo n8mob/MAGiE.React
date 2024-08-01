@@ -1,8 +1,8 @@
-import BinaryJudge from "./BinaryJudge.ts";
+import BinaryJudge, {SplitterFunction} from "./BinaryJudge.ts";
 import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
-import VariableWidthEncoder, {SplitterFunction} from "./encoding/VariableWidthEncoder.ts";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import FullJudgment from "./FullJudgment.ts";
-import {DisplayRow} from "./encoding/BinaryEncoder.ts";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
 export default class VariableWidthEncodingJudge implements BinaryJudge {
   public readonly encoder: VariableWidthEncoder;
@@ -77,9 +77,8 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
   judgeBits<T extends DisplayRowJudgment>(
     guessBits: string,
     winBits: string,
-    displayRowWidth: number
+    splitter: SplitterFunction
   ): FullJudgment<T> {
-    const splitter: SplitterFunction = (bits: string) => this.encoder.splitForDisplay(bits, displayRowWidth);
     return this._judgeBits(
       guessBits,
       winBits,

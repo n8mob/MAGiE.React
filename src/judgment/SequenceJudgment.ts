@@ -1,4 +1,4 @@
-import BitJudgment, {Correctness} from './BitJudgment';
+import BitJudgment, {Correctness} from './BitJudgment.ts';
 
 export type Bits = string;
 export type Chars = string;

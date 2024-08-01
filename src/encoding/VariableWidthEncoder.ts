@@ -1,8 +1,6 @@
 import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
 import {EncodingType} from "../Menu.ts";
 
-export type SplitterFunction = (bits: string) => Generator<string | DisplayRow, void>;
-
 export default class VariableWidthEncoder implements BinaryEncoder {
   public readonly encoding: Record<string, Record<string, string>>;
   public readonly decoding: Record<string, Record<string, string>>;

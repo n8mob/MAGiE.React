@@ -1,5 +1,5 @@
 import React from "react";
-import {Correctness} from "../BitJudgment.ts";
+import {Correctness} from "../judgment/BitJudgment.ts";
 
 interface BitButtonProps {
   bit: string,
