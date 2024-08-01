@@ -5,6 +5,6 @@ import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 export type SplitterFunction = (bits: string) => Generator<DisplayRow | string, void>;
 
 export default interface BinaryJudge {
-  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string, splitter: SplitterFunction): FullJudgment<T>;
+  judgeBits<T extends SequenceJudgment>(guessBits: string, winBits: string, split: SplitterFunction): FullJudgment<T>;
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
 }

@@ -15,11 +15,9 @@ export default class FixedWidthDecodingJudge implements BinaryJudge {
     guessBits: string,
     winBits: string,
     splitter: SplitterFunction,
-    newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) =>
-      new SequenceJudgment(bits, judgments) as T
-  ):
-
-  FullJudgment<T> {
+    newSequenceJudgment: (bits: string, judgments: string) => T =
+      (bits, judgments) => new SequenceJudgment(bits, judgments) as T
+  ): FullJudgment<T> {
     if (!splitter) {
       throw new Error("Splitter must be provided");
     }
@@ -58,7 +56,10 @@ export default class FixedWidthDecodingJudge implements BinaryJudge {
           bitJudgments = "1".repeat(sequenceWinBits.length);
           correctBits += sequenceGuessBits;
         } else {
-          bitJudgments = [...sequenceWinBits].map((winBit: string, index: number) => winBit === sequenceGuessBits[index] ? "1" : "0")
+          bitJudgments = [...sequenceWinBits].map((
+            winBit: string,
+            index: number
+          ) => winBit === sequenceGuessBits[index] ? "1" : "0")
             .join("");
           allCorrect = false;
         }

@@ -125,7 +125,8 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
       console.error('Missing puzzle');
       return;
     } else {
-      const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, this.props.displayWidth);
+      const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+      const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
       if (newJudgment && newJudgment.isCorrect) {
         this.setState({ judgment: newJudgment });
       }

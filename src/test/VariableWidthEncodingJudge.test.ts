@@ -6,6 +6,13 @@ import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 
 describe('VariableWidthEncodingJudge', () => {
   let unitUnderTest: VariableWidthEncodingJudge;
+  const split = function* (bits: string) {
+    let b2 = bits;
+    while (b2 && b2.length > 0) {
+      yield b2.slice(0, 13);
+      b2 = b2.slice(13);
+    }
+  }
 
   beforeEach(() => {
     const encoder: VariableWidthEncoder = new VariableWidthEncoder({
@@ -35,7 +42,7 @@ describe('VariableWidthEncodingJudge', () => {
       guessBits,
       [rowJudgment]
     );
-    const actual = unitUnderTest.judgeBits(guessBits, winBits, 13);
+    const actual = unitUnderTest.judgeBits(guessBits, winBits, split);
     expect(actual).toEqual(expected);
   });
 

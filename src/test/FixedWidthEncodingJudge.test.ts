@@ -22,6 +22,14 @@ const hexadecimal = {
   'F': 15
 };
 
+const splitBy4 = function* (bits: string) {
+  let b2 = bits;
+  while (b2 && b2.length > 0) {
+    yield b2.slice(0, 4);
+    b2 = b2.slice(4);
+  }
+};
+
 describe('FixedWidthEncodingJudge', () => {
   let unitUnderTest: FixedWidthEncodingJudge;
 
@@ -33,18 +41,18 @@ describe('FixedWidthEncodingJudge', () => {
     it('should judge a single correct character', () => {
       const guess = '1010';
       const win = '1010';
-      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win);
+      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
       expect(judgment.isCorrect).toBe(true);
       expect(judgment.correctGuess).toBe(guess);
       expect(judgment.sequenceJudgments).toEqual([
-        new SequenceJudgment(guess, "1111")
+        new CharJudgment(guess, "1111")
       ]);
     });
 
     it('should judge two correct display rows', () => {
       const guess = "11111110";
       const win = "11111110";
-      const judgment = unitUnderTest.judgeBits<DisplayRowJudgment>(guess, win);
+      const judgment = unitUnderTest.judgeBits<DisplayRowJudgment>(guess, win, splitBy4);
       expect(judgment.isCorrect).toBe(true);
       expect(judgment.correctGuess).toBe(guess);
       const rowJudgments = judgment.getRowJudgments();
@@ -58,7 +66,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should judge the third character as incorrect', () => {
       const guess = "000100100100";
       const win = "000100100011";
-      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win);
+      const judgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
       expect(judgment.isCorrect).toBe(false);
       expect(judgment.correctGuess).toBe(guess.slice(0, 9));
       const charJudgments = judgment.getCharJudgments();

@@ -27,38 +27,31 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
 
     let allCorrect = true;
     let correctBits = "";
-    let lastCorrectBit = "";
 
-    while (!nextGuess.done) {
-      let sequenceGuessBits: string;
-      if (nextGuess.value instanceof DisplayRow) {
-        sequenceGuessBits = nextGuess.value.bits;
+    while(!nextWin.done) {
+      let sequenceWinBits: string;
+      if (nextWin.value instanceof DisplayRow) {
+        sequenceWinBits = nextWin.value.bits;
       } else {
-        sequenceGuessBits = nextGuess.value;
+        sequenceWinBits = nextWin.value;
       }
 
-      if (nextWin.done) {
+      if (nextGuess.done) {
         allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
-        nextGuess = guessSplit.next();
+        sequenceJudgments.push(newSequenceJudgment("", "0".repeat(sequenceWinBits.length)));
+        nextWin = winSplit.next();
       } else {
-        let sequenceWinBits: string;
-        if (nextWin.value instanceof DisplayRow) {
-          sequenceWinBits = nextWin.value.bits;
+        let sequenceGuessBits: string;
+        if (nextGuess.value instanceof DisplayRow) {
+          sequenceGuessBits = nextGuess.value.bits;
         } else {
-          sequenceWinBits = nextWin.value;
+          sequenceGuessBits = nextGuess.value;
         }
 
         let bitJudgments: string;
         if (sequenceWinBits === sequenceGuessBits) {
-          bitJudgments = "1".repeat(sequenceGuessBits.length);
-          if (lastCorrectBit !== "") {
-            if (lastCorrectBit === sequenceGuessBits[sequenceGuessBits.length - 1] && sequenceGuessBits !== this.encoder.characterSeparator) {
-              correctBits += this.encoder.characterSeparator;
-            }
-          }
+          bitJudgments = "1".repeat(sequenceWinBits.length);
           correctBits += sequenceGuessBits;
-          lastCorrectBit = sequenceGuessBits[sequenceGuessBits.length - 1];
         } else {
           bitJudgments = [...sequenceWinBits].map((winBit, index) => winBit === sequenceGuessBits[index] ? "1" : "0")
             .join("");

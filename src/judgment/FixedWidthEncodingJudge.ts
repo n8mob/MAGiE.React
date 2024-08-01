@@ -1,7 +1,8 @@
-import BinaryJudge from "./BinaryJudge.ts";
+import BinaryJudge, {SplitterFunction} from "./BinaryJudge.ts";
 import FullJudgment from "./FullJudgment.ts";
 import {SequenceJudgment, CharJudgment} from "./SequenceJudgment.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
 export default class FixedWidthEncodingJudge implements BinaryJudge {
   public readonly encoder: FixedWidthEncoder;
@@ -10,17 +11,16 @@ export default class FixedWidthEncodingJudge implements BinaryJudge {
     this.encoder = encoder;
   }
 
-  _judgeBits<T extends SequenceJudgment>(
+  judgeBits<T extends SequenceJudgment>(
     guessBits: string,
     winBits: string,
-    newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(
-      bits,
-      judgments
-    ) as T
+    split: SplitterFunction,
+    newSequenceJudgment: (bits: string, judgments: string) => T =
+      (bits, judgments) => new CharJudgment(bits, judgments) as T
   ): FullJudgment<T> {
     const sequenceJudgments: T[] = [];
-    const guessSplit = this.encoder.splitByChar(guessBits);
-    const winSplit = this.encoder.splitByChar(winBits);
+    const guessSplit = split(guessBits);
+    const winSplit = split(winBits);
     let nextGuess = guessSplit.next();
     let nextWin = winSplit.next();
 
@@ -28,13 +28,24 @@ export default class FixedWidthEncodingJudge implements BinaryJudge {
     const correctBits: string[] = [];
 
     while (!nextGuess.done) {
-      const sequenceGuessBits = nextGuess.value;
+      let sequenceGuessBits: string;
+      if (nextGuess.value instanceof DisplayRow) {
+        sequenceGuessBits = nextGuess.value.bits;
+      } else {
+        sequenceGuessBits = nextGuess.value;
+      }
+
       if (nextWin.done) {
         allCorrect = false;
         sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
         nextGuess = guessSplit.next();
       } else {
-        const sequenceWinBits = nextWin.value;
+        let sequenceWinBits: string;
+        if (nextWin.value instanceof DisplayRow) {
+          sequenceWinBits = nextWin.value.bits;
+        } else {
+          sequenceWinBits = nextWin.value;
+        }
         const bitJudgments: string[] = [];
         [...sequenceWinBits].map((bit, index) => {
           const bitIsCorrect = bit === sequenceGuessBits[index];
@@ -57,20 +68,14 @@ export default class FixedWidthEncodingJudge implements BinaryJudge {
     return new FullJudgment<T>(allCorrect, correctBits.join(''), sequenceJudgments);
   }
 
-  judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string
-  ) {
-    return this._judgeBits<T>(guessBits, winBits);
-  }
-
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
     const guessBits = this.encoder.encodeText(guessText);
     const winBits = this.encoder.encodeText(winText);
     const newCharJudgment = (bits: string, bitJudgments: string) => new CharJudgment(bits, bitJudgments);
-    return this._judgeBits<CharJudgment>(
+    return this.judgeBits<CharJudgment>(
       guessBits,
       winBits,
+      (bits) => this.encoder.splitByChar(bits),
       newCharJudgment
     );
   }

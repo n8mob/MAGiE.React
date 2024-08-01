@@ -14,15 +14,15 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
   _judgeBits<T extends SequenceJudgment>(
     guessBits: string,
     winBits: string,
-    splitter: SplitterFunction,
+    split: SplitterFunction,
     newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(
       bits,
       judgments
     ) as T
   ): FullJudgment<T> {
     const sequenceJudgments: T[] = [];
-    const guessSplit = splitter(guessBits);
-    const winSplit = splitter(winBits);
+    const guessSplit = split(guessBits);
+    const winSplit = split(winBits);
     let nextGuess = guessSplit.next();
     let nextWin = winSplit.next();
 
@@ -74,15 +74,15 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
     return new FullJudgment<T>(allCorrect, correctBits, sequenceJudgments);
   }
 
-  judgeBits<T extends DisplayRowJudgment>(
+  judgeBits<T extends SequenceJudgment>(
     guessBits: string,
     winBits: string,
-    splitter: SplitterFunction
+    split: SplitterFunction
   ): FullJudgment<T> {
     return this._judgeBits(
       guessBits,
       winBits,
-      splitter,
+      split,
       (bits, judgments) => new DisplayRowJudgment(bits, judgments) as T
     );
   }
