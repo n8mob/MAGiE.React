@@ -31,6 +31,36 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     };
   }
 
+  componentDidMount() {
+    super.componentDidMount?.();
+    window.addEventListener("keydown", this.handleKeyDown)
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount?.();
+    window.removeEventListener("keydown", this.handleKeyDown)
+  }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "0":
+        this.addBit("0");
+        break;
+      case "1":
+        this.addBit("1");
+        break;
+      case "Backspace":
+        this.deleteBit();
+        break;
+      case "Enter":
+        this.handleSubmitClick();
+        break;
+      default:
+        break;
+    }
+  }
+
+
   updateJudge(puzzle: Puzzle) {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
       this.setState({judge: new VariableWidthEncodingJudge(puzzle.encoding)});
@@ -39,17 +69,6 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     } else {
       console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
     }
-  }
-
-  componentDidUpdate(prevProps: PuzzleProps, prevState: EncodePuzzleState) {
-    if (
-      prevState.guessBits !== this.state.guessBits ||
-      prevState.winBits !== this.state.winBits
-    ) {
-      this.updateDisplayRows();
-    }
-
-    super.componentDidUpdate(prevProps, prevState);
   }
 
   addBit = (bit: string) => {
@@ -112,7 +131,6 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     if (newJudgment) {
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
-        this.resetForNextPuzzle();
       } else {
         this.setState({judgment: newJudgment});
       }

@@ -36,15 +36,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
-  componentDidUpdate(prevProps: PuzzleProps, prevState: PuzzleState) {
-    if (
-      prevState.winBits !== this.state.winBits
-    ) {
-      this.updateDisplayRows();
-    }
-    super.componentDidUpdate(prevProps, prevState);
-  }
-
   updateDisplayRows() {
     const {currentPuzzle, winBits} = this.state;
     if (!currentPuzzle) {
@@ -97,7 +88,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     if (newJudgment) {
       if (newJudgment.isCorrect) {
         this.props.onWin?.();
-        this.resetForNextPuzzle();
       } else {
         this.setState({ judgment: newJudgment });
       }

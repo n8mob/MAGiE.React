@@ -53,11 +53,13 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
     if (
       prevState.currentPuzzle !== this.state.currentPuzzle ||
+      prevState.guessText !== this.state.guessText ||
       prevState.guessBits !== this.state.guessBits ||
       prevState.winBits !== this.state.winBits ||
       prevState.judge !== this.state.judge
     ) {
       this.updateJudgment();
+      this.updateDisplayRows();
     }
   }
 
@@ -94,8 +96,10 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       judge: null,
       guessBits: "",
       winBits: "",
+      displayRows: [],
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
     });
+    this.resetForNextPuzzle();
 
     if (puzzle) {
       this.updateJudge(puzzle);
@@ -107,8 +111,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
   updateJudgment() {
     const { currentPuzzle, judge, winBits, guessBits } = this.state;
-    if (currentPuzzle && judge && winBits && guessBits) {
-      const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    if (currentPuzzle && judge) {
+      const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", this.props.displayWidth);
       const judgment = judge.judgeBits(guessBits, winBits, splitter);
       if (judgment) {
         this.setState({ judgment });
@@ -117,12 +121,12 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   render() {
-    const { currentPuzzle, guessBits, judgment, guessText } = this.state;
+    const { currentPuzzle, displayRows, guessBits, judgment, guessText } = this.state;
 
     return (
       <>
         <DisplayMatrix
-          key={`${currentPuzzle}-${guessBits}-${judgment}`}
+          key={`${currentPuzzle}-${guessBits}-${judgment}-${displayRows.length}`}
           bits={guessBits}
           judgments={judgment.sequenceJudgments}
           decodedGuess={guessText}

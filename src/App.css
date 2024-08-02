@@ -8,7 +8,7 @@
 body {
   font-family: Menlo, Consolas, monospace;
   font-size: large;
-  background-color: #AEAEAE;
+  background-color: #d0d4d4;
 }
 
 p {
@@ -24,10 +24,6 @@ div.display > p, li, input {
 
 div.encoding-inputs > button {
   padding: 10px;
-}
-
-div.display {
-  background-color: #AEAEAE;
 }
 
 input.bit-checkbox {
