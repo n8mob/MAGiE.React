@@ -4,6 +4,7 @@ import BinaryJudge from "../judgment/BinaryJudge.ts";
 import FullJudgment from "../judgment/FullJudgment.ts";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
 interface PuzzleProps {
   puzzle: Puzzle;
@@ -17,6 +18,7 @@ interface PuzzleState {
   guessText: string;
   guessBits: string;
   winBits: string;
+  displayRows: DisplayRow[];
   judgment: FullJudgment<SequenceJudgment>;
   updating: boolean;
 }
@@ -24,17 +26,21 @@ interface PuzzleState {
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
   protected constructor(props: TProps) {
     super(props);
-
-    this.state = {
+    const initialState: PuzzleState = {
       currentPuzzle: props.puzzle,
       judge: null,
-      guessBits: "",
       guessText: "",
+      guessBits: "",
       winBits: "",
+      displayRows: [],
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
       updating: false,
-    } as TState;
+    };
+
+    this.state = initialState as TState;
   }
+
+  abstract updateJudge(puzzle: Puzzle): void;
 
   componentDidMount() {
     this.updateCurrentPuzzle(this.props.puzzle);
@@ -55,7 +61,23 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     }
   }
 
-  abstract updateJudge(puzzle: Puzzle): void;
+  updateDisplayRows() {
+    const {currentPuzzle, guessBits} = this.state;
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return;
+    }
+
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.props.displayWidth);
+    const newDisplayRows: DisplayRow[] = [];
+    let displayRow = displayRowSplit.next();
+    while (displayRow && !displayRow.done) {
+      newDisplayRows.push(displayRow.value);
+      displayRow = displayRowSplit.next();
+    }
+
+    this.setState({displayRows: newDisplayRows});
+  }
 
   resetForNextPuzzle() {
     this.setState({
@@ -79,6 +101,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       this.updateJudge(puzzle);
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
       this.setState({ winBits: newWinText });
+      this.updateJudgment();
     }
   }
 

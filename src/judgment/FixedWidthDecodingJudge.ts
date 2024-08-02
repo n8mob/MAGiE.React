@@ -41,7 +41,7 @@ export default class FixedWidthDecodingJudge implements BinaryJudge {
 
       if (nextGuess.done) {
         allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment("", "0".repeat(sequenceWinBits.length)));
+        sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, "0".repeat(sequenceWinBits.length)));
         nextWin = winSplit.next();
       } else {
         let sequenceGuessBits: string;
@@ -63,7 +63,7 @@ export default class FixedWidthDecodingJudge implements BinaryJudge {
             .join("");
           allCorrect = false;
         }
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments));
+        sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, bitJudgments));
         nextWin = winSplit.next();
         nextGuess = guessSplit.next();
       }

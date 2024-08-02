@@ -38,7 +38,7 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
 
       if (nextGuess.done) {
         allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment("", "0".repeat(sequenceWinBits.length)));
+        sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, "0".repeat(sequenceWinBits.length)));
         nextWin = winSplit.next();
       } else {
         let sequenceGuessBits: string;
@@ -57,7 +57,7 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
             .join("");
           allCorrect = false;
         }
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments));
+        sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, bitJudgments));
         nextGuess = guessSplit.next();
         nextWin = winSplit.next();
       }
