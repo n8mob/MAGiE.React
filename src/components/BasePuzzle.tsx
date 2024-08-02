@@ -38,6 +38,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     };
 
     this.state = initialState as TState;
+    this.handleSubmitClick = this.handleSubmitClick.bind(this);
   }
 
   abstract updateJudge(puzzle: Puzzle): void;
@@ -60,6 +61,24 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     ) {
       this.updateJudgment();
       this.updateDisplayRows();
+    }
+  }
+
+  handleSubmitClick() {
+    const {currentPuzzle, guessBits, winBits} = this.state;
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return;
+    }
+
+    const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
+    if (newJudgment) {
+      if (newJudgment.isCorrect && guessBits.length == winBits.length) {
+        this.props?.onWin();
+      } else {
+        this.setState({judgment: newJudgment});
+      }
     }
   }
 
@@ -132,6 +151,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
           decodedGuess={guessText}
           handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
         />
+        <div className={"encodingInputs"}>
+          <input type="button" value="Check Answer" onClick={this.handleSubmitClick}/>
+        </div>
       </>
     );
   }

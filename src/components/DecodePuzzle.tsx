@@ -24,6 +24,28 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       updating: false,
       displayRows: [],
     };
+
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    window.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount?.();
+    window.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "Enter":
+        this.handleSubmitClick();
+        break;
+      default:
+        break;
+    }
   }
 
   updateJudge(puzzle: Puzzle) {
@@ -75,23 +97,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
     }
     this.setState(newState);
-  };
-
-  handleSubmitClick = () => {
-    const { currentPuzzle, judge, guessBits, winBits } = this.state;
-    if (!currentPuzzle || !judge) {
-      console.error('Missing puzzle or judge');
-      return;
-    }
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
-      if (newJudgment.isCorrect) {
-        this.props.onWin?.();
-      } else {
-        this.setState({ judgment: newJudgment });
-      }
-    }
   };
 
   render() {

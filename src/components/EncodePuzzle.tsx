@@ -29,16 +29,18 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
       updating: false,
       displayRows: [],
     };
+
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   componentDidMount() {
     super.componentDidMount?.();
-    window.addEventListener("keydown", this.handleKeyDown)
+    window.addEventListener("keydown", this.handleKeyDown);
   }
 
   componentWillUnmount() {
     super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown)
+    window.removeEventListener("keydown", this.handleKeyDown);
   }
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -119,24 +121,6 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     this.updateBit(rowIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
   };
 
-  handleSubmitClick = () => {
-    const {currentPuzzle, guessBits, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
-    if (newJudgment) {
-      if (newJudgment.isCorrect && guessBits.length == winBits.length) {
-        this.props?.onWin();
-      } else {
-        this.setState({judgment: newJudgment});
-      }
-    }
-  };
-
   render() {
     const {currentPuzzle, guessBits, judgment} = this.state;
 
@@ -156,7 +140,7 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
             <input type="button" className="bitInput" value="⌫" onClick={this.deleteBit}/>
           </p>
           <p>
-            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
+            <input type="button" value="Submit" onClick={() => this.handleSubmitClick()}/>
           </p>
         </div>
       </>
