@@ -1,97 +1,121 @@
-import {Puzzle} from "../Menu.ts";
-import React, {useEffect, useState} from "react";
-import FullJudgment from "../FullJudgment.ts";
+import React from "react";
+import FullJudgment from "../judgment/FullJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
+import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
+import {Puzzle} from "../Menu.ts";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
+import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
+import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
-interface DecodePuzzleProps {
-  puzzle?: Puzzle;
-  displayWidth: number;
-  onWin: () => void;
-}
+class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+  constructor(props: PuzzleProps) {
+    super(props);
 
-const DecodePuzzle: React.FC<DecodePuzzleProps> = ({puzzle, displayWidth, onWin}) => {
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
-  const [guessText, setGuessText] = useState("");
-  const [guessBits, setGuessBits] = useState("");
-  const [winBits, setWinBits] = useState<string>("");
-  const [judgment, setJudgment] = useState(new FullJudgment<SequenceJudgment>(false, "", []));
-
-  // Update currentPuzzle when the puzzle prop changes
-  useEffect(() => {
-    setCurrentPuzzle(puzzle);
-    setGuessText("");
-    setGuessBits("");
-    setWinBits("");
-    setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
-  }, [puzzle]);
-
-  // initialize guessBits and winBits when the currentPuzzle changes
-  useEffect(() => {
-    if (currentPuzzle) {
-      setGuessText(currentPuzzle.init);
-      const newWinText = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
-      setWinBits(newWinText);
-      setJudgment(new FullJudgment(false, "", []));
-    }
-  }, [currentPuzzle]);
-
-  useEffect(() => {
-    if (currentPuzzle && guessText) {
-      const newGuessBits = currentPuzzle.encoding.encodeText(guessText);
-      setGuessBits(newGuessBits);
-    }
-  }, [currentPuzzle, guessText]);
-
-  // Update judgment when guessBits or winBits changes
-  useEffect(() => {
-    if (currentPuzzle && guessBits && winBits) {
-      const judgment = currentPuzzle?.encoding.judgeBits(
-        guessBits,
-        winBits,
-        displayWidth
-      );
-
-      setJudgment(judgment);
-    }
-  }, [currentPuzzle, guessBits, winBits, displayWidth]);
-
-  return <>
-    <DisplayMatrix
-      key={`${currentPuzzle?.init}-${guessBits}`}
-      guessBits={guessBits}
-      judgment={judgment.sequenceJudgments}
-      decodedGuess={puzzle?.encoding.decodeText(guessBits) || ""}
-      handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
-      />
-    <div className="encodingInputs">
-      <p>
-        <input type="text" value={guessText} onChange={handleGuessUpdate}/>
-      </p><p>
-        <input type="button" value="Submit" onClick={handleSubmitClick}/>
-      </p>
-    </div>
-  </>;
-
-  function handleGuessUpdate(event: React.ChangeEvent<HTMLInputElement>) {
-    const newGuessText = event.target.value.toUpperCase();
-    setGuessText(newGuessText);
-    const newGuessBits = currentPuzzle?.encoding.encodeText(newGuessText) || "";
-    setGuessBits(newGuessBits);
+    this.state = {
+      currentPuzzle: props.puzzle,
+      judge: null,
+      guessText: "",
+      guessBits: "",
+      winBits: "",
+      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
+      updating: false,
+      displayRows: [],
+    };
   }
 
-  function handleSubmitClick() {
+  updateJudge(puzzle: Puzzle) {
+    if (puzzle.encoding instanceof VariableWidthEncoder) {
+      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
+    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
+      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
+    } else {
+      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
+    }
+  }
+
+  updateDisplayRows() {
+    const {currentPuzzle, winBits} = this.state;
     if (!currentPuzzle) {
       console.error('Missing puzzle');
       return;
-    } else {
-      const newJudgment = currentPuzzle.encoding.judgeBits(guessBits, winBits, displayWidth);
+    }
+
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
+    const newDisplayRows: DisplayRow[] = [];
+    let displayRow = displayRowSplit.next();
+    while (displayRow && !displayRow.done) {
+      newDisplayRows.push(displayRow.value);
+      displayRow = displayRowSplit.next();
+    }
+
+    this.setState({displayRows: newDisplayRows});
+  }
+
+  updateJudgment() {
+    const {currentPuzzle, judge, guessBits, winBits} = this.state;
+    if (!currentPuzzle || !judge) {
+      console.error('Missing puzzle or judge');
+      return;
+    }
+
+    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
+    if (newJudgment) {
+      this.setState({judgment: newJudgment});
+    }
+  }
+
+  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newGuessText = event.target.value.toUpperCase();
+    const newState = {
+      guessText: newGuessText,
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
+    }
+    this.setState(newState);
+  };
+
+  handleSubmitClick = () => {
+    const { currentPuzzle, judge, guessBits, winBits } = this.state;
+    if (!currentPuzzle || !judge) {
+      console.error('Missing puzzle or judge');
+      return;
+    }
+    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
+    if (newJudgment) {
       if (newJudgment.isCorrect) {
-        onWin?.();
+        this.props.onWin?.();
       } else {
-        setJudgment(newJudgment);
+        this.setState({ judgment: newJudgment });
       }
     }
+  };
+
+  render() {
+    const { currentPuzzle, guessBits, judgment, guessText , winBits} = this.state;
+
+    return (
+      <>
+        <DisplayMatrix
+          key={`${winBits}-${currentPuzzle?.init}-${guessBits}`}
+          bits={winBits}
+          judgments={judgment.sequenceJudgments}
+          decodedGuess={currentPuzzle?.encoding.decodeText(guessBits) || ""}
+          handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
+        />
+        <div className="encodingInputs">
+          <p>
+            <input type="text" value={guessText} onChange={this.handleGuessUpdate} />
+          </p>
+          <p>
+            <input type="button" value="Submit" onClick={this.handleSubmitClick} />
+          </p>
+        </div>
+      </>
+    );
   }
 }
 

@@ -1,28 +1,28 @@
 import React from "react";
 import BitButton from "./BitButton.tsx";
-import {SequenceJudgment} from "../SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 interface BitButtonMatrixProps {
-  guessBits: string;
-  judgment: SequenceJudgment[];
+  bits: string;
+  judgments: SequenceJudgment[];
   decodedGuess: string;
   handleBitClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
   {
-    guessBits,
-    judgment,
+    bits,
+    judgments,
     decodedGuess,
     handleBitClick
   }) => {
   return (
     <div className="display">
       {
-        [...judgment].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
+        [...judgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
         return <p key={`row${rowIndex}`}>
           {[...rowJudgment.bitJudgments].map((bitJudgment, bitRowIndex) => {
-            const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${guessBits.length}`;
+            const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
             return (
               <BitButton
                 key={key}
