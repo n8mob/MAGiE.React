@@ -10,6 +10,11 @@ import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
 import VariableWidthEncoder from "./encoding/VariableWidthEncoder.ts";
 import BackButton from "./components/BackButton.tsx";
 
+const MENUS = {
+  reactTests: 'ReactTests',
+  bigGame: 'BigGame_fromJSON'
+};
+
 function App() {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [showBackButton, setShowBackButton] = useState(false);
@@ -18,7 +23,7 @@ function App() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const menuData = await getMenu('ReactTests');
+        const menuData = await getMenu(MENUS.bigGame);
         menuData.encodingProviders = {};
         Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
           if (encodingData.type == "fixed") {
