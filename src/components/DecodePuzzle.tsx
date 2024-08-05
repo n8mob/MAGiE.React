@@ -108,7 +108,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           key={`${winBits}-${currentPuzzle?.init}-${guessBits}`}
           bits={winBits}
           judgments={judgment.sequenceJudgments}
-          decodedGuess={currentPuzzle?.encoding.decodeText(guessBits) || ""}
           handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
         />
         <div className="encodingInputs">
