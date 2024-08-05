@@ -1,83 +1,51 @@
 import './App.css'
 import {useEffect, useState} from "react";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {getMenu} from "./PuzzleApi.ts";
-import {Category, FixedEncodingData, Level, Menu, Puzzle, VariableEncodingData} from "./Menu.ts";
-import MenuDisplay from "./components/MenuDisplay.tsx";
-import LevelMenu from "./components/LevelMenu.tsx";
-import LevelPlay from "./components/LevelPlay.tsx";
+import {getDailyPuzzle} from "./PuzzleApi.ts";
+import DailyPuzzle from "./components/DailyPuzzle.tsx";
+import {FixedWidthEncodingData, Puzzle, VariableEncodingData} from "./Menu.ts";
 import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
 import VariableWidthEncoder from "./encoding/VariableWidthEncoder.ts";
-import BackButton from "./components/BackButton.tsx";
-
-const MENUS = {
-  reactTests: 'ReactTests',
-  bigGame: 'BigGame_fromJSON'
-};
+import DateTest from "./components/DateTest.tsx";
 
 function App() {
-  const [menu, setMenu] = useState<Menu | null>(null);
-  const [showBackButton, setShowBackButton] = useState(false);
-  const [backPath, setBackPath] = useState<string | null>(null);
+  const [dailyPuzzle, setDailyPuzzle] = useState<Puzzle | null>(null);
 
   useEffect(() => {
-    const fetchMenu = async () => {
+    const fetchDailyPuzzle = async () => {
       try {
-        const menuData = await getMenu(MENUS.bigGame);
-        menuData.encodingProviders = {};
-        Object.entries(menuData.encodings).map(([encodingName, encodingData]) => {
-          if (encodingData.type == "fixed") {
-            const fixedEncoding = encodingData as FixedEncodingData;
-            menuData.encodingProviders[encodingName] = new FixedWidthEncoder(
-              fixedEncoding.encoding.width,
-              fixedEncoding.encoding.encodingMap
-            );
-          } else if (encodingData.type == "variable") {
-            const variableEncoding = encodingData as VariableEncodingData;
-            menuData.encodingProviders[encodingName] = new VariableWidthEncoder(variableEncoding.encoding);
-          }
-        });
+        const puzzleData = await getDailyPuzzle();
+        const puzzle: Puzzle = puzzleData.puzzle;
+        let encodingData: FixedWidthEncodingData | VariableEncodingData;
+        if (puzzleData.encoding.type == "fixed") {
+          encodingData = puzzleData.encoding.encoding as FixedWidthEncodingData;
+          puzzle.encoding = new FixedWidthEncoder(encodingData.encoding.width, encodingData.encoding.encodingMap);
+        } else {
+          encodingData = puzzleData.encoding as VariableEncodingData;
+          puzzle.encoding = new VariableWidthEncoder(encodingData.encoding);
+        }
 
-        Object.values(menuData.categories).map((category: Category) => {
-          category.levels.map((level: Level) => {
-            level.puzzles.map((puzzle: Puzzle) => {
-              puzzle.encoding = menuData.encodingProviders[puzzle.encoding_name];
-            });
-          });
-        });
-        setMenu(menuData);
+        setDailyPuzzle(puzzle);
       } catch (error) {
         console.error('Failed to fetch menu data:', error)
         return <h2>Error</h2>
       }
     };
 
-    fetchMenu().catch(error => console.error('Error fetching menu data.', error));
-  }, [])
+    fetchDailyPuzzle().catch(error => console.error('Error fetching menu data.', error));
+  }, []);
 
   return (
     <>
       <Router>
-        {showBackButton && backPath && <BackButton backPath={backPath} />}
         <h1>MAGiE</h1>
         <Routes>
           <Route path="/" element={
             <>
-              {menu && <MenuDisplay
-                prompt={<p>Select a category:</p>}
-                options={Object.keys(menu.categories)}
-                basePath="/categories"
-                setShowBackButton={setShowBackButton}
-                setBackPath={setBackPath}
-              />}
+              {dailyPuzzle && <DailyPuzzle puzzle={dailyPuzzle}/>}
             </>
           }/>
-          <Route path="/categories/:categoryName" element={
-            <LevelMenu menu={menu} setShowBackButton={setShowBackButton} setBackPath={setBackPath} />
-          }/>
-          <Route path="/categories/:categoryName/levels/:levelNumber/puzzle?/:puzzleId" element={
-            <LevelPlay menu={menu} setShowBackButton={setShowBackButton} setBackPath={setBackPath} />
-          }/>
+          <Route path="/test/:year/:month/:day" element={<DateTest />} />
         </Routes>
       </Router>
     </>

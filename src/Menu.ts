@@ -7,6 +7,19 @@ export interface EncodingData {
   encoding: unknown;
 }
 
+export interface FixedWidthEncodingData extends EncodingData{
+  type: "fixed";
+  encoding: {
+    width: number;
+    encodingMap: Record<string, number>;
+  };
+}
+
+export interface VariableWidthEncodingData extends EncodingData{
+  type: "variable";
+  encoding: Record<string, Record<string, string>>;
+}
+
 export interface FixedEncodingData extends EncodingData {
   type: "fixed";
   encoding: {
@@ -46,4 +59,10 @@ export interface Menu {
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
   encodingProviders: Record<string, BinaryEncoder>;
+}
+
+export interface DailyPuzzle {
+  date: string;
+  puzzle: Puzzle;
+  encoding: EncodingData;
 }
