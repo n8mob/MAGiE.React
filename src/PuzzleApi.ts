@@ -28,3 +28,19 @@ export const getDailyPuzzle = async (): Promise<DailyPuzzle> => {
     throw error;
   }
 }
+
+export const getDailyPuzzleForDate = async (year: number, month: number, day: number): Promise<DailyPuzzle> => {
+  const puzzleForDate = localStorage.getItem(`daily-puzzle-${year}-${month}-${day}`);
+  if (puzzleForDate) {
+    return JSON.parse(puzzleForDate);
+  }
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/puzzles/daily/${year}/${month}/${day}/`);
+    localStorage.setItem(`daily-puzzle-${year}-${month}-${day}`, JSON.stringify(response.data));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch daily puzzle: for ${year}-${month}-${day}`, error);
+    throw error;
+  }
+};

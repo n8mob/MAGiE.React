@@ -6,12 +6,13 @@ import DailyPuzzle from "./components/DailyPuzzle.tsx";
 import {FixedWidthEncodingData, Puzzle, VariableEncodingData} from "./Menu.ts";
 import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
 import VariableWidthEncoder from "./encoding/VariableWidthEncoder.ts";
+import DateTest from "./components/DateTest.tsx";
 
 function App() {
   const [dailyPuzzle, setDailyPuzzle] = useState<Puzzle | null>(null);
 
   useEffect(() => {
-    const fetchMenu = async () => {
+    const fetchDailyPuzzle = async () => {
       try {
         const puzzleData = await getDailyPuzzle();
         const puzzle: Puzzle = puzzleData.puzzle;
@@ -31,8 +32,8 @@ function App() {
       }
     };
 
-    fetchMenu().catch(error => console.error('Error fetching menu data.', error));
-  }, [])
+    fetchDailyPuzzle().catch(error => console.error('Error fetching menu data.', error));
+  }, []);
 
   return (
     <>
@@ -44,6 +45,7 @@ function App() {
               {dailyPuzzle && <DailyPuzzle puzzle={dailyPuzzle}/>}
             </>
           }/>
+          <Route path="/test/:year/:month/:day" element={<DateTest />} />
         </Routes>
       </Router>
     </>

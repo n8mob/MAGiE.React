@@ -48,15 +48,15 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
     } else {
       return <>
         <div className="display">
-          {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
+          {currentPuzzle.clue.map((line, index) => <p key={`clue-line-${index}`}>{line}</p>)}
         </div>
-        {currentPuzzle?.type === "Encode" ? (
-          <EncodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={13}/>
+        {currentPuzzle.type === "Encode" ? (
+          <EncodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={7}/>
         ) : (
-          <DecodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={13}/>
+          <DecodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={7}/>
         )}
         <div className="display">
-          {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
+          {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
         </div>
         {hasWon && <div>
           <h1>to do: share win controls</h1>
