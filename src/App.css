@@ -2,7 +2,6 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 body {
@@ -16,14 +15,33 @@ p {
   letter-spacing: 1px;
 }
 
+div.display {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+}
+
 div.display > p, li, input {
-  text-align: justify;
+  display: flex;
   text-transform: uppercase;
   margin: 1px;
 }
 
+div.encoding-inputs {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: 1rem;
+}
+
 div.encoding-inputs > button {
   padding: 10px;
+}
+
+div.share-controls {
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
 }
 
 input.bit-checkbox {
