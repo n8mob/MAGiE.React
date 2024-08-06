@@ -140,7 +140,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   render() {
-    const { currentPuzzle, displayRows, guessBits, judgment, guessText } = this.state;
+    const { currentPuzzle, displayRows, guessBits, judgment} = this.state;
 
     return (
       <>
@@ -148,7 +148,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
           key={`${currentPuzzle}-${guessBits}-${judgment}-${displayRows.length}`}
           bits={guessBits}
           judgments={judgment.sequenceJudgments}
-          decodedGuess={guessText}
           handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
         />
         <div className={"encodingInputs"}>

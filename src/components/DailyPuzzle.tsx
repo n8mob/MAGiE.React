@@ -19,7 +19,7 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
 
     this.state = {
       currentPuzzle: props.puzzle,
-      winMessage: [""],
+      winMessage: props.puzzle.winMessage,
       hasWon: false,
     };
 
@@ -55,11 +55,14 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
         ) : (
           <DecodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={7}/>
         )}
-        <div className="display">
-          {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
-        </div>
         {hasWon && <div>
-          <h1>to do: share win controls</h1>
+          <div className="display">
+            {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
+          </div>
+          <div className="share-controls">
+            <p>TO DO: SHARE RESULTS</p>
+            <p>even if the line is very long</p>
+          </div>
         </div>}
       </>
     }

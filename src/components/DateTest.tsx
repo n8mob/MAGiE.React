@@ -48,10 +48,10 @@ const DateTest = () => {
   }
 
   return (
-    <div>
+    <>
       <h2>Date Test for {year}-{month}-{day}</h2>
       {puzzle && <DailyPuzzle puzzle={puzzle}/>}
-    </div>
+    </>
   );
 };
 
