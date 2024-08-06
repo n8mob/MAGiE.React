@@ -78,13 +78,13 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
   updateJudgment() {
     const {currentPuzzle, judge, guessBits, winBits} = this.state;
-    if (!currentPuzzle || !judge) {
-      console.error('Missing puzzle or judge');
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
       return;
     }
 
     const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
+    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
     }
@@ -100,7 +100,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   };
 
   render() {
-    const { currentPuzzle, guessBits, judgment, guessText , winBits} = this.state;
+    const {currentPuzzle, guessBits, judgment, guessText, winBits} = this.state;
 
     return (
       <>
@@ -108,14 +108,15 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           key={`${winBits}-${currentPuzzle?.init}-${guessBits}`}
           bits={winBits}
           judgments={judgment.sequenceJudgments}
-          handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
+          handleBitClick={() => {
+          }}  // bits will be read-only for the decode puzzle
         />
         <div className="encodingInputs">
           <p>
-            <input type="text" value={guessText} onChange={this.handleGuessUpdate} />
+            <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
           </p>
           <p>
-            <input type="button" value="Submit" onClick={this.handleSubmitClick} />
+            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
           </p>
         </div>
       </>
