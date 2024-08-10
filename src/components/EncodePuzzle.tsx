@@ -130,7 +130,6 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
           key={`${currentPuzzle?.init}-${guessBits}`}
           bits={guessBits}
           judgments={judgment.sequenceJudgments}
-          decodedGuess={currentPuzzle?.encoding.decodeText(guessBits) || ""}
           handleBitClick={this.handleBitClick}
         />
         <div className="encodingInputs">
