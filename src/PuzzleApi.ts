@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {DailyPuzzle, Menu} from "./Menu.ts";
 
-const API_BASE_URL = '/puzzle-api';
+const API_BASE_URL = 'https://puzzles.magiegame.com';
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
   const menuData = localStorage.getItem(menuName);
