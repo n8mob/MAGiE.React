@@ -106,6 +106,7 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
         + '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
+          .then(() => {alert("The share message has been copied to your clipboard.");})
           .catch(error => {
             console.error('Failed to copy text: ', error);
             alert("Sorry, we couldn't copy the text to your clipboard either.");
