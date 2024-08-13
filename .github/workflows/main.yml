@@ -31,7 +31,6 @@ jobs:
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USER: ${{ secrets.LIGHTSAIL_USER }}
-          LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
         run: |
-          scp -i $LIGHTSAIL_KEY -r dist/* $LIGHTSAIL_USER@$LIGHTSAIL_HOST:/path/to/deploy
+          scp -i ~/.ssh/id_ed25519 -r dist/* $LIGHTSAIL_USER@$LIGHTSAIL_HOST:/path/to/deploy
           
