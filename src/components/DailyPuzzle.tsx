@@ -36,10 +36,6 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
     }
   }
 
-  handleWin() {
-    this.setState({hasWon: true});
-  }
-
   render() {
     const {currentPuzzle, hasWon, winMessage} = this.state;
 
@@ -60,12 +56,28 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
             {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
           </div>
           <div className="share-controls">
-            <p>TO DO: SHARE RESULTS</p>
-            <p>even if the line is very long</p>
+            <button onClick={this.handleShareWin}>Share Your Win</button>
           </div>
         </div>}
       </>
     }
   }
-}
+
+  handleWin() {
+    this.setState({hasWon: true});
+  }
+
+  handleShareWin() {
+    if (navigator.share) {
+      navigator.share({
+        title: "MAGiE Game",
+        text: "Check out this puzzle I solved!",
+        url: window.location.href,
+      })
+        .catch(console.error);
+    } else {
+      alert('It seems that the "Web Share" API is not supported in your browser');
+    }
+  }
+  }
 
