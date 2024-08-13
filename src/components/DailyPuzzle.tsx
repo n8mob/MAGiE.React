@@ -68,15 +68,26 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
   }
 
   handleShareWin() {
+    const today = new Date().toLocaleDateString();
+    const shareText = `I decoded the MAGiE puzzle for ${today}!`;
     if (navigator.share) {
       navigator.share({
-        title: "MAGiE Game",
-        text: "Check out this puzzle I solved!",
+        title: "MAGiE binary puzzles",
+        text: shareText,
         url: window.location.href,
       })
         .catch(console.error);
-    } else {
-      alert('It seems that the "Web Share" API is not supported in your browser');
+    } else if (navigator.clipboard) {
+      const shareViaClipboard =
+        'It seems that this browser does not support "Web Share".'
+      + '\nShall we copy the share message to your clipboard?';
+      if (window.confirm(shareViaClipboard)) {
+        navigator.clipboard.writeText(shareText)
+          .catch(error => {
+            console.error('Failed to copy text: ', error);
+            alert("Sorry, we couldn't copy the text to your clipboard either.");
+          });
+      }
     }
   }
   }
