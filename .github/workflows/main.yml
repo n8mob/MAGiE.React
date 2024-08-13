@@ -24,6 +24,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Ensure .ssh directory exists
+        run: mkdir -p ~/.ssh
+
       - name: SSH Key
         run: echo "${{ secrets.LIGHTSAIL_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
