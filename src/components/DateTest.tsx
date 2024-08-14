@@ -10,17 +10,21 @@ import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 const DateTest = () => {
   const {year, month, day} = useParams<{ year: string, month: string, day: string }>();
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
+  const [yearN, setYearN] = useState<number>(0);
+  const [monthN, setMonthN] = useState<number>(0);
+  const [dayN, setDayN] = useState<number>(0);
 
   useEffect(() => {
     if (!year || !month || !day) {
       return;
     }
 
+    setYearN(parseInt(year));
+    setMonthN(parseInt(month) - 1);
+    setDayN(parseInt(day));
+
     const fetchPuzzleForDate = async () => {
       try {
-        const yearN = parseInt(year);
-        const monthN = parseInt(month);
-        const dayN = parseInt(day);
 
         const puzzleData = await getDailyPuzzleForDate(yearN, monthN, dayN);
         const puzzle: Puzzle = puzzleData.puzzle;
@@ -41,7 +45,7 @@ const DateTest = () => {
     };
 
     fetchPuzzleForDate().catch(error => console.error('Error fetching daily puzzle.', error));
-  }, [year, month, day]);
+  }, [yearN, monthN, dayN, year, month, day]);
 
   if (!puzzle) {
     return <h2>Loading...</h2>
@@ -50,7 +54,7 @@ const DateTest = () => {
   return (
     <>
       <h2>Date Test for {year}-{month}-{day}</h2>
-      {puzzle && <DailyPuzzle puzzle={puzzle}/>}
+      {puzzle && <DailyPuzzle puzzle={puzzle} date={new Date(yearN, monthN, dayN)}/>}
     </>
   );
 };
