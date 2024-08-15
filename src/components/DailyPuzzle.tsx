@@ -24,13 +24,8 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     const userLocale = navigator.language;
     const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
     setFormattedDate(formattedDate)
-
-    if (date.getDate() == new Date().getDate()) {
-      setShareText(`I decoded the MAGiE puzzle for today (${formattedDate})!`);
-    } else {
-      setShareText(`I decoded the MAGiE puzzle for ${formattedDate}!`);
-    }
-
+    const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
+    setShareText(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
   }, [puzzle, date]);
 
   const handleWin = () => {
