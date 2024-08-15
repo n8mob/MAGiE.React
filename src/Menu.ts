@@ -61,7 +61,7 @@ export interface Menu {
   encodingProviders: Record<string, BinaryEncoder>;
 }
 
-export interface DailyPuzzle {
+export interface PuzzleForDate {
   date: string;
   puzzle: Puzzle;
   encoding: EncodingData;
