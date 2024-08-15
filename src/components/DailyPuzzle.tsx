@@ -1,116 +1,43 @@
-import {Component} from "react";
+import {useEffect, useState} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
-import {FixedWidthEncodingData, Puzzle, VariableEncodingData} from "../Menu.ts";
-import {getDailyPuzzleForDate} from "../PuzzleApi.ts";
-import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
+import {Puzzle} from "../Menu.ts";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
   date: Date;
 }
 
-interface DailyPuzzleState {
-  currentPuzzle: Puzzle;
-  date: Date;
-  formattedDate: string;
-  winMessage: string[];
-  hasWon: boolean;
-}
+const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
+  const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
+  const [winMessage, setWinMessage] = useState(puzzle.winMessage);
+  const [hasWon, setHasWon] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+  const [shareText, setShareText] = useState("");
 
-export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzleState> {
-  constructor(props: DailyPuzzleProps) {
-    super(props);
-    this.state = {
-      currentPuzzle: props.puzzle,
-      date: props.date,
-      formattedDate: this.formatDate(props.date),
-      winMessage: props.puzzle.winMessage,
-      hasWon: false,
-    };
+  useEffect(() => {
+    setCurrentPuzzle(puzzle);
+    setWinMessage(puzzle.winMessage);
+    setHasWon(false);
 
-    this.formatDate = this.formatDate.bind(this);
-    this.componentDidUpdate = this.componentDidUpdate.bind(this);
-    this.handleWin = this.handleWin.bind(this);
-    this.handleShareWin = this.handleShareWin.bind(this);
-  }
-
-  formatDate(date: Date) {
     const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'long', month: 'long', day: 'numeric'};
     const userLocale = navigator.language;
-    return date.toLocaleDateString(userLocale, prettyOptions);
-  }
+    const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
+    setFormattedDate(formattedDate)
 
-  componentDidUpdate(prevProps: Readonly<DailyPuzzleProps>) {
-    const {date} = this.props;
-    const fetchPuzzleForDate = async () => {
-      try {
-        const puzzleData = await getDailyPuzzleForDate(
-          date.getFullYear(),
-          date.getMonth() + 1,
-          date.getDate()
-        );
-        const puzzle: Puzzle = puzzleData.puzzle;
-        let encodingData: FixedWidthEncodingData | VariableEncodingData;
-        if (puzzleData.encoding.type == "fixed") {
-          encodingData = puzzleData.encoding.encoding as FixedWidthEncodingData;
-          puzzle.encoding = new FixedWidthEncoder(encodingData.encoding.width, encodingData.encoding.encodingMap);
-        } else {
-          encodingData = puzzleData.encoding as VariableEncodingData;
-          puzzle.encoding = new VariableWidthEncoder(encodingData.encoding);
-        }
-      } catch (error) {
-        console.error('Failed to fetch daily puzzle:', error);
-      }
-    };
-
-    fetchPuzzleForDate().catch(error => console.error('Error fetching daily puzzle.', error));
-    if (prevProps.puzzle !== this.props.puzzle) {
-      this.setState({
-        currentPuzzle: this.props.puzzle,
-        formattedDate: this.formatDate(this.props.date),
-        winMessage: this.props.puzzle.winMessage,
-        hasWon: false,
-      });
-    }
-  }
-
-  render() {
-    const {currentPuzzle, formattedDate, hasWon, winMessage} = this.state;
-
-    if (!currentPuzzle) {
-      return <div>Loading...</div>;
+    if (date.getDate() == new Date().getDate()) {
+      setShareText(`I decoded the MAGiE puzzle for today (${formattedDate})!`);
     } else {
-      return <>
-        <h2>Daily Puzzle<br />{formattedDate}</h2>
-        <div className="display">
-          {currentPuzzle.clue.map((line, index) => <p key={`clue-line-${index}`}>{line}</p>)}
-        </div>
-        {currentPuzzle.type === "Encode" ? (
-          <EncodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={7}/>
-        ) : (
-          <DecodePuzzle puzzle={currentPuzzle} onWin={this.handleWin} displayWidth={7}/>
-        )}
-        {hasWon && <div>
-          <div className="display">
-            {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
-          </div>
-          <div className="share-controls">
-            <button onClick={this.handleShareWin}>Share Your Win</button>
-          </div>
-        </div>}
-      </>
+      setShareText(`I decoded the MAGiE puzzle for ${formattedDate}!`);
     }
-  }
 
-  handleWin() {
-    this.setState({hasWon: true});
-  }
+  }, [puzzle, date]);
 
-  handleShareWin() {
-    const {formattedDate} = this.state
-    const shareText = `I decoded today's MAGiE puzzle! (${formattedDate})`;
+  const handleWin = () => {
+    setHasWon(true);
+  };
+
+  const handleShareWin = () => {
     if (navigator.share) {
       navigator.share({
         title: "MAGiE binary puzzles",
@@ -137,6 +64,31 @@ export default class DailyPuzzle extends Component<DailyPuzzleProps, DailyPuzzle
       + shareText;
       alert(message);
     }
-  }
-}
+  };
 
+  if (!currentPuzzle) {
+    return <div>Loading...</div>;
+  } else {
+    return <>
+      <h2>{formattedDate}</h2>
+      <div className="display">
+        {currentPuzzle.clue.map((line, index) => <p key={`clue-line-${index}`}>{line}</p>)}
+      </div>
+      {currentPuzzle.type === "Encode" ? (
+        <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+      ) : (
+        <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+      )}
+      {hasWon && <div>
+        <div className="display">
+          {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
+        </div>
+        <div className="share-controls">
+          <button onClick={handleShareWin}>Share Your Win</button>
+        </div>
+      </div>}
+    </>
+  }
+};
+
+export default DailyPuzzle;

@@ -29,18 +29,17 @@ export const getDailyPuzzle = async (): Promise<PuzzleForDate> => {
   }
 }
 
-export const getDailyPuzzleForDate = async (year: number, month: number, day: number): Promise<PuzzleForDate> => {
+export const getDailyPuzzleForDate = async (puzzleDate: Date): Promise<PuzzleForDate> => {
+  return getDailyPuzzleForYearMonthDay(puzzleDate.getFullYear(), puzzleDate.getMonth() + 1, puzzleDate.getDate());
+}
+
+export const getDailyPuzzleForYearMonthDay = async (year: number, month: number, day: number): Promise<PuzzleForDate> => {
   const puzzleForDate = localStorage.getItem(`daily-puzzle-${year}-${month}-${day}`);
   if (puzzleForDate) {
     return JSON.parse(puzzleForDate);
   }
 
-  try {
-    const response = await axios.get(`${API_BASE_URL}/puzzles/daily/${year}/${month}/${day}/`);
-    localStorage.setItem(`daily-puzzle-${year}-${month}-${day}`, JSON.stringify(response.data));
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to fetch daily puzzle: for ${year}-${month}-${day}`, error);
-    throw error;
-  }
+  const response = await axios.get(`${API_BASE_URL}/puzzles/daily/${year}/${month}/${day}/`);
+  localStorage.setItem(`daily-puzzle-${year}-${month}-${day}`, JSON.stringify(response.data));
+  return response.data;
 };
