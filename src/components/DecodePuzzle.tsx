@@ -136,12 +136,8 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           />
         </div>
         <div className="puzzle-inputs">
-          <p>
-            <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
-          </p>
-          <p>
-            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
-          </p>
+          <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
+          <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
         </div>
       </>
     );
