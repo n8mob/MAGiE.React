@@ -5,9 +5,13 @@
   max-height: 100%;
 }
 
-body {
+html, body {
   font-family: Menlo, Consolas, monospace;
   background-color: #d0d4d4;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 h1#magie-title {
@@ -28,8 +32,10 @@ h2 {
 }
 
 div.display * {
-  display: flex;
+  width: 100%;
+  max-width: 100%;
   text-transform: uppercase;
+  overflow-x: hidden;
   margin: 1px;
 }
 
