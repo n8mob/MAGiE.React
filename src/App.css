@@ -8,6 +8,7 @@ html, body {
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow-x: hidden;
   overflow-y: scroll;
+  scroll-padding-top: 50vh;
 }
 
 #root {
