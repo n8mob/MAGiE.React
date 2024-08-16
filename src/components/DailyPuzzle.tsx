@@ -14,6 +14,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   const [hasWon, setHasWon] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [shareText, setShareText] = useState("");
+  const [displayWidth, setDisplayWidth] = useState(13); // Default value
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
@@ -26,6 +27,16 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     setFormattedDate(formattedDate)
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setShareText(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
+
+    const updateDisplayWidth = () => {
+      const viewportWidth = window.innerWidth;
+      const bitCheckboxWidth = 32;
+      const newDisplayWidth = Math.floor((viewportWidth * 0.8) / bitCheckboxWidth);
+      setDisplayWidth(newDisplayWidth);
+    };
+
+    updateDisplayWidth();
+
   }, [puzzle, date]);
 
   const handleWin = () => {
@@ -70,9 +81,9 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
       <h2>{formattedDate}</h2>
       <div className="display">
         {currentPuzzle.type === "Encode" ? (
-          <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+          <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}/>
         ) : (
-          <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+          <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}/>
         )}
         {hasWon && <div className="win-message">
           {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
