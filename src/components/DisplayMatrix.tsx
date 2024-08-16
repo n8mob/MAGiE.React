@@ -15,7 +15,7 @@ const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
     handleBitClick
   }) => {
   return (
-    <div className="display">
+    <>
       {
         [...judgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
           return <p key={`row${rowIndex}`}>
@@ -33,7 +33,7 @@ const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
             })}
           </p>;
         })}
-    </div>
+    </>
   );
 }
 

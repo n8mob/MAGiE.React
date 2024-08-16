@@ -2,39 +2,54 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+  max-height: 100%;
 }
 
 body {
   font-family: Menlo, Consolas, monospace;
-  font-size: large;
   background-color: #d0d4d4;
+}
+
+h1#magie-title {
+  font-size: 5em;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  margin: 0;
 }
 
 p {
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
-div.display {
-  display: flex;
-  flex-direction: column;
-  margin: 1rem;
+h2 {
+  margin: 0;
 }
 
-div.display > p, li, input {
+div.display * {
   display: flex;
   text-transform: uppercase;
   margin: 1px;
 }
 
-div.encoding-inputs {
+div.clue-and-bits {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 50vh;
+}
+
+div.puzzle-inputs {
   display: flex;
   justify-content: center;
   flex-direction: column;
   margin: 1rem;
 }
 
-div.encoding-inputs > button {
+.decoding-inputs {
+  font-size: 16px;
+  width: 100%;
   padding: 10px;
 }
 
@@ -42,6 +57,13 @@ div.share-controls {
   display: flex;
   justify-content: left;
   flex-direction: column;
+}
+
+div.win-message {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 50vh;
 }
 
 input.bit-checkbox {

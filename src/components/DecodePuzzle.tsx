@@ -10,6 +10,13 @@ import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
+const preloadImages = (urls: string[]) => {
+  urls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+}
+
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
     super(props);
@@ -26,6 +33,15 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     };
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
+
+    preloadImages([
+      'assets/Bit_off_Yellow.png',
+      'assets/Bit_on_Yellow.png',
+      'assets/Bit_off_Teal.png',
+      'assets/Bit_on_Teal.png',
+      'assets/Bit_off_Purple.png',
+      'assets/Bit_on_Purple.png',
+      ]);
   }
 
   componentDidMount() {
@@ -102,21 +118,29 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   render() {
     const {currentPuzzle, guessBits, judgment, guessText, winBits} = this.state;
 
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return <></>;
+    }
+
     return (
       <>
-        <DisplayMatrix
-          key={`${winBits}-${currentPuzzle?.init}-${guessBits}`}
-          bits={winBits}
-          judgments={judgment.sequenceJudgments}
-          handleBitClick={() => {
-          }}  // bits will be read-only for the decode puzzle
-        />
-        <div className="encodingInputs">
+        <div className="clue-and-bits">
+          {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
+          <DisplayMatrix
+            key={`${winBits}-${currentPuzzle.init}-${guessBits}`}
+            bits={winBits}
+            judgments={judgment.sequenceJudgments}
+            handleBitClick={() => {
+            }}  // bits will be read-only for the decode puzzle
+          />
+        </div>
+        <div className="puzzle-inputs">
           <p>
-            <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
+            <input type="text" className="decoding-inputs" value={guessText} onChange={this.handleGuessUpdate}/>
           </p>
           <p>
-            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
+            <input type="button" className="decoding-inputs" value="Submit" onClick={this.handleSubmitClick}/>
           </p>
         </div>
       </>

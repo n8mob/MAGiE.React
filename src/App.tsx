@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <Router>
-        <h1>MAGiE</h1>
+        <h1 id="magie-title">MAGiE</h1>
         <Routes>
           <Route path="/" element={<TodaysPuzzle />}/>
           <Route path="/test/:year/:month/:day" element={<SpecificDaysPuzzle />} />

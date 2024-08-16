@@ -35,7 +35,7 @@ const SpecificDaysPuzzle = () => {
   return (
     <>
       <h2>Date Test</h2>
-      {currentPuzzle && <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!} />}
+        {currentPuzzle && <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!}/>}
     </>
   );
 };
