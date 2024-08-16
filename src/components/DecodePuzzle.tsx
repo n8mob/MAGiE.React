@@ -41,7 +41,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       'assets/Bit_on_Teal.png',
       'assets/Bit_off_Purple.png',
       'assets/Bit_on_Purple.png',
-      ]);
+    ]);
   }
 
   componentDidMount() {
