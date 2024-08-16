@@ -125,7 +125,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
     return (
       <>
-        <div className="clue-and-bits">
+        <div id="bit-field" className="clue-and-bits">
           {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
           <DisplayMatrix
             key={`${winBits}-${currentPuzzle.init}-${guessBits}`}
@@ -137,10 +137,10 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
         </div>
         <div className="puzzle-inputs">
           <p>
-            <input type="text" className="decoding-inputs" value={guessText} onChange={this.handleGuessUpdate}/>
+            <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
           </p>
           <p>
-            <input type="button" className="decoding-inputs" value="Submit" onClick={this.handleSubmitClick}/>
+            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
           </p>
         </div>
       </>

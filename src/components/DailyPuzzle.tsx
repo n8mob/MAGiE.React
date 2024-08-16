@@ -29,13 +29,31 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     setShareText(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
 
     const updateDisplayWidth = () => {
-      const viewportWidth = window.innerWidth;
+      const elementId = "bit-field";
+      const mainDisplay = document.getElementById(elementId);
+      let displayWidthPixels;
+      let widthDebugMessage: string;
+      if (!mainDisplay) {
+        displayWidthPixels = Math.floor(window.innerWidth * 0.85);
+        widthDebugMessage = `displayWidthPixels (estimated from window): ${displayWidthPixels}.`;
+      } else {
+        displayWidthPixels = parseInt(getComputedStyle(mainDisplay).width);
+        widthDebugMessage = `displayWidthPixels from getComputedStyle(${elementId})): ${displayWidthPixels}.`;
+      }
+
       const bitCheckboxWidth = 32;
-      const newDisplayWidth = Math.floor((viewportWidth * 0.8) / bitCheckboxWidth);
+      const newDisplayWidth = Math.floor(displayWidthPixels / bitCheckboxWidth);
+      console.log(`${widthDebugMessage} => ${displayWidthPixels} / ${bitCheckboxWidth} = ${newDisplayWidth}`);
       setDisplayWidth(newDisplayWidth);
     };
 
     updateDisplayWidth();
+
+    window.addEventListener("resize", updateDisplayWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateDisplayWidth);
+    };
 
   }, [puzzle, date]);
 
@@ -79,11 +97,13 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   } else {
     return <>
       <h2>{formattedDate}</h2>
-      <div className="display">
+      <div id="main-display" className="display">
         {currentPuzzle.type === "Encode" ? (
-          <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}/>
+          <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}
+                        key={`${currentPuzzle}-${displayWidth}`}/>
         ) : (
-          <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}/>
+          <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}
+                        key={`${currentPuzzle}-${displayWidth}`}/>
         )}
         {hasWon && <div className="win-message">
           {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
