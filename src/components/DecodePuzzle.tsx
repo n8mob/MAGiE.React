@@ -10,6 +10,13 @@ import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 
+const preloadImages = (urls: string[]) => {
+  urls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+}
+
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
     super(props);
@@ -26,6 +33,15 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     };
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
+
+    preloadImages([
+      'assets/Bit_off_Yellow.png',
+      'assets/Bit_on_Yellow.png',
+      'assets/Bit_off_Teal.png',
+      'assets/Bit_on_Teal.png',
+      'assets/Bit_off_Purple.png',
+      'assets/Bit_on_Purple.png',
+      ]);
   }
 
   componentDidMount() {
