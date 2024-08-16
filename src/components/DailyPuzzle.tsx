@@ -46,7 +46,9 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
         + '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
-          .then(() => {alert("The share message has been copied to your clipboard.");})
+          .then(() => {
+            alert("The share message has been copied to your clipboard.");
+          })
           .catch(error => {
             console.error('Failed to copy text: ', error);
             alert("Sorry, we couldn't copy the text to your clipboard either.");
@@ -54,9 +56,9 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
       }
     } else {
       const message = 'It seems that this browser supports '
-      + 'neither web share nor programmatic clipboard access.\n\n'
-      + 'The following message was prepared for sharing:\n\n'
-      + shareText;
+        + 'neither web share nor programmatic clipboard access.\n\n'
+        + 'The following message was prepared for sharing:\n\n'
+        + shareText;
       alert(message);
     }
   };
@@ -67,21 +69,17 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     return <>
       <h2>{formattedDate}</h2>
       <div className="display">
-        {currentPuzzle.clue.map((line, index) => <p key={`clue-line-${index}`}>{line}</p>)}
-      </div>
-      {currentPuzzle.type === "Encode" ? (
-        <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
-      ) : (
-        <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
-      )}
-      {hasWon && <div>
-        <div className="display">
+        {currentPuzzle.type === "Encode" ? (
+          <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+        ) : (
+          <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={7}/>
+        )}
+        {hasWon && <div className="win-message">
           {winMessage.map((line, index) => <p key={`winMessageLine-${index}`}>{line}</p>)}
-        </div>
-        <div className="share-controls">
           <button onClick={handleShareWin}>Share Your Win</button>
         </div>
-      </div>}
+        }
+      </div>
     </>
   }
 };

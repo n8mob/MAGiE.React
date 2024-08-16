@@ -102,16 +102,24 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   render() {
     const {currentPuzzle, guessBits, judgment, guessText, winBits} = this.state;
 
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return <></>;
+    }
+
     return (
       <>
-        <DisplayMatrix
-          key={`${winBits}-${currentPuzzle?.init}-${guessBits}`}
-          bits={winBits}
-          judgments={judgment.sequenceJudgments}
-          handleBitClick={() => {
-          }}  // bits will be read-only for the decode puzzle
-        />
-        <div className="encodingInputs">
+        <div className="clue-and-bits">
+          {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
+          <DisplayMatrix
+            key={`${winBits}-${currentPuzzle.init}-${guessBits}`}
+            bits={winBits}
+            judgments={judgment.sequenceJudgments}
+            handleBitClick={() => {
+            }}  // bits will be read-only for the decode puzzle
+          />
+        </div>
+        <div className="encoding-inputs">
           <p>
             <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
           </p>
