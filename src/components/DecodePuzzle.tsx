@@ -135,12 +135,12 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
             }}  // bits will be read-only for the decode puzzle
           />
         </div>
-        <div className="encoding-inputs">
+        <div className="puzzle-inputs">
           <p>
-            <input type="text" value={guessText} onChange={this.handleGuessUpdate}/>
+            <input type="text" className="decoding-inputs" value={guessText} onChange={this.handleGuessUpdate}/>
           </p>
           <p>
-            <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
+            <input type="button" className="decoding-inputs" value="Submit" onClick={this.handleSubmitClick}/>
           </p>
         </div>
       </>

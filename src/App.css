@@ -27,7 +27,7 @@ h2 {
   margin: 0;
 }
 
-div.display p, li, input {
+div.display * {
   display: flex;
   text-transform: uppercase;
   margin: 1px;
@@ -40,14 +40,16 @@ div.clue-and-bits {
   max-height: 50vh;
 }
 
-div.encoding-inputs {
+div.puzzle-inputs {
   display: flex;
   justify-content: center;
   flex-direction: column;
   margin: 1rem;
 }
 
-div.encoding-inputs > button {
+.decoding-inputs {
+  font-size: 16px;
+  width: 100%;
   padding: 10px;
 }
 
