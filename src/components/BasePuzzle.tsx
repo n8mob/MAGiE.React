@@ -5,6 +5,7 @@ import FullJudgment from "../judgment/FullJudgment.ts";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import DisplayMatrix from "./DisplayMatrix.tsx";
 import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import ReactGA4 from "react-ga4";
 
 interface PuzzleProps {
   puzzle: Puzzle;
@@ -67,13 +68,28 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   handleSubmitClick() {
     const {currentPuzzle, guessBits, winBits} = this.state;
     if (!currentPuzzle) {
-      console.error('Missing puzzle');
+      ReactGA4.event({
+        category: 'Error',
+        action: 'Missing puzzle',
+      })
       return;
     }
-
     const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
     const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
     if (newJudgment) {
+      ReactGA4.event(
+        "GuessSubmitted",
+        {
+          guessBits: guessBits.toString(),
+          clue: currentPuzzle.clue,
+          encoding: currentPuzzle.encoding_name,
+          type: currentPuzzle.type,
+          winText: currentPuzzle.winText,
+          judgment_is_correct: newJudgment.isCorrect,
+          judgment_correct_guess: newJudgment.correctGuess.toString(),
+          pagePath: window.location.pathname + window.location.search
+        }
+      );
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
       } else {
@@ -123,24 +139,24 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     if (puzzle) {
       this.updateJudge(puzzle);
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
-      this.setState({ winBits: newWinText });
+      this.setState({winBits: newWinText});
       this.updateJudgment();
     }
   }
 
   updateJudgment() {
-    const { currentPuzzle, judge, winBits, guessBits } = this.state;
+    const {currentPuzzle, judge, winBits, guessBits} = this.state;
     if (currentPuzzle && judge) {
       const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", this.props.displayWidth);
       const judgment = judge.judgeBits(guessBits, winBits, splitter);
       if (judgment) {
-        this.setState({ judgment });
+        this.setState({judgment});
       }
     }
   }
 
   render() {
-    const { currentPuzzle, displayRows, guessBits, judgment} = this.state;
+    const {currentPuzzle, displayRows, guessBits, judgment} = this.state;
 
     return (
       <>
@@ -148,7 +164,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
           key={`${currentPuzzle}-${guessBits}-${judgment}-${displayRows.length}`}
           bits={guessBits}
           judgments={judgment.sequenceJudgments}
-          handleBitClick={() => {}} // read-only bits, EncodePuzzle can add an update function.
+          handleBitClick={() => {
+          }} // read-only bits, EncodePuzzle can add an update function.
         />
         <div className={"encodingInputs"}>
           <input type="button" value="Check Answer" onClick={this.handleSubmitClick}/>
@@ -159,4 +176,4 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 }
 
 export default BasePuzzle;
-export type { PuzzleProps, PuzzleState };
+export type {PuzzleProps, PuzzleState};
