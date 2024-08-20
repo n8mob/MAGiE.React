@@ -1,6 +1,17 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
+const ONE_MINUTE_IN_SECONDS = 60;
+const ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60;
+
+interface StopwatchHandle {
+  stop: () => void;
+  reset: () => void;
+  getTime: () => number;
+  displayTime: () => string;
+  getHours: () => number;
+  getMinutes: () => number;
+  getSeconds: () => number;
+}
 
 const Stopwatch = forwardRef((_props, ref) => {
   const [time, setTime] = useState(0);
@@ -20,12 +31,52 @@ const Stopwatch = forwardRef((_props, ref) => {
     return () => clearInterval(interval!);
   }, [isRunning, time]);
 
+  const getHours = () => {
+    return Math.floor(time / ONE_HOUR_IN_SECONDS);
+  }
+
+  const getMinutes = () => {
+    return Math.floor((time % ONE_HOUR_IN_SECONDS) / ONE_MINUTE_IN_SECONDS);
+  }
+
+  const getSeconds = () => {
+    return time % ONE_MINUTE_IN_SECONDS;
+  }
+
+  const pad = (num: number) => String(num).padStart(2, '0');
+  const displayTime = () => {
+    if (getHours() > 0) {
+      return `${pad(getHours())}:${pad(getMinutes())}:${pad(getSeconds())}`;
+    } else {
+      return `${pad(getMinutes())}:${pad(getSeconds())}`;
+    }
+  };
+
   useImperativeHandle(ref, () => ({
     stop() {
       setIsRunning(false);
     },
+
+    reset() {
+      reset();
+    },
+
     getTime() {
       return time;
+    },
+
+    displayTime() {
+      return displayTime();
+    },
+
+    getHours() {
+      return getHours();
+    },
+    getMinutes() {
+      return getMinutes();
+    },
+    getSeconds() {
+      return getSeconds();
     }
   }));
 
@@ -34,17 +85,10 @@ const Stopwatch = forwardRef((_props, ref) => {
     setTime(0);
   };
 
-  const timeSliceStart = time < ONE_HOUR_IN_SECONDS ? 14 : 11;
-
   return (
-    <div>
-      <h2>Stopwatch</h2>
-      <p>{new Date(time * 1000).toISOString().slice(timeSliceStart, 19)}</p>
-      <button onClick={() => setIsRunning(true)}>Start</button>
-      <button onClick={() => setIsRunning(false)}>Stop</button>
-      <button onClick={reset}>Reset</button>
-    </div>
+      <p id="stopwatch-display">{displayTime()}</p>
   );
 });
 
 export default Stopwatch;
+export type { StopwatchHandle };
