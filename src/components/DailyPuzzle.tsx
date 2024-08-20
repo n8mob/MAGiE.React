@@ -20,19 +20,26 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
 
   const updateShareText = () => {
     if (stopwatchRef.current) {
-      const hours = stopwatchRef.current.getHours();
-      const minutes = stopwatchRef.current.getMinutes();
-      const seconds = stopwatchRef.current.getSeconds();
+      const h = stopwatchRef.current.getHours();
+      const m = stopwatchRef.current.getMinutes();
+      const s = stopwatchRef.current.getSeconds();
       let timeDescription: string;
 
-      if (hours > 0) {
+      let seconds = "seconds";
+      if (s == 1) {
+        seconds = "second";
+      }
+      let minutes = "minutes";
+      if (m == 1) {
+        minutes = "minute";
+      }
+
+      if (h > 0) {
         timeDescription = stopwatchRef.current.displayTime();
-      } else if (minutes == 1) {
-        timeDescription = `${minutes} minute and ${seconds} seconds!`;
-      } else if (minutes > 1) {
-        timeDescription = `${minutes} minutes and ${seconds} seconds!`;
+      } else if (m > 0) {
+        timeDescription = `${m} ${minutes} and ${s} ${seconds}`;
       } else {
-        timeDescription = `${seconds} seconds!`;
+        timeDescription = `${s} ${seconds}`;
       }
 
       setShareText(prevText => `${prevText}\nIt took me ${timeDescription}.`);
