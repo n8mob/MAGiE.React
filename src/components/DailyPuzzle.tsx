@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
 import {Puzzle} from "../Menu.ts";
@@ -16,6 +16,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   const [formattedDate, setFormattedDate] = useState("");
   const [shareText, setShareText] = useState("");
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
+  const stopwatchRef = useRef(null);
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
@@ -60,6 +61,11 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
 
   const handleWin = () => {
     setHasWon(true);
+    if (stopwatchRef.current) {
+      stopwatchRef.current.stop();
+      const finalTime = stopwatchRef.current.getTime();
+      console.log(`Final time: ${finalTime} seconds`);
+    }
   };
 
   const handleShareWin = () => {
@@ -98,7 +104,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   } else {
     return <>
       <h2>{formattedDate}</h2>
-      <Stopwatch />
+      <Stopwatch ref={stopwatchRef} />
       <div id="main-display" className="display">
         {currentPuzzle.type === "Encode" ? (
           <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}

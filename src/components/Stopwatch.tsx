@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
-const Stopwatch: React.FC = () => {
+const ONE_HOUR_IN_SECONDS = 60 * 60;
+
+const Stopwatch = forwardRef((_props, ref) => {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
 
@@ -18,22 +20,31 @@ const Stopwatch: React.FC = () => {
     return () => clearInterval(interval!);
   }, [isRunning, time]);
 
-  const start = () => setIsRunning(true);
-  const stop = () => setIsRunning(false);
+  useImperativeHandle(ref, () => ({
+    stop() {
+      setIsRunning(false);
+    },
+    getTime() {
+      return time;
+    }
+  }));
+
   const reset = () => {
     setIsRunning(false);
     setTime(0);
   };
 
+  const timeSliceStart = time < ONE_HOUR_IN_SECONDS ? 14 : 11;
+
   return (
     <div>
       <h2>Stopwatch</h2>
-      <p>{new Date(time * 1000).toISOString().substr(11, 8)}</p>
-      <button onClick={start}>Start</button>
-      <button onClick={stop}>Stop</button>
+      <p>{new Date(time * 1000).toISOString().slice(timeSliceStart, 19)}</p>
+      <button onClick={() => setIsRunning(true)}>Start</button>
+      <button onClick={() => setIsRunning(false)}>Stop</button>
       <button onClick={reset}>Reset</button>
     </div>
   );
-};
+});
 
 export default Stopwatch;
