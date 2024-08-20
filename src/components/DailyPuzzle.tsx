@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
 import {Puzzle} from "../Menu.ts";
+import Stopwatch from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
@@ -97,6 +98,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   } else {
     return <>
       <h2>{formattedDate}</h2>
+      <Stopwatch />
       <div id="main-display" className="display">
         {currentPuzzle.type === "Encode" ? (
           <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={displayWidth}
