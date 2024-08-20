@@ -35,7 +35,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
         timeDescription = `${seconds} seconds!`;
       }
 
-      setShareText(prevText => `${prevText} in ${timeDescription}.`);
+      setShareText(prevText => `${prevText}\nIt took me ${timeDescription}.`);
     }
   };
 
