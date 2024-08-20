@@ -38,7 +38,12 @@ p {
 
 h2 {
   margin: 0;
-  padding: 0 0 0 2em;
+  padding: 0 0 0 3em;
+}
+
+#stopwatch-display {
+  margin: 0;
+  padding: 8px 0 0 30px;
 }
 
 #main-display {
@@ -52,7 +57,7 @@ h2 {
 div.display {
   text-transform: uppercase;
   overflow-x: hidden;
-  padding: 2em;
+  padding: 8px 0 0 30px;
 }
 
 .display p {
