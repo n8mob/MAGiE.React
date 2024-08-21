@@ -1,92 +1,69 @@
-import React from "react";
-import FullJudgment from "../judgment/FullJudgment.ts";
+import React, {useCallback, useEffect, useState} from "react";
 import DisplayMatrix from "./DisplayMatrix.tsx";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import VariableWidthEncodingJudge from "../judgment/VariableWidthEncodingJudge.ts";
 import {Puzzle} from "../Menu.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import FixedWidthEncodingJudge from "../judgment/FixedWidthEncodingJudge.ts";
+import VariableWidthEncodingJudge from "../judgment/VariableWidthEncodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
+import FixedWidthEncodingJudge from "../judgment/FixedWidthEncodingJudge.ts";
+import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import usePuzzle from "../hooks/usePuzzle.ts";
 
-interface EncodePuzzleProps extends PuzzleProps {
-}
+const EncodePuzzle: React.FC<{ puzzle: Puzzle; displayWidth: number; onWin: () => void }> = ({ puzzle, displayWidth, onWin }) => {
+  const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
 
-interface EncodePuzzleState extends PuzzleState {
-}
+  const updateJudge = (puzzle: Puzzle) => {
+    if (puzzle.encoding instanceof VariableWidthEncoder) {
+      setJudge(new VariableWidthEncodingJudge(puzzle.encoding));
+    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
+      setJudge(new FixedWidthEncodingJudge(puzzle.encoding));
+    } else {
+      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
+    }
+  };
 
-class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
-  constructor(props: EncodePuzzleProps) {
-    super(props);
+  const {
+    currentPuzzle,
+    judgment,
+    guessBits,
+    setGuessBits,
+    setJudge,
+    displayMatrixRef,
+    handleSubmitClick
+  } = usePuzzle({
+    puzzle,
+    displayWidth,
+    onWin,
+    onUpdateJudge: updateJudge
+  });
 
-    this.state = {
-      currentPuzzle: props.puzzle,
-      judge: null,
-      guessText: "",
-      guessBits: "",
-      winBits: "",
-      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      updating: false,
-      displayRows: [],
-    };
+  const addBit = useCallback((bit: string) => {
+    setGuessBits(prevBits => prevBits + bit);
+  }, [setGuessBits]);
 
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
+  const deleteBit = useCallback(() => {
+    setGuessBits(prevBits => prevBits.slice(0, -1));
+  }, [setGuessBits]);
 
-  componentDidMount() {
-    super.componentDidMount?.();
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-
-  handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     switch (event.key) {
       case "0":
-        this.addBit("0");
+        addBit("0");
         break;
       case "1":
-        this.addBit("1");
+        addBit("1");
         break;
       case "Backspace":
-        this.deleteBit();
+        deleteBit();
         break;
       case "Enter":
-        this.handleSubmitClick();
+        handleSubmitClick();
         break;
       default:
         break;
     }
-  }
+  }, [addBit, deleteBit, handleSubmitClick]);
 
-
-  updateJudge(puzzle: Puzzle) {
-    if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.setState({judge: new VariableWidthEncodingJudge(puzzle.encoding)});
-    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.setState({judge: new FixedWidthEncodingJudge(puzzle.encoding)});
-    } else {
-      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
-    }
-  }
-
-  addBit = (bit: string) => {
-    this.setState((prevState: PuzzleState) => ({
-      guessBits: prevState.guessBits + bit,
-    }));
-  };
-
-  deleteBit = () => {
-    this.setState((prevState: PuzzleState) => ({
-      guessBits: prevState.guessBits.slice(0, -1),
-    }));
-  };
-
-  updateBit = (rowIndex: number, bitIndex: number, bit: string) => {
-    const {displayRows, currentPuzzle} = this.state;
+  const updateBit = (rowIndex: number, bitIndex: number, bit: string) => {
     if (!displayRows || displayRows.length === 0) {
       console.error('Missing display rows');
       return;
@@ -94,7 +71,7 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
 
     const rowBits = displayRows[rowIndex].bits;
     const newRowBits = rowBits.slice(0, bitIndex) + bit + rowBits.slice(bitIndex + 1);
-    const newDisplayRowSplit = currentPuzzle?.encoding.splitForDisplay(newRowBits, this.props.displayWidth);
+    const newDisplayRowSplit = currentPuzzle?.encoding.splitForDisplay(newRowBits, displayWidth);
     const newDisplayRows = displayRows.slice(0, rowIndex);
 
     let newDisplayRow = newDisplayRowSplit?.next();
@@ -104,13 +81,11 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     }
 
     newDisplayRows.push(...displayRows.slice(rowIndex + 1));
-    this.setState({
-      displayRows: newDisplayRows,
-      guessBits: newDisplayRows.map(displayRow => displayRow.bits).join(''),
-    });
+    setDisplayRows(newDisplayRows);
+    setGuessBits(newDisplayRows.map(displayRow => displayRow.bits).join(''));
   };
 
-  handleBitClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBitClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event) {
       return;
     }
@@ -118,33 +93,39 @@ class EncodePuzzle extends BasePuzzle<EncodePuzzleProps, EncodePuzzleState> {
     const rowIndex = parseInt(event.currentTarget.getAttribute("data-sequence-index") || "0");
     const bitIndex = parseInt(event.currentTarget.getAttribute("data-bit-index") || "0");
 
-    this.updateBit(rowIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
+    updateBit(rowIndex, bitIndex, event.currentTarget.checked ? "1" : "0");
   };
 
-  render() {
-    const {currentPuzzle, guessBits, judgment} = this.state;
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
-    return (
-      <>
-        <DisplayMatrix
-          key={`${currentPuzzle?.init}-${guessBits}`}
-          bits={guessBits}
-          judgments={judgment.sequenceJudgments}
-          handleBitClick={this.handleBitClick}
-        />
-        <div className="encodingInputs">
-          <p>
-            <input type="button" className="bitInput" value="0" onClick={() => this.addBit("0")}/>
-            <input type="button" className="bitInput" value="1" onClick={() => this.addBit("1")}/>
-            <input type="button" className="bitInput" value="⌫" onClick={this.deleteBit}/>
-          </p>
-          <p>
-            <input type="button" value="Submit" onClick={() => this.handleSubmitClick()}/>
-          </p>
-        </div>
-      </>
-    );
+  if (!currentPuzzle) {
+    console.error('Missing puzzle');
+    return <></>;
   }
-}
+
+  return (
+    <>
+      <DisplayMatrix
+        ref={displayMatrixRef}
+        bits={guessBits}
+        judgments={judgment.sequenceJudgments}
+        handleBitClick={handleBitClick}
+      />
+      <div className="encodingInputs">
+        <p>
+          <input type="button" className="bitInput" value="0" onClick={() => addBit("0")} />
+          <input type="button" className="bitInput" value="1" onClick={() => addBit("1")} />
+          <input type="button" className="bitInput" value="⌫" onClick={deleteBit} />
+        </p>
+        <p>
+          <input type="button" value="Submit" onClick={handleSubmitClick} />
+        </p>
+      </div>
+    </>
+  );
+};
 
 export default EncodePuzzle;

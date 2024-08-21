@@ -1,147 +1,89 @@
-import React from "react";
-import FullJudgment from "../judgment/FullJudgment.ts";
+import React, { useCallback, useEffect } from "react";
 import DisplayMatrix from "./DisplayMatrix.tsx";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import {Puzzle} from "../Menu.ts";
+import { Puzzle } from "../Menu.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import usePuzzle from "../hooks/usePuzzle.ts";
 
-const preloadImages = (urls: string[]) => {
-  urls.forEach(url => {
-    const img = new Image();
-    img.src = url;
-  });
-}
 
-class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  constructor(props: PuzzleProps) {
-    super(props);
+const DecodePuzzle: React.FC<{
+  puzzle: Puzzle;
+  displayWidth: number;
+  onWin: () => void;
+}> = ({ puzzle, displayWidth, onWin }) => {
 
-    this.state = {
-      currentPuzzle: props.puzzle,
-      judge: null,
-      guessText: "",
-      guessBits: "",
-      winBits: "",
-      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      updating: false,
-      displayRows: [],
-    };
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-
-    preloadImages([
-      'assets/Bit_off_Yellow.png',
-      'assets/Bit_on_Yellow.png',
-      'assets/Bit_off_Teal.png',
-      'assets/Bit_on_Teal.png',
-      'assets/Bit_off_Purple.png',
-      'assets/Bit_on_Purple.png',
-    ]);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-
-  handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "Enter":
-        this.handleSubmitClick();
-        break;
-      default:
-        break;
-    }
-  }
-
-  updateJudge(puzzle: Puzzle) {
+  const updateJudge = (puzzle: Puzzle) => {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
+      setJudge(new VariableWidthDecodingJudge(puzzle.encoding));
     } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
+      setJudge(new FixedWidthDecodingJudge(puzzle.encoding));
     } else {
       console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
     }
   }
 
-  updateDisplayRows() {
-    const {currentPuzzle, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
+  const {
+    currentPuzzle,
+    guessText,
+    winBits,
+    judgment,
+    setGuessText,
+    setGuessBits,
+    setJudge,
+    displayMatrixRef,
+    handleSubmitClick,
+  } = usePuzzle({
+    puzzle,
+    displayWidth,
+    onWin,
+    onUpdateJudge: updateJudge
+  });
 
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
-    const newDisplayRows: DisplayRow[] = [];
-    let displayRow = displayRowSplit.next();
-    while (displayRow && !displayRow.done) {
-      newDisplayRows.push(displayRow.value);
-      displayRow = displayRowSplit.next();
-    }
-
-    this.setState({displayRows: newDisplayRows});
-  }
-
-  updateJudgment() {
-    const {currentPuzzle, judge, guessBits, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
-      this.setState({judgment: newJudgment});
-    }
-  }
-
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newGuessText = event.target.value.toUpperCase();
-    const newState = {
-      guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
-    }
-    this.setState(newState);
+    setGuessText(newGuessText);
+    setGuessBits(currentPuzzle?.encoding.encodeText(newGuessText) || "");
   };
 
-  render() {
-    const {currentPuzzle, guessBits, judgment, guessText, winBits} = this.state;
-
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return <></>;
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Enter":
+        handleSubmitClick();
+        break;
+      default:
+        break;
     }
+  }, [handleSubmitClick]);
 
-    return (
-      <>
-        <div id="bit-field" className="clue-and-bits">
-          {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
-          <DisplayMatrix
-            key={`${winBits}-${currentPuzzle.init}-${guessBits}`}
-            bits={winBits}
-            judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}  // bits will be read-only for the decode puzzle
-          />
-        </div>
-        <div className="puzzle-inputs">
-          <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
-          <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
-        </div>
-      </>
-    );
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  if (!currentPuzzle) {
+    console.error('Missing puzzle');
+    return <></>;
   }
+
+  return (
+    <>
+      <div id="bit-field" className="clue-and-bits">
+        {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
+        <DisplayMatrix
+          ref={displayMatrixRef}
+          bits={winBits}
+          judgments={judgment.sequenceJudgments}
+          handleBitClick={() => {}}  // bits will be read-only for the decode puzzle
+        />
+      </div>
+      <div className="puzzle-inputs">
+        <input type="text" className="decode-input" value={guessText} onChange={handleGuessUpdate} />
+        <input type="button" value="Submit" onClick={handleSubmitClick} />
+      </div>
+    </>
+  );
 }
 
 export default DecodePuzzle;
