@@ -1,23 +1,37 @@
-import React from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 import BitButton from "./BitButton.tsx";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
-interface BitButtonMatrixProps {
+interface DisplayMatrixProps {
   bits: string;
   judgments: SequenceJudgment[];
   handleBitClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
+interface DisplayMatrixHandle {
+  updateJudgements: (judgments: SequenceJudgment[]) => void;
+}
+
+const DisplayMatrix = forwardRef<DisplayMatrixHandle, DisplayMatrixProps>((
   {
     bits,
     judgments,
     handleBitClick
-  }) => {
+  },
+  ref) => {
+  const [currentJudgements, setCurrentJudgements] = useState(judgments);
+
+
+  useImperativeHandle(ref, () => ({
+    updateJudgements(judgments: SequenceJudgment[]) {
+      setCurrentJudgements(judgments)
+    }
+  }));
+
   return (
     <>
       {
-        [...judgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
+        [...currentJudgements].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
           return <p key={`row${rowIndex}`}>
             {[...rowJudgment.bitJudgments].map((bitJudgment, bitRowIndex) => {
               const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
@@ -35,6 +49,7 @@ const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
         })}
     </>
   );
-}
+});
 
 export default DisplayMatrix;
+export type {DisplayMatrixProps, DisplayMatrixHandle};
