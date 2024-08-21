@@ -1,10 +1,10 @@
-import {Component} from "react";
-import {Puzzle} from "../Menu.ts";
+import { Component, createRef } from "react";
+import { Puzzle } from "../Menu.ts";
 import BinaryJudge from "../judgment/BinaryJudge.ts";
 import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import DisplayMatrix from "./DisplayMatrix.tsx";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import DisplayMatrix, { DisplayMatrixHandle } from "./DisplayMatrix.tsx";
+import { DisplayRow } from "../encoding/BinaryEncoder.ts";
 import ReactGA4 from "react-ga4";
 
 interface PuzzleProps {
@@ -25,6 +25,8 @@ interface PuzzleState {
 }
 
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
+  private displayMatrixRef = createRef<DisplayMatrixHandle>();
+
   protected constructor(props: TProps) {
     super(props);
     const initialState: PuzzleState = {
@@ -66,7 +68,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   handleSubmitClick() {
-    const {currentPuzzle, guessBits, winBits} = this.state;
+    const { currentPuzzle, guessBits, winBits } = this.state;
     if (!currentPuzzle) {
       ReactGA4.event({
         category: 'Error',
@@ -93,13 +95,14 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
       } else {
-        this.setState({judgment: newJudgment});
+        this.setState({ judgment: newJudgment });
+        this.displayMatrixRef.current?.updateJudgements(newJudgment.sequenceJudgments);
       }
     }
   }
 
   updateDisplayRows() {
-    const {currentPuzzle, guessBits} = this.state;
+    const { currentPuzzle, guessBits } = this.state;
     if (!currentPuzzle) {
       console.error('Missing puzzle');
       return;
@@ -113,7 +116,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       displayRow = displayRowSplit.next();
     }
 
-    this.setState({displayRows: newDisplayRows});
+    this.setState({ displayRows: newDisplayRows });
+    this.displayMatrixRef.current?.updateJudgements(this.state.judgment.sequenceJudgments);
   }
 
   resetForNextPuzzle() {
@@ -139,36 +143,37 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     if (puzzle) {
       this.updateJudge(puzzle);
       const newWinText = puzzle.encoding.encodeText(puzzle.winText);
-      this.setState({winBits: newWinText});
+      this.setState({ winBits: newWinText });
       this.updateJudgment();
     }
   }
 
   updateJudgment() {
-    const {currentPuzzle, judge, winBits, guessBits} = this.state;
+    const { currentPuzzle, judge, winBits, guessBits } = this.state;
     if (currentPuzzle && judge) {
       const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", this.props.displayWidth);
       const judgment = judge.judgeBits(guessBits, winBits, splitter);
       if (judgment) {
-        this.setState({judgment});
+        this.setState({ judgment });
+        this.displayMatrixRef.current?.updateJudgements(judgment.sequenceJudgments);
       }
     }
   }
 
   render() {
-    const {currentPuzzle, displayRows, guessBits, judgment} = this.state;
+    const { guessBits, judgment } = this.state;
 
     return (
       <>
         <DisplayMatrix
-          key={`${currentPuzzle}-${guessBits}-${judgment}-${displayRows.length}`}
+          ref={this.displayMatrixRef}
           bits={guessBits}
           judgments={judgment.sequenceJudgments}
           handleBitClick={() => {
           }} // read-only bits, EncodePuzzle can add an update function.
         />
         <div className={"encodingInputs"}>
-          <input type="button" value="Check Answer" onClick={this.handleSubmitClick}/>
+          <input type="button" value="Check Answer" onClick={this.handleSubmitClick} />
         </div>
       </>
     );
@@ -176,4 +181,4 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 }
 
 export default BasePuzzle;
-export type {PuzzleProps, PuzzleState};
+export type { PuzzleProps, PuzzleState };
