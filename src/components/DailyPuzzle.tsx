@@ -14,7 +14,8 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
   const [winMessage, setWinMessage] = useState(puzzle.winMessage);
   const [hasWon, setHasWon] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
-  const [shareText, setShareText] = useState("");
+  const [puzzleDayString, setPuzzleDayString] = useState("");
+  const [solveTimeString, setSolveTimeString] = useState("");
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
 
@@ -41,8 +42,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
       } else {
         timeDescription = `${s} ${seconds}`;
       }
-
-      setShareText(prevText => `${prevText}\nIt took me ${timeDescription}.`);
+      setSolveTimeString(`It took me ${timeDescription}.`)
     }
   };
 
@@ -56,7 +56,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
     setFormattedDate(formattedDate);
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
-    setShareText(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
+    setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
 
     const updateDisplayWidth = () => {
       const elementId = "bit-field";
@@ -95,6 +95,8 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
   };
 
   const handleShareWin = () => {
+    const shareText  = `${puzzleDayString}\n${solveTimeString}`;
+
     if (navigator.share) {
       navigator.share({
         title: "MAGiE binary puzzles",
