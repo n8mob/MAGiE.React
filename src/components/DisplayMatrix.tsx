@@ -1,4 +1,4 @@
-import React, {forwardRef, useImperativeHandle, useState, useEffect} from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 import BitButton from "./BitButton.tsx";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
@@ -21,11 +21,6 @@ const DisplayMatrix = forwardRef<DisplayMatrixHandle, DisplayMatrixProps>((
     ref
   ) => {
     const [currentJudgements, setCurrentJudgements] = useState(judgments);
-
-    useEffect(() => {
-      setCurrentJudgements(judgments);
-    }, [judgments]);
-
     useImperativeHandle(ref, () => ({
       updateJudgements(newJudgments: SequenceJudgment[]) {
         setCurrentJudgements(newJudgments);

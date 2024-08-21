@@ -1,11 +1,11 @@
-import {useState, useEffect, useRef} from "react";
-import {Puzzle} from "../Menu.ts";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Puzzle } from "../Menu.ts";
 import BinaryJudge from "../judgment/BinaryJudge.ts";
 import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import { DisplayRow } from "../encoding/BinaryEncoder.ts";
 import ReactGA4 from "react-ga4";
-import {DisplayMatrixHandle} from "../components/DisplayMatrix.tsx";
+import { DisplayMatrixHandle } from "../components/DisplayMatrix.tsx";
 
 const preloadImages = (urls: string[]) => {
   urls.forEach(url => {
@@ -21,76 +21,66 @@ interface UsePuzzleProps {
   onUpdateJudge: (puzzle: Puzzle) => void;
 }
 
-const usePuzzle = ({puzzle, displayWidth, onWin, onUpdateJudge}: UsePuzzleProps) => {
+const usePuzzle = ({ puzzle, displayWidth, onWin, onUpdateJudge }: UsePuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(puzzle);
   const [judge, setJudge] = useState<BinaryJudge | null>(null);
   const [guessText, setGuessText] = useState<string>("");
   const [guessBits, setGuessBits] = useState<string>("");
   const [winBits, setWinBits] = useState<string>("");
   const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
-  const [judgment, setJudgment] = useState<FullJudgment<SequenceJudgment>>(new FullJudgment<SequenceJudgment>(
-    false,
-    "",
-    []
-  ));
+  const [judgment, setJudgment] = useState<FullJudgment<SequenceJudgment>>(new FullJudgment<SequenceJudgment>(false, "", []));
 
   const displayMatrixRef = useRef<DisplayMatrixHandle>(null);
 
-  useEffect(
-    () => {
-      const updateCurrentPuzzle = (puzzle: Puzzle) => {
-        setCurrentPuzzle(puzzle);
-        setJudge(null);
-        setGuessBits("");
-        setWinBits("");
-        setDisplayRows([]);
-        setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
-        resetForNextPuzzle();
+  const updateJudgment = useCallback(() => {
+    if (currentPuzzle && judge) {
+      const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", displayWidth);
+      const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
+      if (newJudgment) {
+        setJudgment(newJudgment);
+        displayMatrixRef.current?.updateJudgements(newJudgment.sequenceJudgments);
+      }
+    }
+  }, [currentPuzzle, judge, guessBits, winBits, displayWidth]);
 
-        if (puzzle) {
-          onUpdateJudge(puzzle);
-          const newWinText = puzzle.encoding.encodeText(puzzle.winText);
-          setWinBits(newWinText);
+  useEffect(() => {
+    const updateCurrentPuzzle = (puzzle: Puzzle) => {
+      setCurrentPuzzle(puzzle);
+      setJudge(null);
+      setGuessBits("");
+      setWinBits("");
+      setDisplayRows([]);
+      setJudgment(new FullJudgment<SequenceJudgment>(false, "", []));
+      resetForNextPuzzle();
 
-          const updateJudgment = () => {
-            if (currentPuzzle && judge) {
-              const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", displayWidth);
-              const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
-              if (newJudgment) {
-                setJudgment(newJudgment);
-                displayMatrixRef.current?.updateJudgements(newJudgment.sequenceJudgments);
-              }
-            }
-          };
+      if (puzzle) {
+        onUpdateJudge(puzzle);
+        const newWinText = puzzle.encoding.encodeText(puzzle.winText);
+        setWinBits(newWinText);
+        updateJudgment(); // Call updateJudgment directly here
+      }
+    };
 
-          updateJudgment();
-        }
-      };
+    updateCurrentPuzzle(puzzle);
+  }, [onUpdateJudge, puzzle, updateJudgment]);
 
-      updateCurrentPuzzle(puzzle);
+  const updateDisplayRows = useCallback(() => {
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return;
+    }
 
-      const updateDisplayRows = () => {
-        if (!currentPuzzle) {
-          console.error('Missing puzzle');
-          return;
-        }
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth);
+    const newDisplayRows: DisplayRow[] = [];
+    let displayRow = displayRowSplit.next();
+    while (displayRow && !displayRow.done) {
+      newDisplayRows.push(displayRow.value);
+      displayRow = displayRowSplit.next();
+    }
 
-        const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth);
-        const newDisplayRows: DisplayRow[] = [];
-        let displayRow = displayRowSplit.next();
-        while (displayRow && !displayRow.done) {
-          newDisplayRows.push(displayRow.value);
-          displayRow = displayRowSplit.next();
-        }
-
-        setDisplayRows(newDisplayRows);
-        displayMatrixRef.current?.updateJudgements(judgment.sequenceJudgments);
-      };
-
-      updateDisplayRows();
-
-    }, [currentPuzzle, displayWidth, guessBits, judge, judgment.sequenceJudgments, onUpdateJudge, puzzle, winBits]
-  );
+    setDisplayRows(newDisplayRows);
+    displayMatrixRef.current?.updateJudgements(judgment.sequenceJudgments);
+  }, [currentPuzzle, guessBits, displayWidth, judgment]);
 
   const resetForNextPuzzle = () => {
     setGuessText("");
@@ -142,6 +132,11 @@ const usePuzzle = ({puzzle, displayWidth, onWin, onUpdateJudge}: UsePuzzleProps)
       }
     }
   };
+
+  useEffect(() => {
+    updateJudgment();
+    updateDisplayRows();
+  }, [currentPuzzle, guessText, guessBits, winBits, judge, updateJudgment, updateDisplayRows]);
 
   return {
     currentPuzzle,
