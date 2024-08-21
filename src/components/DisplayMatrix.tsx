@@ -1,6 +1,6 @@
-import React, {forwardRef, useImperativeHandle, useState} from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
 import BitButton from "./BitButton.tsx";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 interface DisplayMatrixProps {
   bits: string;
@@ -12,15 +12,10 @@ interface DisplayMatrixHandle {
   updateJudgements: (judgments: SequenceJudgment[]) => void;
 }
 
-const DisplayMatrix = forwardRef<DisplayMatrixHandle, DisplayMatrixProps>((
-    {
-      bits,
-      judgments,
-      handleBitClick
-    },
-    ref
-  ) => {
+const DisplayMatrix = forwardRef<DisplayMatrixHandle, DisplayMatrixProps>(
+  ({ bits, judgments, handleBitClick }, ref) => {
     const [currentJudgements, setCurrentJudgements] = useState(judgments);
+
     useImperativeHandle(ref, () => ({
       updateJudgements(newJudgments: SequenceJudgment[]) {
         setCurrentJudgements(newJudgments);
@@ -52,4 +47,4 @@ const DisplayMatrix = forwardRef<DisplayMatrixHandle, DisplayMatrixProps>((
 );
 
 export default DisplayMatrix;
-export type {DisplayMatrixProps, DisplayMatrixHandle};
+export type { DisplayMatrixProps, DisplayMatrixHandle };
