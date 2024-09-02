@@ -41,7 +41,6 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
             })}
           </p>
         ))}
-        <p>TEST LINE</p>
       </>
     );
   }

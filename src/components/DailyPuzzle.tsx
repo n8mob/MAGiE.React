@@ -11,7 +11,6 @@ interface DailyPuzzleProps {
 
 const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
-  const [winMessage, setWinMessage] = useState(puzzle.winMessage);
   const [hasWon, setHasWon] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [puzzleDayString, setPuzzleDayString] = useState("");
@@ -48,7 +47,6 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
-    setWinMessage(puzzle.winMessage);
     setHasWon(false);
 
     const prettyOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -152,9 +150,6 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
           )}
           {hasWon && (
             <div className="win-message">
-              {winMessage.map((line, index) => (
-                <p key={`winMessageLine-${index}`}>{line}</p>
-              ))}
               <button onClick={handleShareWin}>Share Your Win</button>
             </div>
           )}

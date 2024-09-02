@@ -1,14 +1,13 @@
-import React from "react";
-import FullJudgment from "../judgment/FullJudgment.ts";
-import DisplayMatrix from "./DisplayMatrix.tsx";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
+import React, {createRef} from "react";
 import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import {Puzzle} from "../Menu.ts";
+import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix.tsx";
+import FullJudgment from "../judgment/FullJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import {Puzzle} from "../Menu.ts";
 
 const preloadImages = (urls: string[]) => {
   urls.forEach(url => {
@@ -18,6 +17,8 @@ const preloadImages = (urls: string[]) => {
 }
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+  displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
+
   constructor(props: PuzzleProps) {
     super(props);
 
@@ -31,6 +32,8 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       updating: false,
       displayRows: [],
     };
+
+    this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
 
@@ -82,7 +85,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
 
     const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
-    const newDisplayRows: DisplayRow[] = [];
+    const newDisplayRows = [];
     let displayRow = displayRowSplit.next();
     while (displayRow && !displayRow.done) {
       newDisplayRows.push(displayRow.value);
@@ -103,6 +106,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
+      this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
     }
   }
 
@@ -116,7 +120,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   };
 
   render() {
-    const {currentPuzzle, guessBits, judgment, guessText, winBits} = this.state;
+    const {currentPuzzle, judgment, guessText, winBits} = this.state;
 
     if (!currentPuzzle) {
       console.error('Missing puzzle');
@@ -126,21 +130,23 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     return (
       <>
         <div id="bit-field" className="clue-and-bits">
-          {[...currentPuzzle.clue].map((line, index) => <p key={index}>{line}</p>)}
+          {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
-            key={`${winBits}-${currentPuzzle.init}-${guessBits}`}
+            ref={this.displayMatrixRef}
             bits={winBits}
             judgments={judgment.sequenceJudgments}
             handleBitClick={() => {
             }}  // bits will be read-only for the decode puzzle
           />
+          {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-text-${winIndex}`}>{winLine}</p>)}
         </div>
         <div className="puzzle-inputs">
           <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
           <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
         </div>
       </>
-    );
+    )
+      ;
   }
 }
 

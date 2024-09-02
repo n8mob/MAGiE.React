@@ -66,7 +66,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   handleSubmitClick() {
-    const {currentPuzzle, guessBits, winBits} = this.state;
+    const {currentPuzzle, guessBits, winBits, displayRows} = this.state;
     if (!currentPuzzle) {
       ReactGA4.event({
         category: 'Error',
@@ -92,6 +92,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       );
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
+        this.setState({
+          displayRows: displayRows.concat([new DisplayRow("new win text!")])
+        });
       } else {
         this.setState({judgment: newJudgment});
       }
