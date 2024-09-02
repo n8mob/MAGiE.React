@@ -14,7 +14,8 @@ const preloadImages = (urls: string[]) => {
     const img = new Image();
     img.src = url;
   });
-}
+};
+
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
@@ -107,6 +108,9 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     if (newJudgment) {
       this.setState({judgment: newJudgment});
       this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
+      if (newJudgment.isCorrect) {
+        this.props.onWin();
+      }
     }
   }
 
@@ -145,8 +149,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
         </div>
       </>
-    )
-      ;
+    );
   }
 }
 
