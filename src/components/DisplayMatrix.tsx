@@ -1,25 +1,37 @@
-import React from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 import BitButton from "./BitButton.tsx";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
-interface BitButtonMatrixProps {
+interface DisplayMatrixProps {
   bits: string;
   judgments: SequenceJudgment[];
   handleBitClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
-  {
-    bits,
-    judgments,
-    handleBitClick
-  }) => {
-  return (
-    <>
-      {
-        [...judgments].map((rowJudgment: SequenceJudgment, rowIndex: number) => {
-          return <p key={`row${rowIndex}`}>
-            {[...rowJudgment.bitJudgments].map((bitJudgment, bitRowIndex) => {
+interface DisplayMatrixUpdate {
+  updateJudgment: (judgments: SequenceJudgment[]) => void;
+}
+
+const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
+  ({
+     bits,
+     judgments,
+     handleBitClick
+   }
+    , ref) => {
+    const [currentJudgments, setCurrentJudgments] = useState(judgments);
+
+    useImperativeHandle(ref, () => ({
+      updateJudgment(newJudgments: SequenceJudgment[]) {
+        setCurrentJudgments(newJudgments);
+      }
+    }));
+
+    return (
+      <>
+        {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
+          <p key={`row${rowIndex}`}>
+            {rowJudgment.bitJudgments.map((bitJudgment, bitRowIndex) => {
               const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
               return (
                 <BitButton
@@ -31,10 +43,14 @@ const DisplayMatrix: React.FC<BitButtonMatrixProps> = (
                   onChange={handleBitClick}
                 />);
             })}
-          </p>;
-        })}
-    </>
-  );
-}
+          </p>
+        ))}
+        /*************** LOOK HERE!! ******************/
+        <p>TEST LINE</p>
+      </>
+    );
+  }
+);
 
 export default DisplayMatrix;
+export type {DisplayMatrixUpdate};
