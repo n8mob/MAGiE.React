@@ -3,8 +3,8 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: Menlo, Consolas, monospace;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  font-family: 'Press Start 2P', Menlo, Consolas, monospace;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow-x: hidden;
@@ -25,7 +25,7 @@ h1#magie-title {
   display: flex;
   align-self: center;
   justify-content: center;
-  margin: 0;
+  margin: 16px 0;
   max-width: 100%; /* Prevents expanding beyond the viewport */
   text-align: center; /* Centers the text */
   word-wrap: break-word; /* Allows text to wrap within the specified width */
