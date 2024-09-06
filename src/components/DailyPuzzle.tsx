@@ -17,6 +17,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
   const [solveTimeString, setSolveTimeString] = useState("");
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
+  const bitFieldRef = useRef<HTMLDivElement>(null);
 
   const updateShareText = () => {
     if (stopwatchRef.current) {
@@ -58,20 +59,16 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
 
     const updateDisplayWidth = () => {
       const elementId = "bit-field";
-      const mainDisplay = document.getElementById(elementId);
+      const bitField = document.getElementById(elementId);
       let displayWidthPixels;
-      let widthDebugMessage: string;
-      if (!mainDisplay) {
+      if (!bitField) {
         displayWidthPixels = Math.floor(window.innerWidth * 0.85);
-        widthDebugMessage = `displayWidthPixels (estimated from window): ${displayWidthPixels}.`;
       } else {
-        displayWidthPixels = parseInt(getComputedStyle(mainDisplay).width);
-        widthDebugMessage = `displayWidthPixels from getComputedStyle(${elementId})): ${displayWidthPixels}.`;
+        displayWidthPixels = parseInt(getComputedStyle(bitField).width);
       }
 
       const bitCheckboxWidth = 32;
       const newDisplayWidth = Math.floor(displayWidthPixels / bitCheckboxWidth);
-      console.log(`${widthDebugMessage} => ${displayWidthPixels} / ${bitCheckboxWidth} = ${newDisplayWidth}`);
       setDisplayWidth(newDisplayWidth);
     };
 
@@ -84,12 +81,28 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     };
   }, [puzzle, date]);
 
+  useEffect(() => {
+    const handleWinEvent = () => {
+      if (stopwatchRef.current) {
+        stopwatchRef.current.stop();
+        bitFieldRef.current?.scrollTo(0, 700);
+        updateShareText();
+      }
+      // Play sound here
+      const audio = new Audio('path/to/sound.mp3');
+      audio.play();
+    };
+
+    window.addEventListener("winEvent", handleWinEvent);
+
+    return () => {
+      window.removeEventListener("winEvent", handleWinEvent);
+    };
+  }, []);
+
   const handleWin = () => {
-    setHasWon(true);
-    if (stopwatchRef.current) {
-      stopwatchRef.current.stop();
-      updateShareText();
-    }
+    const winEvent = new Event("winEvent");
+    window.dispatchEvent(winEvent);
   };
 
   const handleShareWin = () => {
