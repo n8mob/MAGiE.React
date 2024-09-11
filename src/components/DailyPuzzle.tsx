@@ -151,26 +151,26 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
       <>
         <h2>{formattedDate}</h2>
         <Stopwatch ref={stopwatchRef}/>
-          {currentPuzzle.type === "Encode" ? (
-            <EncodePuzzle
-              puzzle={currentPuzzle}
-              onWin={handleWin}
-              displayWidth={displayWidth}
-              key={`${currentPuzzle}-${displayWidth}`}
-            />
-          ) : (
-            <DecodePuzzle
-              puzzle={currentPuzzle}
-              onWin={handleWin}
-              displayWidth={displayWidth}
-              key={`${currentPuzzle}-${displayWidth}`}
-            />
-          )}
-          {hasWon && (
-            <div className="share-controls">
-              <button onClick={handleShareWin}>Share Your Win</button>
-            </div>
-          )}
+        {currentPuzzle.type === "Encode" &&
+          <EncodePuzzle
+            puzzle={currentPuzzle}
+            onWin={handleWin}
+            hasWon={hasWon}
+            onShareWin={handleShareWin}
+            displayWidth={displayWidth}
+            key={`${currentPuzzle}-${displayWidth}`}
+          />
+        }
+        {currentPuzzle.type === "Decode" &&
+          <DecodePuzzle
+            puzzle={currentPuzzle}
+            onWin={handleWin}
+            hasWon={hasWon}
+            onShareWin={handleShareWin}
+            displayWidth={displayWidth}
+            key={`${currentPuzzle}-${displayWidth}`}
+          />
+        }
       </>
     );
   }

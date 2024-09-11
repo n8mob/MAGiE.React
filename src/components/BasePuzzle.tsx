@@ -11,6 +11,8 @@ interface PuzzleProps {
   puzzle: Puzzle;
   displayWidth: number;
   onWin: () => void;
+  hasWon: boolean;
+  onShareWin: () => void;
 }
 
 interface PuzzleState {

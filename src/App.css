@@ -6,6 +6,7 @@ html, body {
   font-family: 'Press Start 2P', Menlo, Consolas, monospace;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
+  color: #213547;
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow: hidden; /* Prevent scrolling on the body */
 }
@@ -17,6 +18,7 @@ html, body {
   margin: 0 auto; /* Center the content */
   overflow: hidden; /* Prevent scrolling on the root */
   display: flex;
+  text-transform: uppercase;
   flex-direction: column;
 }
 
@@ -38,6 +40,7 @@ h1#magie-title {
   max-width: 100%; /* Prevents expanding beyond the viewport */
   text-align: center; /* Centers the text */
   word-wrap: break-word; /* Allows text to wrap within the specified width */
+  text-transform: none;
 }
 
 p {
@@ -56,7 +59,6 @@ h2 {
 }
 
 div.display {
-  text-transform: uppercase;
   padding: 8px 0 0 30px;
 }
 
@@ -83,29 +85,32 @@ div.display {
 }
 
 .puzzle-inputs > * {
+  border-radius: 8px;
   flex-grow: 1; /* Allow children to stretch */
   width: 70%; /* Ensure children take the full width of the container */
   margin: 10px;
+  font-family: inherit;
+  color: inherit;
+  text-shadow: inherit;
   box-sizing: border-box;
+}
+
+.share-controls {
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+  margin: 2em;
+}
+
+.share-controls button {
+  margin: 0.5em;
+  border: 2px solid;
+  color: inherit;
 }
 
 .decode-input {
   font-size: 20px;
   padding: 1em;
-}
-
-div.share-controls {
-  display: flex;
-  justify-content: left;
-  flex-direction: column;
-}
-
-div.win-message {
-  width: 100%;
-  box-sizing: border-box;
-  flex-direction: column;
-  overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 50vh;
 }
 
 input.bit-checkbox {

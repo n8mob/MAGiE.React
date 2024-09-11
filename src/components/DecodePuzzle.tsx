@@ -109,6 +109,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
   render() {
     const {currentPuzzle, judgment, guessText, winBits} = this.state;
+    const {hasWon} = this.props;
 
     if (!currentPuzzle) {
       console.error('Missing puzzle');
@@ -118,23 +119,29 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     return (
       <>
         <div id="main-display" className="display">
-            {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-            <DisplayMatrix
-              ref={this.displayMatrixRef}
-              bits={winBits}
-              judgments={judgment.sequenceJudgments}
-              handleBitClick={() => {
-              }}  // bits will be read-only for the decode puzzle
-            />
+          {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+          <DisplayMatrix
+            ref={this.displayMatrixRef}
+            bits={winBits}
+            judgments={judgment.sequenceJudgments}
+            handleBitClick={() => {
+            }}  // bits will be read-only for the decode puzzle
+          />
           <div id="win-message">
             {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
               key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
         </div>
-        <div className="puzzle-inputs">
-          <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
-          <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
-        </div>
+        {hasWon ? (
+          <div className="share-controls">
+            <button onClick={this.props.onShareWin}>Share Your Win</button>
+          </div>
+        ) : (
+          <div className="puzzle-inputs">
+            <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
+            <button onClick={this.handleSubmitClick}>Check Answer</button>
+          </div>
+        )}
       </>
     )
       ;
