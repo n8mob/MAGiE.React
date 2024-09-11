@@ -50,7 +50,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     setCurrentPuzzle(puzzle);
     setHasWon(false);
 
-    const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'long', month: 'long', day: 'numeric'};
+    const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'long', month: 'short', day: 'numeric'};
     const userLocale = navigator.language;
     const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
     setFormattedDate(formattedDate);
@@ -149,7 +149,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   } else {
     return (
       <>
-        <h2>{formattedDate}</h2>
+        <h3>{formattedDate}</h3>
         <Stopwatch ref={stopwatchRef}/>
         {currentPuzzle.type === "Encode" &&
           <EncodePuzzle
