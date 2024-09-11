@@ -83,6 +83,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
 
   useEffect(() => {
     const handleWinEvent = () => {
+      setHasWon(true);
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
         if (bitFieldRef.current) {
@@ -166,7 +167,7 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
             />
           )}
           {hasWon && (
-            <div className="win-message">
+            <div className="share-controls">
               <button onClick={handleShareWin}>Share Your Win</button>
             </div>
           )}
