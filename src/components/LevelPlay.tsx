@@ -70,9 +70,19 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
         {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
       </div>
       {currentPuzzle.type === "Encode" ? (
-        <EncodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13} />
+        <EncodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={() => console.log("Share win not implemented")}
+          displayWidth={13} />
       ) : (
-        <DecodePuzzle puzzle={currentPuzzle} onWin={handleWin} displayWidth={13} />
+        <DecodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={() => console.log("Share win not implemented")}
+          displayWidth={13} />
       )}
       <div className="display">
         {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
