@@ -11,6 +11,8 @@ interface PuzzleProps {
   puzzle: Puzzle;
   displayWidth: number;
   onWin: () => void;
+  hasWon: boolean;
+  onShareWin: () => void;
 }
 
 interface PuzzleState {
@@ -22,6 +24,13 @@ interface PuzzleState {
   displayRows: DisplayRow[];
   judgment: FullJudgment<SequenceJudgment>;
   updating: boolean;
+}
+
+const preloadImages = (urls: string[]) => {
+  urls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
 }
 
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
@@ -42,10 +51,20 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     this.handleSubmitClick = this.handleSubmitClick.bind(this);
   }
 
+
   abstract updateJudge(puzzle: Puzzle): void;
 
   componentDidMount() {
     this.updateCurrentPuzzle(this.props.puzzle);
+
+    preloadImages([
+      'assets/Bit_off_Yellow.png',
+      'assets/Bit_on_Yellow.png',
+      'assets/Bit_off_Teal.png',
+      'assets/Bit_on_Teal.png',
+      'assets/Bit_off_Purple.png',
+      'assets/Bit_on_Purple.png',
+    ]);
   }
 
   componentDidUpdate(prevProps: PuzzleProps, prevState: TState) {
@@ -66,7 +85,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   handleSubmitClick() {
-    const {currentPuzzle, guessBits, winBits} = this.state;
+    const {currentPuzzle, guessBits, winBits, displayRows} = this.state;
     if (!currentPuzzle) {
       ReactGA4.event({
         category: 'Error',
@@ -92,6 +111,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       );
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
+        this.setState({
+          displayRows: displayRows.concat([new DisplayRow("new win text!")])
+        });
       } else {
         this.setState({judgment: newJudgment});
       }

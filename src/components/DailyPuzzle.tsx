@@ -1,23 +1,23 @@
-import { useEffect, useState, useRef } from "react";
+import {useEffect, useState, useRef} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
-import { Puzzle } from "../Menu.ts";
-import Stopwatch, { StopwatchHandle } from "./Stopwatch.tsx";
+import {Puzzle} from "../Menu.ts";
+import Stopwatch, {StopwatchHandle} from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
   date: Date;
 }
 
-const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
+const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
-  const [winMessage, setWinMessage] = useState(puzzle.winMessage);
   const [hasWon, setHasWon] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
+  const bitFieldRef = useRef<HTMLDivElement>(null);
 
   const updateShareText = () => {
     if (stopwatchRef.current) {
@@ -48,10 +48,9 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
-    setWinMessage(puzzle.winMessage);
     setHasWon(false);
 
-    const prettyOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+    const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'long', month: 'long', day: 'numeric'};
     const userLocale = navigator.language;
     const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
     setFormattedDate(formattedDate);
@@ -60,20 +59,16 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
 
     const updateDisplayWidth = () => {
       const elementId = "bit-field";
-      const mainDisplay = document.getElementById(elementId);
+      const bitField = document.getElementById(elementId);
       let displayWidthPixels;
-      let widthDebugMessage: string;
-      if (!mainDisplay) {
+      if (!bitField) {
         displayWidthPixels = Math.floor(window.innerWidth * 0.85);
-        widthDebugMessage = `displayWidthPixels (estimated from window): ${displayWidthPixels}.`;
       } else {
-        displayWidthPixels = parseInt(getComputedStyle(mainDisplay).width);
-        widthDebugMessage = `displayWidthPixels from getComputedStyle(${elementId})): ${displayWidthPixels}.`;
+        displayWidthPixels = parseInt(getComputedStyle(bitField).width);
       }
 
       const bitCheckboxWidth = 32;
       const newDisplayWidth = Math.floor(displayWidthPixels / bitCheckboxWidth);
-      console.log(`${widthDebugMessage} => ${displayWidthPixels} / ${bitCheckboxWidth} = ${newDisplayWidth}`);
       setDisplayWidth(newDisplayWidth);
     };
 
@@ -86,16 +81,38 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     };
   }, [puzzle, date]);
 
+  useEffect(() => {
+    const handleWinEvent = () => {
+      setHasWon(true);
+      if (stopwatchRef.current) {
+        stopwatchRef.current.stop();
+        if (bitFieldRef.current) {
+          bitFieldRef.current.scrollTo({
+            top: bitFieldRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+        updateShareText();
+      }
+      // Play sound here
+      const audio = new Audio('path/to/sound.mp3');
+      audio.play();
+    };
+
+    window.addEventListener("winEvent", handleWinEvent);
+
+    return () => {
+      window.removeEventListener("winEvent", handleWinEvent);
+    };
+  }, []);
+
   const handleWin = () => {
-    setHasWon(true);
-    if (stopwatchRef.current) {
-      stopwatchRef.current.stop();
-      updateShareText();
-    }
+    const winEvent = new Event("winEvent");
+    window.dispatchEvent(winEvent);
   };
 
   const handleShareWin = () => {
-    const shareText  = `${puzzleDayString}\n${solveTimeString}`;
+    const shareText = `${puzzleDayString}\n${solveTimeString}`;
 
     if (navigator.share) {
       navigator.share({
@@ -133,32 +150,27 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     return (
       <>
         <h2>{formattedDate}</h2>
-        <Stopwatch ref={stopwatchRef} />
-        <div id="main-display" className="display">
-          {currentPuzzle.type === "Encode" ? (
-            <EncodePuzzle
-              puzzle={currentPuzzle}
-              onWin={handleWin}
-              displayWidth={displayWidth}
-              key={`${currentPuzzle}-${displayWidth}`}
-            />
-          ) : (
-            <DecodePuzzle
-              puzzle={currentPuzzle}
-              onWin={handleWin}
-              displayWidth={displayWidth}
-              key={`${currentPuzzle}-${displayWidth}`}
-            />
-          )}
-          {hasWon && (
-            <div className="win-message">
-              {winMessage.map((line, index) => (
-                <p key={`winMessageLine-${index}`}>{line}</p>
-              ))}
-              <button onClick={handleShareWin}>Share Your Win</button>
-            </div>
-          )}
-        </div>
+        <Stopwatch ref={stopwatchRef}/>
+        {currentPuzzle.type === "Encode" &&
+          <EncodePuzzle
+            puzzle={currentPuzzle}
+            onWin={handleWin}
+            hasWon={hasWon}
+            onShareWin={handleShareWin}
+            displayWidth={displayWidth}
+            key={`${currentPuzzle}-${displayWidth}`}
+          />
+        }
+        {currentPuzzle.type === "Decode" &&
+          <DecodePuzzle
+            puzzle={currentPuzzle}
+            onWin={handleWin}
+            hasWon={hasWon}
+            onShareWin={handleShareWin}
+            displayWidth={displayWidth}
+            key={`${currentPuzzle}-${displayWidth}`}
+          />
+        }
       </>
     );
   }
