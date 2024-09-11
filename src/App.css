@@ -7,9 +7,7 @@ html, body {
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
   background-color: #d0d4d4; /* Background color for the entire viewport */
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scroll-padding-top: 50vh;
+  overflow: hidden; /* Prevent scrolling on the body */
 }
 
 #root {
@@ -17,7 +15,18 @@ html, body {
   height: 100%;
   max-width: 700px;
   margin: 0 auto; /* Center the content */
+  overflow: hidden; /* Prevent scrolling on the root */
+  display: flex;
+  flex-direction: column;
+}
+
+#main-display {
+  width: 100%;
+  flex-grow: 1; /* Allow it to take the remaining space */
   box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  word-wrap: break-word; /* Ensure long words break and wrap within the container */
 }
 
 h1#magie-title {
@@ -46,17 +55,8 @@ h2 {
   padding: 8px 0 0 30px;
 }
 
-#main-display {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-
 div.display {
   text-transform: uppercase;
-  overflow-x: hidden;
   padding: 8px 0 0 30px;
 }
 
@@ -79,7 +79,6 @@ div.display {
   justify-content: center; /* Center the children vertically */
   align-items: center; /* Center the children horizontally */
   width: 100%;
-  height: 100%;
   margin-top: 1.6em;
 }
 

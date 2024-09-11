@@ -1,21 +1,14 @@
 import React, {createRef} from "react";
-import BasePuzzle, {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix.tsx";
+import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
+import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
+import BasePuzzle from "./BasePuzzle";
 import FullJudgment from "../judgment/FullJudgment.ts";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
+import {Puzzle} from "../Menu.ts";
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
-import {Puzzle} from "../Menu.ts";
-
-const preloadImages = (urls: string[]) => {
-  urls.forEach(url => {
-    const img = new Image();
-    img.src = url;
-  });
-};
-
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
@@ -37,15 +30,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
-
-    preloadImages([
-      'assets/Bit_off_Yellow.png',
-      'assets/Bit_on_Yellow.png',
-      'assets/Bit_off_Teal.png',
-      'assets/Bit_on_Teal.png',
-      'assets/Bit_off_Purple.png',
-      'assets/Bit_on_Purple.png',
-    ]);
   }
 
   componentDidMount() {
@@ -133,23 +117,27 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
     return (
       <>
-        <div id="bit-field" className="clue-and-bits">
-          {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-          <DisplayMatrix
-            ref={this.displayMatrixRef}
-            bits={winBits}
-            judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}  // bits will be read-only for the decode puzzle
-          />
-          {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+        <div id="main-display" className="display">
+            {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+            <DisplayMatrix
+              ref={this.displayMatrixRef}
+              bits={winBits}
+              judgments={judgment.sequenceJudgments}
+              handleBitClick={() => {
+              }}  // bits will be read-only for the decode puzzle
+            />
+          <div id="win-message">
+            {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
+              key={`win-message-${winIndex}`}>{winLine}</p>)}
+          </div>
         </div>
         <div className="puzzle-inputs">
           <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
           <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
         </div>
       </>
-    );
+    )
+      ;
   }
 }
 

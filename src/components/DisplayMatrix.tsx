@@ -1,6 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 import BitButton from "./BitButton.tsx";
-import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 interface DisplayMatrixProps {
   bits: string;
@@ -13,7 +13,7 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({ bits, judgments, handleBitClick }, ref) => {
+  ({bits, judgments, handleBitClick}, ref) => {
     const [currentJudgments, setCurrentJudgments] = useState(judgments);
 
     useImperativeHandle(ref, () => ({
@@ -24,27 +24,29 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
 
     return (
       <>
-        {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
-          <p key={`row${rowIndex}`}>
-            {rowJudgment.bitJudgments.map((bitJudgment, bitRowIndex) => {
-              const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
-              return (
-                <BitButton
-                  key={key}
-                  bit={bitJudgment.bit}
-                  sequenceIndex={rowIndex}
-                  bitIndex={bitJudgment.bitIndex}
-                  isCorrect={bitJudgment.isCorrect}
-                  onChange={handleBitClick}
-                />
-              );
-            })}
-          </p>
-        ))}
+        <div id="bit-field">
+          {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
+            <p key={`row${rowIndex}`}>
+              {rowJudgment.bitJudgments.map((bitJudgment, bitRowIndex) => {
+                const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
+                return (
+                  <BitButton
+                    key={key}
+                    bit={bitJudgment.bit}
+                    sequenceIndex={rowIndex}
+                    bitIndex={bitJudgment.bitIndex}
+                    isCorrect={bitJudgment.isCorrect}
+                    onChange={handleBitClick}
+                  />
+                );
+              })}
+            </p>
+          ))}
+        </div>
       </>
     );
   }
 );
 
 export default DisplayMatrix;
-export type { DisplayMatrixUpdate };
+export type {DisplayMatrixUpdate};

@@ -24,6 +24,13 @@ interface PuzzleState {
   updating: boolean;
 }
 
+const preloadImages = (urls: string[]) => {
+  urls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+}
+
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
   protected constructor(props: TProps) {
     super(props);
@@ -42,10 +49,20 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     this.handleSubmitClick = this.handleSubmitClick.bind(this);
   }
 
+
   abstract updateJudge(puzzle: Puzzle): void;
 
   componentDidMount() {
     this.updateCurrentPuzzle(this.props.puzzle);
+
+    preloadImages([
+      'assets/Bit_off_Yellow.png',
+      'assets/Bit_on_Yellow.png',
+      'assets/Bit_off_Teal.png',
+      'assets/Bit_on_Teal.png',
+      'assets/Bit_off_Purple.png',
+      'assets/Bit_on_Purple.png',
+    ]);
   }
 
   componentDidUpdate(prevProps: PuzzleProps, prevState: TState) {

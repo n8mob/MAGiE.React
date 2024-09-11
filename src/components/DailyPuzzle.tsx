@@ -1,15 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import {useEffect, useState, useRef} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
-import { Puzzle } from "../Menu.ts";
-import Stopwatch, { StopwatchHandle } from "./Stopwatch.tsx";
+import {Puzzle} from "../Menu.ts";
+import Stopwatch, {StopwatchHandle} from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
   date: Date;
 }
 
-const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
+const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
   const [hasWon, setHasWon] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
@@ -50,7 +50,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     setCurrentPuzzle(puzzle);
     setHasWon(false);
 
-    const prettyOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+    const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'long', month: 'long', day: 'numeric'};
     const userLocale = navigator.language;
     const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
     setFormattedDate(formattedDate);
@@ -85,7 +85,12 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     const handleWinEvent = () => {
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
-        bitFieldRef.current?.scrollTo(0, 700);
+        if (bitFieldRef.current) {
+          bitFieldRef.current.scrollTo({
+            top: bitFieldRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
         updateShareText();
       }
       // Play sound here
@@ -106,7 +111,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
   };
 
   const handleShareWin = () => {
-    const shareText  = `${puzzleDayString}\n${solveTimeString}`;
+    const shareText = `${puzzleDayString}\n${solveTimeString}`;
 
     if (navigator.share) {
       navigator.share({
@@ -144,8 +149,7 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
     return (
       <>
         <h2>{formattedDate}</h2>
-        <Stopwatch ref={stopwatchRef} />
-        <div id="main-display" className="display">
+        <Stopwatch ref={stopwatchRef}/>
           {currentPuzzle.type === "Encode" ? (
             <EncodePuzzle
               puzzle={currentPuzzle}
@@ -166,7 +170,6 @@ const DailyPuzzle = ({ puzzle, date }: DailyPuzzleProps) => {
               <button onClick={handleShareWin}>Share Your Win</button>
             </div>
           )}
-        </div>
       </>
     );
   }
