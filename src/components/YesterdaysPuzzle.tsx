@@ -29,8 +29,8 @@ const YesterdaysPuzzle = () => {
 
   return (
     <>
-      <h3><Link to="/today">&nbsp;&nbsp;puzzle for today &gt;</Link></h3>
-      <h3>&nbsp;&nbsp;puzzle for yesterday</h3>
+      <h3><Link to={"/today"}>&nbsp;&nbsp;today &gt;</Link></h3>
+      <h3>&nbsp;&nbsp;yesterday</h3>
       <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!}/>
     </>
   );
