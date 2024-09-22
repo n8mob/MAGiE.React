@@ -3,6 +3,7 @@ import {Puzzle} from "../Menu.ts";
 import fetchPuzzle from "../FetchPuzzle.tsx";
 import {getDailyPuzzle} from "../PuzzleApi.ts";
 import DailyPuzzle from "./DailyPuzzle.tsx";
+import {Link} from "react-router-dom";
 
 const TodaysPuzzle = () => {
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle>();
@@ -19,7 +20,8 @@ const TodaysPuzzle = () => {
 
   return (
     <>
-      <h3>TODAY</h3>
+      <h3><Link to="/yesterday">&lt;&nbsp;puzzle for yesterday</Link></h3>
+      <h3>&nbsp;&nbsp;puzzle for today</h3>
       <DailyPuzzle puzzle={currentPuzzle} date={new Date()}/>
     </>
   );
