@@ -20,6 +20,7 @@ function App() {
         <h1 id="magie-title">MAGiE</h1>
         <Routes>
           <Route path="/" element={<TodaysPuzzle/>}/>
+          <Route path="/today" element={<TodaysPuzzle/>}/>
           <Route path="/test/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
           <Route path="/yesterday" element={<YesterdaysPuzzle/>}/>
         </Routes>
