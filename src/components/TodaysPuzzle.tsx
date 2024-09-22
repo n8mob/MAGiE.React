@@ -19,6 +19,7 @@ const TodaysPuzzle = () => {
 
   return (
     <>
+      <h3>TODAY</h3>
       <DailyPuzzle puzzle={currentPuzzle} date={new Date()}/>
     </>
   );
