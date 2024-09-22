@@ -50,7 +50,21 @@ p {
 
 h3 {
   margin: 0;
-  padding: 0 0 0 3em;
+  padding: 0 16px;
+}
+
+.split-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.split-content .date-item {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.split-content .right-item {
+  text-align: right;
 }
 
 #stopwatch-display {
