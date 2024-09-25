@@ -128,6 +128,8 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
             }}  // bits will be read-only for the decode puzzle
           />
           <div id="win-message">
+            {hasWon && <p>{guessText}</p>}
+            {hasWon && <p>...</p>}
             {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
               key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
