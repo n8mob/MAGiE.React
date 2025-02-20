@@ -4,11 +4,24 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Press Start 2P', Menlo, Consolas, monospace;
+  font-size: 16px;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
   color: #213547;
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow: hidden; /* Prevent scrolling on the body */
+}
+
+@media (max-width: 600px) {
+  html, body {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  html, body {
+    font-size: 12px;
+  }
 }
 
 #root {
@@ -140,6 +153,13 @@ input.bit-checkbox {
   image-rendering: pixelated;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   margin: 0;
+}
+
+@media (max-width: 600px) {
+  input.bit-checkbox {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 input.bit-checkbox:checked {
