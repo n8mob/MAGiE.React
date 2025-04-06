@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 /vite.local.config.ts
+.env
+.env.prod
+.evn.*

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {PuzzleForDate, Menu} from "./Menu.ts";
+import { PuzzleForDate, Menu } from "./Menu.ts";
 
-const API_BASE_URL = 'https://puzzles.magiegame.com';
+const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
   const menuData = localStorage.getItem(menuName);
