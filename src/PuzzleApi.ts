@@ -11,7 +11,6 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
 
   try {
     const response = await axios.get(`${API_BASE_URL}/menus/${menuName}`);
-    console.debug('menu response', response)
     localStorage.setItem(menuName, JSON.stringify(response.data));
     return response.data;
   } catch (error) {
@@ -23,7 +22,6 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
 export const getDailyPuzzle = async (): Promise<PuzzleForDate> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/puzzles/today/`);
-    console.debug('daily puzzle response', response)
     return response.data;
   } catch (error) {
     console.error('Failed to fetch daily puzzle:', error);
