@@ -8,7 +8,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    env:
+      VITE_MAGIE_PUZZLE_API: 'https://puzzles/magiegame.com'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
