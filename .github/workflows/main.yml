@@ -8,8 +8,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      VITE_MAGIE_PUZZLE_API: 'https://puzzles/magiegame.com'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,6 +19,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Load environment variables
+        run: |
+          echo "VITE_MAGIE_PUZZLE_API=https://puzzles.magiegame.com}" >> $GITHUB_ENV
 
       - name: Build project
         run: npm run build
@@ -40,4 +42,3 @@ jobs:
           LIGHTSAIL_USER: ${{ secrets.LIGHTSAIL_USER }}
         run: |
           scp -i ~/.ssh/id_ed25519 -r dist $LIGHTSAIL_USER@$LIGHTSAIL_HOST:/var/www/magie-react
-          
