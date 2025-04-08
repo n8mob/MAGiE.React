@@ -1,19 +1,18 @@
-import {useEffect, useState, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
 import {Puzzle} from "../Menu.ts";
 import Stopwatch, {StopwatchHandle} from "./Stopwatch.tsx";
-import {Link} from "react-router-dom";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
   date: Date;
+  formattedDate: string;
 }
 
-const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
+const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
   const [hasWon, setHasWon] = useState(false);
-  const [formattedDate, setFormattedDate] = useState("");
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
@@ -51,10 +50,6 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     setCurrentPuzzle(puzzle);
     setHasWon(false);
 
-    const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'short', month: 'short', day: 'numeric'};
-    const userLocale = navigator.language;
-    const formattedDate = date.toLocaleDateString(userLocale, prettyOptions);
-    setFormattedDate(formattedDate);
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
 
@@ -145,23 +140,11 @@ const DailyPuzzle = ({puzzle, date}: DailyPuzzleProps) => {
     }
   };
 
-  const isToday = date.getDate() === new Date().getDate();
-  const link = isToday ? (
-    <Link className="right-item" to={"/yesterday"}>&lt;&lt;</Link>
-  ) : (
-    <Link className="right-item" to={"/today"}>&gt;&gt;</Link>
-  );
-
   if (!currentPuzzle) {
     return <div>Loading...</div>;
   } else {
     return (
       <>
-        <h3 className="split-content">
-          {isToday ? link : null}
-          <span className="date-item">{formattedDate}</span>
-          {isToday ? null : link}
-        </h3>
         <Stopwatch ref={stopwatchRef}/>
         {currentPuzzle.type === "Encode" &&
           <EncodePuzzle
