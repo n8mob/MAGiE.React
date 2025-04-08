@@ -15,10 +15,11 @@ function App() {
     <>
       <h1 id="magie-title">MAGiE</h1>
       <Routes>
-        <Route path="/" element={<TodaysPuzzle/>}/>
-        <Route path="/today" element={<TodaysPuzzle/>}/>
+        <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()} />}/>
+        <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()} />}/>
+        <Route path="/old_today" element={<TodaysPuzzle/>}/>
         <Route path="/test/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-        <Route path="/yesterday" element={<YesterdaysPuzzle/>}/>
+        <Route path="/old_yesterday" element={<YesterdaysPuzzle/>}/>
       </Routes>
     </>
   )
