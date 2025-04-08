@@ -26,9 +26,12 @@ const YesterdaysPuzzle = () => {
     return <div>Loading yesterday's puzzle...</div>;
   }
 
+  let yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
   return (
     <>
-      <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!}/>
+      <DailyPuzzle puzzle={currentPuzzle} date={yesterday!} formattedDate={yesterday.toLocaleDateString()}/>
     </>
   );
 };
