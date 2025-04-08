@@ -22,7 +22,7 @@ jobs:
 
       - name: Load environment variables
         run: |
-          echo "VITE_MAGIE_PUZZLE_API=https://puzzles.magiegame.com}" >> $GITHUB_ENV
+          echo "VITE_MAGIE_PUZZLE_API=https://puzzles.magiegame.com" >> $GITHUB_ENV
 
       - name: Build project
         run: npm run build
