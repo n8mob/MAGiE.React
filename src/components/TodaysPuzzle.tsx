@@ -17,9 +17,11 @@ const TodaysPuzzle = () => {
     return <div>Loading...</div>;
   }
 
+  const todaysDate = new Date();
+
   return (
     <>
-      <DailyPuzzle puzzle={currentPuzzle} date={new Date()}/>
+      <DailyPuzzle puzzle={currentPuzzle} date={todaysDate} formattedDate={todaysDate.toLocaleDateString()}/>
     </>
   );
 };
