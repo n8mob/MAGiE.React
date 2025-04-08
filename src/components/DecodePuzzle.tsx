@@ -9,6 +9,7 @@ import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
+import ReactGA4 from "react-ga4";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
@@ -92,8 +93,22 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     if (newJudgment) {
       this.setState({judgment: newJudgment});
       this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
+
+      let eventParams = {
+        guess_bits: guessBits,
+        guess_text: this.state.guessText,
+        winText: currentPuzzle.winText,
+        encoding: currentPuzzle.encoding_name,
+        encoding_type: currentPuzzle.encoding.getType(),
+        judgment_is_correct: newJudgment.isCorrect,
+        pagePath: window.location.pathname + window.location.search,
+      };
+
       if (newJudgment.isCorrect) {
+        ReactGA4.event("win", {...eventParams, solve_time_ms: -1});
         this.props.onWin();
+      } else {
+        ReactGA4.event("guess", eventParams);
       }
     }
   }
