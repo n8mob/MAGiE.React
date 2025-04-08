@@ -4,15 +4,12 @@ import ReactGA4 from 'react-ga4';
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
 import TodaysPuzzle from "./components/TodaysPuzzle.tsx";
 import YesterdaysPuzzle from "./components/YesterdaysPuzzle.tsx";
+import {usePageTracking} from "./hooks/usePageTracking.ts";
 
+ReactGA4.initialize('G-ZL5RKDBBF6');
 
 function App() {
-  ReactGA4.initialize('G-ZL5RKDBBF6');
-  const page_path = window.location.pathname + window.location.search;
-  ReactGA4.send({
-    hitType: "pageview",
-    page: page_path,
-  });
+  usePageTracking();
 
   return (
     <>
