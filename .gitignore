@@ -25,4 +25,4 @@ dist-ssr
 /vite.local.config.ts
 .env
 .env.prod
-.evn.*
+.env.*
