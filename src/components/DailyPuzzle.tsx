@@ -18,6 +18,14 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [displayWidth, setDisplayWidth] = useState(13); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
   const bitFieldRef = useRef<HTMLDivElement>(null);
+  const winAudio = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    winAudio.current = new Audio('/sounds/big-ta-da.wav');
+    winAudio.current.load();
+    winAudio.current.volume = 0.25;
+  }, []);
+
 
   const updateShareText = () => {
     if (stopwatchRef.current) {
@@ -77,6 +85,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     };
   }, [puzzle, date]);
 
+
   useEffect(() => {
     const handleWinEvent = () => {
       setHasWon(true);
@@ -90,9 +99,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
         }
         updateShareText();
       }
-      // Play sound here
-      const audio = new Audio('path/to/sound.mp3');
-      audio.play();
+      winAudio.current?.play();
     };
 
     window.addEventListener("winEvent", handleWinEvent);
