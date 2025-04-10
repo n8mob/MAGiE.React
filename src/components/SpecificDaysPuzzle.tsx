@@ -70,7 +70,7 @@ const SpecificDaysPuzzle: React.FC<DayPuzzleProps> = ({initialDate}) => {
   const isFutureDate = puzzleDate > new Date();
   if (isFutureDate) {
     return <>
-      <p>/// Restricted ///<br />{formattedDate}<br />//////////////////</p>
+      <p>/// <span className="blink">Restricted</span> ///<br />{formattedDate}<br />//////////////////</p>
       <p>Please rewind.</p>
       {linkToToday}
     </>
