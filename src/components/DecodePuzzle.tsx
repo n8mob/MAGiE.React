@@ -10,9 +10,11 @@ import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.t
 import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
 import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 import ReactGA4 from "react-ga4";
+import {Link} from "react-router-dom";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
+  private isFirstVisit = !localStorage.getItem('seenBefore');
 
   constructor(props: PuzzleProps) {
     super(props);
@@ -36,6 +38,9 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   componentDidMount() {
     super.componentDidMount();
     window.addEventListener("keydown", this.handleKeyDown);
+    if (this.isFirstVisit) {
+      localStorage.setItem('seenBefore', 'true');
+    }
   }
 
   componentWillUnmount() {
@@ -150,9 +155,26 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           </div>
         </div>
         {hasWon ? (
-          <div className="share-controls">
-            <button onClick={this.props.onShareWin}>Share Your Win</button>
-          </div>
+          <>
+            <div className="share-controls">
+              <button onClick={this.props.onShareWin}>Share Your Win</button>
+            </div>
+            <div className="post-win-links">
+              <p>
+                <Link
+                  to={"/test/2025/04/04"}
+                  onClick={() => {
+                    ReactGA4.event('story_start_clicked', {
+                      source: 'post-win-link',
+                      is_first_visit: this.isFirstVisit,
+                    });
+                  }}
+                >
+                  ⏮️ Back to the beginning
+                </Link>
+              </p>
+            </div>
+          </>
         ) : (
           <div className="puzzle-inputs">
             <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>

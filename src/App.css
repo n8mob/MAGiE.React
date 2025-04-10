@@ -184,3 +184,13 @@ input[type="button"] {
   font-weight: bold;
   padding: 15px 20px;
 }
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 2s step-start infinite;
+}
+
