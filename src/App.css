@@ -8,7 +8,7 @@ html, body {
   box-sizing: border-box;
   color: #213547;
   background-color: #d0d4d4; /* Background color for the entire viewport */
-  overflow: hidden; /* Prevent scrolling on the body */
+  overflow: auto; /* Allow scrolling on the body */
 }
 
 #root {
@@ -16,7 +16,7 @@ html, body {
   height: 100%;
   max-width: 700px;
   margin: 0 auto; /* Center the content */
-  overflow: hidden; /* Prevent scrolling on the root */
+  overflow: visible; /* Allow the root container to expand and scroll */
   display: flex;
   text-transform: uppercase;
   flex-direction: column;
@@ -29,6 +29,7 @@ html, body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
   overflow-y: auto; /* Enable vertical scrolling */
   word-wrap: break-word; /* Ensure long words break and wrap within the container */
+  max-height: 60vh; /* Limit the height of the display grid */
 }
 
 h1#magie-title {
@@ -96,6 +97,8 @@ div.display {
   align-items: center; /* Center the children horizontally */
   width: 100%;
   margin-top: 1.6em;
+  position: relative; /* Ensure inputs are positioned within the flow of the page */
+  margin-bottom: 2em; /* Add spacing below inputs to prevent overlap */
 }
 
 .puzzle-inputs > * {
