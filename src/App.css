@@ -44,6 +44,10 @@ h1#magie-title {
   text-transform: none;
 }
 
+.magie-case {
+  text-transform: none;
+}
+
 p {
   font-weight: bold;
   letter-spacing: 2px;
