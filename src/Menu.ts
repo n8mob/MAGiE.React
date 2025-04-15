@@ -35,6 +35,7 @@ export interface VariableEncodingData extends EncodingData {
 }
 
 export interface Puzzle {
+  slug: string;
   init: string;
   clue: string[];
   winText: string;

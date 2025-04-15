@@ -100,6 +100,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 
       let eventParams = {
+        puzzle_slug: currentPuzzle.slug,
         guess_bits: guessBits,
         guess_text: this.state.guessText,
         winText: currentPuzzle.winText,
@@ -166,6 +167,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
                   onClick={() => {
                     ReactGA4.event('story_start_clicked', {
                       source: 'post-win-link',
+                      puzzle_slug: currentPuzzle.slug,
                       is_first_visit: this.isFirstVisit,
                     });
                   }}
