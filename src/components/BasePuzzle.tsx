@@ -99,6 +99,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       ReactGA4.event(
         "GuessSubmitted",
         {
+          puzzle_slug: currentPuzzle.slug,
           guessBits: guessBits.toString(),
           clue: currentPuzzle.clue,
           encoding: currentPuzzle.encoding_name,
