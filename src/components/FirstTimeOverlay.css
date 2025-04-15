@@ -1,5 +1,28 @@
-.help-button {
-    padding: 1em;
+.first-time-overlay {
+    text-transform: none;
+}
+
+.first-time-overlay h2 {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+}
+.first-time-overlay h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.help-display {
+    padding: 0.5rem;
+    width: 2.2rem;
+    position: fixed;
+    right: 1rem;
+    margin: 2rem;
+}
+
+.help-dismiss {
+    padding: 1rem;
 }
 
 .first-time-overlay-inputs {
@@ -7,4 +30,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.coming-soon {
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 1rem;
+    color: #646cff;
 }

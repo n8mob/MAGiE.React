@@ -170,7 +170,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
                     });
                   }}
                 >
-                  ⏮️ Back to the beginning
+                  |&lt;&lt; Back to the beginning
                 </Link>
               </p>
             </div>

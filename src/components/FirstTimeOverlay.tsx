@@ -28,32 +28,32 @@ const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
   return (
     <>
       {hasMounted && !isVisible && (
-        <button className="help-button" onClick={handleManualOpen} title="How to Play">?</button>
+        <button className="help-display" onClick={handleManualOpen} title="How to Play">?</button>
       )}
 
       {isVisible && (
         <div className="first-time-overlay">
           <div className="first-time-modal">
-            <h2>Welcome to MAGiE</h2>
-            <p><em>A retro-future puzzle game set in a decaying AI-run mall.</em></p>
+            <h2>Welcome to <span className="magie-case">MAGiE</span></h2>
+            <p><em>A retro-future puzzle game with bits and a totally rad mall!</em></p>
 
             <h3>🔍 How it works</h3>
             <ul>
-              <li>Each puzzle hides a secret message encoded in binary.</li>
-              <li>Your job: <strong>decode</strong> it, one letter at a time.</li>
-              <li>Letters are translated into numbers (e.g. A = 1, B = 2), then to bits.</li>
+              <li>Each puzzle hides a secret message—your job is to figure it out.</li>
+              <li>Decoding puzzles will show you the bits, and you de-codie those bits, and type the message into the text box.</li>
             </ul>
 
             <h3>🕹️ Tips</h3>
             <ul>
-              <li>Click a bit to flip it (0 ↔ 1).</li>
-              <li>Each guess is checked against the secret and gives you visual feedback.</li>
-              <li>You can try as many guesses as you like.</li>
+              <li>Guess as many times as you like—no penalty for wrong guesses.</li>
               <li>New puzzles appear daily—you can also revisit previous days.</li>
             </ul>
 
             <div className="first-time-overlay-inputs">
-              <button className="help-button" onClick={handleClose}>Got it — Start Playing</button>
+              <button className="help-dismiss" onClick={handleClose}>Got it — Start Playing</button>
+            </div>
+            <div className="coming-soon">
+              <h3>🛍️ Coming Soon: more puzzle types!</h3>
             </div>
           </div>
         </div>
