@@ -1,0 +1,99 @@
+/* MagieScreen.css - pixel-perfect bezel layout */
+
+.bezel-grid {
+    display: grid;
+    grid-template-columns: 13px 1fr 13px;
+    grid-template-rows: 13px 1fr 15px;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+.corner {
+    display: flex;
+    position: relative;
+    z-index: 1;
+}
+
+/* Corner alignment */
+.corner.tl { justify-content: flex-start; align-items: flex-start; }
+.corner.tr { justify-content: flex-end;   align-items: flex-start; }
+.corner.bl { justify-content: flex-start; align-items: flex-end; }
+.corner.br { justify-content: flex-end;   align-items: flex-end; }
+
+.corner-img {
+    background-size: 100% 100%;
+    pointer-events: none;
+}
+
+/* Specific images and sizes */
+.tl .corner-img {
+    background-image: url('/src/assets/bezel_top_left.png');
+    width: 13px;
+    height: 13px;
+}
+
+.tr .corner-img {
+    background-image: url('/src/assets/bezel_top_right.png');
+    width: 24px;
+    height: 24px;
+}
+
+.bl .corner-img {
+    background-image: url('/src/assets/bezel_bottom_left.png');
+    width: 13px;
+    height: 15px;
+}
+
+.br .corner-img {
+    background-image: url('/src/assets/bezel_bottom_right.png');
+    width: 13px;
+    height: 15px;
+}
+
+.edge.top {
+    background-image: url('/src/assets/bezel_top.png');
+    background-repeat: repeat-x;
+    background-size: auto 13px;
+    background-position: top;
+    grid-column: 1 / span 3;
+    grid-row: 1;
+}
+
+.edge.bottom {
+    background-image: url('/src/assets/bezel_bottom.png');
+    background-repeat: repeat-x;
+    background-size: auto 15px;
+    background-position: bottom;
+    grid-column: 1 / span 3;
+    grid-row: 3;
+}
+
+.edge.left {
+    background-image: url('/src/assets/bezel_left.png');
+    background-repeat: repeat-y;
+    background-size: 13px auto;
+    background-position: left;
+    grid-column: 1;
+    grid-row: 1 / span 3;
+}
+
+.edge.right {
+    background-image: url('/src/assets/bezel_right.png');
+    background-repeat: repeat-y;
+    background-size: 13px auto;
+    background-position: right;
+    grid-column: 3;
+    grid-row: 1 / span 3;
+}
+
+.center-content {
+    background-color: #d0d4d4;
+    overflow: auto;
+    padding: 1rem;
+    grid-column: 2;
+    grid-row: 2;
+    z-index: 0;
+    position: relative;
+}
