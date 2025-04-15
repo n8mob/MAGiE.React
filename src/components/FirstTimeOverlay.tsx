@@ -40,7 +40,7 @@ const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
             <h3>🔍 How it works</h3>
             <ul>
               <li>Each puzzle hides a secret message—your job is to figure it out.</li>
-              <li>Decoding puzzles will show you the bits, and you de-codie those bits, and type the message into the
+              <li>Decode-type puzzles will show you the bits, and you de-codie those bits, and type the message into the
                 text box.
               </li>
             </ul>
