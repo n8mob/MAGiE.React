@@ -1,19 +1,10 @@
 .help-button {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    font-size: 1.5rem;
-    background: #333;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 2.5rem;
-    height: 2.5rem;
-    cursor: pointer;
-    z-index: 10000;
-    font-family: 'Press Start 2P', monospace;
+    padding: 1em;
 }
 
-.help-button:hover {
-    background: #555;
+.first-time-overlay-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

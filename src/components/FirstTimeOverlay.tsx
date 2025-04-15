@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import './FirstTimeOverlay.css'; // Optional: add styling here
 
-const FirstTimeOverlay = ({ onClose }: { onClose: () => void }) => {
+const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -52,7 +52,9 @@ const FirstTimeOverlay = ({ onClose }: { onClose: () => void }) => {
               <li>New puzzles appear daily—you can also revisit previous days.</li>
             </ul>
 
-            <button onClick={handleClose}>Got it — Start Playing</button>
+            <div className="first-time-overlay-inputs">
+              <button className="help-button" onClick={handleClose}>Got it — Start Playing</button>
+            </div>
           </div>
         </div>
       )}
