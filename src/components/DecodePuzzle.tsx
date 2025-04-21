@@ -1,4 +1,4 @@
-import React, {createRef} from "react";
+import {createRef} from "react";
 import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
 import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
 import BasePuzzle from "./BasePuzzle";
