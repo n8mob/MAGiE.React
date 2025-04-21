@@ -57,6 +57,15 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
+  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newGuessText = event.target.value.toUpperCase();
+    const newState = {
+      guessText: newGuessText,
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
+    };
+    this.setState(newState);
+  };
+
   updateJudge(puzzle: Puzzle) {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
       this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
@@ -147,3 +156,4 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 }
 
 export default DecodePuzzle;
+

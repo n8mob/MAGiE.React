@@ -36,15 +36,6 @@ const preloadImages = (urls: string[]) => {
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
 
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newGuessText = event.target.value.toUpperCase();
-    const newState = {
-      guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
-    }
-    this.setState(newState);
-  };
-
   protected constructor(props: TProps) {
     super(props);
     const initialState: PuzzleState = {
@@ -63,7 +54,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     this.state = initialState as TState;
     this.handleSubmitClick = this.handleSubmitClick.bind(this);
   }
-
 
   abstract updateJudge(puzzle: Puzzle): void;
 
@@ -235,3 +225,4 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
 export default BasePuzzle;
 export type {PuzzleProps, PuzzleState};
+

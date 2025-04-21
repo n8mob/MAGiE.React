@@ -40,37 +40,46 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     window.removeEventListener("keydown", this.handleKeyDown);
   }
 
-handleKeyDown(event: KeyboardEvent) {
-  switch (event.key) {
-    case "1":
-    case "0":
-      this.setState(
-        (prevState) => ({
-          guessBits: prevState.guessBits + event.key, // Update bits directly
-        }),
-        () => {
-          this.updateJudgment(); // Check win condition after updating bits
-        }
-      );
-      break;
+  handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "1":
+      case "0":
+        this.setState(
+          (prevState) => ({
+            guessBits: prevState.guessBits + event.key, // Update bits directly
+          }),
+          () => {
+            this.updateJudgment(); // Check win condition after updating bits
+          }
+        );
+        break;
 
-    case "Delete":
-    case "Backspace":
-      this.setState(
-        (prevState) => ({
-          guessBits: prevState.guessBits.slice(0, -1), // Remove the last bit
-        }),
-        () => {
-          this.updateJudgment(); // Recheck win condition
-        }
-      );
-      break;
+      case "Delete":
+      case "Backspace":
+        this.setState(
+          (prevState) => ({
+            guessBits: prevState.guessBits.slice(0, -1), // Remove the last bit
+          }),
+          () => {
+            this.updateJudgment(); // Recheck win condition
+          }
+        );
+        break;
 
-    default:
-      event.preventDefault(); // Block all other keys
-      break;
+      default:
+        event.preventDefault(); // Block all other keys
+        break;
+    }
   }
-}
+
+  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newGuessBits = event.target.value.replace(/[^01]/g, ""); // Ensure only binary input
+    const newState = {
+      guessBits: newGuessBits,
+      guessText: this.state.currentPuzzle?.encoding.decodeText(newGuessBits) || "",
+    };
+    this.setState(newState);
+  };
 
   updateJudge(puzzle: Puzzle) {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
@@ -137,7 +146,8 @@ handleKeyDown(event: KeyboardEvent) {
             handleBitClick={() => {
             }}  // bits will be read-only for the encode puzzle
           />
-          {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+          {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
+            key={`win-text-${winIndex}`}>{winLine}</p>)}
         </div>
         <div className="puzzle-inputs">
           <input type="text" className="encode-input" value={guessText} onChange={this.handleGuessUpdate}/>
@@ -149,3 +159,4 @@ handleKeyDown(event: KeyboardEvent) {
 }
 
 export default EncodePuzzle;
+
