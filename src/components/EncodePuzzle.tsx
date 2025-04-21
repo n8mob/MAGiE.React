@@ -83,13 +83,13 @@ handleKeyDown(event: KeyboardEvent) {
   }
 
   updateDisplayRows() {
-    const {currentPuzzle, winBits} = this.state;
+    const {currentPuzzle, guessBits} = this.state;
     if (!currentPuzzle) {
       console.error('Missing puzzle');
       return;
     }
 
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.props.displayWidth);
     const newDisplayRows = [];
     let displayRow = displayRowSplit.next();
     while (displayRow && !displayRow.done) {
