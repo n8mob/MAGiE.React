@@ -42,15 +42,37 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     window.removeEventListener("keydown", this.handleKeyDown);
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-      case "Enter":
-        this.handleSubmitClick();
-        break;
-      default:
-        break;
-    }
+handleKeyDown(event: KeyboardEvent) {
+  switch (event.key) {
+    case "1":
+    case "0":
+      this.setState(
+        (prevState) => ({
+          guessBits: prevState.guessBits + event.key, // Update bits directly
+        }),
+        () => {
+          this.updateJudgment(); // Check win condition after updating bits
+        }
+      );
+      break;
+
+    case "Delete":
+    case "Backspace":
+      this.setState(
+        (prevState) => ({
+          guessBits: prevState.guessBits.slice(0, -1), // Remove the last bit
+        }),
+        () => {
+          this.updateJudgment(); // Recheck win condition
+        }
+      );
+      break;
+
+    default:
+      event.preventDefault(); // Block all other keys
+      break;
   }
+}
 
   updateJudge(puzzle: Puzzle) {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
@@ -97,15 +119,6 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       }
     }
   }
-
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newGuessText = event.target.value.toUpperCase();
-    const newState = {
-      guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
-    }
-    this.setState(newState);
-  };
 
   render() {
     const {currentPuzzle, judgment, guessText, winBits} = this.state;
