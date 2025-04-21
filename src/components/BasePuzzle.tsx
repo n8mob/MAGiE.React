@@ -1,9 +1,9 @@
-import {Component} from "react";
+import React, {Component, createRef} from "react";
 import {Puzzle} from "../Menu.ts";
 import BinaryJudge from "../judgment/BinaryJudge.ts";
 import FullJudgment from "../judgment/FullJudgment.ts";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import DisplayMatrix from "./DisplayMatrix.tsx";
+import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix.tsx";
 import {DisplayRow} from "../encoding/BinaryEncoder.ts";
 import ReactGA4 from "react-ga4";
 
@@ -34,6 +34,17 @@ const preloadImages = (urls: string[]) => {
 }
 
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
+  displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
+
+  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newGuessText = event.target.value.toUpperCase();
+    const newState = {
+      guessText: newGuessText,
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
+    }
+    this.setState(newState);
+  };
+
   protected constructor(props: TProps) {
     super(props);
     const initialState: PuzzleState = {
@@ -46,6 +57,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
       updating: false,
     };
+
+    this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
 
     this.state = initialState as TState;
     this.handleSubmitClick = this.handleSubmitClick.bind(this);
@@ -168,12 +181,34 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   updateJudgment() {
-    const {currentPuzzle, judge, winBits, guessBits} = this.state;
-    if (currentPuzzle && judge) {
-      const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits || "", this.props.displayWidth);
-      const judgment = judge.judgeBits(guessBits, winBits, splitter);
-      if (judgment) {
-        this.setState({judgment});
+    const {currentPuzzle, judge, guessBits, winBits} = this.state;
+    if (!currentPuzzle) {
+      console.error('Missing puzzle');
+      return;
+    }
+
+    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
+    if (newJudgment) {
+      this.setState({judgment: newJudgment});
+      this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
+
+      let eventParams = {
+        puzzle_slug: currentPuzzle.slug,
+        guess_bits: guessBits,
+        guess_text: this.state.guessText,
+        winText: currentPuzzle.winText,
+        encoding: currentPuzzle.encoding_name,
+        encoding_type: currentPuzzle.encoding.getType(),
+        judgment_is_correct: newJudgment.isCorrect,
+        pagePath: window.location.pathname + window.location.search,
+      };
+
+      if (newJudgment.isCorrect) {
+        ReactGA4.event("win", {...eventParams, solve_time_ms: -1});
+        this.props.onWin();
+      } else {
+        ReactGA4.event("guess", eventParams);
       }
     }
   }

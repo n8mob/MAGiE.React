@@ -1,5 +1,5 @@
-import React, { createRef } from "react";
-import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import {createRef} from "react";
+import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
 import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
 import BasePuzzle from "./BasePuzzle";
 import {Puzzle} from "../Menu.ts";
@@ -11,8 +11,6 @@ import FullJudgment from "../judgment/FullJudgment.ts";
 import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
-
   constructor(props: PuzzleProps) {
     super(props);
 

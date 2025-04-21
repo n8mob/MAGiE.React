@@ -13,7 +13,6 @@ import ReactGA4 from "react-ga4";
 import {Link} from "react-router-dom";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
   private isFirstVisit = !localStorage.getItem('seenBefore');
 
   constructor(props: PuzzleProps) {
@@ -85,48 +84,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
     this.setState({displayRows: newDisplayRows});
   }
-
-  updateJudgment() {
-    const {currentPuzzle, judge, guessBits, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
-      this.setState({judgment: newJudgment});
-      this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
-
-      let eventParams = {
-        puzzle_slug: currentPuzzle.slug,
-        guess_bits: guessBits,
-        guess_text: this.state.guessText,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
-        judgment_is_correct: newJudgment.isCorrect,
-        pagePath: window.location.pathname + window.location.search,
-      };
-
-      if (newJudgment.isCorrect) {
-        ReactGA4.event("win", {...eventParams, solve_time_ms: -1});
-        this.props.onWin();
-      } else {
-        ReactGA4.event("guess", eventParams);
-      }
-    }
-  }
-
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newGuessText = event.target.value.toUpperCase();
-    const newState = {
-      guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
-    }
-    this.setState(newState);
-  };
 
   render() {
     const {currentPuzzle, judgment, guessText, winBits} = this.state;
