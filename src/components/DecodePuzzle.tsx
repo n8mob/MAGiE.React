@@ -111,8 +111,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
             ref={this.displayMatrixRef}
             bits={winBits}
             judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}  // bits will be read-only for the decode puzzle
+            handleBitClick={() => {}} // Bits remain read-only
           />
           <div id="win-message">
             {hasWon && <p>{guessText}</p>}
@@ -156,4 +155,3 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 }
 
 export default DecodePuzzle;
-

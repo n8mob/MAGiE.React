@@ -15,7 +15,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [hasWon, setHasWon] = useState(false);
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
-  const [displayWidth, setDisplayWidth] = useState(13); // Default value
+  const [displayWidth, setDisplayWidth] = useState(5); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
   const bitFieldRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);

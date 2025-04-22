@@ -26,7 +26,6 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     };
 
     this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
-
     this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
@@ -41,45 +40,28 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   }
 
   handleKeyDown(event: KeyboardEvent) {
+    const { guessBits } = this.state;
+
     switch (event.key) {
-      case "1":
       case "0":
+      case "1":
         this.setState(
-          (prevState) => ({
-            guessBits: prevState.guessBits + event.key, // Update bits directly
-          }),
-          () => {
-            this.updateJudgment(); // Check win condition after updating bits
-          }
+          { guessBits: guessBits + event.key }, // Append the bit
+          () => this.updateJudgment() // Recheck win condition
         );
         break;
 
-      case "Delete":
       case "Backspace":
         this.setState(
-          (prevState) => ({
-            guessBits: prevState.guessBits.slice(0, -1), // Remove the last bit
-          }),
-          () => {
-            this.updateJudgment(); // Recheck win condition
-          }
+          { guessBits: guessBits.slice(0, -1) }, // Remove the last bit
+          () => this.updateJudgment() // Recheck win condition
         );
         break;
 
       default:
-        event.preventDefault(); // Block all other keys
-        break;
+        break; // Ignore other keys
     }
   }
-
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newGuessBits = event.target.value.replace(/[^01]/g, ""); // Ensure only binary input
-    const newState = {
-      guessBits: newGuessBits,
-      guessText: this.state.currentPuzzle?.encoding.decodeText(newGuessBits) || "",
-    };
-    this.setState(newState);
-  };
 
   updateJudge(puzzle: Puzzle) {
     if (puzzle.encoding instanceof VariableWidthEncoder) {
@@ -127,8 +109,22 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
+  handleBitClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { sequenceIndex, bitIndex } = event.target.dataset;
+    if (sequenceIndex === undefined || bitIndex === undefined) {
+      console.error("Missing sequenceIndex or bitIndex in dataset");
+      return;
+    }
+
+    const index = parseInt(sequenceIndex) * this.props.displayWidth + parseInt(bitIndex);
+    console.log(`${sequenceIndex} *  ${this.props.displayWidth} + ${bitIndex} = ${index}`)
+    const { guessBits } = this.state;
+    const updatedBits = guessBits.split('').map((bit, i) => (i === index ? (bit === '0' ? '1' : '0') : bit)).join('');
+    this.setState({ guessBits: updatedBits }, () => this.updateJudgment());
+  };
+
   render() {
-    const {currentPuzzle, judgment, guessText, winBits} = this.state;
+    const {currentPuzzle, judgment} = this.state;
 
     if (!currentPuzzle) {
       console.error('Missing puzzle');
@@ -141,17 +137,15 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={this.displayMatrixRef}
-            bits={winBits}
+            bits={this.state.guessBits}
             judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}  // bits will be read-only for the encode puzzle
+            handleBitClick={this.handleBitClick}
           />
           {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
             key={`win-text-${winIndex}`}>{winLine}</p>)}
         </div>
         <div className="puzzle-inputs">
-          <input type="text" className="encode-input" value={guessText} onChange={this.handleGuessUpdate}/>
-          <input type="button" value="Submit" onClick={this.handleSubmitClick}/>
+          <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
         </div>
       </>
     );
