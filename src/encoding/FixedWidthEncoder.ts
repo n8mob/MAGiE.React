@@ -1,5 +1,5 @@
-import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
-import {EncodingType} from "../Menu.ts";
+import BinaryEncoder, { BitString, DisplayBit, DisplayRow, stripNonBits } from "./BinaryEncoder.ts";
+import { EncodingType } from "../Menu.ts";
 
 export default class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
@@ -84,6 +84,7 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return;
   }
 
+
   /**
    * Yields a `DisplayRow` for each row of bits in the given string.
    * @param displayWidth The width of each row.
@@ -98,10 +99,16 @@ export default class FixedWidthEncoder implements BinaryEncoder {
       throw new Error(`'displayWidth' must be greater than or equal to the width of the encoding: ${this.width}`);
     }
 
-    while (start < bits.length) {
-      end = start + Math.min(displayWidth, this.width);
-      const bitsForRow = bits.slice(start, end);
-      yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow));
+    const splitWidth = Math.min(displayWidth, this.width);
+    let globalIndex = 0;
+    const bitsA: BitString = stripNonBits(bits);
+
+    while (start < bitsA.length) {
+      end = start + splitWidth;
+      const bitsForRow = bitsA
+        .slice(start, end)
+        .map(b => new DisplayBit(b, globalIndex++));
+      yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow.join("")));
       start = end;
     }
 

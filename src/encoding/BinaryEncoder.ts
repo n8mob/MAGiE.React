@@ -1,12 +1,33 @@
-import {EncodingType} from "../Menu.ts";
+import { EncodingType } from "../Menu.ts";
+
+type BitString = Array<"0" | "1">;
+
+function stripNonBits(s: string): BitString {
+  return s.replace(/[^01]/g, "").split("") as BitString;
+}
+
+class DisplayBit {
+  bit: "0" | "1" | undefined;
+  globalIndex: number;
+
+  constructor(bit: "0" | "1" | undefined, globalIndex: number) {
+    this.bit = bit;
+    this.globalIndex = globalIndex;
+  }
+}
 
 class DisplayRow {
-  bits: string;
+  bits: DisplayBit[];
   annotation: string;
 
-  constructor(bits: string, annotation: string = "") {
+  constructor(bits: DisplayBit[], annotation: string = "") {
     this.bits = bits;
     this.annotation = annotation;
+  }
+
+  toString(): string {
+    const bitString = this.bits.map(bit => bit.bit).join("");
+    return `${bitString} ${this.annotation}`.trim();
   }
 }
 
@@ -27,5 +48,6 @@ interface BinaryEncoder {
 }
 
 export default BinaryEncoder;
-export {DisplayRow};
+export { DisplayBit, DisplayRow, stripNonBits };
+export type { BitString };
 

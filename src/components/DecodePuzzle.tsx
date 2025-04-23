@@ -1,52 +1,11 @@
-import {createRef} from "react";
-import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
+import React from "react";
+import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import DisplayMatrix from "./DisplayMatrix";
 import BasePuzzle from "./BasePuzzle";
-import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import {Puzzle} from "../Menu.ts";
-import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
-import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 import ReactGA4 from "react-ga4";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  private isFirstVisit = !localStorage.getItem('seenBefore');
-
-  constructor(props: PuzzleProps) {
-    super(props);
-
-    this.state = {
-      currentPuzzle: props.puzzle,
-      judge: null,
-      guessText: "",
-      guessBits: "",
-      winBits: "",
-      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      updating: false,
-      displayRows: [],
-    };
-
-    this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    window.addEventListener("keydown", this.handleKeyDown);
-    if (this.isFirstVisit) {
-      localStorage.setItem('seenBefore', 'true');
-    }
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-
   handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "Enter":
@@ -65,34 +24,6 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     };
     this.setState(newState);
   };
-
-  updateJudge(puzzle: Puzzle) {
-    if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
-    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
-    } else {
-      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
-    }
-  }
-
-  updateDisplayRows() {
-    const {currentPuzzle, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
-    const newDisplayRows = [];
-    let displayRow = displayRowSplit.next();
-    while (displayRow && !displayRow.done) {
-      newDisplayRows.push(displayRow.value);
-      displayRow = displayRowSplit.next();
-    }
-
-    this.setState({displayRows: newDisplayRows});
-  }
 
   render() {
     const {currentPuzzle, judgment, guessText, winBits} = this.state;

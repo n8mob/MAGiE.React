@@ -1,44 +1,9 @@
-import {createRef} from "react";
-import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
+import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import DisplayMatrix from "./DisplayMatrix";
 import BasePuzzle from "./BasePuzzle";
-import {Puzzle} from "../Menu.ts";
-import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import VariableWidthEncodingJudge from "../judgment/VariableWidthEncodingJudge.ts";
-import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import FixedWidthEncodingJudge from "../judgment/FixedWidthEncodingJudge.ts";
-import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
+import React from "react";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  constructor(props: PuzzleProps) {
-    super(props);
-
-    this.state = {
-      currentPuzzle: props.puzzle,
-      judge: null,
-      guessText: "",
-      guessBits: "",
-      winBits: "",
-      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      updating: false,
-      displayRows: [],
-    };
-
-    this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-
   handleKeyDown(event: KeyboardEvent) {
     const { guessBits } = this.state;
 
@@ -63,16 +28,6 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
-  updateJudge(puzzle: Puzzle) {
-    if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.setState({judge: new VariableWidthEncodingJudge(puzzle.encoding)});
-    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.setState({judge: new FixedWidthEncodingJudge(puzzle.encoding)});
-    } else {
-      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
-    }
-  }
-
   updateDisplayRows() {
     const {currentPuzzle, guessBits} = this.state;
     if (!currentPuzzle) {
@@ -80,7 +35,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       return;
     }
 
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.props.displayWidth);
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.state.displayWidth);
     const newDisplayRows = [];
     let displayRow = displayRowSplit.next();
     while (displayRow && !displayRow.done) {
@@ -98,7 +53,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       return;
     }
 
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
@@ -116,8 +71,8 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       return;
     }
 
-    const index = parseInt(sequenceIndex) * this.props.displayWidth + parseInt(bitIndex);
-    console.log(`${sequenceIndex} *  ${this.props.displayWidth} + ${bitIndex} = ${index}`)
+    const index = parseInt(sequenceIndex) * this.state.displayWidth + parseInt(bitIndex);
+    console.log(`${sequenceIndex} *  ${this.state.displayWidth} + ${bitIndex} = ${index}`)
     const { guessBits } = this.state;
     const updatedBits = guessBits.split('').map((bit, i) => (i === index ? (bit === '0' ? '1' : '0') : bit)).join('');
     this.setState({ guessBits: updatedBits }, () => this.updateJudgment());

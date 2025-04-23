@@ -15,7 +15,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [hasWon, setHasWon] = useState(false);
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
-  const [displayWidth, setDisplayWidth] = useState(5); // Default value
   const stopwatchRef = useRef<StopwatchHandle>(null);
   const bitFieldRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
@@ -61,27 +60,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
 
-    const updateDisplayWidth = () => {
-      const elementId = "bit-field";
-      const bitField = document.getElementById(elementId);
-      let displayWidthPixels;
-      if (!bitField) {
-        displayWidthPixels = Math.floor(window.innerWidth * 0.85);
-      } else {
-        displayWidthPixels = parseInt(getComputedStyle(bitField).width);
-      }
-
-      const bitCheckboxWidth = 32;
-      const newDisplayWidth = Math.floor(displayWidthPixels / bitCheckboxWidth);
-      setDisplayWidth(newDisplayWidth);
-    };
-
-    updateDisplayWidth();
-
-    window.addEventListener("resize", updateDisplayWidth);
-
     return () => {
-      window.removeEventListener("resize", updateDisplayWidth);
+      window.removeEventListener("resize", () => {}); // Remove unused resize listener
     };
   }, [puzzle, date]);
 
@@ -99,7 +79,13 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
         }
         updateShareText();
       }
-      winAudio.current?.play();
+
+      if (winAudio.current) {
+        winAudio.current.play()
+          .catch((error) => {
+            console.warn("Audio playback failed:", error);
+          });
+      }
     };
 
     window.addEventListener("winEvent", handleWinEvent);
@@ -159,8 +145,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
             onWin={handleWin}
             hasWon={hasWon}
             onShareWin={handleShareWin}
-            displayWidth={displayWidth}
-            key={`${currentPuzzle}-${displayWidth}`}
+            key={`${currentPuzzle}`}
           />
         }
         {currentPuzzle.type === "Decode" &&
@@ -169,8 +154,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
             onWin={handleWin}
             hasWon={hasWon}
             onShareWin={handleShareWin}
-            displayWidth={displayWidth}
-            key={`${currentPuzzle}-${displayWidth}`}
+            key={`${currentPuzzle}`}
           />
         }
       </>
@@ -179,3 +163,4 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 };
 
 export default DailyPuzzle;
+

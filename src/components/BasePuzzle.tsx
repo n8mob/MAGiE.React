@@ -1,18 +1,23 @@
-import React, {Component, createRef} from "react";
-import {Puzzle} from "../Menu.ts";
+import React, { Component, createRef } from "react";
+import { Puzzle } from "../Menu.ts";
 import BinaryJudge from "../judgment/BinaryJudge.ts";
 import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix.tsx";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import DisplayMatrix, { DisplayMatrixUpdate } from "./DisplayMatrix.tsx";
+import { DisplayRow } from "../encoding/BinaryEncoder.ts";
 import ReactGA4 from "react-ga4";
+import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
+import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
+import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
+import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
 
 interface PuzzleProps {
   puzzle: Puzzle;
-  displayWidth: number;
   onWin: () => void;
   hasWon: boolean;
   onShareWin: () => void;
+  bitDisplayWidthPx: number;
+  displayAreaWidthPx: number;
 }
 
 interface PuzzleState {
@@ -24,6 +29,9 @@ interface PuzzleState {
   displayRows: DisplayRow[];
   judgment: FullJudgment<SequenceJudgment>;
   updating: boolean;
+  bitDisplayWidthPx: number;
+  displayAreaWidthPx: number;
+  displayWidth: number;
 }
 
 const preloadImages = (urls: string[]) => {
@@ -35,6 +43,8 @@ const preloadImages = (urls: string[]) => {
 
 abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState> extends Component<TProps, TState> {
   displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
+  isFirstVisit = !localStorage.getItem('seenBefore');
+  private readonly BIT_FIELD_ELEMENT_ID = "bit-field";
 
   protected constructor(props: TProps) {
     super(props);
@@ -47,17 +57,38 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       displayRows: [],
       judgment: new FullJudgment<SequenceJudgment>(false, "", []),
       updating: false,
+      bitDisplayWidthPx: props.bitDisplayWidthPx,
+      displayAreaWidthPx: props.displayAreaWidthPx,
+      displayWidth: this.props.displayAreaWidthPx / this.props.bitDisplayWidthPx,
     };
 
     this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
 
     this.state = initialState as TState;
+    this.updateDisplayWidth();
     this.handleSubmitClick = this.handleSubmitClick.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  abstract updateJudge(puzzle: Puzzle): void;
+  abstract handleKeyDown(event: KeyboardEvent): void;
+
+  updateDisplayWidth = () => {
+    const elementId = this.BIT_FIELD_ELEMENT_ID;
+    const bitField = document.getElementById(elementId);
+    let displayWidthPixels;
+    if (!bitField) {
+      displayWidthPixels = Math.floor(window.innerWidth * 0.85);
+    } else {
+      displayWidthPixels = parseInt(getComputedStyle(bitField).width);
+    }
+    const newDisplayWidth = displayWidthPixels / this.state.bitDisplayWidthPx;
+    this.setState({displayWidth: newDisplayWidth});
+  };
 
   componentDidMount() {
+    if (this.isFirstVisit) {
+      localStorage.setItem('seenBefore', 'true');
+    }
     this.updateCurrentPuzzle(this.props.puzzle);
 
     preloadImages([
@@ -68,6 +99,15 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       'assets/Bit_off_Purple.png',
       'assets/Bit_on_Purple.png',
     ]);
+
+    this.updateDisplayWidth();
+    window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("resize", this.updateDisplayWidth);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDisplayWidth);
+    window.removeEventListener("keydown", this.handleKeyDown);
   }
 
   componentDidUpdate(prevProps: PuzzleProps, prevState: TState) {
@@ -96,7 +136,11 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       })
       return;
     }
-    const split = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+
+    const split: (bits: string) => Generator<DisplayRow, void> = (bits: string) => {
+      return currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
+    };
+
     const newJudgment = this.state.judge?.judgeBits(guessBits, winBits, split);
     if (newJudgment) {
       ReactGA4.event(
@@ -116,7 +160,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
         this.setState({
-          displayRows: displayRows.concat([new DisplayRow("new win text!")])
+          displayRows: displayRows.concat(new DisplayRow([], "new win text!")),
         });
       } else {
         this.setState({judgment: newJudgment});
@@ -131,7 +175,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       return;
     }
 
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.props.displayWidth);
+    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.state.displayWidth);
     const newDisplayRows: DisplayRow[] = [];
     let displayRow = displayRowSplit.next();
     while (displayRow && !displayRow.done) {
@@ -170,6 +214,16 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     }
   }
 
+  updateJudge(puzzle: Puzzle) {
+    if (puzzle.encoding instanceof VariableWidthEncoder) {
+      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
+    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
+      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
+    } else {
+      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
+    }
+  }
+
   updateJudgment() {
     const {currentPuzzle, judge, guessBits, winBits} = this.state;
     if (!currentPuzzle) {
@@ -177,7 +231,9 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       return;
     }
 
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
+    const splitter: (bits: string) => Generator<DisplayRow, void> = (bits: string) => {
+      return currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
+    };
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
@@ -224,5 +280,4 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 }
 
 export default BasePuzzle;
-export type {PuzzleProps, PuzzleState};
-
+export type { PuzzleProps, PuzzleState };
