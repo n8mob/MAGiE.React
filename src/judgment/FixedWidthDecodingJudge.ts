@@ -12,8 +12,8 @@ export default class FixedWidthDecodingJudge implements BinaryJudge {
   }
 
   judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string,
+    guessBits: BitString,
+    winBits: BitString,
     splitter: SplitterFunction,
     newSequenceJudgment: (bits: string, judgments: string) => T =
       (bits, judgments) => new SequenceJudgment(bits, judgments) as T

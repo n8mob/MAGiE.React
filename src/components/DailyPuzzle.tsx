@@ -135,31 +135,33 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
   if (!currentPuzzle) {
     return <div>Loading...</div>;
-  } else {
-    return (
-      <>
-        <Stopwatch ref={stopwatchRef}/>
-        {currentPuzzle.type === "Encode" &&
-          <EncodePuzzle
-            puzzle={currentPuzzle}
-            onWin={handleWin}
-            hasWon={hasWon}
-            onShareWin={handleShareWin}
-            key={`${currentPuzzle}`}
-          />
-        }
-        {currentPuzzle.type === "Decode" &&
-          <DecodePuzzle
-            puzzle={currentPuzzle}
-            onWin={handleWin}
-            hasWon={hasWon}
-            onShareWin={handleShareWin}
-            key={`${currentPuzzle}`}
-          />
-        }
-      </>
-    );
   }
+
+  return (
+    <>
+      <Stopwatch ref={stopwatchRef}/>
+      {currentPuzzle.type === "Encode" &&
+        <EncodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={handleShareWin}
+          bitDisplayWidthPx={32}
+          key={`${currentPuzzle}`}
+        />
+      }
+      {currentPuzzle.type === "Decode" &&
+        <DecodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={handleShareWin}
+          bitDisplayWidthPx={32}
+          key={`${currentPuzzle}`}
+        />
+      }
+    </>
+  );
 };
 
 export default DailyPuzzle;

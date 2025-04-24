@@ -1,7 +1,7 @@
 import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
 import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
 import FullJudgment from "./FullJudgment.ts";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import { BitString, DisplayBit, DisplayRow } from "../encoding/BinaryEncoder.ts";
 import BinaryJudge, {SplitterFunction} from "./BinaryJudge.ts";
 
 export default class VariableWidthDecodingJudge implements BinaryJudge {
@@ -11,8 +11,8 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
   }
 
   _judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string,
+    guessBits: BitString,
+    winBits: BitString,
     splitter: SplitterFunction,
     newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(
       bits,
@@ -29,7 +29,7 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
     let correctBits = "";
 
     while(!nextWin.done) {
-      let sequenceWinBits: string;
+      let sequenceWinBits: DisplayBit[];
       if (nextWin.value instanceof DisplayRow) {
         sequenceWinBits = nextWin.value.bits;
       } else {
@@ -41,7 +41,7 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
         sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, "0".repeat(sequenceWinBits.length)));
         nextWin = winSplit.next();
       } else {
-        let sequenceGuessBits: string;
+        let sequenceGuessBits: DisplayBit[];
         if (nextGuess.value instanceof DisplayRow) {
           sequenceGuessBits = nextGuess.value.bits;
         } else {
@@ -67,8 +67,8 @@ export default class VariableWidthDecodingJudge implements BinaryJudge {
   }
 
   judgeBits<T extends DisplayRowJudgment>(
-    guessBits: string,
-    winBits: string,
+    guessBits: BitString,
+    winBits: BitString,
     splitter: SplitterFunction
   ): FullJudgment<T> {
     return this._judgeBits(

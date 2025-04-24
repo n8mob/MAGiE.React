@@ -12,8 +12,8 @@ export default class FixedWidthEncoder implements BinaryEncoder {
    * @param width The width of each encoded character in bits. This value is used by `splitBits`.
    * @param encoding A mapping from characters to their encoded values.
    * @param decoding Optional. A mapping from encoded values to their respective characters.
-   * @param defaultEncoded Optional. The default value used when encoding an unknown character.
-   * @param defaultDecoded Optional. The default character used when decoding an unknown value.
+   * @param defaultEncoded Optional. The default value that will be used when encoding an unknown character.
+   * @param defaultDecoded Optional. The default character that will be used when decoding an unknown value.
    */
   constructor(
     width: number,
@@ -47,10 +47,11 @@ export default class FixedWidthEncoder implements BinaryEncoder {
       : this.defaultDecoded;
   }
 
-  encodeChar(charToEncode: string): string {
-    return charToEncode in this.encoding
-      ? this.encoding[charToEncode].toString(2).padStart(this.width, '0')
-      : this.defaultEncoded.toString(2).padStart(this.width, '0');
+  encodeChar(charToEncode: string): BitString {
+    let s = charToEncode in this.encoding
+            ? this.encoding[charToEncode].toString(2).padStart(this.width, '0')
+            : this.defaultEncoded.toString(2).padStart(this.width, '0');
+    return stripNonBits(s);
   }
 
   decodeText(encodedText: string): string {
@@ -61,8 +62,8 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return decoded.join('');
   }
 
-  encodeText(textToEncode: string): string {
-    return [...textToEncode].map(char => this.encodeChar(char)).join('');
+  encodeText(textToEncode: string): BitString {
+    return [...textToEncode].map(char => this.encodeChar(char)).flat();
   }
 
   /**
@@ -86,26 +87,25 @@ export default class FixedWidthEncoder implements BinaryEncoder {
 
 
   /**
-   * Yields a `DisplayRow` for each row of bits in the given string.
+   * Yields a `DisplayRow` for each row of bits in the given BitString.
    * @param displayWidth The width of each row.
    * @param bits The string of bits to be split.
    * @returns A generator yielding `DisplayRow` objects.
    */
-  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
+  * splitForDisplay(bits: BitString, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
     let end = 0;
 
     if (displayWidth < this.width) {
-      throw new Error(`'displayWidth' must be greater than or equal to the width of the encoding: ${this.width}`);
+      throw new Error(`displayWidth (${displayWidth}) must be greater than or equal to the width of the encoding: ${this.width}`);
     }
 
     const splitWidth = Math.min(displayWidth, this.width);
     let globalIndex = 0;
-    const bitsA: BitString = stripNonBits(bits);
 
-    while (start < bitsA.length) {
+    while (start < bits.length) {
       end = start + splitWidth;
-      const bitsForRow = bitsA
+      const bitsForRow: DisplayBit[] = bits
         .slice(start, end)
         .map(b => new DisplayBit(b, globalIndex++));
       yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow.join("")));

@@ -1,21 +1,30 @@
-import BinaryEncoder, {DisplayRow} from "./BinaryEncoder.ts";
-import {EncodingType} from "../Menu.ts";
+import BinaryEncoder, { BitString, DisplayBit, DisplayRow } from "./BinaryEncoder.ts";
+import { EncodingType } from "../Menu.ts";
 
 export default class VariableWidthEncoder implements BinaryEncoder {
-  public readonly encoding: Record<string, Record<string, string>>;
-  public readonly decoding: Record<string, Record<string, string>>;
-  readonly defaultEncoded: string;
+  public readonly encoding: Record<string, Record<string, BitString>>;
+  public readonly decoding: Record<string, Record<BitString, string>>;
+  readonly defaultEncoded: BitString = ["0"];
   readonly defaultDecoded: string;
-  readonly characterSeparator: string;
+  readonly characterSeparator: BitString;
 
   constructor(
-    encoding: Record<string, Record<string, string>>,
-    decoding?: Record<string, Record<string, string>>,
-    defaultEncoded: string = "0",
+    encoding: Record<string, Record<string, BitString>>,
+    decoding?: Record<string, Record<BitString, string>>,
+    defaultEncoded: BitString = ["0"],
     defaultDecoded: string = "?",
-    characterSeparator: string = "0"
+    characterSeparator: BitString = ["0"]
   ) {
-    this.encoding = encoding;
+    //this.encoding = encoding;
+    // need to translate all the 'strings' in the given encoding to bitstrings
+    this.encoding = {};
+    for (const symbol in encoding) {
+      this.encoding[symbol] = {};
+      for (const coded in encoding[symbol]) {
+        this.encoding[symbol][coded] = encoding[symbol][coded].split("")
+          .map((bit) => parseInt(bit));
+      }
+    }
     this.defaultEncoded = defaultEncoded;
     this.defaultDecoded = defaultDecoded;
     if (!decoding) {
@@ -36,40 +45,31 @@ export default class VariableWidthEncoder implements BinaryEncoder {
     return "Variable";
   }
 
-  findForSymbol(coded: string, coding: Record<string, Record<string, string>>): string | undefined {
-    for (const symbol in Object.keys(coding)) {
-      if (coded in coding[symbol]) {
-        return coding[symbol][coded];
+  /**
+   * Encodes a character into a string of bits.
+   * @param toEncode A string containing the single character to encode.
+   */
+  encodeChar(toEncode: string): BitString {
+    for (const symbol in this.encoding) {
+      if (toEncode in this.encoding[symbol]) {
+        return this.encoding[symbol][toEncode];
+      }
+      return this.defaultEncoded;
+    }
+  }
+
+  decodeChar(encoded: BitString): string {
+    for (const symbol in this.decoding) {
+      if (encoded in this.decoding[symbol]) {
+        return this.decoding[symbol][encoded];
       }
     }
-    return undefined;
+    return this.defaultDecoded;
   }
 
-  _encodeChar(toEncode: string | DisplayRow): string {
-    if (typeof toEncode === "string") {
-      return this.encodeChar(toEncode);
-    } else {
-      return this.encodeChar(toEncode.bits);
-    }
-  }
-
-  encodeChar(toEncode: string): string {
-    const encoded = this.findForSymbol(toEncode, this.encoding);
-    return encoded ? encoded : this.defaultEncoded;
-  }
-
-  decodeChar(encoded: string): string {
-    const decoded = this.findForSymbol(encoded, this.decoding);
-    if (decoded === undefined) {
-      return this.defaultDecoded;
-    } else {
-      return decoded;
-    }
-  }
-
-  encodeText(toEncode: string): string {
+  encodeText(toEncode: string): BitString {
     const encodedSplit = this.encodeAndSplit(toEncode);
-    let encodedText = "";
+    let encodedText: DisplayBit[] = [];
     let prev = "";
     let nextSplit = encodedSplit.next();
 
@@ -99,11 +99,11 @@ export default class VariableWidthEncoder implements BinaryEncoder {
   }
 
   /**
-   * Encodes a string of characters into a string of bits and then splits the bits into sequences for each character.
+   * Encodes a string of characters, yielding a BitString for each character in the given string
    * @see splitByChar
    * @param toEncode
    */
-  * encodeAndSplit(toEncode: string): Generator<string, void> {
+  * encodeAndSplit(toEncode: string): Generator<BitString, void> {
     for (const token of toEncode) {
       yield this.encodeChar(token);
     }
@@ -114,7 +114,7 @@ export default class VariableWidthEncoder implements BinaryEncoder {
    * @implNote omits the character separator
    * @param bits
    */
-  * splitByChar(bits: string): Generator<string, void> {
+  * splitByChar(bits: BitString): Generator<string, void> {
     let tokenStart = 0;
     if (!bits) {
       return;
@@ -136,15 +136,16 @@ export default class VariableWidthEncoder implements BinaryEncoder {
     return;
   }
 
-  * splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void> {
-    let displayBits = "";
-    let remaining = bits;
+  * splitForDisplay(bits: BitString, displayWidth: number): Generator<DisplayRow, void> {
+    let displayBits: DisplayBit[] = [];
+    let remaining: BitString = bits;
+    let index = 0;
     while (remaining.length >= displayWidth) {
-      displayBits = remaining.slice(0, displayWidth);
+      displayBits = remaining.slice(0, displayWidth).map((bit) => new DisplayBit(bit, index++));
       remaining = remaining.slice(displayWidth);
       yield new DisplayRow(displayBits, "");
     }
-    yield new DisplayRow(remaining, "");
+    yield new DisplayRow(remaining.map((bit) => new DisplayBit(bit, index++)), "");
     return;
   }
 }

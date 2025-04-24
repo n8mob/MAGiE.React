@@ -7,7 +7,14 @@ function stripNonBits(s: string): BitString {
 }
 
 class DisplayBit {
+  /**
+   * The bit value, which can be "0" or "1".
+   * undefined is also allowed. I'm expecting to use that when, say, a guess has not been entered for this bit yet.
+   */
   bit: "0" | "1" | undefined;
+  /**
+   * The global index of the bit in the entire bit string.
+   */
   globalIndex: number;
 
   constructor(bit: "0" | "1" | undefined, globalIndex: number) {
@@ -36,15 +43,15 @@ interface BinaryEncoder {
 
   decodeText(encodedText: string): string;
 
-  encodeText(textToEncode: string): string;
+  encodeText(textToEncode: string): BitString;
 
   decodeChar(encodedChar: string): string;
 
-  encodeChar(charToEncode: string): string;
+  encodeChar(charToEncode: string): BitString;
 
   splitByChar(bits: string): Generator<string, void>;
 
-  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void>;
+  splitForDisplay(bits: BitString, displayWidth: number): Generator<DisplayRow, void>;
 }
 
 export default BinaryEncoder;

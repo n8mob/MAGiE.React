@@ -2,23 +2,24 @@ import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
 import DisplayMatrix from "./DisplayMatrix";
 import BasePuzzle from "./BasePuzzle";
 import React from "react";
+import { BitString } from "../encoding/BinaryEncoder.ts";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   handleKeyDown(event: KeyboardEvent) {
-    const { guessBits } = this.state;
+    const {guessBits} = this.state;
 
     switch (event.key) {
       case "0":
       case "1":
         this.setState(
-          { guessBits: guessBits + event.key }, // Append the bit
+          {guessBits: guessBits.concat(event.key)}, // Append the bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
 
       case "Backspace":
         this.setState(
-          { guessBits: guessBits.slice(0, -1) }, // Remove the last bit
+          {guessBits: guessBits.slice(0, -1)}, // Remove the last bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
@@ -53,7 +54,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       return;
     }
 
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
+    const splitter = (bits: BitString) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
@@ -65,7 +66,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   }
 
   handleBitClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { sequenceIndex, bitIndex } = event.target.dataset;
+    const {sequenceIndex, bitIndex} = event.target.dataset;
     if (sequenceIndex === undefined || bitIndex === undefined) {
       console.error("Missing sequenceIndex or bitIndex in dataset");
       return;
@@ -73,9 +74,9 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
     const index = parseInt(sequenceIndex) * this.state.displayWidth + parseInt(bitIndex);
     console.log(`${sequenceIndex} *  ${this.state.displayWidth} + ${bitIndex} = ${index}`)
-    const { guessBits } = this.state;
-    const updatedBits = guessBits.split('').map((bit, i) => (i === index ? (bit === '0' ? '1' : '0') : bit)).join('');
-    this.setState({ guessBits: updatedBits }, () => this.updateJudgment());
+    const {guessBits} = this.state;
+    const updatedBits = guessBits.map((bit, i) => (i === index ? (bit === '0' ? '1' : '0') : bit));
+    this.setState({guessBits: updatedBits}, () => this.updateJudgment());
   };
 
   render() {
