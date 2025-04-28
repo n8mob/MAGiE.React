@@ -1,24 +1,42 @@
+import { IndexedBit } from "../IndexedBit.ts";
+
 type Correctness = true | false | "unknown";
 
-class BitJudgment {
-  bit: string;
-  isCorrect: Correctness;
-  sequenceIndex: number | null;
-  bitIndex: number;
+class BitJudgment extends IndexedBit {
+  private readonly _isCorrect: Correctness = "unknown";
 
-  constructor(
-    bit: string,
-    isCorrect: Correctness = "unknown",
-    bitIndex: number,
-    sequenceIndex: number | null = null
-  ) {
-    this.bit = bit;
-    this.isCorrect = isCorrect;
-    this.bitIndex = bitIndex;
-    this.sequenceIndex = sequenceIndex;
+  get isCorrect(): Correctness {
+    return this._isCorrect;
+  }
+
+  /**
+   * Recommend using {@link BitJudgment.judge} or {@link BitJudgment.judgeCorrect} or {@link BitJudgment.judgeIncorrect} factory methods.
+   * This raw constructor expects an IndexedBit and a correctness value.
+   * @param bitValue
+   * @param isCorrect
+   */
+  constructor(bitValue: IndexedBit, isCorrect: Correctness) {
+    super(bitValue.bit, bitValue.index);
+    this._isCorrect = isCorrect;
+  }
+
+  toString(): string {
+    return `[${this.index}]: ${this.bit} ${this._isCorrect ? "is correct" : "is incorrect"}`;
+  }
+
+  static judge(guessBit: IndexedBit, winBit: IndexedBit): BitJudgment {
+    return new BitJudgment(guessBit, guessBit.equals(winBit));
+  }
+
+  static judgeCorrect(bit: IndexedBit): BitJudgment {
+    return new BitJudgment(bit, true);
+  }
+
+  static judgeIncorrect(bit: IndexedBit): BitJudgment {
+    return new BitJudgment(bit, false);
   }
 }
 
-export default BitJudgment;
+export { BitJudgment };
 export type { Correctness };
 
