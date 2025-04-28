@@ -93,6 +93,10 @@ class BitSequence {
   }
 
   endsWith(bits: IndexedBit | "0" | "1" | BitSequence | string): boolean {
+    if (this.isEmpty) {
+      return false;
+    }
+
     if (typeof bits === "string") {
       const startIndex = this.lastBit().index - bits.length + 1;
       bits = BitSequence.fromString(bits, startIndex);
