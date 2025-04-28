@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { SequenceJudgment, CharJudgment, DisplayRowJudgment } from "./SequenceJudgment";
-import { BitSequence } from "../BitSequence";
-import { IndexedBit } from "../IndexedBit";
-import { BitJudgment } from "./BitJudgment";
+import { SequenceJudgment, CharJudgment, DisplayRowJudgment } from "../../judgment/SequenceJudgment.ts";
+import { BitSequence } from "../../BitSequence.ts";
+import { IndexedBit } from "../../IndexedBit.ts";
+import { BitJudgment } from "../../judgment/BitJudgment.ts";
 
 // Mock DisplayRow for DisplayRowJudgment
 class MockDisplayRow extends BitSequence {}
