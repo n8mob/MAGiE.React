@@ -96,8 +96,9 @@ class BitSequence {
     return foundIndex === -1 ? -1 : foundIndex + actualStart;
   }
 
-  getBitByGlobalIndex(index: number): IndexedBit | undefined {
-    return this.bits.find(bit => bit.index === index);
+  getBitByGlobalIndex(index: number): IndexedBit {
+    return this.bits.find(bit => bit.index === index) || this.bits[index];
+    // [2025-04-28] is this going to bite us?
   }
 
   toggleBit(index: number, globalIndex: null | number = null): BitSequence {
