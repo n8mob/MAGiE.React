@@ -1,5 +1,3 @@
-import { toBitString } from "./BitSequence.ts";
-
 class IndexedBit {
   /**
    * The bit value, which can be "0" or "1".
@@ -24,9 +22,26 @@ class IndexedBit {
     return this.bit ?? " ";
   }
 
-  equals(other: IndexedBit): boolean {
+  equals(other: IndexedBit | string): boolean {
+    if (this.bit === undefined) {
+      return false;
+    }
+    if (typeof other === "string") {
+      return this.bit === other;
+    }
+    if (!other || other.bit === undefined) {
+      return false;
+    }
     return this.bit === other.bit && this.index === other.index;
+  }
+
+  static trueAtIndex(index: number): IndexedBit {
+    return new IndexedBit("1", index);
+  }
+
+  static falseAtIndex(index: number): IndexedBit {
+    return new IndexedBit("0", index);
   }
 }
 
-export default IndexedBit;
+export { IndexedBit };
