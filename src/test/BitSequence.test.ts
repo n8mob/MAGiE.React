@@ -32,8 +32,37 @@ describe("BitSequence core mutator methods", () => {
   });
 });
 
+describe("BitSequence other tests", () => {
+  it("should return true when .endsWith(null) is called on an empty BitSequence", () => {
+    const emptySequence = BitSequence.empty();
+    // noinspection TypeScriptValidateTypes
+    expect(emptySequence.endsWith(null)).to.be.true;
+  });
+
+  it("should return false when .endsWith(null) is called on a non-empty BitSequence", () => {
+    const nonEmptySequence = BitSequence.fromString("101");
+    // noinspection TypeScriptValidateTypes
+    expect(nonEmptySequence.endsWith(null)).to.be.false;
+  });
+
+  it("should return true when .endsWith('0') is called on a BitSequence ending with '0'", () => {
+    const sequence = BitSequence.fromString("1010");
+    expect(sequence.endsWith("0")).to.be.true;
+  });
+
+  it("should return false when .endsWith('0') is called on a BitSequence not ending with '0'", () => {
+    const sequence = BitSequence.fromString("1011");
+    expect(sequence.endsWith("0")).to.be.false;
+  });
+
+  it("should return true when .endsWith('1') is called on a BitSequence ending with '1'", () => {
+    const sequence = BitSequence.fromString("1011");
+    expect(sequence.endsWith("1")).to.be.true;
+  });
+});
+
 describe("BitSequence.fromString", () => {
-  // Also tests BitSequence.empty() which is a shorcut to BitSequence.fromString("")
+  // Also tests BitSequence.empty() which is a shortcut to BitSequence.fromString("")
   it("should create a BitSequence from a string with valid bits", () => {
     const sequence = BitSequence.fromString("1010");
     expect(sequence).to.be.instanceof(BitSequence);

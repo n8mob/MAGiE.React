@@ -27,7 +27,7 @@ class BitSequence {
    */
   appendBits(bits: BitSequence | string): BitSequence {
     if (typeof bits === "string") {
-      return new BitSequence(this.bits.concat(BitSequence.indexBits(bits, this.lastIndex() + 1)));
+      return new BitSequence(this.bits.concat(BitSequence.indexBits(bits, this.endIndex + 1)));
     } else {
       return this.appendBitsAndReIndex(bits);
     }
@@ -38,7 +38,7 @@ class BitSequence {
   }
 
   appendBitsAndReIndex(bits: BitSequence): BitSequence {
-    let newIndex = this.lastIndex() + 1;
+    let newIndex = this.endIndex + 1;
     const newBits: IndexedBit[] = [];
     for (const oldBit of bits.bits) {
       newBits.push(new IndexedBit(oldBit.bit, newIndex));
@@ -55,15 +55,23 @@ class BitSequence {
     return this.bits.length;
   }
 
-  startIndex(): number {
+  get startIndex(): number {
     if (this.bits.length === 0) {
-      return 0;
+      return -1;
     }
     return this.bits[0].index;
   }
 
-  lastIndex(): number {
-    return this.bits.length > 0 ? this.lastBit().index : -1;
+  get endIndex (): number {
+    return this.isEmpty ? -1 : this.bits[this.bits.length - 1].index;
+  }
+
+  endsWith(bit: IndexedBit | "0" | "1"): boolean {
+    if (!bit) {
+      return this.isEmpty;
+    }
+
+    return this.bits[this.bits.length - 1].equals(bit);
   }
 
   firstBit(): IndexedBit {
