@@ -62,16 +62,63 @@ class BitSequence {
     return this.bits[0].index;
   }
 
-  get endIndex (): number {
+  get endIndex(): number {
     return this.isEmpty ? -1 : this.bits[this.bits.length - 1].index;
   }
 
-  endsWith(bit: IndexedBit | "0" | "1"): boolean {
-    if (!bit) {
-      return this.isEmpty;
+  startsWith(bits: IndexedBit | "0" | "1" | BitSequence | string): boolean {
+    if (typeof bits === "string") {
+      bits = BitSequence.fromString(bits, this.startIndex);
+    }
+    if (bits instanceof BitSequence) {
+      if (bits.length > this.length) {
+        return false;
+      }
+      for (let i = 0; i < bits.length; i++) {
+        if (!this.getBit(i).equals(bits.getBit(i))) {
+          return false;
+        }
+      }
+      return true;
     }
 
-    return this.bits[this.bits.length - 1].equals(bit);
+    // Fallback to single-bit check
+    if (!bits) {
+      return this.isEmpty;
+    }
+    if (this.isEmpty) {
+      return false;
+    }
+    return this.firstBit().equals(bits);
+  }
+
+  endsWith(bits: IndexedBit | "0" | "1" | BitSequence | string): boolean {
+    if (typeof bits === "string") {
+      const startIndex = this.lastBit().index - bits.length + 1;
+      bits = BitSequence.fromString(bits, startIndex);
+    }
+    if (bits instanceof BitSequence) {
+      if (bits.length > this.length) {
+        return false;
+      }
+      for (let i = 1; i <= bits.length; i++) {
+        const thisIndex = this.length - i;
+        const thatIndex = bits.length - i;
+        if (!this.getBit(thisIndex).equals(bits.getBit(thatIndex))) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Fallback to single-bit check
+    if (!bits) {
+      return this.isEmpty;
+    }
+    if (this.isEmpty) {
+      return false;
+    }
+    return this.lastBit().equals(bits);
   }
 
   firstBit(): IndexedBit {
@@ -226,3 +273,4 @@ class BitSequence {
 }
 
 export { BitSequence };
+

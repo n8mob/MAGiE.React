@@ -59,6 +59,16 @@ describe("BitSequence other tests", () => {
     const sequence = BitSequence.fromString("1011");
     expect(sequence.endsWith("1")).to.be.true;
   });
+
+  it('should return true when .endsWith("01") is called on a BitSequence ending with "01"', () => {
+    const sequence = BitSequence.fromString("10101");
+    expect(sequence.endsWith("01")).to.be.true;
+  });
+
+  it('should return true when .startsWith("01") is called on a BitSequence starting with "01"', () => {
+    const sequence = BitSequence.fromString("01010");
+    expect(sequence.startsWith("01")).to.be.true;
+  });
 });
 
 describe("BitSequence.fromString", () => {
