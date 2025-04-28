@@ -1,13 +1,14 @@
 import {SequenceJudgment} from './SequenceJudgment.ts';
+import { BitSequence } from "../BitSequence.ts";
 
 class FullJudgment<T extends SequenceJudgment> {
   isCorrect: boolean;
-  correctGuess: string;
+  correctGuess: BitSequence;
   sequenceJudgments: T[];
 
   constructor(
     isCorrect: boolean,
-    correctGuess: string,
+    correctGuess: BitSequence,
     sequenceJudgments: T[]
     ) {
     this.isCorrect = isCorrect;
@@ -58,4 +59,4 @@ class FullJudgment<T extends SequenceJudgment> {
   }
 }
 
-export default FullJudgment;
+export { FullJudgment };
