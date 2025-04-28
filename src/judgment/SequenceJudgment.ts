@@ -24,13 +24,15 @@ export class SequenceJudgment {
    * @param guess
    * @param bitJudgments
    */
-  constructor(guess: IndexedBit[] | BitSequence, bitJudgments: string) {
+  constructor(guess: IndexedBit[] | BitSequence, bitJudgments: string | BitJudgment[]) {
     this.guess = guess instanceof BitSequence ? guess : new BitSequence(guess);
-    this.bitJudgments = [];
-
-    for (let i = 0; i < this.guess.length; i++) {
-      const judgment = new BitJudgment(this.guess.getBit(i), bitJudgments[i] == "1");
-      this.bitJudgments.push(judgment);
+     if (bitJudgments instanceof Array) {
+      this.bitJudgments = bitJudgments;
+    } else {
+      this.bitJudgments = [];
+      for (let i = 0; i < bitJudgments.length; i++) {
+        this.bitJudgments.push(new BitJudgment(this.guess.getBit(i), bitJudgments[i] === "1"));
+      }
     }
   }
 
