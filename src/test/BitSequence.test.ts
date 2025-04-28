@@ -2,6 +2,36 @@ import { describe, expect, it } from "vitest";
 import { BitSequence } from "../BitSequence";
 import { IndexedBit } from "../IndexedBit";
 
+describe("BitSequence core mutator methods", () => {
+  it("appendBit should add a bit and return a new BitSequence", () => {
+    const seq = BitSequence.fromString("10");
+    const newSeq = seq.appendBit("1");
+    expect(newSeq.toString()).to.equal("101");
+    expect(seq.toString()).to.equal("10"); // original unchanged
+  });
+
+  it("appendBits should add bits from string and return a new BitSequence", () => {
+    const seq = BitSequence.fromString("10");
+    const newSeq = seq.appendBits("01");
+    expect(newSeq.toString()).to.equal("1001");
+    expect(seq.toString()).to.equal("10");
+  });
+
+  it("toggleBit should flip the bit at the given index", () => {
+    const seq = BitSequence.fromString("101");
+    const toggled = seq.toggleBit(1);
+    expect(toggled.toString()).to.equal("111");
+    expect(seq.toString()).to.equal("101");
+  });
+
+  it("slice should return a new BitSequence with the correct bits", () => {
+    const seq = BitSequence.fromString("10101");
+    const sliced = seq.slice(1, 4);
+    expect(sliced.toString()).to.equal("010");
+    expect(seq.toString()).to.equal("10101");
+  });
+});
+
 describe("BitSequence.fromString", () => {
   // Also tests BitSequence.empty() which is a shorcut to BitSequence.fromString("")
   it("should create a BitSequence from a string with valid bits", () => {

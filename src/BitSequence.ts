@@ -18,43 +18,33 @@ class BitSequence {
     this.bits = bits;
   }
 
-  appendBit(bit: IndexedBit | string): BitSequence {
-    if (typeof bit === "string") {
-      return this.appendStringBit(bit);
+  appendBit(bit: string): BitSequence {
+    return this.appendBits(bit);
+  }
+
+  /**
+   * Appends bits to the sequence and re-indexes them.
+   */
+  appendBits(bits: BitSequence | string): BitSequence {
+    if (typeof bits === "string") {
+      return new BitSequence(this.bits.concat(BitSequence.indexBits(bits, this.lastIndex() + 1)));
     } else {
-      return this.appendBitAndReIndex(bit);
+      return this.appendBitsAndReIndex(bits);
     }
   }
 
-  appendBitAndReIndex(bit: IndexedBit): BitSequence {
-    const indexedBit = new IndexedBit(bit.bit, this.lastIndex() + 1);
-    return new BitSequence(this.bits.concat(indexedBit));
+  appendBitsAndKeepIndex(bits: BitSequence): BitSequence {
+    return new BitSequence(this.bits.concat(bits.bits));
   }
 
-  appendBitAndKeepIndex(bit: IndexedBit): void {
-    this.bits.push(bit);
-  }
-
-  appendBitsAndKeepIndex(bits: BitSequence): void {
-    this.bits.push(...bits.bits);
-  }
-
-  appendBitsAndReIndex(bits: BitSequence): void {
-    for (const bit of bits.bits) {
-      this.appendBitAndReIndex(bit);
+  appendBitsAndReIndex(bits: BitSequence): BitSequence {
+    let newIndex = this.lastIndex() + 1;
+    const newBits: IndexedBit[] = [];
+    for (const oldBit of bits.bits) {
+      newBits.push(new IndexedBit(oldBit.bit, newIndex));
+      newIndex += 1;
     }
-  }
-
-  appendStringBit(s: string, index: number = 0): BitSequence {
-    if (s != "0" && s != "1") {
-      throw new Error(`Invalid bit: ${s}`);
-    }
-
-    if (!index) {
-      index = this.lastIndex() + 1;
-    }
-
-    return new BitSequence(this.bits.concat(new IndexedBit(s, index)));
+    return new BitSequence(this.bits.concat(newBits));
   }
 
   get length() {
@@ -198,9 +188,13 @@ class BitSequence {
    * // etc.
    */
   static fromString(s: string, startIndex: number = 0): BitSequence {
-    const stripped = BitSequence.stripNonBits(s);
-    const indexedBits = BitSequence.indexBits(stripped, startIndex);
+    const indexedBits = this.indexBitsFromString(s, startIndex);
     return new BitSequence(indexedBits);
+  }
+
+  static indexBitsFromString(s: string, startIndex: number) {
+    const stripped = BitSequence.stripNonBits(s);
+    return BitSequence.indexBits(stripped, startIndex);
   }
 
   /**
