@@ -1,7 +1,9 @@
-import BinaryEncoder, { BitString, DisplayBit, DisplayRow, stripNonBits } from "./BinaryEncoder.ts";
+import BinaryEncoder from "./BinaryEncoder.ts";
 import { EncodingType } from "../Menu.ts";
+import { DisplayRow } from "./DisplayRow.ts";
+import { BitSequence } from "../BitSequence.ts";
 
-export default class FixedWidthEncoder implements BinaryEncoder {
+class FixedWidthEncoder implements BinaryEncoder {
   private readonly width: number;
   public readonly encoding: Record<string, number>;
   public readonly decoding: Record<number, string>;
@@ -40,46 +42,57 @@ export default class FixedWidthEncoder implements BinaryEncoder {
     return "Fixed";
   }
 
-  decodeChar(encodedChar: string): string {
-    const encoded = parseInt(encodedChar, 2);
+  decodeChar(encodedChar: BitSequence): string {
+    const encoded = parseInt(encodedChar.toPlainString(), 2);
     return encoded in this.decoding
-      ? this.decoding[encoded]
-      : this.defaultDecoded;
+           ? this.decoding[encoded]
+           : this.defaultDecoded;
   }
 
-  encodeChar(charToEncode: string): BitString {
-    let s = charToEncode in this.encoding
-            ? this.encoding[charToEncode].toString(2).padStart(this.width, '0')
-            : this.defaultEncoded.toString(2).padStart(this.width, '0');
-    return stripNonBits(s);
+  encodeChar(charToEncode: string, startIndex: number = 0): BitSequence {
+    const s: string = charToEncode in this.encoding
+                      ? this.encoding[charToEncode].toString(2).padStart(this.width, '0')
+                      : this.defaultEncoded.toString(2).padStart(this.width, '0');
+    return BitSequence.fromString(s, startIndex);
   }
 
-  decodeText(encodedText: string): string {
+  decodeText(encodedText: BitSequence): string {
     const decoded: string[] = [];
+
     for (let i = 0; i < encodedText.length; i += this.width) {
       decoded.push(this.decodeChar(encodedText.slice(i, i + this.width)));
     }
     return decoded.join('');
   }
 
-  encodeText(textToEncode: string): BitString {
-    return [...textToEncode].map(char => this.encodeChar(char)).flat();
+  encodeText(textToEncode: string): BitSequence {
+    let bitSequence: BitSequence = BitSequence.empty();
+    for (const char of textToEncode) {
+      const encodedChar = this.encodeChar(char);
+      bitSequence = bitSequence.appendBitsAndReIndex(encodedChar);
+    }
+    return bitSequence;
   }
 
   /**
-   * Yields chunked strings of bits by splitting the given string
-   * into chunks of the width defined for this `FixedWidth` encoding.
+   * Yields DisplayRows, one row for each chunk of length `width` in the given BitString.
+   * into chunks of length `width` as defined for this `FixedWidth` encoding.
+   * @see FixedWidthEncoder#constructor
    * @param bits The string of bits to be split.
-   * @returns A generator yielding chunks of bits.
-   * @see constructor for the `width` parameter.
+   * @returns A generator yielding DisplayRows, one for each `width`-length segment of bits.
+   *
    */
-  * splitByChar(bits: string): Generator<string, void> {
+  * splitByChar(bits: BitSequence): Generator<DisplayRow, void> {
     let start = 0;
     let end = 0;
 
     while (start < bits.length) {
       end = start + this.width;
-      yield bits.slice(start, end);
+
+      const nextCharWidth = bits.slice(start, end);
+      // TODO make sure we have a test case that checks this
+      const decodedChar = this.decodeChar(nextCharWidth);
+      yield new DisplayRow(nextCharWidth, decodedChar);
       start = end;
     }
     return;
@@ -92,26 +105,27 @@ export default class FixedWidthEncoder implements BinaryEncoder {
    * @param bits The string of bits to be split.
    * @returns A generator yielding `DisplayRow` objects.
    */
-  * splitForDisplay(bits: BitString, displayWidth: number): Generator<DisplayRow, void> {
+  * splitForDisplay(bits: BitSequence, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
     let end = 0;
 
-    if (displayWidth < this.width) {
-      throw new Error(`displayWidth (${displayWidth}) must be greater than or equal to the width of the encoding: ${this.width}`);
+    const charBitsPerRow = Math.floor(displayWidth / this.width);
+
+    if (charBitsPerRow < 1) {
+      throw new Error(`Display width ${displayWidth} is too short to show characters of width ${this.width}`);
     }
 
-    const splitWidth = Math.min(displayWidth, this.width);
-    let globalIndex = 0;
+    const splitWidth = charBitsPerRow * this.width;
 
     while (start < bits.length) {
       end = start + splitWidth;
-      const bitsForRow: DisplayBit[] = bits
-        .slice(start, end)
-        .map(b => new DisplayBit(b, globalIndex++));
-      yield new DisplayRow(bitsForRow, this.decodeChar(bitsForRow.join("")));
+      const bitsForRow = bits.slice(start, end);
+      yield new DisplayRow(bitsForRow, this.decodeText(bitsForRow));
       start = end;
     }
 
     return;
   }
 }
+
+export { FixedWidthEncoder };
