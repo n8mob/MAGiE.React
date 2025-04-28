@@ -25,7 +25,14 @@ class BitJudgment extends IndexedBit {
   }
 
   static judge(guessBit: IndexedBit, winBit: IndexedBit): BitJudgment {
-    return new BitJudgment(guessBit, guessBit.equals(winBit));
+    if (!guessBit) {
+      return BitJudgment.judgeIncorrect(winBit)
+    } else if (!winBit) {
+      return BitJudgment.judgeIncorrect(guessBit)
+    }
+
+    const correctness = guessBit.equals(winBit);
+    return new BitJudgment(guessBit, correctness);
   }
 
   static judgeCorrect(bit: IndexedBit): BitJudgment {
