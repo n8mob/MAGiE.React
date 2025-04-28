@@ -47,6 +47,10 @@ class BitSequence {
     return new BitSequence(this.bits.concat(newBits));
   }
 
+  get isEmpty(): boolean {
+    return this.bits.length === 0;
+  }
+
   get length() {
     return this.bits.length;
   }

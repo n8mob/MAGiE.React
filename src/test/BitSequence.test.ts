@@ -78,6 +78,11 @@ describe("BitSequence.fromString", () => {
     const sequence = BitSequence.empty();
     expect(sequence).to.deep.equal(new BitSequence([]));
   });
+
+  it('should evaluate isEmpty correctly', () => {
+    const sequence = BitSequence.empty();
+    expect(sequence.isEmpty).to.be.true;
+  });
 });
 
 describe("BitSequence.indexOf", () => {
