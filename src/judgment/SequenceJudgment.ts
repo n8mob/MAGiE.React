@@ -7,7 +7,7 @@ import { DisplayRow } from "../encoding/DisplayRow.ts";
  * A class representing a sequence of bits with their corresponding judgments.
  * The sequence could be an entire guess or just a part of it like a display row or a single letter.
  */
-export class SequenceJudgment {
+class SequenceJudgment {
   /**
    * The guess bits corresponding to the judgment bits.
    */
@@ -56,15 +56,15 @@ export class SequenceJudgment {
   }
 
   [Symbol.iterator](): Iterator<BitJudgment> {
-    let pointer = 0;
-    const components = this.bitJudgments;
+    let index = 0;
+    const components = this.bitJudgments.slice();
 
     return {
       next(): IteratorResult<BitJudgment> {
-        if (pointer < components.length) {
+        if (index < components.length) {
           return {
             done: false,
-            value: components[pointer++],
+            value: components[index++],
           };
         } else {
           return {
@@ -86,15 +86,16 @@ export class SequenceJudgment {
   }
 }
 
-export class CharJudgment extends SequenceJudgment {
+class CharJudgment extends SequenceJudgment {
   constructor(guess: BitSequence, bitJudgments: string) {
     super(guess, bitJudgments);
   }
 }
 
-export class DisplayRowJudgment extends SequenceJudgment {
+class DisplayRowJudgment extends SequenceJudgment {
   constructor(guess: DisplayRow, bitJudgments: string) {
     super(guess, bitJudgments);
   }
 }
 
+export { SequenceJudgment, CharJudgment, DisplayRowJudgment };

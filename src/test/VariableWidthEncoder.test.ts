@@ -228,5 +228,13 @@ describe('VariableWidthEncoder', () => {
     expect(() => Array.from(unitUnderTest.splitForDisplay(encoded, -1))).to.throw();
   });
 
+  it('should not infinite loop if no separator is found in splitByChar', () => {
+    // Use a bitstring that does not contain the opposite encoding symbol
+    const encoded = BitSequence.fromString('1111111'); // Only "1"s, no "0" separator
+    const result = Array.from(unitUnderTest.splitByChar(encoded));
+    // It should yield at least one token and terminate
+    expect(result.length).to.be.greaterThan(0);
+  });
+
 });
 
