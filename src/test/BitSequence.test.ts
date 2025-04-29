@@ -33,10 +33,13 @@ describe("BitSequence core mutator methods", () => {
 });
 
 describe("BitSequence other tests", () => {
-  it("should return true when .endsWith(null) is called on an empty BitSequence", () => {
+  it("does not end with anything if it is empty", () => {
     const emptySequence = BitSequence.empty();
     // noinspection TypeScriptValidateTypes
-    expect(emptySequence.endsWith(null)).to.be.true;
+    expect(emptySequence.endsWith(null)).to.be.false;
+    expect(emptySequence.endsWith("0")).to.be.false;
+    expect(emptySequence.endsWith("1")).to.be.false;
+    expect(emptySequence.endsWith("")).to.be.false;
   });
 
   it("should return false when .endsWith(null) is called on a non-empty BitSequence", () => {

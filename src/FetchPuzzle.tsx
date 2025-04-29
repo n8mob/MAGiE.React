@@ -1,6 +1,6 @@
-import FixedWidthEncoder from "./encoding/FixedWidthEncoder.ts";
-import VariableWidthEncoder from "./encoding/VariableWidthEncoder.ts";
-import {FixedWidthEncodingData, Puzzle, PuzzleForDate, VariableEncodingData} from "./Menu.ts";
+import { FixedWidthEncoder } from "./encoding/FixedWidthEncoder.ts";
+import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
+import { FixedWidthEncodingData, Puzzle, PuzzleForDate, VariableEncodingData } from "./Menu.ts";
 
 const fetchPuzzle = async (fetchFunction: () => Promise<PuzzleForDate>): Promise<Puzzle> => {
   const puzzleData = await fetchFunction();

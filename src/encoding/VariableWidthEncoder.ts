@@ -1,9 +1,8 @@
 import BinaryEncoder from "./BinaryEncoder.ts";
 import { EncodingType } from "../Menu.ts";
 import { DisplayRow } from "./DisplayRow.ts";
-import { IndexedBit } from "../IndexedBit.ts";
 import { BitSequence } from "../BitSequence.ts";
-import encodePuzzle from "../components/EncodePuzzle.tsx";
+
 
 class VariableWidthEncoder implements BinaryEncoder {
   public readonly encoding: Record<string, Record<string, string>>;
@@ -243,7 +242,6 @@ class VariableWidthEncoder implements BinaryEncoder {
     }
 
     let remaining: BitSequence = bits;
-    let index = 0;
     while (remaining.length >= displayWidth) {
       const nextSlice = remaining.slice(0, displayWidth);
       remaining = remaining.slice(displayWidth);
