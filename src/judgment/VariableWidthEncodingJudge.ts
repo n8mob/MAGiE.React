@@ -1,5 +1,5 @@
 import { BinaryJudge, SplitterFunction } from "./BinaryJudge.ts";
-import { CharJudgment, DisplayRowJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
+import { CharJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
 import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
 import { FullJudgment } from "./FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
@@ -29,28 +29,37 @@ class VariableWidthEncodingJudge implements BinaryJudge {
     let allCorrect = true;
     let correctBits = BitSequence.empty();
 
-    while (!nextWin.done) {
-      if (nextGuess.done) {
-        allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment(nextWin.value, "0".repeat(nextWin.value.length)));
-        nextWin = winSplit.next();
-        continue;
-      }
+    const judgeGuessAgainstWin = (guess: BitSequence, win: BitSequence): T => {
       let bitJudgments: string;
-      if (nextGuess.value.equals(nextWin.value)) {
-        bitJudgments = "1".repeat(nextGuess.value.length);
-        if (correctBits.endsWith(nextGuess.value.firstBit()) && !nextGuess.value.startsWith(this.encoder.characterSeparator)) {
+      if (guess.equals(win)) {
+        bitJudgments = "1".repeat(guess.length);
+        if (correctBits.endsWith(guess.firstBit()) && !guess.startsWith(this.encoder.characterSeparator)) {
           correctBits = correctBits.appendBits(this.encoder.characterSeparator);
           bitJudgments += "1";
         }
-        correctBits = correctBits.appendBits(nextGuess.value);
+        correctBits = correctBits.appendBits(guess);
       } else {
-        bitJudgments = [...nextWin.value].map((winBit) => {
-          return winBit.equals(nextGuess.value.getBitByGlobalIndex(winBit.index)) ? "1" : "0";
+        bitJudgments = [...win].map((winBit) => {
+          return winBit.equals(guess.getBitByGlobalIndex(winBit.index)) ? "1" : "0";
         }).join("");
         allCorrect = false;
       }
-      sequenceJudgments.push(newSequenceJudgment(nextGuess.value, bitJudgments));
+      return newSequenceJudgment(guess, bitJudgments);
+    };
+
+    while (!nextWin.done) {
+      const win = nextWin.value;
+
+      if (nextGuess.done) {
+        allCorrect = false;
+        sequenceJudgments.push(newSequenceJudgment(win, "0".repeat(win.length)));
+        nextWin = winSplit.next();
+        continue;
+      }
+
+      const sequenceJudgment = judgeGuessAgainstWin(nextGuess.value, win);
+      sequenceJudgments.push(sequenceJudgment);
+
       nextGuess = guessSplit.next();
       nextWin = winSplit.next();
     }
@@ -74,7 +83,7 @@ class VariableWidthEncodingJudge implements BinaryJudge {
       guessBits,
       winBits,
       split,
-      (bits, judgments) => new DisplayRowJudgment(bits, judgments) as T
+      (guess, judgments) => new CharJudgment(guess, judgments) as T
     );
   }
 
