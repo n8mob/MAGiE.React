@@ -1,12 +1,12 @@
-import React, {forwardRef, useImperativeHandle, useRef, useState} from "react";
+import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import BitButton from "./BitButton.tsx";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import { BitString } from "../encoding/BinaryEncoder.ts";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import { BitSequence } from "../BitSequence.ts";
 
 interface DisplayMatrixProps {
-  bits: BitString;
+  bits: BitSequence;
   judgments: SequenceJudgment[];
-  handleBitClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBitClick: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface DisplayMatrixUpdate {
@@ -15,9 +15,9 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({bits, judgments, handleBitClick}, ref) => {
+  ({judgments, handleBitClick}, ref) => {
     const [currentJudgments, setCurrentJudgments] = useState(judgments);
-    const bitFieldRef = useRef<HTMLDivElement>(null);
+    const bitFieldRef = useRef<HTMLDivElement | null>(null);
 
     useImperativeHandle(ref, () => ({
       updateJudgment(newJudgments: SequenceJudgment[]) {
@@ -33,14 +33,12 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
         <div ref={bitFieldRef} id="bit-field">
           {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
             <p key={`row${rowIndex}`}>
-              {rowJudgment.bitJudgments.map((bitJudgment, bitRowIndex) => {
-                const key = `${rowIndex}-${bitRowIndex}-${bitJudgment.bit}-${bitJudgment.isCorrect}-${bits.length}`;
+              {rowJudgment.bitJudgments.map((bitJudgment) => {
                 return (
                   <BitButton
-                    key={key}
-                    bit={bitJudgment.bit}
+                    bit={bitJudgment}
                     sequenceIndex={rowIndex}
-                    bitIndex={bitJudgment.bitIndex}
+                    bitIndex={bitJudgment.index}
                     isCorrect={bitJudgment.isCorrect}
                     onChange={handleBitClick}
                   />
@@ -54,5 +52,5 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
   }
 );
 
-export default DisplayMatrix;
-export type {DisplayMatrixUpdate};
+export { DisplayMatrix };
+export type { DisplayMatrixProps, DisplayMatrixUpdate };
