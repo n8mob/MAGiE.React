@@ -1,8 +1,9 @@
-import React from "react";
-import {Correctness} from "../judgment/BitJudgment.ts";
+import { Correctness } from "../judgment/BitJudgment.ts";
+import { IndexedBit } from "../IndexedBit.ts";
+import * as React from "react";
 
 interface BitButtonProps {
-  bit: string,
+  bit: IndexedBit,
   isCorrect: Correctness,
   bitIndex: number,
   sequenceIndex: number | null,
@@ -17,7 +18,7 @@ const BitButton: React.FC<BitButtonProps> = (
     onChange,
     sequenceIndex = null
   }) => {
-  const isBitOn = bit === "1";
+  const isBitOn = bit.bit === "1";
 
   return (
     <>

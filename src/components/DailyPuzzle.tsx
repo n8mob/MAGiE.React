@@ -15,8 +15,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [hasWon, setHasWon] = useState(false);
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
-  const stopwatchRef = useRef<StopwatchHandle>(null);
-  const bitFieldRef = useRef<HTMLDivElement>(null);
+  const stopwatchRef = useRef<StopwatchHandle | null>(null);
+  const bitFieldRef = useRef<HTMLDivElement | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     return () => {
       window.removeEventListener("resize", () => {}); // Remove unused resize listener
     };
-  }, [puzzle, date]);
+  }, [puzzle, date, formattedDate]);
 
 
   useEffect(() => {
@@ -147,7 +147,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
           hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
-          key={`${currentPuzzle}`}
+          key={`${currentPuzzle.slug}`}
         />
       }
       {currentPuzzle.type === "Decode" &&
@@ -157,7 +157,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
           hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
-          key={`${currentPuzzle}`}
+          key={`${currentPuzzle.slug}`}
         />
       }
     </>

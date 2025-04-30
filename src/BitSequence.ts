@@ -18,6 +18,11 @@ class BitSequence {
     this.bits = bits;
   }
 
+  /**
+   * Appends a single bit to the sequence and sets its index as the last bit.
+   *
+   * @param bit a string representing the bit value ("0" or "1").
+   */
   appendBit(bit: string): BitSequence {
     return this.appendBits(bit);
   }

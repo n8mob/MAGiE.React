@@ -1,10 +1,13 @@
 import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
-import DisplayMatrix from "./DisplayMatrix";
-import BasePuzzle from "./BasePuzzle";
-import React from "react";
-import { BitString } from "../encoding/BinaryEncoder.ts";
+import { DisplayMatrix } from "./DisplayMatrix";
+import { BasePuzzle } from "./BasePuzzle";
+import { BitSequence } from "../BitSequence.ts";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+  constructor(props: PuzzleProps) {
+    super(props);
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     const {guessBits} = this.state;
 
@@ -12,7 +15,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       case "0":
       case "1":
         this.setState(
-          {guessBits: guessBits.concat(event.key)}, // Append the bit
+          {guessBits: guessBits.appendBit(event.key)}, // Append the bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
@@ -54,7 +57,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       return;
     }
 
-    const splitter = (bits: BitString) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
+    const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment) {
       this.setState({judgment: newJudgment});
@@ -75,8 +78,11 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     const index = parseInt(sequenceIndex) * this.state.displayWidth + parseInt(bitIndex);
     console.log(`${sequenceIndex} *  ${this.state.displayWidth} + ${bitIndex} = ${index}`)
     const {guessBits} = this.state;
-    const updatedBits = guessBits.map((bit, i) => (i === index ? (bit === '0' ? '1' : '0') : bit));
-    this.setState({guessBits: updatedBits}, () => this.updateJudgment());
+    guessBits.toggleBit(index);
+    this.setState(
+      { guessBits: guessBits.toggleBit(index) },
+      () => this.updateJudgment()
+    );
   };
 
   render() {

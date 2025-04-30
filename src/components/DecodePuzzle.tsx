@@ -1,11 +1,14 @@
-import React from "react";
-import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
-import DisplayMatrix from "./DisplayMatrix";
-import BasePuzzle from "./BasePuzzle";
+import { BasePuzzle, PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import { DisplayMatrix } from "./DisplayMatrix";
+import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+  constructor(props: PuzzleProps) {
+    super(props);
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case "Enter":
@@ -20,9 +23,9 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     const newGuessText = event.target.value.toUpperCase();
     const newState = {
       guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
     };
-    this.setState(newState);
+    this.updateState(newState);
   };
 
   render() {
@@ -63,7 +66,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
                   onClick={() => {
                     ReactGA4.event('story_start_clicked', {
                       source: 'post-win-link',
-                      puzzle_slug: currentPuzzle.slug,
+                      puzzle_slug: currentPuzzle?.slug,
                       is_first_visit: this.isFirstVisit,
                     });
                   }}
