@@ -32,7 +32,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
       <>
         <div ref={bitFieldRef} id="bit-field">
           {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
-            <p key={`row${rowIndex}`}>
+            <p key={`row-${rowIndex}`}>
               {rowJudgment.bitJudgments.map((bitJudgment) => {
                 return (
                   <BitButton

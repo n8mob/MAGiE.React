@@ -1,8 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
-import {Puzzle} from "../Menu.ts";
-import Stopwatch, {StopwatchHandle} from "./Stopwatch.tsx";
+import { Puzzle } from "../Menu.ts";
+import Stopwatch, { StopwatchHandle } from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
@@ -61,7 +61,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
 
     return () => {
-      window.removeEventListener("resize", () => {}); // Remove unused resize listener
+      window.removeEventListener("resize", () => {
+      }); // Remove unused resize listener
     };
   }, [puzzle, date, formattedDate]);
 
@@ -72,10 +73,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
         if (bitFieldRef.current) {
-          bitFieldRef.current.scrollTo({
-            top: bitFieldRef.current.scrollHeight,
-            behavior: 'smooth'
-          });
+          bitFieldRef.current.scrollTo({top: bitFieldRef.current.scrollHeight, behavior: 'smooth'});
         }
         updateShareText();
       }
@@ -111,8 +109,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
-        'It seems that this browser does not support "Web Share".' +
-        '\nShall we copy the share message to your clipboard?';
+        'It seems that this browser does not support "Web Share".'
+        + '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
           .then(() => {
@@ -147,7 +145,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
           hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
-          key={`${currentPuzzle.slug}`}
         />
       }
       {currentPuzzle.type === "Decode" &&
@@ -157,7 +154,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
           hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
-          key={`${currentPuzzle.slug}`}
         />
       }
     </>

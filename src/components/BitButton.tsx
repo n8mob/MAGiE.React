@@ -30,6 +30,7 @@ const BitButton: React.FC<BitButtonProps> = (
              data-judgment={isCorrect == true ? "correct" : isCorrect == false ? "incorrect" : "unknown"}
              data-sequence-index={sequenceIndex}
              data-bit-index={bitIndex}
+             key={`bit-${bitIndex}`}
       />
     </>
   );
