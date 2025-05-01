@@ -1,4 +1,4 @@
-import {SequenceJudgment} from './SequenceJudgment.ts';
+import { SequenceJudgment } from './SequenceJudgment.ts';
 import { BitSequence } from "../BitSequence.ts";
 
 class FullJudgment<T extends SequenceJudgment> {
@@ -10,7 +10,7 @@ class FullJudgment<T extends SequenceJudgment> {
     isCorrect: boolean,
     correctGuess: BitSequence,
     sequenceJudgments: T[]
-    ) {
+  ) {
     this.isCorrect = isCorrect;
     this.correctGuess = correctGuess;
     this.sequenceJudgments = sequenceJudgments;
@@ -56,6 +56,27 @@ class FullJudgment<T extends SequenceJudgment> {
         }
       },
     };
+  }
+
+  equals(that: FullJudgment<T>): boolean {
+    if (this.isCorrect !== that.isCorrect) {
+      return false;
+    }
+
+    if (!this.correctGuess.equals(that.correctGuess)) {
+      return false;
+    }
+
+    if (this.sequenceJudgments.length !== that.sequenceJudgments.length) {
+      return false;
+    }
+
+    for (let i = 0; i < this.sequenceJudgments.length; i++) {
+      if (!this.sequenceJudgments[i].equals(that.sequenceJudgments[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
