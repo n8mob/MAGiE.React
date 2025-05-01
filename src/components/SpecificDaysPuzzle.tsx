@@ -11,6 +11,13 @@ const addDays = (date: Date, days: number) => {
   return newDate;
 }
 
+const prettyOptions: Intl.DateTimeFormatOptions = {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric'
+};
+
+
 const dateLinkFormat = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -28,7 +35,6 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
   const [puzzleDate, setPuzzleDate] = useState<Date | null>(null);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [formattedDate, setFormattedDate] = useState("");
-  const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'short', month: 'short', day: 'numeric'};
   const linkToToday = <Link to={"/today"}>Go to today's puzzle</Link>;
 
   useEffect(() => {
