@@ -211,12 +211,27 @@ class BitSequence {
     return this.bits.map(bit => bit.toString()).join("");
   }
 
-  equals(o: unknown): boolean {
-    if (o instanceof BitSequence) {
-      return this.bits.length === o.bits.length &&
-        this.bits.every((bit, index) => bit.equals(o.bits[index]));
+  equals(that: unknown): boolean {
+    if (this === that) {
+      return true;
     }
-    return false;
+
+    if (!(that instanceof BitSequence)) {
+      return false;
+    }
+
+    if (this.bits.length !== that.bits.length) {
+      return false;
+    }
+
+    // check each bit
+    for (let i = 0; i < this.bits.length; i++) {
+      if (!this.bits[i].equals(that.bits[i])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   static empty(): BitSequence {
