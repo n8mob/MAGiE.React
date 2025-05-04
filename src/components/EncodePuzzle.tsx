@@ -54,7 +54,6 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       { guessBits: toggled } as PuzzleState,
       () => this.updateJudgment()
     );
-    this.updateJudgment();
   };
 
   *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
