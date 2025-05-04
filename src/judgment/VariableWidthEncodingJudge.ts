@@ -1,10 +1,10 @@
-import BinaryJudge, {SplitterFunction} from "./BinaryJudge.ts";
-import {CharJudgment, DisplayRowJudgment, SequenceJudgment} from "./SequenceJudgment.ts";
-import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import FullJudgment from "./FullJudgment.ts";
-import {DisplayRow} from "../encoding/BinaryEncoder.ts";
+import { BinaryJudge, SplitterFunction } from "./BinaryJudge.ts";
+import { CharJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
+import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
+import { FullJudgment } from "./FullJudgment.ts";
+import { BitSequence } from "../BitSequence.ts";
 
-export default class VariableWidthEncodingJudge implements BinaryJudge {
+class VariableWidthEncodingJudge implements BinaryJudge {
   public readonly encoder: VariableWidthEncoder;
 
   constructor(encoder: VariableWidthEncoder) {
@@ -12,13 +12,13 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
   }
 
   _judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string,
+    guessBits: BitSequence,
+    winBits: BitSequence,
     split: SplitterFunction,
-    newSequenceJudgment: (bits: string, judgments: string) => T = (bits, judgments) => new SequenceJudgment(
+    newSequenceJudgment: (bits: BitSequence, judgments: string) => T = (
       bits,
       judgments
-    ) as T
+    ) => new SequenceJudgment(bits, judgments) as T
   ): FullJudgment<T> {
     const sequenceJudgments: T[] = [];
     const guessSplit = split(guessBits);
@@ -27,63 +27,63 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
     let nextWin = winSplit.next();
 
     let allCorrect = true;
-    let correctBits = "";
-    let lastCorrectBit = "";
+    let correctBits = BitSequence.empty();
 
-    while (!nextGuess.done) {
-      let sequenceGuessBits: string;
-      if (nextGuess.value instanceof DisplayRow) {
-        sequenceGuessBits = nextGuess.value.bits;
+    const judgeGuessAgainstWin = (guess: BitSequence, win: BitSequence): T => {
+      let bitJudgments: string;
+      if (guess.equals(win)) {
+        bitJudgments = "1".repeat(guess.length);
+        if (correctBits.endsWith(guess.firstBit()) && !guess.startsWith(this.encoder.characterSeparator)) {
+          correctBits = correctBits.appendBits(this.encoder.characterSeparator);
+          bitJudgments += "1";
+        }
+        correctBits = correctBits.appendBits(guess);
       } else {
-        sequenceGuessBits = nextGuess.value;
-      }
-
-      if (nextWin.done) {
+        bitJudgments = [...win].map((winBit) => {
+          return winBit.equals(guess.getBitByGlobalIndex(winBit.index)) ? "1" : "0";
+        }).join("");
         allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
-        nextGuess = guessSplit.next();
-      } else {
-        let sequenceWinBits: string;
-        if (nextWin.value instanceof DisplayRow) {
-          sequenceWinBits = nextWin.value.bits;
-        } else {
-          sequenceWinBits = nextWin.value;
-        }
-
-        let bitJudgments: string;
-        if (sequenceWinBits === sequenceGuessBits) {
-          bitJudgments = "1".repeat(sequenceGuessBits.length);
-          if (lastCorrectBit !== "") {
-            if (lastCorrectBit === sequenceGuessBits[sequenceGuessBits.length - 1] && sequenceGuessBits !== this.encoder.characterSeparator) {
-              correctBits += this.encoder.characterSeparator;
-            }
-          }
-          correctBits += sequenceGuessBits;
-          lastCorrectBit = sequenceGuessBits[sequenceGuessBits.length - 1];
-        } else {
-          bitJudgments = [...sequenceWinBits].map((winBit, index) => winBit === sequenceGuessBits[index] ? "1" : "0")
-            .join("");
-          allCorrect = false;
-        }
-        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments));
-        nextGuess = guessSplit.next();
-        nextWin = winSplit.next();
       }
+      return newSequenceJudgment(guess, bitJudgments);
+    };
+
+    while (!nextWin.done) {
+      const win = nextWin.value;
+
+      if (nextGuess.done) {
+        allCorrect = false;
+        sequenceJudgments.push(newSequenceJudgment(win, "0".repeat(win.length)));
+        nextWin = winSplit.next();
+        continue;
+      }
+
+      const sequenceJudgment = judgeGuessAgainstWin(nextGuess.value, win);
+      sequenceJudgments.push(sequenceJudgment);
+
+      nextGuess = guessSplit.next();
+      nextWin = winSplit.next();
+    }
+
+    // Handle extra guesses after winBits are exhausted
+    while (!nextGuess.done) {
+      allCorrect = false;
+      sequenceJudgments.push(newSequenceJudgment(nextGuess.value, "0".repeat(nextGuess.value.length)));
+      nextGuess = guessSplit.next();
     }
 
     return new FullJudgment<T>(allCorrect, correctBits, sequenceJudgments);
   }
 
   judgeBits<T extends SequenceJudgment>(
-    guessBits: string,
-    winBits: string,
+    guessBits: BitSequence,
+    winBits: BitSequence,
     split: SplitterFunction
   ): FullJudgment<T> {
     return this._judgeBits(
       guessBits,
       winBits,
       split,
-      (bits, judgments) => new DisplayRowJudgment(bits, judgments) as T
+      (guess, judgments) => new CharJudgment(guess, judgments) as T
     );
   }
 
@@ -91,8 +91,8 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
     const guessBits = this.encoder.encodeText(guessText);
     const winBits = this.encoder.encodeText(winText);
 
-    const newCharJudgment = (bits: string, judgments: string) => new CharJudgment(bits, judgments);
-    const splitter = (bits: string) => this.encoder.splitByChar(bits);
+    const newCharJudgment = (bits: BitSequence, judgments: string) => new CharJudgment(bits, judgments);
+    const splitter = (bits: BitSequence) => this.encoder.splitByChar(bits);
     return this._judgeBits(
       guessBits,
       winBits,
@@ -101,3 +101,5 @@ export default class VariableWidthEncodingJudge implements BinaryJudge {
     );
   }
 }
+
+export { VariableWidthEncodingJudge };

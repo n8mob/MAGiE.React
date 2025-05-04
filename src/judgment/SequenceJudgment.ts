@@ -1,38 +1,70 @@
-import BitJudgment, {Correctness} from './BitJudgment.ts';
+import { BitJudgment } from './BitJudgment.ts';
+import { IndexedBit } from "../IndexedBit.ts";
+import { BitSequence } from "../BitSequence.ts";
+import { DisplayRow } from "../encoding/DisplayRow.ts";
 
-export type Bits = string;
-export type Chars = string;
+/**
+ * A class representing a sequence of bits with their corresponding judgments.
+ * The sequence could be an entire guess or just a part of it like a display row or a single letter.
+ */
+class SequenceJudgment {
+  /**
+   * The guess bits corresponding to the judgment bits.
+   */
+  guess: BitSequence;
 
-export class SequenceJudgment {
-  isSequenceCorrect: Correctness;
-  guess: string;
+  /**
+   * The judgments corresponding to each bit in the guess.
+   */
   bitJudgments: BitJudgment[];
 
-  constructor(guess: string, bitJudgments: string) {
-    this.guess = guess;
-    this.bitJudgments = [];
-    for (let i = 0; i < this.guess.length; i++) {
-      const judgment = new BitJudgment(this.guess[i], bitJudgments[i] == "1", i);
-      this.bitJudgments.push(judgment);
+  /**
+   * Create a new SequenceJudgment for the given guess bit sequence
+   * and interpret the bitJudgments string as a sequence of bits indicating the correctness of the corresponding bits.
+   * @param guess
+   * @param bitJudgments
+   */
+  constructor(guess: IndexedBit[] | BitSequence, bitJudgments: string | BitJudgment[]) {
+    this.guess = guess instanceof BitSequence ? guess : new BitSequence(guess);
+     if (bitJudgments instanceof Array) {
+      this.bitJudgments = bitJudgments;
+    } else {
+      this.bitJudgments = [];
+      for (let i = 0; i < bitJudgments.length; i++) {
+        this.bitJudgments.push(new BitJudgment(this.guess.getBit(i), bitJudgments[i] === "1"));
+      }
     }
+  }
 
-    this.isSequenceCorrect = this.bitJudgments.every(judgment => judgment.isCorrect);
+  /**
+   * Check if the sequence is correct.
+   * @returns true if all bits are correct, false otherwise.
+   */
+  get isSequenceCorrect(): boolean {
+    return this.bitJudgments.every(bitJudgment => bitJudgment.isCorrect);
   }
 
   toString(): string {
-    return `(${this.isSequenceCorrect}, '${this.guess}', '${this.bitJudgments}')`;
+    let guessBitString = ""
+    let judgmentBitString = ""
+
+    this.bitJudgments.forEach(bitJudgment => {
+      guessBitString += bitJudgment.bit;
+      judgmentBitString += bitJudgment.isCorrect ? "1" : "0";
+    })
+    return `${guessBitString}\n${judgmentBitString} <---${this.isSequenceCorrect ? "all '1's: correct!" : "not all correct"}`;
   }
 
   [Symbol.iterator](): Iterator<BitJudgment> {
-    let pointer = 0;
-    const components = this.bitJudgments;
+    let index = 0;
+    const components = this.bitJudgments.slice();
 
     return {
       next(): IteratorResult<BitJudgment> {
-        if (pointer < components.length) {
+        if (index < components.length) {
           return {
             done: false,
-            value: components[pointer++],
+            value: components[index++],
           };
         } else {
           return {
@@ -47,26 +79,23 @@ export class SequenceJudgment {
   equals(o: unknown): boolean {
     if (o instanceof SequenceJudgment) {
       return this.isSequenceCorrect === o.isSequenceCorrect &&
-        this.guess === o.guess &&
+        this.guess.equals(o.guess) &&
         this.bitJudgments === o.bitJudgments;
     }
     return false;
   }
-
-  hashCode(): number {
-    return this.isSequenceCorrect.toString().length + this.guess.length + this.bitJudgments.length;
-  }
 }
 
-export class CharJudgment extends SequenceJudgment {
-  constructor(guess: string, bitJudgments: string) {
+class CharJudgment extends SequenceJudgment {
+  constructor(guess: BitSequence, bitJudgments: string) {
     super(guess, bitJudgments);
   }
 }
 
-export class DisplayRowJudgment extends SequenceJudgment {
-  constructor(guess: string, bitJudgments: string) {
+class DisplayRowJudgment extends SequenceJudgment {
+  constructor(guess: DisplayRow, bitJudgments: string) {
     super(guess, bitJudgments);
   }
 }
 
+export { SequenceJudgment, CharJudgment, DisplayRowJudgment };

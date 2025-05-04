@@ -1,8 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
-import {Puzzle} from "../Menu.ts";
-import Stopwatch, {StopwatchHandle} from "./Stopwatch.tsx";
+import { Puzzle } from "../Menu.ts";
+import Stopwatch, { StopwatchHandle } from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
@@ -15,9 +15,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [hasWon, setHasWon] = useState(false);
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
-  const [displayWidth, setDisplayWidth] = useState(13); // Default value
-  const stopwatchRef = useRef<StopwatchHandle>(null);
-  const bitFieldRef = useRef<HTMLDivElement>(null);
+  const stopwatchRef = useRef<StopwatchHandle | null>(null);
+  const bitFieldRef = useRef<HTMLDivElement | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -60,30 +59,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
-
-    const updateDisplayWidth = () => {
-      const elementId = "bit-field";
-      const bitField = document.getElementById(elementId);
-      let displayWidthPixels;
-      if (!bitField) {
-        displayWidthPixels = Math.floor(window.innerWidth * 0.85);
-      } else {
-        displayWidthPixels = parseInt(getComputedStyle(bitField).width);
-      }
-
-      const bitCheckboxWidth = 32;
-      const newDisplayWidth = Math.floor(displayWidthPixels / bitCheckboxWidth);
-      setDisplayWidth(newDisplayWidth);
-    };
-
-    updateDisplayWidth();
-
-    window.addEventListener("resize", updateDisplayWidth);
-
-    return () => {
-      window.removeEventListener("resize", updateDisplayWidth);
-    };
-  }, [puzzle, date]);
+  }, [puzzle, date, formattedDate]);
 
 
   useEffect(() => {
@@ -92,14 +68,17 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
         if (bitFieldRef.current) {
-          bitFieldRef.current.scrollTo({
-            top: bitFieldRef.current.scrollHeight,
-            behavior: 'smooth'
-          });
+          bitFieldRef.current.scrollTo({top: bitFieldRef.current.scrollHeight, behavior: 'smooth'});
         }
         updateShareText();
       }
-      winAudio.current?.play();
+
+      if (winAudio.current) {
+        winAudio.current.play()
+          .catch((error) => {
+            console.warn("Audio playback failed:", error);
+          });
+      }
     };
 
     window.addEventListener("winEvent", handleWinEvent);
@@ -125,8 +104,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
-        'It seems that this browser does not support "Web Share".' +
-        '\nShall we copy the share message to your clipboard?';
+        'It seems that this browser does not support "Web Share".'
+        + '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
           .then(() => {
@@ -149,33 +128,32 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
   if (!currentPuzzle) {
     return <div>Loading...</div>;
-  } else {
-    return (
-      <>
-        <Stopwatch ref={stopwatchRef}/>
-        {currentPuzzle.type === "Encode" &&
-          <EncodePuzzle
-            puzzle={currentPuzzle}
-            onWin={handleWin}
-            hasWon={hasWon}
-            onShareWin={handleShareWin}
-            displayWidth={displayWidth}
-            key={`${currentPuzzle}-${displayWidth}`}
-          />
-        }
-        {currentPuzzle.type === "Decode" &&
-          <DecodePuzzle
-            puzzle={currentPuzzle}
-            onWin={handleWin}
-            hasWon={hasWon}
-            onShareWin={handleShareWin}
-            displayWidth={displayWidth}
-            key={`${currentPuzzle}-${displayWidth}`}
-          />
-        }
-      </>
-    );
   }
+
+  return (
+    <>
+      <Stopwatch ref={stopwatchRef}/>
+      {currentPuzzle.type === "Encode" &&
+        <EncodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={handleShareWin}
+          bitDisplayWidthPx={32}
+        />
+      }
+      {currentPuzzle.type === "Decode" &&
+        <DecodePuzzle
+          puzzle={currentPuzzle}
+          onWin={handleWin}
+          hasWon={hasWon}
+          onShareWin={handleShareWin}
+          bitDisplayWidthPx={32}
+        />
+      }
+    </>
+  );
 };
 
 export default DailyPuzzle;
+

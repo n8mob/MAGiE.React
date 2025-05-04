@@ -1,11 +1,12 @@
-import React from "react";
-import {Correctness} from "../judgment/BitJudgment.ts";
+import { Correctness } from "../judgment/BitJudgment.ts";
+import { IndexedBit } from "../IndexedBit.ts";
+import * as React from "react";
 
 interface BitButtonProps {
-  bit: string,
+  bit: IndexedBit,
+  key: string,
   isCorrect: Correctness,
   bitIndex: number,
-  sequenceIndex: number | null,
   onChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
@@ -15,9 +16,8 @@ const BitButton: React.FC<BitButtonProps> = (
     isCorrect,
     bitIndex,
     onChange,
-    sequenceIndex = null
   }) => {
-  const isBitOn = bit === "1";
+  const isBitOn = bit.bit === "1";
 
   return (
     <>
@@ -25,13 +25,12 @@ const BitButton: React.FC<BitButtonProps> = (
              className={"bit-checkbox"}
              onChange={onChange}
              checked={isBitOn}
-             data-bit-value={bit}
-             data-judgment={isCorrect == true ? "correct" : isCorrect == false ? "incorrect" : "unknown"}
-             data-sequence-index={sequenceIndex}
              data-bit-index={bitIndex}
+             data-judgment={isCorrect ? "correct" : "incorrect"}
+             key={`bit-${bitIndex}`}
       />
     </>
   );
 }
 
-export default BitButton;
+export { BitButton };

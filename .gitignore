@@ -23,6 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 /vite.local.config.ts
+
+# Ignore source map files
+*.map
+
 .env
 .env.prod
 .env.*
+
+/coverage/

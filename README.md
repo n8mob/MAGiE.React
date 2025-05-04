@@ -26,7 +26,7 @@ The one thing that will bite you is that I have a separate project to generate m
 
 That project can be found in my [puzzleeditor2020 repository](https://github.com/n8mob/puzzleeditor2020).
 
-But you'll need to run that Django project and then add some puzzle for it to work.
+But you'll need to run that Django project and then add some puzzles for it to work.
 
 If you'd like to contribute to this project, I think a good first step would be to modify the React app 
 to allow a choice between a static JSON file, or an API for the puzzles.
@@ -36,12 +36,12 @@ to allow a choice between a static JSON file, or an API for the puzzles.
 A lot of the lines of text are constrained to 13 characters.
 This reflects the stylistic choices from the Mobile/Unity versions of the game.
 
-It had a very retro asthetic, with an LCD-screen motif.
+It had a very retro aesthetic, with an LCD-screen motif.
 My designer buddy had created a nice-looking, chunky pixel font for us.
-That, plus the retro-ness of it kept the text display narrow.
+That, plus the retro-ness of it, kept the text display narrow.
 
 So if you feel cramped, it may help if you imagine yourself as
-a 10 year old who's family apartment and school are both attached to a rad, retro-future, 80's shopping mall.
+a 10-year-old whose family apartment and school are both attached to a rad, retro-future, 80's shopping mall.
 
 # Long story long(er)
 

@@ -1,7 +1,7 @@
 import {Link, useParams} from "react-router-dom";
 import {getDailyPuzzleForDate} from "../PuzzleApi.ts";
 import DailyPuzzle from "./DailyPuzzle.tsx";
-import React, {useEffect, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {Puzzle} from "../Menu.ts";
 import fetchPuzzle from "../FetchPuzzle.tsx";
 
@@ -10,6 +10,13 @@ const addDays = (date: Date, days: number) => {
   newDate.setDate(newDate.getDate() + days);
   return newDate;
 }
+
+const prettyOptions: Intl.DateTimeFormatOptions = {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric'
+};
+
 
 const dateLinkFormat = (date: Date) => {
   const year = date.getFullYear();
@@ -23,12 +30,11 @@ type DayPuzzleProps = {
   initialDate?: Date;
 }
 
-const SpecificDaysPuzzle: React.FC<DayPuzzleProps> = ({initialDate}) => {
+const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
   const {year, month, day} = useParams<{ year?: string, month?: string, day?: string }>();
   const [puzzleDate, setPuzzleDate] = useState<Date | null>(null);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [formattedDate, setFormattedDate] = useState("");
-  const prettyOptions: Intl.DateTimeFormatOptions = {weekday: 'short', month: 'short', day: 'numeric'};
   const linkToToday = <Link to={"/today"}>Go to today's puzzle</Link>;
 
   useEffect(() => {
@@ -57,7 +63,7 @@ const SpecificDaysPuzzle: React.FC<DayPuzzleProps> = ({initialDate}) => {
         })
         .catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
     }
-  }, [puzzleDate]);
+  }, [prettyOptions, puzzleDate]);
 
   if (!puzzleDate) {
     return <>

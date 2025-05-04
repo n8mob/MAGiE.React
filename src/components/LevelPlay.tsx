@@ -1,5 +1,5 @@
 import { Menu, Level, Puzzle } from "../Menu.ts";
-import React, { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EncodePuzzle from "./EncodePuzzle.tsx";
 import DecodePuzzle from "./DecodePuzzle.tsx";
@@ -10,7 +10,7 @@ interface LevelPlayProps {
   setBackPath: (path: string) => void;
 }
 
-const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath }) => {
+const LevelPlay: FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath }) => {
   const { levelNumber, puzzleId } = useParams();
   const [level, setLevel] = useState<Level | null>(null);
   const categoryName = decodeURIComponent(useParams().categoryName || "");
@@ -75,14 +75,16 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
           onWin={handleWin}
           hasWon={hasWon}
           onShareWin={() => console.log("Share win not implemented")}
-          displayWidth={13} />
+          bitDisplayWidthPx={32}
+        />
       ) : (
         <DecodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
           hasWon={hasWon}
           onShareWin={() => console.log("Share win not implemented")}
-          displayWidth={13} />
+          bitDisplayWidthPx={32}
+        />
       )}
       <div className="display">
         {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
@@ -106,7 +108,7 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
       setWinMessage([]);
       setHasWon(false);
     } else {
-      const genericWinMessge = [
+      const genericWinMessage = [
         "You win!",
         "You finishos",
         "puzzles in",
@@ -114,7 +116,7 @@ const LevelPlay: React.FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackP
       ];
       const quote = ["."];
       const closeQuote = [".", "Congrats!"]
-      setWinMessage([...genericWinMessge, ...quote, ...level.levelName, ...closeQuote]);
+      setWinMessage([...genericWinMessage, ...quote, ...level.levelName, ...closeQuote]);
     }
   }
 }

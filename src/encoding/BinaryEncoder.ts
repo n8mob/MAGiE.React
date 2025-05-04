@@ -1,31 +1,22 @@
-import {EncodingType} from "../Menu.ts";
-
-class DisplayRow {
-  bits: string;
-  annotation: string;
-
-  constructor(bits: string, annotation: string = "") {
-    this.bits = bits;
-    this.annotation = annotation;
-  }
-}
+import { EncodingType } from "../Menu.ts";
+import { DisplayRow } from "./DisplayRow.ts";
+import { BitSequence } from "../BitSequence.ts";
 
 interface BinaryEncoder {
   getType(): EncodingType;
 
-  decodeText(encodedText: string): string;
+  decodeText(encodedText: BitSequence): string;
 
-  encodeText(textToEncode: string): string;
+  encodeText(textToEncode: string): BitSequence;
 
-  decodeChar(encodedChar: string): string;
+  decodeChar(encodedChar: BitSequence): string;
 
-  encodeChar(charToEncode: string): string;
+  encodeChar(charToEncode: string, startIndex?: number): BitSequence;
 
-  splitByChar(bits: string): Generator<string, void>;
+  splitByChar(bits: BitSequence): Generator<BitSequence, void>;
 
-  splitForDisplay(bits: string, displayWidth: number): Generator<DisplayRow, void>;
+  splitForDisplay(bits: BitSequence, displayWidth: number): Generator<DisplayRow, void>;
 }
 
 export default BinaryEncoder;
-export {DisplayRow};
 

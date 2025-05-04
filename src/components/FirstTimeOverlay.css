@@ -1,5 +1,22 @@
+.first-time-modal {
+    background-color: #d1d8d8;
+    border-radius: 0.75rem;
+    max-width: 500px;
+    width: 100%;
+    padding: 1.25rem; /* 👈 This is the fix */
+    box-shadow: 0 2px 12px
+}
+
 .first-time-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem; /* 👈 mobile-safe edge breathing */
+    /*background-color: rgba(0,0,0,0.4);*/
     text-transform: none;
+    z-index: 999;
 }
 
 .first-time-overlay h2 {

@@ -1,51 +1,14 @@
-import React, {createRef} from "react";
-import {PuzzleProps, PuzzleState} from "./BasePuzzle.tsx";
-import DisplayMatrix, {DisplayMatrixUpdate} from "./DisplayMatrix";
-import BasePuzzle from "./BasePuzzle";
-import FullJudgment from "../judgment/FullJudgment.ts";
-import {SequenceJudgment} from "../judgment/SequenceJudgment.ts";
-import {Puzzle} from "../Menu.ts";
-import VariableWidthEncoder from "../encoding/VariableWidthEncoder.ts";
-import VariableWidthDecodingJudge from "../judgment/VariableWidthDecodingJudge.ts";
-import FixedWidthEncoder from "../encoding/FixedWidthEncoder.ts";
-import FixedWidthDecodingJudge from "../judgment/FixedWidthDecodingJudge.ts";
+import { BasePuzzle, PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import { DisplayMatrix } from "./DisplayMatrix";
+import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ChangeEvent } from "react";
+import { DisplayRow } from "../encoding/DisplayRow.ts";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
-  displayMatrixRef: React.RefObject<DisplayMatrixUpdate>;
-  private isFirstVisit = !localStorage.getItem('seenBefore');
-
   constructor(props: PuzzleProps) {
     super(props);
-
-    this.state = {
-      currentPuzzle: props.puzzle,
-      judge: null,
-      guessText: "",
-      guessBits: "",
-      winBits: "",
-      judgment: new FullJudgment<SequenceJudgment>(false, "", []),
-      updating: false,
-      displayRows: [],
-    };
-
-    this.displayMatrixRef = createRef<DisplayMatrixUpdate>();
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    window.addEventListener("keydown", this.handleKeyDown);
-    if (this.isFirstVisit) {
-      localStorage.setItem('seenBefore', 'true');
-    }
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount?.();
-    window.removeEventListener("keydown", this.handleKeyDown);
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -58,78 +21,25 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
-  updateJudge(puzzle: Puzzle) {
-    if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.setState({judge: new VariableWidthDecodingJudge(puzzle.encoding)});
-    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.setState({judge: new FixedWidthDecodingJudge(puzzle.encoding)});
-    } else {
-      console.error(`Unsupported encoding type: ${puzzle.encoding.getType()}, ${puzzle.encoding_name}`);
-    }
-  }
-
-  updateDisplayRows() {
-    const {currentPuzzle, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(winBits, this.props.displayWidth);
-    const newDisplayRows = [];
-    let displayRow = displayRowSplit.next();
-    while (displayRow && !displayRow.done) {
-      newDisplayRows.push(displayRow.value);
-      displayRow = displayRowSplit.next();
-    }
-
-    this.setState({displayRows: newDisplayRows});
-  }
-
-  updateJudgment() {
-    const {currentPuzzle, judge, guessBits, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const splitter = (bits: string) => currentPuzzle.encoding.splitForDisplay(bits, this.props.displayWidth);
-    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
-      this.setState({judgment: newJudgment});
-      this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
-
-      let eventParams = {
-        puzzle_slug: currentPuzzle.slug,
-        guess_bits: guessBits,
-        guess_text: this.state.guessText,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
-        judgment_is_correct: newJudgment.isCorrect,
-        pagePath: window.location.pathname + window.location.search,
-      };
-
-      if (newJudgment.isCorrect) {
-        ReactGA4.event("win", {...eventParams, solve_time_ms: -1});
-        this.props.onWin();
-      } else {
-        ReactGA4.event("guess", eventParams);
-      }
-    }
-  }
-
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     const newGuessText = event.target.value.toUpperCase();
     const newState = {
       guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || "",
-    }
-    this.setState(newState);
+      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
+    } as PuzzleState;
+    this.updateState(newState);
   };
 
+
+  *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
+    if (!this.state.currentPuzzle) {
+      return;
+    }
+    yield* this.state.currentPuzzle.encoding.splitForDisplay(this.state.winBits, displayWidth);
+  }
+
   render() {
-    const {currentPuzzle, judgment, guessText, winBits} = this.state;
+    const {currentPuzzle, judgment, guessText, displayRows} = this.state;
     const {hasWon} = this.props;
 
     if (!currentPuzzle) {
@@ -143,10 +53,9 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={this.displayMatrixRef}
-            bits={winBits}
+            displayRows={displayRows}
             judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}  // bits will be read-only for the decode puzzle
+            handleBitClick={() => {}} // Bits remain read-only
           />
           <div id="win-message">
             {hasWon && <p>{guessText}</p>}
@@ -167,7 +76,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
                   onClick={() => {
                     ReactGA4.event('story_start_clicked', {
                       source: 'post-win-link',
-                      puzzle_slug: currentPuzzle.slug,
+                      puzzle_slug: currentPuzzle?.slug,
                       is_first_visit: this.isFirstVisit,
                     });
                   }}
