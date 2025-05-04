@@ -59,11 +59,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
-
-    return () => {
-      window.removeEventListener("resize", () => {
-      }); // Remove unused resize listener
-    };
   }, [puzzle, date, formattedDate]);
 
 
