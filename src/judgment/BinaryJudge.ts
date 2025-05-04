@@ -17,12 +17,12 @@ interface BinaryJudge {
 class BaseBinaryJudge implements BinaryJudge {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   judgeBits<T extends SequenceJudgment>(_guessBits: BitSequence, _winBits: BitSequence, _split: SplitterFunction): FullJudgment<T> {
-    throw new Error("judgeBits not implemented");
+    return new FullJudgment(false, BitSequence.empty(), []);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   judgeText(_guessText: string, _winText: string): FullJudgment<CharJudgment> {
-    throw new Error("judgeText not implemented");
+    return new FullJudgment(false, BitSequence.empty(), []);
   }
 }
 

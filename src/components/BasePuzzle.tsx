@@ -93,7 +93,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       const displayMatrixWidth = this.displayMatrixRef.current.getWidth();
       const newDisplayWidth = Math.floor(displayMatrixWidth / this.state.bitDisplayWidthPx);
       console.log(`old width: ${displayMatrixWidth} / ${this.state.bitDisplayWidthPx} = new width: ${newDisplayWidth}`);
-      this.updateState({displayWidth: newDisplayWidth} as Partial<TState>);
+      this.updateState({displayWidth: newDisplayWidth} as Partial<TState>, () => { this.updateJudgment(); });
     } else {
       console.warn("DisplayMatrix ref is not ready yet.");
     }
@@ -106,13 +106,13 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     this.updateCurrentPuzzle(this.props.puzzle);
 
     preloadImages([
-                    'assets/Bit_off_Yellow.png',
-                    'assets/Bit_on_Yellow.png',
-                    'assets/Bit_off_Teal.png',
-                    'assets/Bit_on_Teal.png',
-                    'assets/Bit_off_Purple.png',
-                    'assets/Bit_on_Purple.png',
-                  ]);
+      'assets/Bit_off_Yellow.png',
+      'assets/Bit_on_Yellow.png',
+      'assets/Bit_off_Teal.png',
+      'assets/Bit_on_Teal.png',
+      'assets/Bit_off_Purple.png',
+      'assets/Bit_on_Purple.png',
+    ]);
 
     this.updateDisplayWidth();
     window.addEventListener("keydown", this.handleKeyDown);

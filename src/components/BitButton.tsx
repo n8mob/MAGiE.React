@@ -4,6 +4,7 @@ import * as React from "react";
 
 interface BitButtonProps {
   bit: IndexedBit,
+  key: string,
   isCorrect: Correctness,
   bitIndex: number,
   onChange: React.ChangeEventHandler<HTMLInputElement>
