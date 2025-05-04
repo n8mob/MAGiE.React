@@ -3,6 +3,7 @@ import { FullJudgment } from "./FullJudgment.ts";
 import { CharJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
 import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
 import { BitSequence } from "../BitSequence.ts";
+import { IndexedBit } from "../IndexedBit.ts";
 
 class FixedWidthDecodingJudge implements BinaryJudge {
   encoder: FixedWidthEncoder;
@@ -31,28 +32,28 @@ class FixedWidthDecodingJudge implements BinaryJudge {
     let allCorrect = true;
     let correctBits = BitSequence.empty();
 
-    while (!nextWin.done) {
-      const sequenceWinBits: BitSequence = nextWin.value;
+    while (!nextGuess.done) {
+      const sequenceGuessBits: BitSequence = nextGuess.value;
 
-      if (nextGuess.done) {
+      if (nextWin.done) {
         allCorrect = false;
-        sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, "0".repeat(sequenceWinBits.length)));
+        sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, "0".repeat(sequenceGuessBits.length)));
         nextWin = winSplit.next();
         continue; // guess is done, continue loop to display incorrectly guessed win bits.
       }
 
-      const sequenceGuessBits = nextGuess.value;
+      const sequenceWinBits = nextWin.value;
       let bitJudgments: string;
-      if (sequenceWinBits.equals(sequenceGuessBits)) {
+      if (sequenceGuessBits.equals(sequenceWinBits)) {
         bitJudgments = "1".repeat(sequenceWinBits.length);
         correctBits = correctBits.appendBits(sequenceGuessBits);
       } else {
-        bitJudgments = [...sequenceWinBits]
-          .map((winBit: string, index: number) => winBit === sequenceGuessBits[index] ? "1" : "0")
+        bitJudgments = [...sequenceGuessBits]
+          .map((guessBit: IndexedBit, index: number) => guessBit.equals(sequenceWinBits[index]) ? "1" : "0")
           .join("");
         allCorrect = false;
       }
-      sequenceJudgments.push(newSequenceJudgment(sequenceWinBits, bitJudgments));
+      sequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, bitJudgments));
       nextWin = winSplit.next();
       nextGuess = guessSplit.next();
     }
