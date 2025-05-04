@@ -34,13 +34,15 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
           {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`}>
               {[...displayRow].map((bit, indexWithinRow) => (
-                  <BitButton
-                    bit={bit}
-                    bitIndex={bit.index}
-                    isCorrect={currentJudgments[rowIndex].bitJudgments[indexWithinRow].isCorrect}
-                    onChange={handleBitClick}
-                  />
-                )
+                <BitButton
+                  bit={bit}
+                  bitIndex={bit.index}
+                  isCorrect={currentJudgments[rowIndex].bitJudgments[indexWithinRow].isCorrect}
+                  onChange={handleBitClick}
+                />
+              ))}
+              {displayRow.annotation && (
+                <span className="annotation">{'\u00A0'}{displayRow.annotation}</span>
               )}
             </p>
           ))}

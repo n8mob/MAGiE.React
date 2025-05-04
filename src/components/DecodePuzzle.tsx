@@ -4,6 +4,7 @@ import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
 import { ChangeEvent } from "react";
+import { DisplayRow } from "../encoding/DisplayRow.ts";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
@@ -28,6 +29,14 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     } as PuzzleState;
     this.updateState(newState);
   };
+
+
+  *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
+    if (!this.state.currentPuzzle) {
+      return;
+    }
+    yield* this.state.currentPuzzle.encoding.splitForDisplay(this.state.winBits, displayWidth);
+  }
 
   render() {
     const {currentPuzzle, judgment, guessText, displayRows} = this.state;

@@ -187,15 +187,16 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     }
   }
 
+  abstract splitForDisplay(displayWidth: number): Generator<DisplayRow, void>;
+
   updateDisplayRows() {
-    const {currentPuzzle, guessBits} = this.state;
+    const {currentPuzzle} = this.state;
     if (!currentPuzzle) {
       console.error('Missing puzzle');
       return;
     }
 
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.state.displayWidth);
-    const newDisplayRows: DisplayRow[] = [...displayRowSplit];
+    const newDisplayRows: DisplayRow[] = [...this.splitForDisplay(this.state.displayWidth)];
     this.updateState({displayRows: newDisplayRows} as Partial<TState>);
   }
 

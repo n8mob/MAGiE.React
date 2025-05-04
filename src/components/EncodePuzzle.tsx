@@ -2,6 +2,7 @@ import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BasePuzzle } from "./BasePuzzle";
 import { ChangeEvent } from "react";
+import { DisplayRow } from "../encoding/DisplayRow.ts";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
@@ -31,24 +32,6 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
-  updateDisplayRows() {
-    const {currentPuzzle, guessBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.state.displayWidth);
-    const newDisplayRows = [];
-    let displayRow = displayRowSplit.next();
-    while (displayRow && !displayRow.done) {
-      newDisplayRows.push(displayRow.value);
-      displayRow = displayRowSplit.next();
-    }
-
-    this.updateState({displayRows: newDisplayRows} as PuzzleState);
-  }
-
   handleBitClick = (event: ChangeEvent<HTMLInputElement>) => {
     const {bitIndex} = event.target.dataset;
     const {guessBits} = this.state;
@@ -73,6 +56,14 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     );
     this.updateJudgment();
   };
+
+  *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
+    if (!this.state.currentPuzzle) {
+      return;
+    }
+
+    yield* this.state.currentPuzzle.encoding.splitForDisplay(this.state.guessBits, displayWidth);
+  }
 
   render() {
     const {currentPuzzle, displayRows, judgment} = this.state;

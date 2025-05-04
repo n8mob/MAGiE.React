@@ -109,13 +109,15 @@ class FixedWidthEncoder implements BinaryEncoder {
     let start = 0;
     let end = 0;
 
-    const charBitsPerRow = Math.floor(displayWidth / this.width);
-
-    if (charBitsPerRow < 1) {
+    if (displayWidth < 1) {
       throw new Error(`Display width ${displayWidth} is too short to show characters of width ${this.width}`);
     }
 
-    const splitWidth = charBitsPerRow * this.width;
+    const splitWidth: number = Math.min(this.width, displayWidth);
+
+    if (splitWidth < 1) {
+      throw new Error(`Display width ${displayWidth} is too short to show characters of width ${this.width}`);
+    }
 
     while (start < bits.length) {
       end = start + splitWidth;
