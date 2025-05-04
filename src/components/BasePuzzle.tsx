@@ -11,6 +11,8 @@ import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
 import { FixedWidthDecodingJudge } from "../judgment/FixedWidthDecodingJudge.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { BitSequence } from "../BitSequence.ts";
+import { VariableWidthEncodingJudge } from "../judgment/VariableWidthEncodingJudge.ts";
+import { FixedWidthEncodingJudge } from "../judgment/FixedWidthEncodingJudge.ts";
 
 interface PuzzleProps {
   puzzle: Puzzle;
@@ -90,6 +92,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     if (this.displayMatrixRef.current) {
       const displayMatrixWidth = this.displayMatrixRef.current.getWidth();
       const newDisplayWidth = Math.floor(displayMatrixWidth / this.state.bitDisplayWidthPx);
+      console.log(`old width: ${displayMatrixWidth} / ${this.state.bitDisplayWidthPx} = new width: ${newDisplayWidth}`);
       this.updateState({displayWidth: newDisplayWidth} as Partial<TState>);
     } else {
       console.warn("DisplayMatrix ref is not ready yet.");
@@ -134,7 +137,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       prevState.judge !== this.state.judge
     ) {
       this.updateJudgment();
-      this.updateDisplayRows();
     }
   }
 
@@ -177,12 +179,10 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
       if (newJudgment.isCorrect && guessBits.length == winBits.length) {
         this.props?.onWin();
-        const newDisplayRows: DisplayRow[] = displayRows.concat(new DisplayRow([], "new win text!"));
-        this.setState({
-                        displayRows: newDisplayRows,
-                      } as Partial<TState>);
+        const newDisplayRows: DisplayRow[] = displayRows.slice()
+        this.updateState({displayRows: newDisplayRows} as Partial<TState>);
       } else {
-        this.setState({judgment: newJudgment} as Partial<TState>);
+        this.updateState({judgment: newJudgment} as Partial<TState>);
       }
     }
   }
@@ -195,18 +195,12 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
     }
 
     const displayRowSplit = currentPuzzle.encoding.splitForDisplay(guessBits, this.state.displayWidth);
-    const newDisplayRows: DisplayRow[] = [];
-    let displayRow = displayRowSplit.next();
-    while (displayRow && !displayRow.done) {
-      newDisplayRows.push(displayRow.value);
-      displayRow = displayRowSplit.next();
-    }
-
-    this.setState({displayRows: newDisplayRows} as Partial<TState>);
+    const newDisplayRows: DisplayRow[] = [...displayRowSplit];
+    this.updateState({displayRows: newDisplayRows} as Partial<TState>);
   }
 
   resetForNextPuzzle() {
-    this.setState(this.emptyState(this.props));
+    this.updateState(this.emptyState(this.props));
   }
 
   updateCurrentPuzzle(puzzle: Puzzle) {
@@ -225,10 +219,23 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
   }
 
   protected updateJudge(puzzle: Puzzle, callback?: () => void) {
+    if (!puzzle.encoding) {
+      console.error(`Missing encoding for puzzle ${puzzle.slug}`);
+      return;
+    }
+
     if (puzzle.encoding instanceof VariableWidthEncoder) {
-      this.updateState({judge: new VariableWidthDecodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      if (puzzle.type === "Encode") {
+        this.updateState({judge: new VariableWidthEncodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      } else {
+        this.updateState({judge: new VariableWidthDecodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      }
     } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      this.updateState({judge: new FixedWidthDecodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      if (puzzle.type === "Encode") {
+        this.updateState({judge: new FixedWidthEncodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      } else if (puzzle.type === "Decode") {
+        this.updateState({judge: new FixedWidthDecodingJudge(puzzle.encoding)} as Partial<TState>, callback);
+      }
     } else {
       console.error("Unsupported encoding type");
       if (callback) {
@@ -247,7 +254,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
 
     const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
+    if (newJudgment && !newJudgment.equals(this.state.judgment)) {
       this.updateState({judgment: newJudgment} as Partial<TState>);
       this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 
@@ -269,6 +276,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
         ReactGA4.event("guess", eventParams);
       }
     }
+    this.updateDisplayRows();
   }
 
   render() {
@@ -278,7 +286,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps, TState extends PuzzleState
       <>
         <DisplayMatrix
           key={`${currentPuzzle}-${guessBits}-${judgment}-${displayRows.length}`}
-          bits={guessBits}
+          displayRows={displayRows}
           judgments={judgment.sequenceJudgments}
           handleBitClick={() => {
           }} // read-only bits, EncodePuzzle can add an update function.
