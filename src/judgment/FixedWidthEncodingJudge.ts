@@ -2,7 +2,6 @@ import { BinaryJudge, SplitterFunction } from "./BinaryJudge.ts";
 import { FullJudgment } from "./FullJudgment.ts";
 import { CharJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
 import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
-import { IndexedBit } from "../IndexedBit.ts";
 import { BitSequence } from "../BitSequence.ts";
 import { BitJudgment } from "./BitJudgment.ts";
 
@@ -27,7 +26,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
     let nextWin = winSplit.next();
 
     let allCorrect = true;
-    const correctBits: IndexedBit[] = [];
+    const correctBits = BitSequence.empty();
 
     while (!nextWin.done) {
       const sequenceWinBits = nextWin.value;
@@ -44,7 +43,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
       for (const winBit of sequenceWinBits) {
         const bitJudgment = BitJudgment.judge(winBit, sequenceGuessBits.getBitByGlobalIndex(winBit.index));
         if (bitJudgment.isCorrect) {
-          correctBits.push(winBit);
+          correctBits.appendBits(winBit.bit?.toString() || "0");
         } else {
           allCorrect = false;
         }
