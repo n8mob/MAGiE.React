@@ -26,7 +26,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
     let nextWin = winSplit.next();
 
     let allCorrect = true;
-    const correctBits = BitSequence.empty();
+    let correctBits = BitSequence.empty();
 
     while (!nextWin.done) {
       const sequenceWinBits = nextWin.value;
@@ -43,7 +43,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
       for (const winBit of sequenceWinBits) {
         const bitJudgment = BitJudgment.judge(winBit, sequenceGuessBits.getBitByGlobalIndex(winBit.index));
         if (bitJudgment.isCorrect) {
-          correctBits.appendBits(winBit.bit?.toString() || "0");
+          correctBits = correctBits.appendBits(winBit.bit?.toString() || "0");
         } else {
           allCorrect = false;
         }
