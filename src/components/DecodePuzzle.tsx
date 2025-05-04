@@ -3,6 +3,7 @@ import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
+import { ChangeEvent } from "react";
 
 class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
@@ -19,17 +20,17 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     }
   }
 
-  handleGuessUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     const newGuessText = event.target.value.toUpperCase();
     const newState = {
       guessText: newGuessText,
       guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
-    };
+    } as PuzzleState;
     this.updateState(newState);
   };
 
   render() {
-    const {currentPuzzle, judgment, guessText, winBits} = this.state;
+    const {currentPuzzle, judgment, guessText, displayRows} = this.state;
     const {hasWon} = this.props;
 
     if (!currentPuzzle) {
@@ -43,7 +44,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
           {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={this.displayMatrixRef}
-            bits={winBits}
+            displayRows={displayRows}
             judgments={judgment.sequenceJudgments}
             handleBitClick={() => {}} // Bits remain read-only
           />

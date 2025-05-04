@@ -1,7 +1,7 @@
 import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BasePuzzle } from "./BasePuzzle";
-import { BitSequence } from "../BitSequence.ts";
+import { ChangeEvent } from "react";
 
 class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
   constructor(props: PuzzleProps) {
@@ -14,19 +14,18 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     switch (event.key) {
       case "0":
       case "1":
-        this.setState(
-          {guessBits: guessBits.appendBit(event.key)}, // Append the bit
+        this.updateState(
+          {guessBits: guessBits.appendBit(event.key)} as PuzzleState, // Append the bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
 
       case "Backspace":
-        this.setState(
-          {guessBits: guessBits.slice(0, -1)}, // Remove the last bit
+        this.updateState(
+          {guessBits: guessBits.slice(0, -1)} as PuzzleState, // Remove the last bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
-
       default:
         break; // Ignore other keys
     }
@@ -47,46 +46,36 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       displayRow = displayRowSplit.next();
     }
 
-    this.setState({displayRows: newDisplayRows});
+    this.updateState({displayRows: newDisplayRows} as PuzzleState);
   }
 
-  updateJudgment() {
-    const {currentPuzzle, judge, guessBits, winBits} = this.state;
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return;
-    }
-
-    const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
-    const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
-    if (newJudgment) {
-      this.setState({judgment: newJudgment});
-      this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
-      if (newJudgment.isCorrect) {
-        this.props.onWin();
-      }
-    }
-  }
-
-  handleBitClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {sequenceIndex, bitIndex} = event.target.dataset;
-    if (sequenceIndex === undefined || bitIndex === undefined) {
-      console.error("Missing sequenceIndex or bitIndex in dataset");
-      return;
-    }
-
-    const index = parseInt(sequenceIndex) * this.state.displayWidth + parseInt(bitIndex);
-    console.log(`${sequenceIndex} *  ${this.state.displayWidth} + ${bitIndex} = ${index}`)
+  handleBitClick = (event: ChangeEvent<HTMLInputElement>) => {
+    const {bitIndex} = event.target.dataset;
     const {guessBits} = this.state;
-    guessBits.toggleBit(index);
-    this.setState(
-      { guessBits: guessBits.toggleBit(index) },
+    console.log(`guess state: ${guessBits.toString()}`);
+
+    if (bitIndex === undefined) {
+      console.error("Missing bitIndex in dataset");
+      return;
+    }
+
+    const index = parseInt(bitIndex);
+    const before = guessBits.toPlainString().slice(0, index);
+    const toToggle = guessBits.slice(index, index + 1);
+    const didToggle = toToggle.toPlainString() === "1" ? "0" : "1";
+    const after = guessBits.slice(index + 1);
+    const toggled = guessBits.toggleBit(index);
+
+    console.log(`toggle ${before}[${toToggle}/${didToggle}]${after}`);
+    this.updateState(
+      { guessBits: toggled } as PuzzleState,
       () => this.updateJudgment()
     );
+    this.updateJudgment();
   };
 
   render() {
-    const {currentPuzzle, judgment} = this.state;
+    const {currentPuzzle, displayRows, judgment} = this.state;
 
     if (!currentPuzzle) {
       console.error('Missing puzzle');
@@ -95,11 +84,11 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
 
     return (
       <>
-        <div className="clue-and-bits">
+        <div className="main-display">
           {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={this.displayMatrixRef}
-            bits={this.state.guessBits}
+            displayRows={displayRows}
             judgments={judgment.sequenceJudgments}
             handleBitClick={this.handleBitClick}
           />
