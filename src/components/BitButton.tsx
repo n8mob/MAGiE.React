@@ -6,7 +6,6 @@ interface BitButtonProps {
   bit: IndexedBit,
   isCorrect: Correctness,
   bitIndex: number,
-  sequenceIndex: number | null,
   onChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
@@ -16,7 +15,6 @@ const BitButton: React.FC<BitButtonProps> = (
     isCorrect,
     bitIndex,
     onChange,
-    sequenceIndex = null
   }) => {
   const isBitOn = bit.bit === "1";
 
@@ -26,14 +24,12 @@ const BitButton: React.FC<BitButtonProps> = (
              className={"bit-checkbox"}
              onChange={onChange}
              checked={isBitOn}
-             data-bit-value={bit}
-             data-judgment={isCorrect == true ? "correct" : isCorrect == false ? "incorrect" : "unknown"}
-             data-sequence-index={sequenceIndex}
              data-bit-index={bitIndex}
+             data-judgment={isCorrect ? "correct" : "incorrect"}
              key={`bit-${bitIndex}`}
       />
     </>
   );
 }
 
-export default BitButton;
+export { BitButton };

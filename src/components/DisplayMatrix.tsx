@@ -1,10 +1,10 @@
 import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
-import BitButton from "./BitButton.tsx";
+import { BitButton } from "./BitButton.tsx";
 import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
-import { BitSequence } from "../BitSequence.ts";
+import { DisplayRow } from "../encoding/DisplayRow.ts";
 
 interface DisplayMatrixProps {
-  bits: BitSequence;
+  displayRows: DisplayRow[];
   judgments: SequenceJudgment[];
   handleBitClick: (event: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -15,7 +15,7 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({judgments, handleBitClick}, ref) => {
+  ({displayRows, judgments, handleBitClick}, ref) => {
     const [currentJudgments, setCurrentJudgments] = useState(judgments);
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,19 +31,17 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
     return (
       <>
         <div ref={bitFieldRef} id="bit-field">
-          {currentJudgments.map((rowJudgment: SequenceJudgment, rowIndex: number) => (
+          {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`}>
-              {rowJudgment.bitJudgments.map((bitJudgment) => {
-                return (
+              {[...displayRow].map((bit, indexWithinRow) => (
                   <BitButton
-                    bit={bitJudgment}
-                    sequenceIndex={rowIndex}
-                    bitIndex={bitJudgment.index}
-                    isCorrect={bitJudgment.isCorrect}
+                    bit={bit}
+                    bitIndex={bit.index}
+                    isCorrect={currentJudgments[rowIndex].bitJudgments[indexWithinRow].isCorrect}
                     onChange={handleBitClick}
                   />
-                );
-              })}
+                )
+              )}
             </p>
           ))}
         </div>
