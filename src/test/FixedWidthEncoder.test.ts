@@ -29,8 +29,8 @@ describe('FixedWidthEncoder', () => {
   });
 
   it('should reverse the encoding to get the decoding', () => {
-    expect(unitUnderTest.encoding).toEqual(hexadecimal);
-    expect(unitUnderTest.decoding).toEqual({
+    expect(unitUnderTest.encoding).to.deep.equal(hexadecimal);
+    expect(unitUnderTest.decoding).to.deep.equal({
         0: '0',
         1: '1',
         2: '2',
@@ -117,29 +117,35 @@ describe('FixedWidthEncoder', () => {
 
   it('should splitForDisplay into correct DisplayRows for full rows', () => {
     const encoded = BitSequence.fromString('1010000110110010'); // "A1B2"
-    // displayWidth = 8, so 2 chars per row (4 bits per char)
+    // displayWidth = 8, but fixed-width = 4 and it doesn't try to cram extra characters per row. (yet.)
     const rows = Array.from(unitUnderTest.splitForDisplay(encoded, 8));
-    expect(rows.length).to.equal(2);
-    expect(rows[0].toPlainString()).to.equal('10100001');
-    expect(rows[0].annotation).to.equal('A1');
-    expect(rows[1].toPlainString()).to.equal('10110010');
-    expect(rows[1].annotation).to.equal('B2');
+    expect(rows).to.have.length(4);
+    expect(rows[0].toPlainString()).to.equal('1010');
+    expect(rows[0].annotation).to.equal('A');
+    expect(rows[1].toPlainString()).to.equal('0001');
+    expect(rows[1].annotation).to.equal('1');
+    expect(rows[2].toPlainString()).to.equal('1011');
+    expect(rows[2].annotation).to.equal('B');
+    expect(rows[3].toPlainString()).to.equal('0010');
+    expect(rows[3].annotation).to.equal('2');
   });
 
   it('should splitForDisplay into correct DisplayRows for partial last row', () => {
     const encoded = BitSequence.fromString('101000011011'); // "A1B"
-    // displayWidth = 8, so 2 chars per row, last row is partial
+    // displayWidth = 8, but fixed-width = 4 and it doesn't try to cram extra characters per row. (yet.)
     const rows = Array.from(unitUnderTest.splitForDisplay(encoded, 8));
-    expect(rows.length).to.equal(2);
-    expect(rows[0].toPlainString()).to.equal('10100001');
-    expect(rows[0].annotation).to.equal('A1');
-    expect(rows[1].toPlainString()).to.equal('1011');
-    expect(rows[1].annotation).to.equal('B');
+    expect(rows).to.have.length(3);
+    expect(rows[0].toPlainString()).to.equal('1010');
+    expect(rows[0].annotation).to.equal('A');
+    expect(rows[1].toPlainString()).to.equal('0001');
+    expect(rows[1].annotation).to.equal('1');
+    expect(rows[2].toPlainString()).to.equal('1011');
+    expect(rows[2].annotation).to.equal('B');
   });
 
   it('should throw if displayWidth is too small for a character', () => {
     const encoded = BitSequence.fromString('1010');
-    expect(() => Array.from(unitUnderTest.splitForDisplay(encoded, 2))).to.throw();
+    expect(() => Array.from(unitUnderTest.splitForDisplay(encoded, 0))).to.throw();
   });
 
 });

@@ -46,11 +46,11 @@ describe('FixedWidthEncodingJudge', () => {
       const guess = DisplayRow.fromString("1010", 0, "A");
       const win = BitSequence.fromString("1010");
       const actualFullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
-      expect(actualFullJudgment.isCorrect).to.be.true;
-      !expect(actualFullJudgment.correctGuess).to.not.be.undefined;
-      !expect(actualFullJudgment.correctGuess).to.not.be.null;
-      expect(actualFullJudgment.correctGuess.equals(guess)).to.be.true;
-      expect(actualFullJudgment.sequenceJudgments).to.have.lengthOf(1);
+      expect(actualFullJudgment.isCorrect, "isCorrect should be true").to.be.true;
+      !expect(actualFullJudgment.correctGuess, "correctGuess should not be undefined").to.not.be.undefined;
+      !expect(actualFullJudgment.correctGuess, "correctGuess should not be null").to.not.be.null;
+      expect(actualFullJudgment.sequenceJudgments, "there should be exactly one sequenceJudgment").to.have.lengthOf(1);
+      expect(actualFullJudgment.correctGuess.equals(guess), "correctGuess should equal the guess").to.be.true;
 
       const actualSequenceJudgment: SequenceJudgment = actualFullJudgment.sequenceJudgments[0];
       expect(actualSequenceJudgment.isSequenceCorrect).to.be.true;
@@ -66,7 +66,7 @@ describe('FixedWidthEncodingJudge', () => {
       const win = BitSequence.fromString("11111110");
       const judgment = unitUnderTest.judgeBits<DisplayRowJudgment>(guess, win, splitBy4);
       expect(judgment.isCorrect).to.be.true;
-      expect(judgment.correctGuess).to.deep.equal(guess);
+      expect(judgment.correctGuess.equals(guess), "correctGuess should equal guess").to.be.true;
       const rowJudgments = judgment.getRowJudgments();
       let nextJudgment = rowJudgments.next();
       while (!nextJudgment.done) {
@@ -80,7 +80,7 @@ describe('FixedWidthEncodingJudge', () => {
       const win = BitSequence.fromString("000100100011");  //  0001 0010 0011
       const actualFullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
       expect(actualFullJudgment.isCorrect).to.be.false;
-      expect(actualFullJudgment.correctGuess).to.deep.equal(guess.slice(0, 9));
+      expect(actualFullJudgment.correctGuess.equals(guess.slice(0, 9)), "correctGuess should equal guess").to.be.true;
       const actualCharJudgments = actualFullJudgment.getCharJudgments();
 
 
@@ -158,7 +158,7 @@ describe('FixedWidthEncodingJudge', () => {
       const guessBits = unitUnderTest.encoder.encodeText(guessText);
       const judgment = unitUnderTest.judgeText(guessText, winText);
       expect(judgment.isCorrect).to.be.true;
-      expect(judgment.correctGuess).to.deep.equal(guessBits);
+      expect(judgment.correctGuess.equals(guessBits)).to.be.true;
     });
   });
 });
