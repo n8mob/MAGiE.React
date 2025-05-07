@@ -63,7 +63,7 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
         })
         .catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
     }
-  }, [prettyOptions, puzzleDate]);
+  }, [puzzleDate]);
 
   if (!puzzleDate) {
     return <>
@@ -95,9 +95,9 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
   return (
     <>
       <h3 className="split-content">
-        {<Link className="right-item" to={"/test/" + dateLinkFormat(addDays(puzzleDate, -1))}>&lt;&lt;</Link>}
+        {<Link className="right-item" to={"/date/" + dateLinkFormat(addDays(puzzleDate, -1))}>&lt;&lt;</Link>}
         <span className="date-item">{formattedDate}</span>
-        {<Link className="right-item" to={"/test/" + dateLinkFormat(addDays(puzzleDate, 1))}>&gt;&gt;</Link>}
+        {<Link className="right-item" to={"/date/" + dateLinkFormat(addDays(puzzleDate, 1))}>&gt;&gt;</Link>}
       </h3>
       {currentPuzzle && <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!} formattedDate={formattedDate}/>}
     </>
