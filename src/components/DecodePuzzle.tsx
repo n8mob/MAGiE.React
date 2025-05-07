@@ -72,7 +72,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
             <div className="post-win-links">
               <p>
                 <Link
-                  to={"/test/2025/04/04"}
+                  to={"/date/2025/04/04"}
                   onClick={() => {
                     ReactGA4.event('story_start_clicked', {
                       source: 'post-win-link',
