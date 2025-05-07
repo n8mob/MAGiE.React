@@ -21,9 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
         <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-        <Route path="/old_today" element={<TodaysPuzzle/>}/>
-        <Route path="/test/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-        <Route path="/old_yesterday" element={<YesterdaysPuzzle/>}/>
+        <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
       </Routes>
     </>
   );
