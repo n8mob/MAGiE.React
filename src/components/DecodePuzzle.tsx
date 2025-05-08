@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { ChangeEvent } from "react";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 
-class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+class DecodePuzzle extends BasePuzzle {
   constructor(props: PuzzleProps) {
     super(props);
   }
@@ -27,7 +27,7 @@ class DecodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
       guessText: newGuessText,
       guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
     } as PuzzleState;
-    this.updateState(newState);
+    this.setState(newState);
   };
 
 

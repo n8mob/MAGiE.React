@@ -16,7 +16,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
     guessBits: BitSequence,
     winBits: BitSequence,
     split: SplitterFunction,
-    newSequenceJudgment: (bits: BitSequence, judgments: string) => T =
+    newSequenceJudgment: (bits: BitSequence, judgments: BitJudgment[] | string) => T =
     (bits, judgments) => new CharJudgment(bits, judgments) as T
   ): FullJudgment<T> {
     const allSequenceJudgments: T[] = [];
@@ -50,7 +50,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
         sequenceBitJudgments.push(bitJudgment);
       }
 
-      allSequenceJudgments.push(new SequenceJudgment(sequenceGuessBits, sequenceBitJudgments));
+      allSequenceJudgments.push(newSequenceJudgment(sequenceGuessBits, sequenceBitJudgments));
 
       nextGuess = guessSplit.next();
       nextWin = winSplit.next();
@@ -69,7 +69,7 @@ class FixedWidthEncodingJudge implements BinaryJudge {
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
     const guessBits = this.encoder.encodeText(guessText);
     const winBits = this.encoder.encodeText(winText);
-    const newCharJudgment = (bits: BitSequence, bitJudgments: string) => {
+    const newCharJudgment = (bits: BitSequence, bitJudgments: BitJudgment[] | string) => {
       return new CharJudgment(bits, bitJudgments);
     }
 

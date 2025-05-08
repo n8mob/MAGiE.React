@@ -5,7 +5,6 @@ const ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60;
 
 interface StopwatchHandle {
   stop: () => void;
-  reset: () => void;
   getTime: () => number;
   displayTime: () => string;
   getHours: () => number;
@@ -18,7 +17,7 @@ const Stopwatch = forwardRef((_props, ref) => {
   const [isRunning, setIsRunning] = useState(true);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
 
     if (isRunning) {
       interval = setInterval(() => {
@@ -57,14 +56,6 @@ const Stopwatch = forwardRef((_props, ref) => {
       setIsRunning(false);
     },
 
-    reset() {
-      reset();
-    },
-
-    getTime() {
-      return time;
-    },
-
     displayTime() {
       return displayTime();
     },
@@ -79,11 +70,6 @@ const Stopwatch = forwardRef((_props, ref) => {
       return getSeconds();
     }
   }));
-
-  const reset = () => {
-    setIsRunning(false);
-    setTime(0);
-  };
 
   return (
       <p id="stopwatch-display">{displayTime()}</p>
