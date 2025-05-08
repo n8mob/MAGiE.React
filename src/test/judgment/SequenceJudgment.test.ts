@@ -3,9 +3,7 @@ import { SequenceJudgment, CharJudgment, DisplayRowJudgment } from "../../judgme
 import { BitSequence } from "../../BitSequence.ts";
 import { IndexedBit } from "../../IndexedBit.ts";
 import { BitJudgment } from "../../judgment/BitJudgment.ts";
-
-// Mock DisplayRow for DisplayRowJudgment
-class MockDisplayRow extends BitSequence {}
+import { DisplayRow } from "../../encoding/DisplayRow.ts";
 
 describe("SequenceJudgment", () => {
   it("constructs from BitSequence and bitJudgments string", () => {
@@ -84,7 +82,7 @@ describe("CharJudgment", () => {
 
 describe("DisplayRowJudgment", () => {
   it("constructs and behaves like SequenceJudgment", () => {
-    const row = new MockDisplayRow([new IndexedBit("1", 0), new IndexedBit("0", 1)]);
+    const row = new DisplayRow([new IndexedBit("1", 0), new IndexedBit("0", 1)]);
     const drj = new DisplayRowJudgment(row, "10");
     expect(drj.guess.equals(row)).to.be.true;
     expect(drj.bitJudgments[0].isCorrect).to.be.true;

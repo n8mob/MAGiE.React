@@ -36,7 +36,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
               {[...displayRow].map((bit, indexWithinRow) => (
                 <BitButton
                   bit={bit}
-                  key={bit.index}
+                  key={`bit-${bit.index}`}
                   bitIndex={bit.index}
                   isCorrect={currentJudgments[rowIndex]?. bitJudgments?.[indexWithinRow]?.isCorrect ?? "unknown"}
                   onChange={handleBitClick}

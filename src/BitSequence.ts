@@ -38,10 +38,6 @@ class BitSequence {
     }
   }
 
-  appendBitsAndKeepIndex(bits: BitSequence): BitSequence {
-    return new BitSequence(this.bits.concat(bits.bits));
-  }
-
   appendBitsAndReIndex(bits: BitSequence): BitSequence {
     let newIndex = this.endIndex + 1;
     const newBits: IndexedBit[] = [];

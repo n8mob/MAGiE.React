@@ -3,7 +3,7 @@ import {getDailyPuzzleForDate} from "../PuzzleApi.ts";
 import DailyPuzzle from "./DailyPuzzle.tsx";
 import {FC, useEffect, useState} from "react";
 import {Puzzle} from "../Menu.ts";
-import fetchPuzzle from "../FetchPuzzle.tsx";
+import { fetchPuzzle } from "../FetchPuzzle.tsx";
 
 const addDays = (date: Date, days: number) => {
   const newDate = new Date(date);

@@ -76,7 +76,7 @@ class VariableWidthDecodingJudge implements BinaryJudge {
     const guessBits = this.encoder.encodeText(guessText);
     const winBits = this.encoder.encodeText(winText);
 
-    const newCharJudgment = (bits: BitSequence, judgments: string) => new CharJudgment(bits, judgments);
+    const newCharJudgment = (bits: BitSequence | IndexedBit[], judgments: string) => new CharJudgment(bits, judgments);
     const splitter = (bits: BitSequence) => this.encoder.splitByChar(bits);
     return this._judgeBits(
       guessBits,
