@@ -242,7 +242,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
     const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, this.state.displayWidth);
     const newJudgment = judge?.judgeBits(guessBits, winBits, splitter);
     if (newJudgment && !newJudgment.equals(this.state.judgment)) {
-      this.setState({judgment: newJudgment} as Pick<TState, keyof TState>);
+      this.setState({judgment: newJudgment});
       this.displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 
       const eventParams = {
