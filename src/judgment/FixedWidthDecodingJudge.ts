@@ -49,7 +49,7 @@ class FixedWidthDecodingJudge implements BinaryJudge {
         correctBits = correctBits.appendBits(sequenceGuessBits);
       } else {
         bitJudgments = [...sequenceGuessBits]
-          .map((guessBit: IndexedBit, index: number) => guessBit.equals(sequenceWinBits[index]) ? "1" : "0")
+          .map((guessBit: IndexedBit, index: number) => guessBit.equals(sequenceWinBits.getBit(index)) ? "1" : "0")
           .join("");
         allCorrect = false;
       }

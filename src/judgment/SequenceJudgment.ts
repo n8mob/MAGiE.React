@@ -87,7 +87,7 @@ class SequenceJudgment {
 }
 
 class CharJudgment extends SequenceJudgment {
-  constructor(guess: BitSequence, bitJudgments: string) {
+  constructor(guess: BitSequence | IndexedBit[], bitJudgments: BitJudgment[] | string) {
     super(guess, bitJudgments);
   }
 }

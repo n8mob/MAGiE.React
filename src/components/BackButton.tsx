@@ -1,11 +1,11 @@
-import React from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface BackButtonProps {
   backPath: string;
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ backPath }) => {
+const BackButton: FC<BackButtonProps> = ({ backPath }) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {

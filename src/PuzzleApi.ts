@@ -17,16 +17,6 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
     console.error('Failed to fetch menu data:', error);
     throw error;
   }
-};
-
-export const getDailyPuzzle = async (): Promise<PuzzleForDate> => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/puzzles/today/`);
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch daily puzzle:', error);
-    throw error;
-  }
 }
 
 export const getDailyPuzzleForDate = async (puzzleDate: Date): Promise<PuzzleForDate> => {
@@ -35,12 +25,15 @@ export const getDailyPuzzleForDate = async (puzzleDate: Date): Promise<PuzzleFor
 
 function checkPuzzleForDate(data: unknown): data is PuzzleForDate {
   return (
-    typeof data === "object" &&
-    data !== null &&
-    typeof data.date === "string" &&
-    isPuzzle(data.puzzle) &&
-    typeof data.encoding === "object" &&
-    data.encoding !== null
+    typeof data === "object"
+    && data !== null
+    && "date" in data
+    && typeof (data as { date: unknown }).date === "string"
+    && "puzzle" in data
+    && isPuzzle((data as { puzzle: unknown }).puzzle)
+    && "encoding" in data
+    && typeof (data as { encoding: unknown }).encoding === "object"
+    && (data as { encoding: unknown }).encoding !== null
   );
 }
 
@@ -48,13 +41,16 @@ function isPuzzle(data: unknown): data is Puzzle {
   return (
     typeof data === "object" &&
     data !== null &&
-    typeof data.slug === "string" &&
-    Array.isArray(data.clue) &&
-    typeof data.winText === "string" &&
-    typeof data.encoding_name === "string"
+    "slug" in data &&
+    typeof (data as { slug: unknown }).slug === "string" &&
+    "clue" in data &&
+    Array.isArray((data as { clue: unknown }).clue) &&
+    "winText" in data &&
+    typeof (data as { winText: unknown }).winText === "string" &&
+    "encoding_name" in data &&
+    typeof (data as { encoding_name: unknown }).encoding_name === "string"
   );
 }
-
 
 export const getDailyPuzzleForYearMonthDay = async (year: number, month: number, day: number): Promise<PuzzleForDate> => {
   const paddedMonth = String(month).padStart(2, '0');

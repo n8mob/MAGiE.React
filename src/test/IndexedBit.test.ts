@@ -55,27 +55,26 @@ describe("IndexedBit", () => {
       expect(bitUndef.equals("1")).to.be.false;
       expect(bitUndef.equals("0")).to.be.false;
       // noinspection TypeScriptValidateTypes
-      expect(bitUndef.equals(undefined)).to.be.false;
+      expect(bitUndef.equals(undefined as any)).to.be.false;
     });
 
     it("should compare with null using equals", () => {
       const bit = new IndexedBit("1", 2);
       // noinspection TypeScriptValidateTypes
-      expect(bit.equals(null)).to.be.false;
+      expect(bit.equals(null as any)).to.be.false;
     });
 
     it("should compare with an object without bit using equals", () => {
       const bit = new IndexedBit("1", 2);
       const objWithoutBit = { index: 2 };
       // noinspection TypeScriptValidateTypes
-      expect(bit.equals(objWithoutBit)).to.be.false;
+      expect(bit.equals(objWithoutBit as any)).to.be.false;
     });
 
     it("should compare with an object without index using equals", () => {
       const bit = new IndexedBit("1", 2);
       const objWithoutIndex = { bit: "1" };
-      // noinspection TypeScriptValidateTypes
-      expect(bit.equals(objWithoutIndex)).to.be.false;
+      expect(bit.equals(objWithoutIndex as any)).to.be.false;
     });
 
     it("should create a true bit at index using trueAtIndex", () => {

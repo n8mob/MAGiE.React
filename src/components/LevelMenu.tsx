@@ -1,7 +1,7 @@
 // In LevelMenu.tsx
-import {Link, useParams} from 'react-router-dom';
-import React, {Fragment, useEffect} from 'react';
-import {Category, Level, Menu} from '../Menu.ts';
+import { Link, useParams } from 'react-router-dom';
+import { FC, Fragment, useEffect } from 'react';
+import { Category, Level, Menu } from '../Menu.ts';
 
 interface LevelMenuProps {
   menu: Menu | null;
@@ -9,7 +9,7 @@ interface LevelMenuProps {
   setBackPath: (path: string) => void;
 }
 
-const LevelMenu: React.FC<LevelMenuProps> = ({ menu, setShowBackButton, setBackPath }) => {
+const LevelMenu: FC<LevelMenuProps> = ({menu, setShowBackButton, setBackPath}) => {
   const categoryName = decodeURIComponent(useParams().categoryName || "");
   const category: Category = menu?.categories[categoryName] || {levels: []};
   const levelBaseUri = `/categories/${encodeURIComponent(categoryName)}/levels`;

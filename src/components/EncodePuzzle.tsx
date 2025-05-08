@@ -4,7 +4,7 @@ import { BasePuzzle } from "./BasePuzzle";
 import { ChangeEvent } from "react";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 
-class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
+class EncodePuzzle extends BasePuzzle {
   constructor(props: PuzzleProps) {
     super(props);
   }
@@ -15,14 +15,14 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     switch (event.key) {
       case "0":
       case "1":
-        this.updateState(
+        this.setState(
           {guessBits: guessBits.appendBit(event.key)} as PuzzleState, // Append the bit
           () => this.updateJudgment() // Recheck win condition
         );
         break;
 
       case "Backspace":
-        this.updateState(
+        this.setState(
           {guessBits: guessBits.slice(0, -1)} as PuzzleState, // Remove the last bit
           () => this.updateJudgment() // Recheck win condition
         );
@@ -50,7 +50,7 @@ class EncodePuzzle extends BasePuzzle<PuzzleProps, PuzzleState> {
     const toggled = guessBits.toggleBit(index);
 
     console.log(`toggle ${before}[${toToggle}/${didToggle}]${after}`);
-    this.updateState(
+    this.setState(
       { guessBits: toggled } as PuzzleState,
       () => this.updateJudgment()
     );

@@ -1,15 +1,15 @@
-import React, {Fragment, useEffect} from "react";
+import {FC, Fragment, ReactNode, useEffect} from "react";
 import {Link} from "react-router-dom";
 
 interface MenuProps {
-  prompt: JSX.Element;
+  prompt: ReactNode;
   options: string[];
   basePath: string;
   setShowBackButton: (show: boolean) => void;
   setBackPath: (path: string) => void;
 }
 
-const MenuDisplay: React.FC<MenuProps> = (
+const MenuDisplay: FC<MenuProps> = (
   {
     prompt,
     options,

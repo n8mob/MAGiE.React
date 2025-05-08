@@ -3,8 +3,6 @@ import {Route, Routes} from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import FirstTimeOverlay from "./components/FirstTimeOverlay.tsx";
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
-import TodaysPuzzle from "./components/TodaysPuzzle.tsx";
-import YesterdaysPuzzle from "./components/YesterdaysPuzzle.tsx";
 import {usePageTracking} from "./hooks/usePageTracking.ts";
 import {useState} from "react";
 
@@ -21,9 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
         <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-        <Route path="/old_today" element={<TodaysPuzzle/>}/>
-        <Route path="/test/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-        <Route path="/old_yesterday" element={<YesterdaysPuzzle/>}/>
+        <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
       </Routes>
     </>
   );
