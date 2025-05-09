@@ -1,14 +1,26 @@
+@font-face {
+  font-family: "HD44780";
+  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
 html, body {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Press Start 2P', Menlo, Consolas, monospace;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  font-family: 'HD44780', Menlo, Consolas, monospace;
+  text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
-  color: #213547;
+  color: #202E30;
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow: auto; /* Allow scrolling on the body */
+}
+
+pre {
+  font-family: "Press Start 2P", "HD44780", Menlo, Consolas, monospace;
+  font-size: x-large;
 }
 
 #root {
@@ -191,6 +203,10 @@ input[type="button"] {
   padding: 15px 20px;
 }
 
+.warning {
+  align-self: center;
+}
+
 @keyframes blink {
   0%, 50%, 100% { opacity: 1; }
   25%, 75% { opacity: 0; }
@@ -198,5 +214,6 @@ input[type="button"] {
 
 .blink {
   animation: blink 2s step-start infinite;
+  color: palevioletred;
 }
 

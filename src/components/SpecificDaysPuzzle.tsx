@@ -1,8 +1,8 @@
-import {Link, useParams} from "react-router-dom";
-import {getDailyPuzzleForDate} from "../PuzzleApi.ts";
+import { Link, useParams } from "react-router-dom";
+import { getDailyPuzzleForDate } from "../PuzzleApi.ts";
 import DailyPuzzle from "./DailyPuzzle.tsx";
-import {FC, useEffect, useState} from "react";
-import {Puzzle} from "../Menu.ts";
+import { FC, useEffect, useState } from "react";
+import { Puzzle } from "../Menu.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 
 const addDays = (date: Date, days: number) => {
@@ -76,9 +76,16 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
   const isFutureDate = puzzleDate > new Date();
   if (isFutureDate) {
     return <>
-      <p>/// <span className="blink">Restricted</span> ///<br />{formattedDate}<br />//////////////////</p>
-      <p>Please rewind.</p>
-      {linkToToday}
+      <div className={'warning'}>
+        <pre>{`
+//////////////////////
+///   ${formattedDate}   ///
+///       IS       ///
+///   `}<span className={'blink'}>Restricted&nbsp;&nbsp;&nbsp;</span>{`///
+/// Please rewind  ///
+//////////////////////`.trim()}<br />&nbsp;{linkToToday}
+          </pre>
+      </div>
     </>
   }
 
