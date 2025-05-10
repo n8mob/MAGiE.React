@@ -11,14 +11,14 @@ class VariableWidthEncodingJudge implements BinaryJudge {
     this.encoder = encoder;
   }
 
-  _judgeBits<T extends SequenceJudgment>(
+  judgeBits<T extends SequenceJudgment>(
     guessBits: BitSequence,
     winBits: BitSequence,
     split: SplitterFunction,
     newSequenceJudgment: (bits: BitSequence, judgments: string) => T = (
       bits,
       judgments
-    ) => new SequenceJudgment(bits, judgments) as T
+    ) => new CharJudgment(bits, judgments) as T
   ): FullJudgment<T> {
     const sequenceJudgments: T[] = [];
     const guessSplit = split(guessBits);
@@ -74,30 +74,15 @@ class VariableWidthEncodingJudge implements BinaryJudge {
     return new FullJudgment<T>(allCorrect, correctBits, sequenceJudgments);
   }
 
-  judgeBits<T extends SequenceJudgment>(
-    guessBits: BitSequence,
-    winBits: BitSequence,
-    split: SplitterFunction
-  ): FullJudgment<T> {
-    return this._judgeBits(
-      guessBits,
-      winBits,
-      split,
-      (guess, judgments) => new CharJudgment(guess, judgments) as T
-    );
-  }
-
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
     const guessBits = this.encoder.encodeText(guessText);
     const winBits = this.encoder.encodeText(winText);
 
-    const newCharJudgment = (bits: BitSequence, judgments: string) => new CharJudgment(bits, judgments);
     const splitter = (bits: BitSequence) => this.encoder.splitByChar(bits);
-    return this._judgeBits(
+    return this.judgeBits(
       guessBits,
       winBits,
-      splitter,
-      newCharJudgment
+      splitter
     );
   }
 }
