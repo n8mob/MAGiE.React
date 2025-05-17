@@ -1,4 +1,4 @@
-import { BitJudgment } from './BitJudgment.ts';
+import { BitJudgment, Correctness } from './BitJudgment.ts';
 import { IndexedBit } from "../IndexedBit.ts";
 import { BitSequence } from "../BitSequence.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
@@ -31,7 +31,8 @@ class SequenceJudgment {
     } else {
       this.bitJudgments = [];
       for (let i = 0; i < bitJudgments.length; i++) {
-        this.bitJudgments.push(new BitJudgment(this.guess.getBit(i), bitJudgments[i] === "1"));
+        const correctness: Correctness = bitJudgments[i] === "1" ? Correctness.correct : Correctness.incorrect;
+        this.bitJudgments.push(new BitJudgment(this.guess.getBit(i), correctness));
       }
     }
   }
