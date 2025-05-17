@@ -128,18 +128,18 @@ describe('FixedWidthEncodingJudge', () => {
       // guess: 110011 (6 bits, one full char and two bits of the next)
       const win = BitSequence.fromString("11001100");
       const guess = BitSequence.fromString("110011");
-      const fullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const actual = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
 
       // Should have two sequence judgments: one full, one partial
-      expect(fullJudgment.sequenceJudgments).to.have.lengthOf(2);
+      expect(actual.sequenceJudgments).to.have.lengthOf(2);
 
       // First chunk: full character, should be correct
-      const first = fullJudgment.sequenceJudgments[0];
+      const first = actual.sequenceJudgments[0];
       expect(first.guess.toString()).to.equal("1100");
       expect(first.isSequenceCorrect).to.be.true;
 
       // Second chunk: only two bits guessed, compare to win's "11"
-      const second = fullJudgment.sequenceJudgments[1];
+      const second = actual.sequenceJudgments[1];
       expect(second.guess.toString()).to.equal("11");
       // Compare to win's "11" (from "1100"), so both bits should be correct
       expect(second.bitJudgments[0].isCorrect).to.be.true;
@@ -147,7 +147,7 @@ describe('FixedWidthEncodingJudge', () => {
       expect(second.isSequenceCorrect).to.be.false;
 
       // Full judgment should be true, as all guessed bits match
-      expect(fullJudgment.isCorrect).to.be.false;
+      expect(actual.isCorrect).to.be.false;
     });
   });
 

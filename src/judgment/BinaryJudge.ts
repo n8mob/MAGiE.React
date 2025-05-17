@@ -48,8 +48,9 @@ abstract class BaseBinaryJudge implements BinaryJudge {
       }
 
       const bitJudgments: BitJudgment[] = [];
-      for (const guessBit of nextGuess.value) {
-        const bitJudgment = bitJudge(guessBit, nextWin.value.getBitByGlobalIndex(guessBit.index));
+      for (const winBit of nextWin.value) {
+        const guessBit = nextGuess.value.getBitByGlobalIndex(winBit.index);
+        const bitJudgment = bitJudge(guessBit, winBit);
         bitJudgments.push(bitJudgment);
         if (bitJudgment.isCorrect) {
           correctBits.push(guessBit);
