@@ -5,7 +5,7 @@ import * as React from "react";
 interface BitButtonProps {
   bit: IndexedBit,
   key: string,
-  isCorrect: Correctness,
+  correctness: Correctness,
   bitIndex: number,
   onChange: React.ChangeEventHandler<HTMLInputElement>
 }
@@ -13,7 +13,7 @@ interface BitButtonProps {
 const BitButton: React.FC<BitButtonProps> = (
   {
     bit,
-    isCorrect,
+    correctness,
     bitIndex,
     onChange,
   }) => {
@@ -26,7 +26,7 @@ const BitButton: React.FC<BitButtonProps> = (
              onChange={onChange}
              checked={isBitOn}
              data-bit-index={bitIndex}
-             data-judgment={isCorrect ? "correct" : "incorrect"}
+             data-judgment={correctness}
              key={`bit-${bitIndex}`}
       />
     </>

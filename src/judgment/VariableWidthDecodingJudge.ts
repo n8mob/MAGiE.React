@@ -8,9 +8,11 @@ import { BitJudgment, Correctness } from "./BitJudgment.ts";
 
 class VariableWidthDecodingJudge extends BaseBinaryJudge {
   public readonly encoder: VariableWidthEncoder;
-  public readonly bitJudge = (guessBit: IndexedBit, winBit: IndexedBit) => {
+  public readonly judgeBit = (guessBit: IndexedBit, winBit: IndexedBit) => {
     if (!guessBit) {
       return new BitJudgment(winBit, Correctness.unguessed);
+    } else if (!winBit) {
+      return new BitJudgment(guessBit, Correctness.incorrect);
     }
     return new BitJudgment(guessBit, winBit.equals(guessBit) ? Correctness.correct : Correctness.incorrect);
   };
@@ -28,8 +30,8 @@ class VariableWidthDecodingJudge extends BaseBinaryJudge {
     guessBits: BitSequence,
     winBits: BitSequence,
     splitter: SplitterFunction,
-    bitJudge: BitJudge = this.bitJudge,
-    newSequenceJudgment: (bits: IndexedBit[] | BitSequence, judgments: string) => T = this.newSequenceJudgment
+    bitJudge: BitJudge = this.judgeBit,
+    newSequenceJudgment: (bits: BitSequence, judgments: string) => T = this.newSequenceJudgment
   ): FullJudgment<T> {
     return super.judgeBits(
       guessBits,
@@ -50,7 +52,7 @@ class VariableWidthDecodingJudge extends BaseBinaryJudge {
       guessBits,
       winBits,
       splitter,
-      this.bitJudge,
+      this.judgeBit,
       newCharJudgment
     );
   }

@@ -13,8 +13,8 @@ interface BinaryJudge {
     guessBits: BitSequence,
     winBits: BitSequence,
     split: SplitterFunction,
-    bitJudge: BitJudge,
-    newSequenceJudgment: NewSequenceJudgment<T>
+    bitJudge?: BitJudge,
+    newSequenceJudgment?: NewSequenceJudgment<T>
   ): FullJudgment<T>;
 
   judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
