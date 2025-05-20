@@ -26,7 +26,7 @@ const BitButton: React.FC<BitButtonProps> = (
              onChange={onChange}
              checked={isBitOn}
              data-bit-index={bitIndex}
-             data-judgment={correctness}
+             data-correctness={correctness}
              key={`bit-${bitIndex}`}
       />
     </>
