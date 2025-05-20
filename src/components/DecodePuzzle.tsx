@@ -35,7 +35,10 @@ class DecodePuzzle extends BasePuzzle {
     if (!this.state.currentPuzzle) {
       return;
     }
-    yield* this.state.currentPuzzle.encoding.splitForDisplay(this.state.winBits, displayWidth);
+
+    const allBits = this.state.winBits.appendBits(this.state.guessBits.slice(this.state.winBits.length));
+
+    yield* this.state.currentPuzzle.encoding.splitForDisplay(allBits, displayWidth);
   }
 
   render() {

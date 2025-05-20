@@ -30,12 +30,44 @@ describe("BitSequence core mutator methods", () => {
     expect(sliced.toString()).to.equal("010");
     expect(seq.toString()).to.equal("10101");
   });
+
+  it("appendBitsAndReIndex should append bits from another BitSequence and re-index them", () => {
+    const seq1 = BitSequence.fromString("101");
+    const seq2 = BitSequence.fromString("010");
+    const result = seq1.appendBitsAndReIndex(seq2);
+
+    expect(result.toString()).to.equal("101010");
+    expect(result.getBit(3).index).to.equal(3);
+    expect(result.getBit(4).index).to.equal(4);
+    expect(result.getBit(5).index).to.equal(5);
+  });
+
+  it("appendBitsAndReIndex should handle appending an empty BitSequence", () => {
+    const seq1 = BitSequence.fromString("101");
+    const emptySeq = BitSequence.empty();
+    const result = seq1.appendBitsAndReIndex(emptySeq);
+
+    expect(result.toString()).to.equal("101");
+    expect(result.length).to.equal(3);
+  });
+
+  it("appendBitsAndReIndex should handle appending to an empty BitSequence", () => {
+    const emptySeq = BitSequence.empty();
+    const seq2 = BitSequence.fromString("010");
+    const result = emptySeq.appendBitsAndReIndex(seq2);
+
+    expect(result.toString()).to.equal("010");
+    expect(result.getBit(0).index).to.equal(0);
+    expect(result.getBit(1).index).to.equal(1);
+    expect(result.getBit(2).index).to.equal(2);
+  });
 });
 
 describe("BitSequence other tests", () => {
   it("does not end with anything if it is empty", () => {
     const emptySequence = BitSequence.empty();
     // noinspection TypeScriptValidateTypes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(emptySequence.endsWith(null as any)).to.be.false;
     expect(emptySequence.endsWith("0")).to.be.false;
     expect(emptySequence.endsWith("1")).to.be.false;
@@ -44,6 +76,7 @@ describe("BitSequence other tests", () => {
 
   it("should return false when .endsWith(null) is called on a non-empty BitSequence", () => {
     const nonEmptySequence = BitSequence.fromString("101");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(nonEmptySequence.endsWith(null as any)).to.be.false;
   });
 
@@ -194,5 +227,30 @@ describe("BitSequence.equals", () => {
     expect(sequence.equals("10101")).to.be.false;
     expect(sequence.equals(null)).to.be.false;
     expect(sequence.equals(undefined)).to.be.false;
+  });
+});
+
+describe("BitSequence iteration", () => {
+  it("should iterate over all bits in the sequence", () => {
+    const sequence = BitSequence.fromString("10101");
+    const bits = [...sequence];
+    expect(bits).to.have.lengthOf(5);
+    expect(bits[0].bit).to.equal("1");
+    expect(bits[1].bit).to.equal("0");
+    expect(bits[2].bit).to.equal("1");
+    expect(bits[3].bit).to.equal("0");
+    expect(bits[4].bit).to.equal("1");
+  });
+
+  it("should handle iteration over an empty sequence", () => {
+    const sequence = BitSequence.empty();
+    const bits = [...sequence];
+    expect(bits).to.have.lengthOf(0);
+  });
+
+  it("should preserve the order of bits during iteration", () => {
+    const sequence = BitSequence.fromString("11001");
+    const bits = [...sequence];
+    expect(bits.map(bit => bit.bit).join("")).to.equal("11001");
   });
 });

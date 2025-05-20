@@ -1,70 +1,52 @@
 import { describe, expect, it } from "vitest";
 import { IndexedBit } from "../../IndexedBit.ts";
-import { BitJudgment } from "../../judgment/BitJudgment.ts";
+import { BitJudgment, Correctness } from "../../judgment/BitJudgment.ts";
 
 describe('BitJudgment', () => {
-  it('should store a correct "on" bit', () => {
-    const onBit = new IndexedBit("1", 0);
-    const judgment = BitJudgment.judge(onBit, onBit);
+  it('should store correctness as correct', () => {
+    const bit = new IndexedBit("1", 0);
+    const judgment = new BitJudgment(bit, Correctness.correct);
 
-    expect(judgment.isCorrect).to.equal(true);
-    expect(judgment.index).to.equal(onBit.index);
-    expect(judgment.bit).to.equal(onBit.bit);
-  });
-
-  it('should store a correct "off" bit', () => {
-    const offBit = new IndexedBit("0", 76);
-    const judgment = BitJudgment.judge(offBit, offBit);
-
-    expect(judgment.isCorrect).to.equal(true);
-    expect(judgment.index).to.equal(offBit.index);
-    expect(judgment.bit).to.equal(offBit.bit); // aha!
-  });
-
-  it('should store an incorrect bit when guessBit is missing', () => {
-    const winBit = new IndexedBit("1", 2);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const judgment = BitJudgment.judge(undefined as any, winBit);
-    expect(judgment.isCorrect).to.equal(false);
-    expect(judgment.index).to.equal(winBit.index);
-    expect(judgment.bit).to.equal(winBit.bit);
-  });
-
-  it('should store an incorrect bit when winBit is missing', () => {
-    const guessBit = new IndexedBit("0", 3);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const judgment = BitJudgment.judge(guessBit, undefined as any);
-    expect(judgment.isCorrect).to.equal(false);
-    expect(judgment.index).to.equal(guessBit.index);
-    expect(judgment.bit).to.equal(guessBit.bit);
-  });
-
-  it('should judgeCorrect accurately', () => {
-    const bit = new IndexedBit("1", 5);
-    const judgment = BitJudgment.judgeCorrect(bit);
-    expect(judgment.isCorrect).to.equal(true);
+    expect(judgment.correctness).to.equal(Correctness.correct);
+    expect(judgment.isCorrect).to.be.true;
     expect(judgment.index).to.equal(bit.index);
     expect(judgment.bit).to.equal(bit.bit);
   });
 
-  it('should judgeIncorrect accurately', () => {
-    const bit = new IndexedBit("0", 6);
-    const judgment = BitJudgment.judgeIncorrect(bit);
-    expect(judgment.isCorrect).to.equal(false);
+  it('should store correctness as incorrect', () => {
+    const bit = new IndexedBit("0", 1);
+    const judgment = new BitJudgment(bit, Correctness.incorrect);
+
+    expect(judgment.correctness).to.equal(Correctness.incorrect);
+    expect(judgment.isCorrect).to.be.false;
     expect(judgment.index).to.equal(bit.index);
     expect(judgment.bit).to.equal(bit.bit);
   });
 
-  it('should return correct string from toString for correct', () => {
-    const bit = new IndexedBit("1", 7);
-    const judgment = BitJudgment.judgeCorrect(bit);
-    expect(judgment.toString()).to.include("is correct");
+  it('should store correctness as unguessed', () => {
+    const bit = new IndexedBit("1", 2);
+    const judgment = new BitJudgment(bit, Correctness.unguessed);
+
+    expect(judgment.correctness).to.equal(Correctness.unguessed);
+    expect(judgment.isCorrect).to.be.false;
+    expect(judgment.index).to.equal(bit.index);
+    expect(judgment.bit).to.equal(bit.bit);
   });
 
-  it('should return correct string from toString for incorrect', () => {
-    const bit = new IndexedBit("0", 8);
-    const judgment = BitJudgment.judgeIncorrect(bit);
-    expect(judgment.toString()).to.include("is incorrect");
+  it('should store correctness as hidden', () => {
+    const bit = new IndexedBit("0", 3);
+    const judgment = new BitJudgment(bit, Correctness.hidden);
+
+    expect(judgment.correctness).to.equal(Correctness.hidden);
+    expect(judgment.isCorrect).to.be.false;
+    expect(judgment.index).to.equal(bit.index);
+    expect(judgment.bit).to.equal(bit.bit);
+  });
+
+  it('should return correct string from toString', () => {
+    const bit = new IndexedBit("1", 4);
+    const judgment = new BitJudgment(bit, Correctness.correct);
+
+    expect(judgment.toString()).to.equal(`[4]: 1 correct`);
   });
 });
-

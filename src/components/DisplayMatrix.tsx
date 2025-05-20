@@ -2,6 +2,7 @@ import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "
 import { BitButton } from "./BitButton.tsx";
 import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
+import { Correctness } from "../judgment/BitJudgment.ts";
 
 interface DisplayMatrixProps {
   displayRows: DisplayRow[];
@@ -38,7 +39,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
                   bit={bit}
                   key={`bit-${bit.index}`}
                   bitIndex={bit.index}
-                  isCorrect={currentJudgments[rowIndex]?. bitJudgments?.[indexWithinRow]?.isCorrect ?? "unknown"}
+                  correctness={currentJudgments[rowIndex]?. bitJudgments?.[indexWithinRow]?.correctness || Correctness.incorrect}
                   onChange={handleBitClick}
                 />
               ))}

@@ -152,29 +152,30 @@ input.bit-checkbox:checked {
   background-image: url('assets/Bit_on_Yellow.png');
 }
 
-input[data-judgment="unknown"] {
+input[data-correctness="unguessed"] {
   background-image: url("assets/Bit_off_Yellow.png");
 }
 
-input[data-judgment="unknown"]:checked {
+input[data-correctness="unguessed"]:checked {
   background-image: url("assets/Bit_on_Yellow.png");
 }
 
-input[data-judgment="correct"] {
+input[data-correctness="correct"] {
   background-image: url("assets/Bit_off_Teal.png");
 }
 
-input[data-judgment="correct"]:checked {
+input[data-correctness="correct"]:checked {
   background-image: url("assets/Bit_on_Teal.png");
 }
 
-input[data-judgment="incorrect"] {
+input[data-correctness="incorrect"] {
   background-image: url("assets/Bit_off_Purple.png");
 }
 
-input[data-judgment="incorrect"]:checked {
+input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
+
 
 .sticky-container {
   position: sticky;

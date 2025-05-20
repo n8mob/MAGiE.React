@@ -1,5 +1,6 @@
 import { SequenceJudgment } from './SequenceJudgment.ts';
 import { BitSequence } from "../BitSequence.ts";
+import { IndexedBit } from "../IndexedBit.ts";
 
 class FullJudgment<T extends SequenceJudgment> {
   isCorrect: boolean;
@@ -8,11 +9,11 @@ class FullJudgment<T extends SequenceJudgment> {
 
   constructor(
     isCorrect: boolean,
-    correctGuess: BitSequence,
+    correctGuess: BitSequence | IndexedBit[],
     sequenceJudgments: T[]
   ) {
     this.isCorrect = isCorrect;
-    this.correctGuess = correctGuess;
+    this.correctGuess = new BitSequence(correctGuess);
     this.sequenceJudgments = sequenceJudgments;
   }
 
