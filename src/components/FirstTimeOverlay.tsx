@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
-import './FirstTimeOverlay.css'; // Optional: add styling here
+import './FirstTimeOverlay.css';
+import JudgmentLegend from "./JudgmentLegend.tsx"; // Optional: add styling here
 
 const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -44,6 +45,8 @@ const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
                 text box.
               </li>
             </ul>
+
+            <JudgmentLegend />
 
             <h3>🕹️ Tips</h3>
             <ul>
