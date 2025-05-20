@@ -83,7 +83,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
     if (this.displayMatrixRef.current) {
       const displayMatrixWidth = this.displayMatrixRef.current.getWidth();
       const newDisplayWidth = Math.floor(displayMatrixWidth / this.state.bitDisplayWidthPx);
-      this.setState({displayWidth: newDisplayWidth} as PuzzleState, () => {
+      this.setState({displayWidth: newDisplayWidth} as Partial<TState>, () => {
         this.updateJudgment();
       });
     } else {
