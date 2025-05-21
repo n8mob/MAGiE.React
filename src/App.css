@@ -176,11 +176,11 @@ input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
 
-
-.sticky-container {
-  position: sticky;
-  top: 0; /* Adjust this value as needed */
-  z-index: 10; /* Ensure it's above other content */
+.scrollable-popup {
+  max-height: 90vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 input[type="button"] {
