@@ -31,7 +31,7 @@ class DecodePuzzle extends BasePuzzle {
   };
 
 
-  *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
+  * splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
     if (!this.state.currentPuzzle) {
       return;
     }
@@ -58,7 +58,8 @@ class DecodePuzzle extends BasePuzzle {
             ref={this.displayMatrixRef}
             displayRows={displayRows}
             judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {}} // Bits remain read-only
+            handleBitClick={() => {
+            }} // Bits remain read-only
           />
           <div id="win-message">
             {hasWon && <p>{guessText}</p>}
@@ -90,11 +91,16 @@ class DecodePuzzle extends BasePuzzle {
             </div>
           </>
         ) : (
-          <div className="puzzle-inputs">
-            <input type="text" className="decode-input" value={guessText} onChange={this.handleGuessUpdate}/>
-            <button onClick={this.handleSubmitClick}>Check Answer</button>
-          </div>
-        )}
+           <div className="puzzle-inputs">
+             <input type="text"
+                    className="decode-input"
+                    placeholder={'DECODE TEXT HERE'}
+                    value={guessText}
+                    onChange={this.handleGuessUpdate}
+                    enterKeyHint={"done"}
+                    autoCorrect="off"/>
+           </div>
+         )}
       </>
     )
       ;
