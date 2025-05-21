@@ -14,14 +14,9 @@ html, body {
   font-family: "HD44780", Menlo, Consolas, monospace;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
-  color: #202E30;
+  color: #1e2a1e;
   background-color: #d0d4d4; /* Background color for the entire viewport */
   overflow: auto; /* Allow scrolling on the body */
-}
-
-pre {
-  font-family: "Press Start 2P", "HD44780", Menlo, Consolas, monospace;
-  font-size: x-large;
 }
 
 #root {
