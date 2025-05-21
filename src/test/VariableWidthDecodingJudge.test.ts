@@ -1,4 +1,4 @@
-import { CharJudgment, SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { VariableWidthDecodingJudge } from "../judgment/VariableWidthDecodingJudge.ts";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -60,7 +60,7 @@ describe('VariableWidthDecodingJudge', () => {
     const winText = "A CAB.";
     const guessBits = testEncoder.encodeText(guessText);
     const actual = unitUnderTest.judgeText(guessText, winText);
-    expect(actual).to.be.instanceof(FullJudgment<CharJudgment>);
+    expect(actual).to.be.instanceof(FullJudgment);
     expect(actual.isCorrect).to.be.true;
     expect(actual.correctGuess.equals(guessBits)).to.be.true;
     const charJudgments = actual.getCharJudgments();

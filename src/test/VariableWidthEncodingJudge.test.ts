@@ -49,7 +49,7 @@ describe('VariableWidthEncodingJudge', () => {
       expect(nextCharJudgment.value.bitJudgments).to.have.length(4);
       expect(nextCharJudgment.value
                              .bitJudgments
-                             .map(bitJudgment => bitJudgment.isCorrect ? "1" : "0")
+                             .map((bitJudgment: BitJudgment) => bitJudgment.isCorrect ? "1" : "0")
                              .join("")
       ).to.equal("1111");
       nextCharJudgment = charJudgments.next();

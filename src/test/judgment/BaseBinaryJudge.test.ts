@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BaseBinaryJudge } from "../../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../../judgment/FullJudgment.ts";
-import { CharJudgment, SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
+import { SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
 import { BitSequence } from "../../BitSequence.ts";
 import { BitJudgment, Correctness } from "../../judgment/BitJudgment.ts";
 import { IndexedBit } from "../../IndexedBit.ts";
@@ -24,11 +24,11 @@ const newSequenceJudgment = (bits: BitSequence, judgments: BitJudgment[] | strin
 
 // Test implementation of BaseBinaryJudge
 class TestBinaryJudge extends BaseBinaryJudge {
-  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment> {
+  judgeText(guessText: string, winText: string): FullJudgment {
     const guessBits = BitSequence.fromString(guessText);
     const winBits = BitSequence.fromString(winText);
 
-    return this.judgeBits<CharJudgment>(
+    return this.judgeBits(
       guessBits,
       winBits,
       (bits) => this.splitByChar(bits),
@@ -47,7 +47,7 @@ class TestBinaryJudge extends BaseBinaryJudge {
     return generator();
   }
 
-  private bitJudge(guessBit?: IndexedBit, winBit?: IndexedBit): BitJudgment {
+  public bitJudge(guessBit?: IndexedBit, winBit?: IndexedBit): BitJudgment {
     if (!guessBit) {
       return new BitJudgment(winBit!, Correctness.hidden);
     } else if (!winBit) {
