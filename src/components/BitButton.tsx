@@ -4,18 +4,16 @@ import * as React from "react";
 
 interface BitButtonProps {
   bit: IndexedBit,
-  key: string,
+  key?: string,
   correctness: Correctness,
-  bitIndex: number,
-  onChange: React.ChangeEventHandler<HTMLInputElement>
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
 }
 
 const BitButton: React.FC<BitButtonProps> = (
   {
     bit,
     correctness,
-    bitIndex,
-    onChange,
+    onChange = () => { },
   }) => {
   const isBitOn = bit.bit === "1";
 
@@ -25,9 +23,8 @@ const BitButton: React.FC<BitButtonProps> = (
              className={"bit-checkbox"}
              onChange={onChange}
              checked={isBitOn}
-             data-bit-index={bitIndex}
              data-correctness={correctness}
-             key={`bit-${bitIndex}`}
+             key={`bit-${bit.index}`}
       />
     </>
   );

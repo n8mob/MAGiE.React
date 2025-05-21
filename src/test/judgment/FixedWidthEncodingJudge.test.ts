@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { FixedWidthEncoder } from "../../encoding/FixedWidthEncoder.ts";
 import { FixedWidthEncodingJudge } from "../../judgment/FixedWidthEncodingJudge.ts";
-import { CharJudgment, DisplayRowJudgment, SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
+import { CharJudgment, SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
 import { DisplayRow } from "../../encoding/DisplayRow.ts";
 import { BitSequence } from "../../BitSequence.ts";
 
@@ -45,7 +45,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should judge a single correct character', () => {
       const guess = DisplayRow.fromString("1010", 0, "A");
       const win = BitSequence.fromString("1010");
-      const actualFullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const actualFullJudgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(actualFullJudgment.isCorrect, "isCorrect should be true").to.be.true;
       !expect(actualFullJudgment.correctGuess, "correctGuess should not be undefined").to.not.be.undefined;
       !expect(actualFullJudgment.correctGuess, "correctGuess should not be null").to.not.be.null;
@@ -64,7 +64,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should judge two correct display rows', () => {
       const guess = BitSequence.fromString("11111110");
       const win = BitSequence.fromString("11111110");
-      const judgment = unitUnderTest.judgeBits<DisplayRowJudgment>(guess, win, splitBy4);
+      const judgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(judgment.isCorrect).to.be.true;
       expect(judgment.correctGuess.equals(guess), "correctGuess should equal guess").to.be.true;
       const rowJudgments = judgment.getRowJudgments();
@@ -78,7 +78,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should judge the third character as incorrect', () => {
       const guess = BitSequence.fromString("000100100100"); // 0001 0010 0100
       const win = BitSequence.fromString("000100100011");  //  0001 0010 0011
-      const actualFullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const actualFullJudgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(actualFullJudgment.isCorrect).to.be.false;
       expect(actualFullJudgment.correctGuess.equals(guess.slice(0, 9)), "correctGuess should equal guess").to.be.true;
       const actualCharJudgments = actualFullJudgment.getCharJudgments();
@@ -105,7 +105,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should handle guess longer than win', () => {
       const guess = BitSequence.fromString("10101111"); // 8 bits
       const win = BitSequence.fromString("1010");       // 4 bits
-      const fullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const fullJudgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(fullJudgment.isCorrect).to.be.false;
       expect(fullJudgment.sequenceJudgments).to.have.lengthOf(2);
       // First chunk compared, second chunk (extra guess) all incorrect
@@ -115,7 +115,7 @@ describe('FixedWidthEncodingJudge', () => {
     it('should handle win longer than guess', () => {
       const guess = BitSequence.fromString("1010");       // 4 bits
       const win = BitSequence.fromString("10101111");     // 8 bits
-      const fullJudgment = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const fullJudgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(fullJudgment.sequenceJudgments).to.have.lengthOf(2);
       expect(fullJudgment.sequenceJudgments[0].isSequenceCorrect).to.be.true;
       // First chunk compared, second chunk (extra win) all incorrect
@@ -128,7 +128,7 @@ describe('FixedWidthEncodingJudge', () => {
       // guess: 110011 (6 bits, one full char and two bits of the next)
       const win = BitSequence.fromString("11001100");
       const guess = BitSequence.fromString("110011");
-      const actual = unitUnderTest.judgeBits<SequenceJudgment>(guess, win, splitBy4);
+      const actual = unitUnderTest.judgeBits(guess, win, splitBy4);
 
       // Should have two sequence judgments: one full, one partial
       expect(actual.sequenceJudgments).to.have.lengthOf(2);

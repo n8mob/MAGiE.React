@@ -88,13 +88,13 @@ class SequenceJudgment {
 }
 
 class CharJudgment extends SequenceJudgment {
-  constructor(guess: BitSequence | IndexedBit[], bitJudgments: BitJudgment[] | string) {
+  constructor(guess: BitSequence | IndexedBit[], bitJudgments: string | BitJudgment[]) {
     super(guess, bitJudgments);
   }
 }
 
 class DisplayRowJudgment extends SequenceJudgment {
-  constructor(guess: DisplayRow, bitJudgments: string) {
+  constructor(guess: DisplayRow, bitJudgments: string | BitJudgment[]) {
     super(guess, bitJudgments);
   }
 }

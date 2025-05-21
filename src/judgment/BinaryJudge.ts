@@ -1,34 +1,46 @@
-import { CharJudgment, SequenceJudgment } from "./SequenceJudgment.ts";
+import { SequenceJudgment } from "./SequenceJudgment.ts";
 import { FullJudgment } from "./FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
-import { BitJudgment } from "./BitJudgment.ts";
+import { BitJudgment, Correctness } from "./BitJudgment.ts";
 import { IndexedBit } from "../IndexedBit.ts";
 
 type SplitterFunction = (bits: BitSequence) => Generator<BitSequence, void>;
-type NewSequenceJudgment<T extends SequenceJudgment> = (bits: BitSequence, judgments: string | BitJudgment[]) => T;
+type NewSequenceJudgment = (bits: BitSequence, judgments: string | BitJudgment[]) => SequenceJudgment;
 type BitJudge = (guessBit?: IndexedBit, winBit?: IndexedBit) => BitJudgment;
 
 interface BinaryJudge {
-  judgeBits<T extends SequenceJudgment>(
+  judgeBits(
     guessBits: BitSequence,
     winBits: BitSequence,
     split: SplitterFunction,
     bitJudge?: BitJudge,
-    newSequenceJudgment?: NewSequenceJudgment<T>
-  ): FullJudgment<T>;
+    newSequenceJudgment?: NewSequenceJudgment
+  ): FullJudgment;
 
-  judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
+  judgeText(guessText: string, winText: string): FullJudgment;
 }
 
 abstract class BaseBinaryJudge implements BinaryJudge {
-  judgeBits<T extends SequenceJudgment>(
+  bitJudge(guessBit?: IndexedBit, winBit?: IndexedBit): BitJudgment {
+    if (!guessBit && !winBit) {
+      return new BitJudgment(new IndexedBit(undefined, 0), Correctness.hidden);
+    }
+    if (!guessBit) {
+      return new BitJudgment(winBit!, Correctness.hidden);
+    } else if (!winBit) {
+      return new BitJudgment(guessBit, Correctness.incorrect);
+    }
+    return new BitJudgment(guessBit, winBit.equals(guessBit) ? Correctness.correct : Correctness.incorrect);
+  }
+
+  judgeBits(
     guessBits: BitSequence,
     winBits: BitSequence,
     split: SplitterFunction,
     bitJudge: BitJudge,
-    newSequenceJudgment: NewSequenceJudgment<T>
-  ): FullJudgment<T> {
-    const sequenceJudgments: T[] = [];
+    newSequenceJudgment: NewSequenceJudgment
+  ): FullJudgment {
+    const sequenceJudgments: SequenceJudgment[] = [];
     const guessSplit = split(guessBits);
     const winSplit = split(winBits);
     let nextGuess = guessSplit.next();
@@ -75,8 +87,8 @@ abstract class BaseBinaryJudge implements BinaryJudge {
     return new FullJudgment(allCorrect, correctBits, sequenceJudgments);
   }
 
-  abstract judgeText(guessText: string, winText: string): FullJudgment<CharJudgment>;
+  abstract judgeText(guessText: string, winText: string): FullJudgment;
 }
 
-export type { SplitterFunction, NewSequenceJudgment, BitJudge };
-export { BinaryJudge, BaseBinaryJudge };
+export type { SplitterFunction, NewSequenceJudgment, BinaryJudge, BitJudge };
+export { BaseBinaryJudge };
