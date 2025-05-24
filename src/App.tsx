@@ -1,13 +1,12 @@
-// App.tsx
 import './App.css'
 import { Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
-import FirstTimeOverlay from "./components/FirstTimeOverlay.tsx";
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useState } from "react";
-import SettingsDialog from "./components/SettingsDialog.tsx";
 import Dialog from './components/Dialog.tsx';
+import FirstTimeContent from './components/FirstTimeContent.tsx';
+import SettingsContent from './components/SettingsContent.tsx';
 
 ReactGA4.initialize('G-ZL5RKDBBF6');
 
@@ -18,16 +17,16 @@ function App() {
 
   return (
     <>
-      {showFirstTime &&
+      {showFirstTime && (
         <Dialog onClose={() => setShowFirstTime(false)}>
-          <FirstTimeOverlay />
+          <FirstTimeContent />
         </Dialog>
-      }
-      {showSettings &&
+      )}
+      {showSettings && (
         <Dialog onClose={() => setShowSettings(false)}>
-          <SettingsDialog onClose={() => setShowSettings(false)}/>
+          <SettingsContent/>
         </Dialog>
-      }
+      )}
 
       <h1 id="magie-title">MAGiE</h1>
       <Routes>
