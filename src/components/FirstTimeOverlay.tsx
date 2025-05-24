@@ -34,7 +34,7 @@ const FirstTimeOverlay = ({onClose}: { onClose: () => void }) => {
 
       {isVisible && (
         <div className="first-time-overlay">
-          <div className="first-time-modal">
+          <div className="first-time-modal scrollable-popup">
             <h2>Welcome to <span className="magie-case">MAGiE</span></h2>
             <p><em>A retro-future puzzle game with bits and a totally rad mall!</em></p>
 
