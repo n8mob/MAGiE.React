@@ -1,48 +1,56 @@
-.first-time-modal {
+/* Dialog.css */
+.dialog-modal {
     background-color: #d1d8d8;
     border-radius: 0.75rem;
     max-width: 500px;
     width: 100%;
-    padding: 1.25rem; /* 👈 This is the fix */
+    padding: 1.25rem;
     box-shadow: 0 2px 12px
 }
 
-.first-time-overlay {
+.dialog-content {
     position: fixed;
     inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1rem; /* 👈 mobile-safe edge breathing */
-    /*background-color: rgba(0,0,0,0.4);*/
+    background-color: #d0d4d4;
     text-transform: none;
     z-index: 999;
 }
 
-.first-time-overlay h2 {
+.dialog-content h2 {
     text-align: center;
     text-transform: uppercase;
     font-size: 1rem;
     letter-spacing: 0.05em;
 }
-.first-time-overlay h3 {
+.dialog-content h3 {
     font-size: 1rem;
     text-transform: uppercase;
 }
 
-.help-display {
+.activate-dialog {
     padding: 0.5rem;
     width: 2.2rem;
     position: fixed;
-    right: 1rem;
     margin: 2rem;
 }
 
-.help-dismiss {
+.activate-dialog-right {
+    right: 1rem;
+}
+
+.activate-dialog-left {
+    left: 1rem;
+}
+
+.dialog-dismiss {
     padding: 1rem;
 }
 
-.first-time-overlay-inputs {
+.dialog-inputs {
     display: flex;
     flex-direction: column;
     align-items: center;
