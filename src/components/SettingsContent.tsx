@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 export default function SettingsContent() {
   const [useHdFont, setUseHdFont] = useState(() => {
     return localStorage.getItem('useHdFont') === 'true';
   });
 
-  const handleFontToggle = (e) => {
+  const handleFontToggle = (e: ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.checked;
     setUseHdFont(newVal);
-    localStorage.setItem('useHdFont', newVal);
+    localStorage.setItem('useHdFont', newVal.toString());
     // Fire analytics event if needed
   };
-
+p
   return (
     <>
       <h2>Settings</h2>
