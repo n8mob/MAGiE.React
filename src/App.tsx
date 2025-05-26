@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
@@ -14,6 +14,16 @@ function App() {
   usePageTracking();
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(true);
+  const [useHdFont, setUseHdFont] = useState(() => {
+    return localStorage.getItem('useHdFont') === 'true';
+  });
+
+  useEffect(() => {
+    document.body.style.fontFamily = useHdFont
+                                     ? '"HD44780", Menlo, Consolas, monospace'
+                                     : '"Press Start 2P", Menlo, Consolas, monospace';
+  }, [useHdFont]);
+
 
   return (
     <>
@@ -28,7 +38,7 @@ function App() {
       )}
       {showSettings && (
         <Dialog onClose={() => setShowSettings(false)}>
-          <SettingsContent/>
+          <SettingsContent useHdFont={useHdFont} setUseHdFont={setUseHdFont}/>
         </Dialog>
       )}
 

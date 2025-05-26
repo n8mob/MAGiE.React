@@ -1,9 +1,11 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
 
-export default function SettingsContent() {
-  const [useHdFont, setUseHdFont] = useState(() => {
-    return localStorage.getItem('useHdFont') === 'true';
-  });
+interface SettingsContentProps {
+  useHdFont: boolean;
+  setUseHdFont: (value: boolean) => void;
+}
+
+export default function SettingsContent({ useHdFont, setUseHdFont }: SettingsContentProps) {
 
   const handleFontToggle = (e: ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.checked;
@@ -11,7 +13,7 @@ export default function SettingsContent() {
     localStorage.setItem('useHdFont', newVal.toString());
     // Fire analytics event if needed
   };
-p
+
   return (
     <>
       <h2>Settings</h2>
@@ -21,7 +23,7 @@ p
           checked={useHdFont}
           onChange={handleFontToggle}
         />
-        Use retro LCD font
+        Use LCD font
       </label>
     </>
   );

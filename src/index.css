@@ -1,5 +1,5 @@
 :root {
-  font-family: "Press Start 2P", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Press Start 2P", Menlo, Consolas, monospace, sans-serif; /* Retro-friendly default */
   line-height: 1.5;
   font-weight: 400;
   color: #213547;
