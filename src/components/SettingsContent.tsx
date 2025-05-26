@@ -1,4 +1,5 @@
 import { ChangeEvent } from 'react';
+import ReactGA4 from "react-ga4";
 
 interface SettingsContentProps {
   useLcdFont: boolean;
@@ -11,7 +12,9 @@ export default function SettingsContent({ useLcdFont, setUseLcdFont }: SettingsC
     const isShowLcdFontSelected = e.target.checked;
     setUseLcdFont(isShowLcdFontSelected);
     localStorage.setItem('useLcdFont', isShowLcdFontSelected.toString());
-    // TODO Fire analytics for font preference change
+    ReactGA4.event('FontPreferenceChange', {
+      label: useLcdFont ? 'HD44780' : 'Press Start 2P'
+    });
   };
 
   return (

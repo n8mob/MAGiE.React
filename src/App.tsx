@@ -49,14 +49,30 @@ function App() {
 
   return (
     <>
-      <button aria-label={"open settings"} className="activate-dialog left" onClick={() => setShowSettings(true)}>⋮</button>
-      <button aria-label={"show how-to information"} className="activate-dialog right" onClick={() => setShowHowTo(true)}>?</button>
+      <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
+        setShowSettings(true);
+        ReactGA4.event('OpenSettings');
+      }}>
+        ⋮
+      </button>
+      <button aria-label={"show how-to information"}
+              className="activate-dialog right"
+              onClick={() => {
+                setShowHowTo(true);
+                ReactGA4.event('OpenHelpWindow', {
+                  source: 'activate-dialog',
+                  dialog: 'how-to',
+                  is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+                });
+              }}>
+        ?
+      </button>
 
       {showHowTo && (<Dialog onClose={() => {
           setHasSeenHowTo(true);
           localStorage.setItem('hasSeenHowTo', 'true');
           setShowHowTo(false);
-      }}>
+        }}>
           <FirstTimeContent/>
         </Dialog>
       )}
