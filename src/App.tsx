@@ -49,8 +49,8 @@ function App() {
 
   return (
     <>
-      <button className="activate-dialog left" onClick={() => setShowSettings(true)}>⋮</button>
-      <button className="activate-dialog right" onClick={() => setShowHowTo(true)}>?</button>
+      <button aria-label={"open settings"} className="activate-dialog left" onClick={() => setShowSettings(true)}>⋮</button>
+      <button aria-label={"show how-to information"} className="activate-dialog right" onClick={() => setShowHowTo(true)}>?</button>
 
       {showHowTo && (<Dialog onClose={() => {
           setHasSeenHowTo(true);
