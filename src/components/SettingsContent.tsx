@@ -1,17 +1,17 @@
 import { ChangeEvent } from 'react';
 
 interface SettingsContentProps {
-  useHdFont: boolean;
-  setUseHdFont: (value: boolean) => void;
+  useLcdFont: boolean;
+  setUseLcdFont: (value: boolean) => void;
 }
 
-export default function SettingsContent({ useHdFont, setUseHdFont }: SettingsContentProps) {
+export default function SettingsContent({ useLcdFont, setUseLcdFont }: SettingsContentProps) {
 
   const handleFontToggle = (e: ChangeEvent<HTMLInputElement>) => {
-    const newVal = e.target.checked;
-    setUseHdFont(newVal);
-    localStorage.setItem('useHdFont', newVal.toString());
-    // Fire analytics event if needed
+    const isShowLcdFontSelected = e.target.checked;
+    setUseLcdFont(isShowLcdFontSelected);
+    localStorage.setItem('useLcdFont', isShowLcdFontSelected.toString());
+    // TODO Fire analytics for font preference change
   };
 
   return (
@@ -20,7 +20,7 @@ export default function SettingsContent({ useHdFont, setUseHdFont }: SettingsCon
       <label>
         <input
           type="checkbox"
-          checked={useHdFont}
+          checked={useLcdFont}
           onChange={handleFontToggle}
         />
         Use LCD font

@@ -48,7 +48,7 @@ const preloadImages = (urls: string[]) => {
 abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState extends PuzzleState = PuzzleState>
   extends Component<TProps, TState> {
   displayMatrixRef: RefObject<DisplayMatrixUpdate>;
-  isFirstVisit = !localStorage.getItem('seenBefore');
+  isFirstVisit = !localStorage.getItem('isFirstVisit');
 
   protected constructor(props: TProps) {
     super(props);

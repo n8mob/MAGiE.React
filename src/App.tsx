@@ -12,33 +12,51 @@ ReactGA4.initialize('G-ZL5RKDBBF6');
 
 function App() {
   usePageTracking();
+  const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
+    return localStorage.getItem('hasSeenHowTo') === 'true';
+  });
+  const [showHowTo, setShowHowTo] = useState(() => {
+    return localStorage.getItem('hasSeenHowTo') !== 'true';
+  });
+
   const [showSettings, setShowSettings] = useState(false);
-  const [showHelp, setShowHelp] = useState(true);
-  const [useHdFont, setUseHdFont] = useState(() => {
-    return localStorage.getItem('useHdFont') === 'true';
+  const [useLcdFont, setUseLcdFont] = useState(() => {
+    return localStorage.getItem('useLcdFont') === 'true';
   });
 
   useEffect(() => {
-    document.body.style.fontFamily = useHdFont
+    document.body.style.fontFamily = useLcdFont
                                      ? '"HD44780", Menlo, Consolas, monospace'
                                      : '"Press Start 2P", Menlo, Consolas, monospace';
-  }, [useHdFont]);
+  }, [useLcdFont]);
 
+  useEffect(() => {
+    const isFirstVisit = !localStorage.getItem('isFirstVisit');
+    const hasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
+    if (isFirstVisit || !hasSeenHowTo) {
+      setShowHowTo(true)
+      localStorage.setItem('isFirstVisit', 'false');
+      // TODO fire analytics event for first visit
+    }
+  }, [hasSeenHowTo, showHowTo]);
 
   return (
     <>
-
       <button className="activate-dialog left" onClick={() => setShowSettings(true)}>⋮</button>
-      <button className="activate-dialog right" onClick={() => setShowHelp(true)}>?</button>
+      <button className="activate-dialog right" onClick={() => setShowHowTo(true)}>?</button>
 
-      {showHelp && (
-        <Dialog onClose={() => setShowHelp(false)}>
+      {showHowTo && (<Dialog onClose={() => {
+          setHasSeenHowTo(true);
+          localStorage.setItem('hasSeenHowTo', 'true');
+          setShowHowTo(false);
+      }}>
           <FirstTimeContent/>
         </Dialog>
       )}
+
       {showSettings && (
         <Dialog onClose={() => setShowSettings(false)}>
-          <SettingsContent useHdFont={useHdFont} setUseHdFont={setUseHdFont}/>
+          <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont}/>
         </Dialog>
       )}
 
