@@ -13,8 +13,11 @@ ReactGA4.initialize('G-ZL5RKDBBF6');
 function App() {
   usePageTracking();
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
-    return localStorage.getItem('hasSeenHowTo') === 'true';
+    const storedHasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
+    const storedSeenBefore = localStorage.getItem('seenBefore') === 'true';
+    return storedHasSeenHowTo || storedSeenBefore;
   });
+
   const [showHowTo, setShowHowTo] = useState(() => {
     return localStorage.getItem('hasSeenHowTo') !== 'true';
   });
@@ -23,6 +26,10 @@ function App() {
   const [useLcdFont, setUseLcdFont] = useState(() => {
     return localStorage.getItem('useLcdFont') === 'true';
   });
+
+  useEffect(() => {
+    localStorage.removeItem('seenBefore');
+  }, []);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
