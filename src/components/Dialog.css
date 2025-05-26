@@ -1,0 +1,34 @@
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* translucent backdrop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.dialog-content {
+  background-color: #d1d8d8;
+  border-radius: 0.75rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh; /* set height limit */
+  overflow-y: auto; /* enable vertical scroll */
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  text-transform: none;
+}
+
+
+.dialog-actions button {
+  padding: 0.5rem;
+  margin: 1rem;
+}
+
+.coming-soon {
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: #646cff;
+}
