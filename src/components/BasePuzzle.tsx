@@ -92,9 +92,6 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
   };
 
   componentDidMount() {
-    if (this.isFirstVisit) {
-      localStorage.setItem('seenBefore', 'true');
-    }
     this.updateCurrentPuzzle(this.props.puzzle);
 
     preloadImages([
@@ -135,11 +132,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
   handleSubmitClick() {
     const {currentPuzzle, guessBits, winBits, displayRows, bitJudge, newSequenceJudgment} = this.state;
     if (!currentPuzzle) {
-      ReactGA4.event(
-        {
-          category: 'Error',
-          action: 'Missing puzzle',
-        })
+      ReactGA4.event('Error', {detail: 'missing-puzzle'});
       return;
     }
 
@@ -154,9 +147,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
 
     const newJudgment = this.state.judge.judgeBits(guessBits, winBits, split, bitJudge, newSequenceJudgment);
     if (newJudgment) {
-      ReactGA4.event(
-        "GuessSubmitted",
-        {
+      ReactGA4.event('GuessSubmitted', {
           puzzle_slug: currentPuzzle.slug,
           guessBits: guessBits.toString(),
           clue: currentPuzzle.clue,
