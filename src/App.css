@@ -11,7 +11,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: "HD44780", Menlo, Consolas, monospace;
+  font-family: "HD44780", "Press Start 2P", Menlo, Consolas, monospace;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   color: #1e2a1e;
@@ -183,12 +183,28 @@ input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
 
-.scrollable-popup {
-  max-height: 90vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+.activate-dialog {
+  position: fixed;
+  top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden; /* clip overflow */
+  padding: 1rem;
+  width: 2rem;
+  height: 2rem;
 }
+
+.activate-dialog.left {
+  left: 1rem;
+}
+
+.activate-dialog.right {
+  right: 1rem;
+}
+
 
 input[type="button"] {
   margin: 8px;

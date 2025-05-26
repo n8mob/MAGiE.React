@@ -13,13 +13,17 @@ ReactGA4.initialize('G-ZL5RKDBBF6');
 function App() {
   usePageTracking();
   const [showSettings, setShowSettings] = useState(false);
-  const [showFirstTime, setShowFirstTime] = useState(true);
+  const [showHelp, setShowHelp] = useState(true);
 
   return (
     <>
-      {showFirstTime && (
-        <Dialog onClose={() => setShowFirstTime(false)}>
-          <FirstTimeContent />
+
+      <button className="activate-dialog left" onClick={() => setShowSettings(true)}>⋮</button>
+      <button className="activate-dialog right" onClick={() => setShowHelp(true)}>?</button>
+
+      {showHelp && (
+        <Dialog onClose={() => setShowHelp(false)}>
+          <FirstTimeContent/>
         </Dialog>
       )}
       {showSettings && (
