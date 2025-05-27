@@ -8,7 +8,36 @@ import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
 
-ReactGA4.initialize('G-ZL5RKDBBF6');
+const ga4id = 'G-ZL5RKDBBF6';
+
+ReactGA4.initialize(ga4id);
+
+const urlParams = new URLSearchParams(window.location.search);
+const debugMode = urlParams.has('debug') || urlParams.has('_dbg');
+
+/**
+ * Global declaration for gtag function
+ * Not sure why 'Window' is marked as unused
+ * other than the fact that 'window' uses a lowercase 'w' down below.
+ * If I use a lowercase 'w' here, it will complain about 'gtag' not being defined.
+ * and if I use an uppercase 'W' down there I get the same complaint.
+ */
+declare global {
+  // noinspection JSUnusedGlobalSymbols
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+  }
+}
+
+if (window.gtag) {
+  if (debugMode) {
+    window.gtag('config', ga4id, {'debug_mode': debugMode});
+    console.log('Google Analytics 4 initialized with debug mode enabled.');
+    ReactGA4.event("debug_mode_enabled", {debug_mode: debugMode});
+  }
+} else {
+  console.warn('Google Analytics 4 is not available. Make sure you have included the GA4 script in your HTML.');
+}
 
 function App() {
   usePageTracking();
@@ -51,7 +80,10 @@ function App() {
     <>
       <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
         setShowSettings(true);
-        ReactGA4.event('OpenSettings');
+        ReactGA4.event('open_settings_dialog', {
+          source: 'activate_dialog',
+          dialog: 'settings',
+        });
       }}>
         ⋮
       </button>
@@ -59,9 +91,9 @@ function App() {
               className="activate-dialog right"
               onClick={() => {
                 setShowHowTo(true);
-                ReactGA4.event('OpenHelpWindow', {
-                  source: 'activate-dialog',
-                  dialog: 'how-to',
+                ReactGA4.event('open_help_dialog', {
+                  source: 'activate_dialog',
+                  dialog: 'help',
                   is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
                 });
               }}>

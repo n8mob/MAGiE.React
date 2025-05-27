@@ -12,8 +12,10 @@ export default function SettingsContent({ useLcdFont, setUseLcdFont }: SettingsC
     const isShowLcdFontSelected = e.target.checked;
     setUseLcdFont(isShowLcdFontSelected);
     localStorage.setItem('useLcdFont', isShowLcdFontSelected.toString());
-    ReactGA4.event('FontPreferenceChange', {
-      label: useLcdFont ? 'HD44780' : 'Press Start 2P'
+    ReactGA4.event('font_preference_change', {
+      source: 'settings_dialog',
+      action: 'toggle_font',
+      value: isShowLcdFontSelected ? 'hd44780' : 'press_start_2p',
     });
   };
 
