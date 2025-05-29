@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
@@ -20,7 +20,7 @@ const debugMode = urlParams.has('debug') || urlParams.has('_dbg');
  * Not sure why 'Window' is marked as unused
  * other than the fact that 'window' uses a lowercase 'w' down below.
  * If I use a lowercase 'w' here, it will complain about 'gtag' not being defined.
- * and if I use an uppercase 'W' down there I get the same complaint.
+ * And if I use an uppercase 'W' down there, I get the same complaint.
  */
 declare global {
   // noinspection JSUnusedGlobalSymbols
@@ -46,6 +46,7 @@ function App() {
     const storedSeenBefore = localStorage.getItem('seenBefore') === 'true';
     return storedHasSeenHowTo || storedSeenBefore;
   });
+  const [headerContent, setHeaderContent] = useState<ReactNode>(null);
 
   const [showHowTo, setShowHowTo] = useState(() => {
     return localStorage.getItem('hasSeenHowTo') !== 'true';
@@ -76,51 +77,59 @@ function App() {
     }
   }, [hasSeenHowTo, showHowTo]);
 
+  const routes = useMemo(() => (
+    <Routes>
+      <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()} setDynamicHeader={setHeaderContent}/>}/>
+      <Route path="/today"
+             element={<SpecificDaysPuzzle initialDate={new Date()} setDynamicHeader={setHeaderContent}/>}/>
+      <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle setDynamicHeader={setHeaderContent}/>}/>
+    </Routes>), [setHeaderContent]);
+
   return (
     <>
-      <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
-        setShowSettings(true);
-        ReactGA4.event('open_settings_dialog', {
-          source: 'activate_dialog',
-          dialog: 'settings',
-        });
-      }}>
-        ⋮
-      </button>
-      <button aria-label={"show how-to information"}
-              className="activate-dialog right"
-              onClick={() => {
-                setShowHowTo(true);
-                ReactGA4.event('open_help_dialog', {
-                  source: 'activate_dialog',
-                  dialog: 'help',
-                  is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
-                });
-              }}>
-        ?
-      </button>
-
-      {showHowTo && (<Dialog onClose={() => {
-          setHasSeenHowTo(true);
-          localStorage.setItem('hasSeenHowTo', 'true');
-          setShowHowTo(false);
+      <div id="magie-header">
+        <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
+          setShowSettings(true);
+          ReactGA4.event('open_settings_dialog', {
+            source: 'activate_dialog',
+            dialog: 'settings',
+          });
         }}>
-          <FirstTimeContent/>
-        </Dialog>
-      )}
+          ⋮
+        </button>
+        <button aria-label={"show how-to information"}
+                className="activate-dialog right"
+                onClick={() => {
+                  setShowHowTo(true);
+                  ReactGA4.event('open_help_dialog', {
+                    source: 'activate_dialog',
+                    dialog: 'help',
+                    is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+                  });
+                }}>
+          ?
+        </button>
 
-      {showSettings && (
-        <Dialog onClose={() => setShowSettings(false)}>
-          <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont}/>
-        </Dialog>
-      )}
+        {showHowTo && (<Dialog onClose={() => {
+            setHasSeenHowTo(true);
+            localStorage.setItem('hasSeenHowTo', 'true');
+            setShowHowTo(false);
+          }}>
+            <FirstTimeContent/>
+          </Dialog>
+        )}
 
-      <h1 id="magie-title">MAGiE</h1>
-      <Routes>
-        <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-        <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-        <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-      </Routes>
+        {showSettings && (
+          <Dialog onClose={() => setShowSettings(false)}>
+            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont}/>
+          </Dialog>
+        )}
+
+        <h1 id="magie-title">MAGiE</h1>
+        {headerContent /* TODO this is where the thing seems to be looping out of control */}
+      </div>
+      {routes}
+
     </>
   );
 }

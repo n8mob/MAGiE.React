@@ -1,11 +1,7 @@
 :root {
   font-family: "Press Start 2P", Menlo, Consolas, monospace, sans-serif; /* Retro-friendly default */
   line-height: 1.5;
-  font-weight: 400;
-  color: #213547;
   background-color: #d0d4d4;
-  color: rgba(255, 255, 255, 0.87);
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -21,17 +17,13 @@ a:hover {
   color: #66ffff;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+input, textarea {
+  font-size: 16px;
 }
 
 button {
@@ -45,6 +37,8 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   color: inherit;
+  min-height: 44px;
+  min-width: 44px;
 }
 button:hover {
   color: #646cff;

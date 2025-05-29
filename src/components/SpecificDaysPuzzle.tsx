@@ -1,7 +1,7 @@
 import {Link, useParams} from "react-router-dom";
 import {getDailyPuzzleForDate} from "../PuzzleApi.ts";
 import DailyPuzzle from "./DailyPuzzle.tsx";
-import {FC, useEffect, useState} from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import {Puzzle} from "../Menu.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 
@@ -28,14 +28,15 @@ const dateLinkFormat = (date: Date) => {
 
 type DayPuzzleProps = {
   initialDate?: Date;
+  setDynamicHeader: (dynamicHeaderContent: ReactNode) => void;
 }
 
-const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
+const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate, setDynamicHeader}) => {
   const {year, month, day} = useParams<{ year?: string, month?: string, day?: string }>();
   const [puzzleDate, setPuzzleDate] = useState<Date | null>(null);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [formattedDate, setFormattedDate] = useState("");
-  const linkToToday = <Link to={"/today"}>Go to today's puzzle</Link>;
+  const linkToToday = <Link to={"/today"}>Rewind to today</Link>;
 
   useEffect(() => {
     if (initialDate) {
@@ -51,7 +52,7 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
       setCurrentPuzzle(null);
       setFormattedDate("");
       const userLocale = navigator.language;
-      setFormattedDate(puzzleDate.toLocaleDateString(userLocale, prettyOptions));
+      const formattedDateForPuzzle = puzzleDate.toLocaleDateString(userLocale, prettyOptions);
 
       fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))
         .then(puzzle => {
@@ -62,14 +63,31 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
           }
         })
         .catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
+
+      console.log("Formatting puzzle date as: " + formattedDateForPuzzle);
+      setFormattedDate(formattedDateForPuzzle);
+
+      const previousLink = `/date/${dateLinkFormat(addDays(puzzleDate, -1))}`;
+      const nextLink = `/date/${dateLinkFormat(addDays(puzzleDate, 1))}`;
+
+      setDynamicHeader(
+        <h3 className="split-content">
+          {<Link className="right-item" to={previousLink}>&lt;&lt;</Link>}
+          <span className="date-item">{formattedDateForPuzzle}</span>
+          {<Link className="right-item" to={nextLink}>&gt;&gt;</Link>}
+        </h3>
+      );
+
     }
-  }, [puzzleDate]);
+
+    return () => setDynamicHeader(null); // Clear header when component unmounts
+  });
 
   if (!puzzleDate) {
     return <>
       <p>What day is it???</p>
       <p>Tape loop misfeed.</p>
-      {linkToToday}
+      <p>{linkToToday}</p>
     </>
   }
 
@@ -94,11 +112,6 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
 
   return (
     <>
-      <h3 className="split-content">
-        {<Link className="right-item" to={"/date/" + dateLinkFormat(addDays(puzzleDate, -1))}>&lt;&lt;</Link>}
-        <span className="date-item">{formattedDate}</span>
-        {<Link className="right-item" to={"/date/" + dateLinkFormat(addDays(puzzleDate, 1))}>&gt;&gt;</Link>}
-      </h3>
       {currentPuzzle && <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!} formattedDate={formattedDate}/>}
     </>
   );

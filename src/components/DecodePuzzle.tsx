@@ -93,12 +93,15 @@ class DecodePuzzle extends BasePuzzle {
         ) : (
            <div className="puzzle-inputs">
              <input type="text"
+                    inputMode="text"
                     className="decode-input"
                     placeholder={'DECODE TEXT HERE'}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck="false"
                     value={guessText}
                     onChange={this.handleGuessUpdate}
-                    enterKeyHint={"done"}
-                    autoCorrect="off"/>
+                    enterKeyHint={"done"}/>
            </div>
          )}
       </>
