@@ -42,34 +42,27 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
+  const {headerContent} = useHeader();
+
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
     const storedHasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
     const storedSeenBefore = localStorage.getItem('seenBefore') === 'true';
     return storedHasSeenHowTo || storedSeenBefore;
   });
-
-  const { headerContent } = useHeader();
-  const [showHowTo, setShowHowTo] = useState(() => {
-    return localStorage.getItem('hasSeenHowTo') !== 'true';
-  });
+  const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
-  const [useLcdFont, setUseLcdFont] = useState(() => {
-    return localStorage.getItem('useLcdFont') === 'true';
-  });
+  const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
 
-  useEffect(() => {
-    localStorage.removeItem('seenBefore');
-  }, []);
+  useEffect(() => localStorage.removeItem('seenBefore'), []);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
-                                     ? '"HD44780", Menlo, Consolas, monospace'
-                                     : '"Press Start 2P", Menlo, Consolas, monospace';
+      ? '"HD44780", Menlo, Consolas, monospace'
+      : '"Press Start 2P", Menlo, Consolas, monospace';
   }, [useLcdFont]);
 
   useEffect(() => {
     const isFirstVisit = !localStorage.getItem('isFirstVisit');
-    const hasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
     if (isFirstVisit || !hasSeenHowTo) {
       setShowHowTo(true)
       localStorage.setItem('isFirstVisit', 'false');

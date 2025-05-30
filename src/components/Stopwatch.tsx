@@ -12,7 +12,7 @@ interface StopwatchHandle {
   getSeconds: () => number;
 }
 
-const Stopwatch = forwardRef((_props, ref) => {
+export const Stopwatch = forwardRef((_props, ref) => {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
 
@@ -76,5 +76,5 @@ const Stopwatch = forwardRef((_props, ref) => {
   );
 });
 
-export default Stopwatch;
+
 export type { StopwatchHandle };

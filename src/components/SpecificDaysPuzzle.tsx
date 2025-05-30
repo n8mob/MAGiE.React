@@ -76,11 +76,6 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
       const previousLink = `/date/${dateLinkFormat(addDays(puzzleDate, -1))}`;
       const nextLink = `/date/${dateLinkFormat(addDays(puzzleDate, 1))}`;
 
-      console.log("Calculated previous link:", previousLink);
-      console.log("About to set header content with formatted date:", formattedDate);
-      console.log("Calculated next link:", nextLink);
-
-      // 2. TODO use a callback or check something to make sure it isn't re-rendering unnecessarily.
       const content = (
         <h3 className="split-content">
           {<Link className="left-item" to={previousLink}>&lt;&lt;</Link>}
