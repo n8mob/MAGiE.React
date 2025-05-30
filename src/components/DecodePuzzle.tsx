@@ -110,4 +110,4 @@ class DecodePuzzle extends BasePuzzle {
   }
 }
 
-export default DecodePuzzle;
+export { DecodePuzzle };

@@ -3,10 +3,11 @@ import { Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
+import { useHeader } from "./hooks/useHeader.ts";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -46,12 +47,11 @@ function App() {
     const storedSeenBefore = localStorage.getItem('seenBefore') === 'true';
     return storedHasSeenHowTo || storedSeenBefore;
   });
-  const [headerContent, setHeaderContent] = useState<ReactNode>(null);
 
+  const { headerContent } = useHeader();
   const [showHowTo, setShowHowTo] = useState(() => {
     return localStorage.getItem('hasSeenHowTo') !== 'true';
   });
-
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => {
     return localStorage.getItem('useLcdFont') === 'true';
@@ -79,11 +79,10 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()} setDynamicHeader={setHeaderContent}/>}/>
-      <Route path="/today"
-             element={<SpecificDaysPuzzle initialDate={new Date()} setDynamicHeader={setHeaderContent}/>}/>
-      <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle setDynamicHeader={setHeaderContent}/>}/>
-    </Routes>), [setHeaderContent]);
+      <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
+      <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
+      <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
+    </Routes>), []);
 
   return (
     <>
@@ -126,10 +125,9 @@ function App() {
         )}
 
         <h1 id="magie-title">MAGiE</h1>
-        {headerContent /* TODO this is where the thing seems to be looping out of control */}
+        {headerContent ?? <span>No header content</span>}
       </div>
       {routes}
-
     </>
   );
 }

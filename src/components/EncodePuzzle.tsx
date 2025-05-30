@@ -93,5 +93,4 @@ class EncodePuzzle extends BasePuzzle {
   }
 }
 
-export default EncodePuzzle;
-
+export { EncodePuzzle };
