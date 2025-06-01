@@ -85,7 +85,7 @@ class EncodePuzzle extends BasePuzzle {
           {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
             key={`win-text-${winIndex}`}>{winLine}</p>)}
         </div>
-        <div className="puzzle-inputs">
+        <div id="puzzle-inputs">
           <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
         </div>
       </>
