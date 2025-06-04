@@ -6,37 +6,14 @@
   font-style: normal;
 }
 
+
 html, body {
-  width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
   color: #1e2a1e;
   background-color: #d0d4d4; /* Background color for the entire viewport */
-  overflow: auto; /* Allow scrolling on the body */
-}
-
-#root {
-  width: 100%;
-  height: 100%;
-  max-width: 700px;
-  margin: 0 auto; /* Center the content */
-  overflow: visible; /* Allow the root container to expand and scroll */
-  display: flex;
-  text-transform: uppercase;
-  flex-direction: column;
-}
-
-#main-display {
-  width: 100%;
-  flex-grow: 1; /* Allow it to take the remaining space */
-  box-sizing: border-box;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  overflow-y: auto; /* Enable vertical scrolling */
-  word-wrap: break-word; /* Ensure long words break and wrap within the container */
-  max-height: 60vh; /* Limit the height of the display grid */
 }
 
 h1#magie-title {
@@ -55,14 +32,70 @@ h1#magie-title {
   text-transform: none;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+#magie-header {
+  flex: 1 1 auto;
+  align-items: stretch;
+}
+
 h3 {
   margin: 0;
-  padding: 0 16px;
+}
+
+#game-content {
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 32px - 112px); /* 32 for stopwatch, 112 for the header */
+}
+
+#main-display {
+  /* allow main-display to shrink, but not grow */
+  flex: 1 1 auto;
+  min-height: 0;    /* Important for flex children! */
+  background-color: #f0f0f0;
+  padding: 1em;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  word-wrap: break-word; /* Ensure long words break and wrap within the container */
+  text-align: left;
+}
+
+.decode-input {
+  padding: 1em;
+}
+
+#puzzle-inputs {
+  flex: 0 0 auto;
+  position: sticky; /* Or fixed if needed */
+  bottom: 0;
+  display: flex;
+  justify-self: end;
+  justify-content: center;
+  padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
+  background-color: #d0d4d4;
+  flex-direction: column;
+}
+
+#puzzle-inputs > * {
+  border-radius: 8px;
+  font-family: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  box-sizing: border-box;
 }
 
 .split-content {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 1em;
 }
 
 .split-content .date-item {
@@ -79,10 +112,6 @@ h3 {
   padding: 8px 0 0 30px;
 }
 
-div.display {
-  padding: 8px 0 0 30px;
-}
-
 .display p {
   margin: 0;
   padding: 0;
@@ -92,51 +121,21 @@ div.display {
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
-  overflow-y: scroll;
   max-height: 40vh;
 }
 
-.puzzle-inputs {
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Center the children vertically */
-  align-items: center; /* Center the children horizontally */
-  width: 100%;
-  margin-top: 1.6em;
-  position: relative; /* Ensure inputs are positioned within the flow of the page */
-  margin-bottom: 2em; /* Add spacing below inputs to prevent overlap */
-}
-
-.puzzle-inputs > * {
-  border-radius: 8px;
-  flex-grow: 1; /* Allow children to stretch */
-  width: 70%; /* Ensure children take the full width of the container */
-  margin: 10px;
-  font-family: inherit;
-  color: inherit;
-  text-shadow: inherit;
-  box-sizing: border-box;
-}
-
-.share-controls {
-  display: flex;
-  justify-content: left;
-  flex-direction: column;
-}
-
-.share-controls button {
-  margin: 0.5em;
-  padding: 1em;
-  border: 2px solid;
-  color: inherit;
-}
-
-.decode-input {
-  padding: 1em;
-}
-
 #bit-field {
-  padding: 0.5em 0;
+  box-sizing: border-box;
+  margin: 0.5em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#bit-field p {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 input.bit-checkbox {
@@ -182,6 +181,19 @@ input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
 
+.share-controls {
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+}
+
+.share-controls button {
+  margin: 0.5em;
+  padding: 1em;
+  border: 2px solid;
+  color: inherit;
+}
+
 .activate-dialog {
   position: fixed;
   top: 1rem;
@@ -222,4 +234,3 @@ input[type="button"] {
 .blink {
   animation: blink 2s step-start infinite;
 }
-

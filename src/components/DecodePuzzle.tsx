@@ -3,12 +3,19 @@ import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
-import { ChangeEvent } from "react";
+import { ChangeEvent, createRef, RefObject } from "react";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 
 class DecodePuzzle extends BasePuzzle {
+  gameContentRef: RefObject<HTMLDivElement>;
+  mainDisplayRef: RefObject<HTMLDivElement>;
+  clueRef: RefObject<HTMLDivElement>;
+
   constructor(props: PuzzleProps) {
     super(props);
+    this.gameContentRef = createRef<HTMLDivElement>();
+    this.mainDisplayRef = createRef<HTMLDivElement>();
+    this.clueRef = createRef<HTMLDivElement>();
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -52,59 +59,64 @@ class DecodePuzzle extends BasePuzzle {
 
     return (
       <>
-        <div id="main-display" className="display">
-          {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-          <DisplayMatrix
-            ref={this.displayMatrixRef}
-            displayRows={displayRows}
-            judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }} // Bits remain read-only
-          />
-          <div id="win-message">
-            {hasWon && <p>{guessText}</p>}
-            {hasWon && <p>...</p>}
-            {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
-              key={`win-message-${winIndex}`}>{winLine}</p>)}
+        <div id="game-content" ref={this.gameContentRef}>
+          <div id="main-display" className="display" ref={this.mainDisplayRef}>
+            <div id="clue-text" ref={this.clueRef}>
+              {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+            </div>
+            <DisplayMatrix
+              ref={this.displayMatrixRef}
+              displayRows={displayRows}
+              judgments={judgment.sequenceJudgments}
+              handleBitClick={() => {
+              }} // Bits remain read-only
+            />
+            <div id="win-message">
+              {hasWon && <p>{guessText}</p>}
+              {hasWon && <p>...</p>}
+              {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
+                key={`win-message-${winIndex}`}>{winLine}</p>)}
+            </div>
           </div>
+          {hasWon ? (
+            <>
+              <div className="share-controls">
+                <button onClick={this.props.onShareWin}>Share Your Win</button>
+              </div>
+              <div className="post-win-links">
+                <p>
+                  <Link
+                    to={"/date/2025/04/04"}
+                    onClick={() => {
+                      ReactGA4.event('story_start_clicked', {
+                        source: 'post-win-link',
+                        puzzle_slug: currentPuzzle?.slug,
+                        is_first_visit: this.isFirstVisit,
+                      });
+                    }}
+                  >
+                    |&lt;&lt; Back to the beginning
+                  </Link>
+                </p>
+              </div>
+            </>
+          ) : (
+            <div id="puzzle-inputs">
+              <input type="text"
+                     inputMode="text"
+                     className="decode-input"
+                     placeholder={'DECODE TEXT HERE'}
+                     autoComplete="off"
+                     autoCorrect="off"
+                     spellCheck="false"
+                     value={guessText}
+                     onChange={this.handleGuessUpdate}
+                     enterKeyHint={"done"}/>
+            </div>
+          )}
         </div>
-        {hasWon ? (
-          <>
-            <div className="share-controls">
-              <button onClick={this.props.onShareWin}>Share Your Win</button>
-            </div>
-            <div className="post-win-links">
-              <p>
-                <Link
-                  to={"/date/2025/04/04"}
-                  onClick={() => {
-                    ReactGA4.event('story_start_clicked', {
-                      source: 'post-win-link',
-                      puzzle_slug: currentPuzzle?.slug,
-                      is_first_visit: this.isFirstVisit,
-                    });
-                  }}
-                >
-                  |&lt;&lt; Back to the beginning
-                </Link>
-              </p>
-            </div>
-          </>
-        ) : (
-           <div className="puzzle-inputs">
-             <input type="text"
-                    className="decode-input"
-                    placeholder={'DECODE TEXT HERE'}
-                    value={guessText}
-                    onChange={this.handleGuessUpdate}
-                    enterKeyHint={"done"}
-                    autoCorrect="off"/>
-           </div>
-         )}
-      </>
-    )
-      ;
+      </>);
   }
 }
 
-export default DecodePuzzle;
+export { DecodePuzzle };

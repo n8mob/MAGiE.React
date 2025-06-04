@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import EncodePuzzle from "./EncodePuzzle.tsx";
-import DecodePuzzle from "./DecodePuzzle.tsx";
+import { EncodePuzzle } from "./EncodePuzzle.tsx";
+import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { Puzzle } from "../Menu.ts";
-import Stopwatch, { StopwatchHandle } from "./Stopwatch.tsx";
+import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
@@ -155,5 +155,4 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   );
 };
 
-export default DailyPuzzle;
-
+export { DailyPuzzle };
