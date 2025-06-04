@@ -72,7 +72,7 @@ export const Stopwatch = forwardRef((_props, ref) => {
   }));
 
   return (
-      <p id="stopwatch-display">{displayTime()}</p>
+      <div id="stopwatch-display">{displayTime()}</div>
   );
 });
 

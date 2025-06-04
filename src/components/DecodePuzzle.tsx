@@ -28,74 +28,6 @@ class DecodePuzzle extends BasePuzzle {
     }
   }
 
-  handleInputFocus = () => {
-    console.log('puzzle input got focus, pausing for animation.', Date.now());
-
-    setTimeout(() => {
-      this.scrollCluesToTop();
-      this.adjustPuzzleInputPosition();
-    }, 500); // Adjust delay as needed for keyboard animation
-  };
-
-  private scrollCluesToTop() {
-    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-    console.log(`viewportHeight after keyboard animation: ${viewportHeight}`);
-
-    const mainDisplay = this.mainDisplayRef.current;
-    if (mainDisplay) {
-      // Get the main display's offset from the top of the document
-      const mainDisplayOffsetTop = mainDisplay.offsetTop;
-      const mainDisplayHeight = mainDisplay.offsetHeight;
-
-      // Calculate the bottom position of the main display
-      const mainDisplayBottom = mainDisplayOffsetTop + mainDisplayHeight;
-      console.log(`mainDisplayOffsetTop: ${mainDisplayOffsetTop}, mainDisplayHeight: ${mainDisplayHeight}, mainDisplayBottom: ${mainDisplayBottom}`);
-
-      // If the bottom of the main display is below the viewport height (keyboard covers it), adjust scrolling
-      if (mainDisplayBottom > viewportHeight) {
-        console.log('Adjusting scroll to reveal main display...');
-        window.scrollTo({
-          top: mainDisplayOffsetTop,
-          behavior: 'smooth'
-        });
-      } else {
-        console.log('No scroll adjustment needed.');
-      }
-    }
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    // Listen for viewport size changes
-    window.visualViewport?.addEventListener('resize', this.adjustPuzzleInputPosition);
-    this.adjustPuzzleInputPosition();
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    // Clean up listener
-    window.visualViewport?.removeEventListener('resize', this.adjustPuzzleInputPosition);
-  }
-
-  adjustPuzzleInputPosition = () => {
-    const puzzleInputs = document.getElementById('puzzle-inputs');
-    if (!puzzleInputs) {
-      console.warn('Puzzle inputs element not found.');
-      return;
-    }
-
-    console.log(`#puzzle-inputs before adjustment: height: ${puzzleInputs.offsetHeight} top: ${puzzleInputs.offsetTop} bottom: ${puzzleInputs.style.bottom}`);
-
-    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-    const windowHeight = window.innerHeight;
-    const keyboardHeight = windowHeight - viewportHeight;
-    console.log(`Viewport height: ${viewportHeight}, Window height: ${windowHeight}, Keyboard height: ${keyboardHeight}`);
-
-    // Adjust bottom position based on keyboard height
-    puzzleInputs.style.bottom = `${keyboardHeight}px`;
-    console.log(`#puzzle-inputs after adjustment: height: ${puzzleInputs.offsetHeight} top: ${puzzleInputs.offsetTop}, bottom: ${puzzleInputs.style.bottom}`);
-  };
-
   handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     const newGuessText = event.target.value.toUpperCase();
     const newState = {
@@ -178,7 +110,6 @@ class DecodePuzzle extends BasePuzzle {
                      autoCorrect="off"
                      spellCheck="false"
                      value={guessText}
-                     onFocus={this.handleInputFocus}
                      onChange={this.handleGuessUpdate}
                      enterKeyHint={"done"}/>
             </div>

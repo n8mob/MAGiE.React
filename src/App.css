@@ -8,25 +8,12 @@
 
 
 html, body {
-  width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
   color: #1e2a1e;
   background-color: #d0d4d4; /* Background color for the entire viewport */
-
-  overflow: auto; /* Allow scrolling on the body */
-}
-
-#root {
-  width: 100vw;
-  height: 100vh;
-  text-transform: uppercase;
-  place-items: center;
-  display: flex;
-  flex-direction: column;
 }
 
 h1#magie-title {
@@ -41,15 +28,20 @@ h1#magie-title {
   text-transform: none;
 }
 
-#magie-header {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
 .magie-case {
   text-transform: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+#magie-header {
+  flex: 1 1 auto;
+  align-items: stretch;
 }
 
 h3 {
@@ -57,27 +49,45 @@ h3 {
 }
 
 #game-content {
-  box-sizing: border-box;
-  width: 100vw;
-  height: 100vh;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  min-height: 0; /* huh? */
+  height: calc(100vh - 32px - 112px); /* 32 for stopwatch, 112 for the header */
 }
 
 #main-display {
+  /* allow main-display to shrink, but not grow */
+  flex: 1 1 auto;
+  min-height: 0;    /* Important for flex children! */
   background-color: #f0f0f0;
-  width: 100%;
-  flex-grow: 1; /* Allow it to take the remaining space */
-  box-sizing: border-box;
   padding: 1em;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  overflow-y: auto; /* Enable vertical scrolling */
   word-wrap: break-word; /* Ensure long words break and wrap within the container */
-  max-height: 60vh; /* Limit the height of the display grid */
   text-align: left;
+}
+
+.decode-input {
+  padding: 1em;
+}
+
+#puzzle-inputs {
+  flex: 0 0 auto;
+  position: sticky; /* Or fixed if needed */
+  bottom: 0;
+  display: flex;
+  justify-self: end;
+  justify-content: center;
+  padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
+  background-color: #d0d4d4;
+  flex-direction: column;
+}
+
+#puzzle-inputs > * {
+  border-radius: 8px;
+  font-family: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  box-sizing: border-box;
 }
 
 .split-content {
@@ -111,7 +121,6 @@ h3 {
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
-  overflow-y: scroll;
   max-height: 40vh;
 }
 
@@ -170,34 +179,6 @@ input[data-correctness="incorrect"] {
 
 input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
-}
-
-.decode-input {
-  padding: 1em;
-}
-
-#puzzle-inputs {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 1rem;
-  z-index: 1000; /* Ensure it appears above other content */
-  background-color: #d0d4d4;
-  box-sizing: border-box;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-#puzzle-inputs > * {
-  border-radius: 8px;
-  font-family: inherit;
-  color: inherit;
-  text-shadow: inherit;
-  box-sizing: border-box;
 }
 
 .share-controls {
