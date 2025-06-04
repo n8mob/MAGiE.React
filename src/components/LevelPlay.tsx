@@ -1,8 +1,8 @@
 import { Menu, Level, Puzzle } from "../Menu.ts";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import EncodePuzzle from "./EncodePuzzle.tsx";
-import DecodePuzzle from "./DecodePuzzle.tsx";
+import { EncodePuzzle } from "./EncodePuzzle.tsx";
+import { DecodePuzzle } from "./DecodePuzzle.tsx";
 
 interface LevelPlayProps {
   menu: Menu | null;
