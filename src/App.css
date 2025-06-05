@@ -59,7 +59,6 @@ h3 {
   /* allow main-display to shrink, but not grow */
   flex: 1 1 auto;
   min-height: 0;    /* Important for flex children! */
-  background-color: #f0f0f0;
   padding: 1em;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   word-wrap: break-word; /* Ensure long words break and wrap within the container */
