@@ -119,7 +119,12 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
 
   return (
     <>
-      {currentPuzzle && <DailyPuzzle puzzle={currentPuzzle} date={puzzleDate!} formattedDate={formattedDate}/>}
+      {currentPuzzle && <DailyPuzzle 
+        key={currentPuzzle.slug}
+        puzzle={currentPuzzle} 
+        date={puzzleDate!} 
+        formattedDate={formattedDate}/>
+      }
     </>
   );
 };
