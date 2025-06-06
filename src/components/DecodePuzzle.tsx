@@ -10,12 +10,14 @@ class DecodePuzzle extends BasePuzzle {
   gameContentRef: RefObject<HTMLDivElement>;
   mainDisplayRef: RefObject<HTMLDivElement>;
   clueRef: RefObject<HTMLDivElement>;
+  winMessageRef: RefObject<HTMLDivElement>; // Add ref for win-message
 
   constructor(props: PuzzleProps) {
     super(props);
     this.gameContentRef = createRef<HTMLDivElement>();
     this.mainDisplayRef = createRef<HTMLDivElement>();
     this.clueRef = createRef<HTMLDivElement>();
+    this.winMessageRef = createRef<HTMLDivElement>(); // Initialize ref
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -48,6 +50,26 @@ class DecodePuzzle extends BasePuzzle {
     yield* this.state.currentPuzzle.encoding.splitForDisplay(allBits, displayWidth);
   }
 
+  componentDidUpdate(prevProps: PuzzleProps, prevState: PuzzleState) {
+    super.componentDidUpdate(prevProps, prevState);
+    if (!prevProps.hasWon && this.props.hasWon) {
+      // Only scroll when hasWon changes to true
+      const mainDisplay = this.mainDisplayRef.current;
+      const winMessage = this.winMessageRef.current;
+      if (mainDisplay && winMessage) {
+        // Scroll so the bottom of win-message is visible, but not past the bottom
+        const mainRect = mainDisplay.getBoundingClientRect();
+        const winRect = winMessage.getBoundingClientRect();
+        // If win-message is below the visible area, scroll it into view
+        if (winRect.bottom > mainRect.bottom || winRect.top < mainRect.top) {
+          // Scroll so the bottom of win-message aligns with the bottom of main-display
+          const scrollOffset = winMessage.offsetTop + winMessage.offsetHeight - mainDisplay.clientHeight;
+          mainDisplay.scrollTop = scrollOffset > 0 ? scrollOffset : 0;
+        }
+      }
+    }
+  }
+
   render() {
     const {currentPuzzle, judgment, guessText, displayRows} = this.state;
     const {hasWon} = this.props;
@@ -71,7 +93,7 @@ class DecodePuzzle extends BasePuzzle {
               handleBitClick={() => {
               }} // Bits remain read-only
             />
-            <div id="win-message">
+            <div id="win-message" ref={this.winMessageRef}>
               {hasWon && <p>{guessText}</p>}
               {hasWon && <p>...</p>}
               {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
