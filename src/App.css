@@ -52,6 +52,7 @@ h3 {
   overflow-x: hidden; /* Prevent horizontal scrolling */
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 32px - 112px); /* Fallback for browsers that do not support dvh */
   height: calc(100dvh - 32px - 112px); /* 32 for stopwatch, 112 for the header */
 }
 
