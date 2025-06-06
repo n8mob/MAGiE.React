@@ -142,27 +142,6 @@ class DecodePuzzle extends BasePuzzle {
     }, 300);
   };
 
-  // handleResizeDebounced = () => {
-  //   console.log('Resize event detected, debouncing...');
-  //   if (this.resizeTimeout) {
-  //     console.log('Clearing previous resize timeout');
-  //     clearTimeout(this.resizeTimeout);
-  //   }
-  //   this.resizeTimeout = window.setTimeout(() => {
-  //     console.log('Resize debounce complete, adjusting main display height');
-  //     if (this.waitingForResize) {
-  //       this.adjustMainDisplayHeightForInput();
-  //       // Add a small delay to ensure layout is stable before scrolling
-  //       setTimeout(() => {
-  //         this.scrollMainDisplayForInput();
-  //       }, 50);
-  //       console.log('Removing resize listener after adjustment');
-  //       window.removeEventListener('resize', this.handleResizeDebounced);
-  //       this.waitingForResize = false;
-  //     }
-  //   }, 200);
-  // };
-
   adjustMainDisplayHeightForInput = () => {
     const gameContent = this.gameContentRef.current;
     if (gameContent) {
