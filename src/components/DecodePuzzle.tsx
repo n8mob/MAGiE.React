@@ -163,14 +163,11 @@ class DecodePuzzle extends BasePuzzle {
   adjustMainDisplayHeightForInput = () => {
     const gameContent = this.gameContentRef.current;
     if (gameContent) {
-      console.log(`Adjusting game-content height from ${gameContent.style.height} to ${window.innerHeight}px`);
       gameContent.style.height = window.innerHeight + 'px';
-      console.log(`Scrolling game-content into view with height ${gameContent.style.height}`);
       gameContent.scrollIntoView({ behavior: 'smooth' });
     }
     const puzzleInputs = this.puzzleInputsRef.current;
     if (puzzleInputs) {
-      console.log(`Puzzle inputs rect: top ${puzzleInputs.getBoundingClientRect().top}, bottom ${puzzleInputs.getBoundingClientRect().bottom}`);
       // Ensure puzzle-inputs is visible
       puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
@@ -210,13 +207,10 @@ class DecodePuzzle extends BasePuzzle {
       const scrollY = window.scrollY || window.pageYOffset;
       // If main-display is not at the top, scroll so it is
       if (mainRect.top < 0 || mainRect.top > 0) {
-        console.log(`scrolling main-display to top: ${scrollY + mainRect.top}`);
         window.scrollTo({ top: scrollY + mainRect.top, behavior: 'smooth' });
       }
       // Optionally, ensure puzzle-inputs is visible (should be if main-display is at top)
-      console.log(`puzzle-inputs rect top: ${inputsRect.top} bottom: ${inputsRect.bottom} window height: ${window.innerHeight}`);
       if (inputsRect.top < 0 || inputsRect.bottom > window.innerHeight) {
-        console.log(`scrolling to puzzle-inputs: ${scrollY + inputsRect.top}`);
         window.scrollTo({ top: scrollY + inputsRect.top, behavior: 'smooth' });
       }
     }
