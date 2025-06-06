@@ -11,6 +11,9 @@ class DecodePuzzle extends BasePuzzle {
   mainDisplayRef: RefObject<HTMLDivElement>;
   clueRef: RefObject<HTMLDivElement>;
   winMessageRef: RefObject<HTMLDivElement>; // Add ref for win-message
+  puzzleInputsRef: RefObject<HTMLDivElement>; // Ref for #puzzle-inputs
+  resizeTimeout: number | null = null;
+  waitingForResize: boolean = false;
 
   constructor(props: PuzzleProps) {
     super(props);
@@ -18,6 +21,7 @@ class DecodePuzzle extends BasePuzzle {
     this.mainDisplayRef = createRef<HTMLDivElement>();
     this.clueRef = createRef<HTMLDivElement>();
     this.winMessageRef = createRef<HTMLDivElement>(); // Initialize ref
+    this.puzzleInputsRef = createRef<HTMLDivElement>();
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -31,12 +35,62 @@ class DecodePuzzle extends BasePuzzle {
   }
 
   handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    const prevGuessBits = this.state.guessBits;
     const newGuessText = event.target.value.toUpperCase();
+    const newGuessBits = this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty();
     const newState = {
       guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
+      guessBits: newGuessBits,
     } as PuzzleState;
-    this.setState(newState);
+    this.setState(newState, () => {
+      // Find last changed bit index
+      let lastChangedIndex = -1;
+      const minLen = Math.min(prevGuessBits.length, newGuessBits.length);
+      for (let i = 0; i < minLen; ++i) {
+        if (prevGuessBits.getBit(i) !== newGuessBits.getBit(i)) {
+          lastChangedIndex = i;
+        }
+      }
+      if (newGuessBits.length > prevGuessBits.length) {
+        lastChangedIndex = newGuessBits.length - 1;
+      }
+      // Find which row contains this bit
+      let rowIndex = -1;
+      if (lastChangedIndex !== -1 && this.state.displayRows) {
+        for (let i = 0; i < this.state.displayRows.length; ++i) {
+          const row: DisplayRow = this.state.displayRows[i];
+          if (row.length > 0) {
+            const firstBitIndex = row.firstBit().index;
+            const lastBitIndex = row.lastBit().index;
+            if (lastChangedIndex >= firstBitIndex && lastChangedIndex <= lastBitIndex) {
+              rowIndex = i;
+              break;
+            }
+          }
+        }
+      }
+      // Scroll the row into view, but keep #puzzle-inputs visible
+      if (rowIndex !== -1 && this.displayMatrixRef.current && typeof this.displayMatrixRef.current.getBitRowElement === 'function') {
+        const rowElem = this.displayMatrixRef.current.getBitRowElement(rowIndex);
+        const mainDisplay = this.mainDisplayRef.current;
+        const puzzleInputs = this.puzzleInputsRef.current;
+        if (rowElem && mainDisplay && puzzleInputs) {
+          // Scroll the row into view within main-display
+          const rowRect = rowElem.getBoundingClientRect();
+          const mainRect = mainDisplay.getBoundingClientRect();
+          const inputsRect = puzzleInputs.getBoundingClientRect();
+          // If row is below main-display, scroll down, but not so far that puzzle-inputs is hidden
+          if (rowRect.bottom > mainRect.bottom) {
+            // Calculate max scroll so puzzle-inputs is still visible
+            const maxScroll = (inputsRect.top) - mainRect.top - rowElem.offsetHeight;
+            mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
+          } else if (rowRect.top < mainRect.top) {
+            // If row is above main-display, scroll up
+            mainDisplay.scrollTop += rowRect.top - mainRect.top;
+          }
+        }
+      }
+    });
   };
 
 
@@ -69,6 +123,80 @@ class DecodePuzzle extends BasePuzzle {
       }
     }
   }
+
+  handleInputFocus = () => {
+    this.waitingForResize = true;
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+    this.resizeTimeout = window.setTimeout(() => {
+      console.log('Resize timeout triggered, adjusting main display height');
+      this.adjustMainDisplayHeightForInput();
+    }, 300);
+  };
+
+  handleInputBlur = () => {
+    this.resizeTimeout = window.setTimeout(() => {
+      console.log('Resize timeout after blur triggered, adjusting main display height');
+      this.adjustMainDisplayHeightForInput();
+    }, 300);
+  };
+
+  adjustMainDisplayHeightForInput = () => {
+    const gameContent = this.gameContentRef.current;
+    if (gameContent) {
+      gameContent.style.height = window.innerHeight + 'px';
+      gameContent.scrollIntoView({ behavior: 'smooth' });
+    }
+    const puzzleInputs = this.puzzleInputsRef.current;
+    if (puzzleInputs) {
+      // Ensure puzzle-inputs is visible
+      puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+  };
+
+  componentDidMount() {
+    super.componentDidMount();
+    // Attach focus handler to input after mount
+    setTimeout(() => {
+      const input = this.puzzleInputsRef.current?.querySelector('input');
+      if (input) {
+        input.addEventListener('focus', this.handleInputFocus, { passive: true });
+        input.addEventListener('blur', this.handleInputBlur, { passive: true });
+      }
+    }, 0);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    const input = this.puzzleInputsRef.current?.querySelector('input');
+    if (input) {
+      input.removeEventListener('focus', this.handleInputFocus);
+      input.removeEventListener('blur', this.handleInputBlur);
+    }
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+  }
+
+  scrollMainDisplayForInput = () => {
+    const mainDisplay = this.mainDisplayRef.current;
+    const puzzleInputs = this.puzzleInputsRef.current;
+    if (mainDisplay && puzzleInputs) {
+      // Scroll so main-display's top is at the top of the viewport, and puzzle-inputs is visible
+      const mainRect = mainDisplay.getBoundingClientRect();
+      const inputsRect = puzzleInputs.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      // If main-display is not at the top, scroll so it is
+      if (mainRect.top < 0 || mainRect.top > 0) {
+        window.scrollTo({ top: scrollY + mainRect.top, behavior: 'smooth' });
+      }
+      // Optionally, ensure puzzle-inputs is visible (should be if main-display is at top)
+      if (inputsRect.top < 0 || inputsRect.bottom > window.innerHeight) {
+        window.scrollTo({ top: scrollY + inputsRect.top, behavior: 'smooth' });
+      }
+    }
+  };
 
   render() {
     const {currentPuzzle, judgment, guessText, displayRows} = this.state;
@@ -123,7 +251,7 @@ class DecodePuzzle extends BasePuzzle {
               </div>
             </>
           ) : (
-            <div id="puzzle-inputs">
+            <div id="puzzle-inputs" ref={this.puzzleInputsRef}>
               <input type="text"
                      inputMode="text"
                      className="decode-input"
