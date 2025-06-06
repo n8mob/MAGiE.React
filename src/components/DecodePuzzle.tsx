@@ -35,12 +35,62 @@ class DecodePuzzle extends BasePuzzle {
   }
 
   handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    const prevGuessBits = this.state.guessBits;
     const newGuessText = event.target.value.toUpperCase();
+    const newGuessBits = this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty();
     const newState = {
       guessText: newGuessText,
-      guessBits: this.state.currentPuzzle?.encoding.encodeText(newGuessText) || BitSequence.empty(),
+      guessBits: newGuessBits,
     } as PuzzleState;
-    this.setState(newState);
+    this.setState(newState, () => {
+      // Find last changed bit index
+      let lastChangedIndex = -1;
+      const minLen = Math.min(prevGuessBits.length, newGuessBits.length);
+      for (let i = 0; i < minLen; ++i) {
+        if (prevGuessBits.getBit(i) !== newGuessBits.getBit(i)) {
+          lastChangedIndex = i;
+        }
+      }
+      if (newGuessBits.length > prevGuessBits.length) {
+        lastChangedIndex = newGuessBits.length - 1;
+      }
+      // Find which row contains this bit
+      let rowIndex = -1;
+      if (lastChangedIndex !== -1 && this.state.displayRows) {
+        for (let i = 0; i < this.state.displayRows.length; ++i) {
+          const row: DisplayRow = this.state.displayRows[i];
+          if (row.length > 0) {
+            const firstBitIndex = row.firstBit().index;
+            const lastBitIndex = row.lastBit().index;
+            if (lastChangedIndex >= firstBitIndex && lastChangedIndex <= lastBitIndex) {
+              rowIndex = i;
+              break;
+            }
+          }
+        }
+      }
+      // Scroll the row into view, but keep #puzzle-inputs visible
+      if (rowIndex !== -1 && this.displayMatrixRef.current && typeof this.displayMatrixRef.current.getBitRowElement === 'function') {
+        const rowElem = this.displayMatrixRef.current.getBitRowElement(rowIndex);
+        const mainDisplay = this.mainDisplayRef.current;
+        const puzzleInputs = this.puzzleInputsRef.current;
+        if (rowElem && mainDisplay && puzzleInputs) {
+          // Scroll the row into view within main-display
+          const rowRect = rowElem.getBoundingClientRect();
+          const mainRect = mainDisplay.getBoundingClientRect();
+          const inputsRect = puzzleInputs.getBoundingClientRect();
+          // If row is below main-display, scroll down, but not so far that puzzle-inputs is hidden
+          if (rowRect.bottom > mainRect.bottom) {
+            // Calculate max scroll so puzzle-inputs is still visible
+            const maxScroll = (inputsRect.top) - mainRect.top - rowElem.offsetHeight;
+            mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
+          } else if (rowRect.top < mainRect.top) {
+            // If row is above main-display, scroll up
+            mainDisplay.scrollTop += rowRect.top - mainRect.top;
+          }
+        }
+      }
+    });
   };
 
 
@@ -76,44 +126,53 @@ class DecodePuzzle extends BasePuzzle {
 
   handleInputFocus = () => {
     this.waitingForResize = true;
-    window.addEventListener('resize', this.handleResizeDebounced);
-    // Do not call adjustMainDisplayHeightForInput or scrollMainDisplayForInput immediately
-    // Only do so after resize debounce
+    this.resizeTimeout = window.setTimeout(() => {
+      console.log('Resize timeout triggered, adjusting main display height');
+      this.adjustMainDisplayHeightForInput();
+    }, 300);
   };
 
   handleInputBlur = () => {
-    // Reset main-display max-height when input loses focus
-    const mainDisplay = this.mainDisplayRef.current;
-    if (mainDisplay) {
-      mainDisplay.style.maxHeight = '';
-    }
+    this.resizeTimeout = window.setTimeout(() => {
+      console.log('Resize timeout after blur triggered, adjusting main display height');
+      this.adjustMainDisplayHeightForInput();
+    }, 300);
   };
 
-  handleResizeDebounced = () => {
-    if (this.resizeTimeout) {
-      clearTimeout(this.resizeTimeout);
-    }
-    this.resizeTimeout = window.setTimeout(() => {
-      if (this.waitingForResize) {
-        this.adjustMainDisplayHeightForInput();
-        // Add a small delay to ensure layout is stable before scrolling
-        setTimeout(() => {
-          this.scrollMainDisplayForInput();
-        }, 50);
-        window.removeEventListener('resize', this.handleResizeDebounced);
-        this.waitingForResize = false;
-      }
-    }, 200);
-  };
+  // handleResizeDebounced = () => {
+  //   console.log('Resize event detected, debouncing...');
+  //   if (this.resizeTimeout) {
+  //     console.log('Clearing previous resize timeout');
+  //     clearTimeout(this.resizeTimeout);
+  //   }
+  //   this.resizeTimeout = window.setTimeout(() => {
+  //     console.log('Resize debounce complete, adjusting main display height');
+  //     if (this.waitingForResize) {
+  //       this.adjustMainDisplayHeightForInput();
+  //       // Add a small delay to ensure layout is stable before scrolling
+  //       setTimeout(() => {
+  //         this.scrollMainDisplayForInput();
+  //       }, 50);
+  //       console.log('Removing resize listener after adjustment');
+  //       window.removeEventListener('resize', this.handleResizeDebounced);
+  //       this.waitingForResize = false;
+  //     }
+  //   }, 200);
+  // };
 
   adjustMainDisplayHeightForInput = () => {
-    const mainDisplay = this.mainDisplayRef.current;
+    const gameContent = this.gameContentRef.current;
+    if (gameContent) {
+      console.log(`Adjusting game-content height from ${gameContent.style.height} to ${window.innerHeight}px`);
+      gameContent.style.height = window.innerHeight + 'px';
+      console.log(`Scrolling game-content into view with height ${gameContent.style.height}`);
+      gameContent.scrollIntoView({ behavior: 'smooth' });
+    }
     const puzzleInputs = this.puzzleInputsRef.current;
-    if (mainDisplay && puzzleInputs) {
-      const inputsRect = puzzleInputs.getBoundingClientRect();
-      // Calculate available height: window.innerHeight - height of puzzleInputs
-      const availableHeight = window.innerHeight - inputsRect.height;
-      mainDisplay.style.maxHeight = availableHeight + 'px';
+    if (puzzleInputs) {
+      console.log(`Puzzle inputs rect: top ${puzzleInputs.getBoundingClientRect().top}, bottom ${puzzleInputs.getBoundingClientRect().bottom}`);
+      // Ensure puzzle-inputs is visible
+      puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
   };
 
@@ -136,7 +195,6 @@ class DecodePuzzle extends BasePuzzle {
       input.removeEventListener('focus', this.handleInputFocus);
       input.removeEventListener('blur', this.handleInputBlur);
     }
-    window.removeEventListener('resize', this.handleResizeDebounced);
     if (this.resizeTimeout) {
       clearTimeout(this.resizeTimeout);
     }

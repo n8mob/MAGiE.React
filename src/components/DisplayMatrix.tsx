@@ -13,12 +13,15 @@ interface DisplayMatrixProps {
 interface DisplayMatrixUpdate {
   updateJudgment: (judgments: SequenceJudgment[]) => void;
   getWidth: () => number;
+  scrollToBottom?: () => void;
+  getBitRowElement?: (rowIndex: number) => HTMLElement | null;
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
   ({displayRows, judgments, handleBitClick}, ref) => {
     const [currentJudgments, setCurrentJudgments] = useState(judgments);
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
+    const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
     useImperativeHandle(ref, () => ({
       updateJudgment(newJudgments: SequenceJudgment[]) {
@@ -26,6 +29,14 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
       },
       getWidth: () => {
         return bitFieldRef.current?.offsetWidth ?? 0;
+      },
+      scrollToBottom: () => {
+        if (bitFieldRef.current) {
+          bitFieldRef.current.scrollTo({ top: bitFieldRef.current.scrollHeight, behavior: 'smooth' });
+        }
+      },
+      getBitRowElement: (rowIndex: number) => {
+        return rowRefs.current[rowIndex] || null;
       }
     }));
 
@@ -33,7 +44,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
       <>
         <div ref={bitFieldRef} id="bit-field">
           {displayRows.map((displayRow, rowIndex) => (
-            <p key={`row-${rowIndex}`}>
+            <p key={`row-${rowIndex}`} ref={el => rowRefs.current[rowIndex] = el}>
               {[...displayRow].map((bit, indexWithinRow) => (
                 <BitButton
                   bit={bit}
