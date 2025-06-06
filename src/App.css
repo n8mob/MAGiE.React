@@ -10,7 +10,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
+  max-width: 500px;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   color: #1e2a1e;
   background-color: #d0d4d4; /* Background color for the entire viewport */
