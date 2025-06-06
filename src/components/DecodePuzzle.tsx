@@ -126,6 +126,9 @@ class DecodePuzzle extends BasePuzzle {
 
   handleInputFocus = () => {
     this.waitingForResize = true;
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
     this.resizeTimeout = window.setTimeout(() => {
       console.log('Resize timeout triggered, adjusting main display height');
       this.adjustMainDisplayHeightForInput();
