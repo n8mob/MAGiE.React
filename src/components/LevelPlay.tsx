@@ -1,46 +1,37 @@
-import { Menu, Level, Puzzle } from "../Menu.ts";
+import { Level, Puzzle } from "../Menu.ts";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
+import { useMenu } from "../hooks/useMenu.tsx";
+import { useCategory } from "../hooks/useCategory.tsx";
 
 interface LevelPlayProps {
-  menu: Menu | null;
-  setShowBackButton: (show: boolean) => void;
-  setBackPath: (path: string) => void;
+  menuName?: string;
 }
 
-const LevelPlay: FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath }) => {
-  const { levelNumber, puzzleId } = useParams();
+const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
+  const {menu, loading, error} = useMenu(menuName);
+  const {categoryIndex, levelNumber, puzzleIndex} = useParams();
+  const { category } = useCategory(menu, categoryIndex);
   const [level, setLevel] = useState<Level | null>(null);
-  const categoryName = decodeURIComponent(useParams().categoryName || "");
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [winMessage, setWinMessage] = useState<string[]>([]);
   const [hasWon, setHasWon] = useState(false);
 
   useEffect(() => {
-    setShowBackButton(true);
-    setBackPath(`/categories/${encodeURIComponent(categoryName)}`);
-  }, [setShowBackButton, setBackPath, categoryName]);
-
-  useEffect(() => {
-    if (!menu || !categoryName || !levelNumber) {
+    if (!menu) {
+      console.warn('Waiting for the menu.');
       return;
     }
 
     if (!levelNumber) {
-      console.error('Missing level number');
+      console.warn('Waiting for the level number.');
       return;
     }
 
-    if (!menu || !(categoryName in menu.categories)) {
-      console.error(`Cannot find category "${categoryName}"`);
-      return;
-    }
-
-    const category = menu.categories[decodeURIComponent(categoryName)];
     if (!category) {
-      console.error(`Cannot find category "${categoryName}"`);
+      console.warn(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
       return;
     }
 
@@ -52,18 +43,23 @@ const LevelPlay: FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath })
       setLevel(level);
     }
 
-    if (!puzzleId) {
-      console.error('Missing puzzle ID');
-      return;
-    } else {
-      setCurrentPuzzle(level.puzzles[parseInt(puzzleId)]);
+    if (!puzzleIndex) {
+      console.warn("The puzzleNumber is missing. We'll use the first puzzle.");
     }
 
-  }, [categoryName, levelNumber, menu, puzzleId]);
+    setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);
 
-  if (!currentPuzzle || !level) {
+  }, [category, categoryIndex, levelNumber, menu, menuName, puzzleIndex]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading menu!</div>;
+
+  if (!menu || !currentPuzzle || !level) {
     return <><h2>Loading...</h2></>;
   } else {
+    if (!currentPuzzle.encoding) {
+      currentPuzzle.encoding = menu.encodingProviders[currentPuzzle.encoding_name]
+    }
     return <>
       <h2>{level?.levelName.join("\n")}</h2>
       <div className="display">
@@ -89,7 +85,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menu, setShowBackButton, setBackPath })
       <div className="display">
         {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
       </div>
-      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext} />}
+      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext}/>}
     </>
   }
 

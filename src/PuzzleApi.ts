@@ -4,9 +4,10 @@ import { PuzzleForDate, Menu, Puzzle } from "./Menu.ts";
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
-  const menuData = localStorage.getItem(menuName);
-  if (menuData) {
-    return JSON.parse(menuData);
+  const rawMenuData = localStorage.getItem(menuName);
+  if (rawMenuData) {
+    const menuData = JSON.parse(rawMenuData);
+    return new Menu(menuData);
   }
 
   try {

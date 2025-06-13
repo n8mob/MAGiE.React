@@ -3,6 +3,7 @@ import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { Puzzle } from "../Menu.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
+import ReactGA4 from "react-ga4";
 
 interface DailyPuzzleProps {
   puzzle: Puzzle;
@@ -65,11 +66,13 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   useEffect(() => {
     const handleWinEvent = () => {
       setHasWon(true);
+      let solveTimeSeconds = -1;
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
         if (bitFieldRef.current) {
           bitFieldRef.current.scrollTo({top: bitFieldRef.current.scrollHeight, behavior: 'smooth'});
         }
+        solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
         updateShareText();
       }
 
@@ -79,6 +82,18 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
             console.warn("Audio playback failed:", error);
           });
       }
+
+      console.log(`Puzzle solved in ${solveTimeSeconds} s`);
+      const eventParams = {
+        puzzle_slug: currentPuzzle.slug,
+        winText: currentPuzzle.winText,
+        encoding: currentPuzzle.encoding_name,
+        encoding_type: currentPuzzle.encoding.getType(),
+        pagePath: window.location.pathname + window.location.search,
+        solve_time_seconds: solveTimeSeconds,
+      };
+
+      ReactGA4.event("win", {...eventParams});
     };
 
     window.addEventListener("winEvent", handleWinEvent);

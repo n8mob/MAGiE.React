@@ -8,6 +8,9 @@ import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
 import { useHeader } from "./hooks/useHeader.ts";
+import { MenuBrowser } from './components/MenuBrowser.tsx';
+import { CategoryBrowser } from './components/CategoryBrowser.tsx';
+import LevelPlay from "./components/LevelPlay.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -70,11 +73,16 @@ function App() {
     }
   }, [hasSeenHowTo, showHowTo]);
 
+  const mallMenuName = "AbandonedMall-March2025";
+
   const routes = useMemo(() => (
     <Routes>
       <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
+      <Route path="/mall" element={<MenuBrowser menuName={mallMenuName} />}/>
+      <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName={mallMenuName} />}/>
+      <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName={mallMenuName} />} />
     </Routes>), []);
 
   return (

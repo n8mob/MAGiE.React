@@ -250,7 +250,8 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
       };
 
       if (newJudgment.isCorrect) {
-        ReactGA4.event("win", {...eventParams, solve_time_ms: -1});
+        // TODO get the solve time from a stopwatch or similar.
+        ReactGA4.event("winning_judgment", eventParams);
         this.props.onWin();
       } else {
         ReactGA4.event("guess", eventParams);

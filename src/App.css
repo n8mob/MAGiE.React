@@ -32,6 +32,10 @@ h1#magie-title {
   text-transform: none;
 }
 
+.error-message {
+  color: #962c2c;
+}
+
 #root {
   display: flex;
   flex-direction: column;

@@ -1,4 +1,6 @@
 import BinaryEncoder from "./encoding/BinaryEncoder.ts";
+import { FixedWidthEncoder } from "./encoding/FixedWidthEncoder.ts";
+import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 export type EncodingType = "Fixed" | "Variable" | "Other";
 
@@ -20,20 +22,6 @@ export interface VariableWidthEncodingData extends EncodingData{
   encoding: Record<string, Record<string, string>>;
 }
 
-export interface FixedEncodingData extends EncodingData {
-  type: "fixed";
-  encoding: {
-    width: number;
-    encodingMap: Record<string, number>
-  };
-}
-
-export type EncodingSymbol = string;
-export interface VariableEncodingData extends EncodingData {
-  type: "variable";
-  encoding: Record<EncodingSymbol, Record<string, string>>;
-}
-
 export interface Puzzle {
   slug: string;
   init: string;
@@ -53,13 +41,36 @@ export interface Level {
 }
 
 export interface Category {
+  name: string;
   levels: Level[];
 }
 
-export interface Menu {
+export interface MenuData {
+  categories: Record<string, Category>;
+  encodings: Record<string, EncodingData>;
+}
+
+export class Menu {
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
   encodingProviders: Record<string, BinaryEncoder>;
+  constructor(data: MenuData) {
+    this.categories = data.categories;
+    this.encodings = data.encodings;
+    this.encodingProviders = {};
+    Object.entries(data.encodings).forEach(([encodingName, encodingData]) => {
+      if (encodingData.type === "fixed") {
+        const fixedEncodingData = encodingData as FixedWidthEncodingData;
+        this.encodingProviders[encodingName] = new FixedWidthEncoder(
+          fixedEncodingData.encoding.width,
+          fixedEncodingData.encoding.encodingMap
+        );
+      } else if (encodingData.type === "variable") {
+        const variableEncodingData = encodingData as VariableWidthEncodingData;
+        this.encodingProviders[encodingName] = new VariableWidthEncoder(variableEncodingData.encoding);
+      }
+    });
+  }
 }
 
 export interface PuzzleForDate {
