@@ -7,19 +7,19 @@ import { Puzzle } from "../Menu.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 
-interface DailyPuzzleProps {
+interface PlayPuzzleProps {
   puzzle: Puzzle;
-  date: Date;
-  formattedDate: string;
+  puzzleShareString: string;
+  onWin?: () => void;
+  onShareWin?: () => void;
+  hasWon?: boolean;
 }
 
-const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
+const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasWonProp }: PlayPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
   const [hasWon, setHasWon] = useState(false);
-  const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
-  const bitFieldRef = useRef<HTMLDivElement | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -28,23 +28,14 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     winAudio.current.volume = 0.25;
   }, []);
 
-
-  const updateShareText = () => {
+  const updateSolveTimeString = () => {
     if (stopwatchRef.current) {
       const h = stopwatchRef.current.getHours();
       const m = stopwatchRef.current.getMinutes();
       const s = stopwatchRef.current.getSeconds();
       let timeDescription: string;
-
-      let seconds = "seconds";
-      if (s == 1) {
-        seconds = "second";
-      }
-      let minutes = "minutes";
-      if (m == 1) {
-        minutes = "minute";
-      }
-
+      let seconds = s === 1 ? "second" : "seconds";
+      let minutes = m === 1 ? "minute" : "minutes";
       if (h > 0) {
         timeDescription = stopwatchRef.current.displayTime();
       } else if (m > 0) {
@@ -52,18 +43,15 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       } else {
         timeDescription = `${s} ${seconds}`;
       }
-      setSolveTimeString(`It took me ${timeDescription}.`)
+      setSolveTimeString(`It took me ${timeDescription}.`);
     }
   };
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
     setHasWon(false);
-
-    const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
-    setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
-  }, [puzzle, date, formattedDate]);
-
+    setSolveTimeString("");
+  }, [puzzle]);
 
   useEffect(() => {
     const handleWinEvent = () => {
@@ -71,39 +59,29 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       let solveTimeSeconds = -1;
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
-        if (bitFieldRef.current) {
-          bitFieldRef.current.scrollTo({top: bitFieldRef.current.scrollHeight, behavior: 'smooth'});
-        }
         solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
-        updateShareText();
+        updateSolveTimeString();
       }
-
       if (winAudio.current) {
-        winAudio.current.play()
-          .catch((error) => {
-            console.warn("Audio playback failed:", error);
-          });
+        winAudio.current.play().catch((error) => {
+          console.warn("Audio playback failed:", error);
+        });
       }
-
-      console.log(`Puzzle solved in ${solveTimeSeconds} s`);
-      const eventParams = {
+      ReactGA4.event("win", {
         puzzle_slug: currentPuzzle.slug,
         winText: currentPuzzle.winText,
         encoding: currentPuzzle.encoding_name,
         encoding_type: currentPuzzle.encoding.getType(),
         pagePath: window.location.pathname + window.location.search,
         solve_time_seconds: solveTimeSeconds,
-      };
-
-      ReactGA4.event("win", {...eventParams});
+      });
+      if (onWin) onWin();
     };
-
     window.addEventListener("winEvent", handleWinEvent);
-
     return () => {
       window.removeEventListener("winEvent", handleWinEvent);
     };
-  }, []);
+  }, [currentPuzzle, onWin]);
 
   const handleWin = () => {
     const winEvent = new Event("winEvent");
@@ -111,8 +89,10 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   };
 
   const handleShareWin = () => {
-    const shareText = `${puzzleDayString}\n${solveTimeString}`;
-
+    const shareText = `${puzzleShareString}\n${solveTimeString}`;
+    if (onShareWin) {
+      onShareWin();
+    }
     if (navigator.share) {
       navigator.share({
         title: "MAGiE binary puzzles",
@@ -121,8 +101,8 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
-        'It seems that this browser does not support "Web Share".'
-        + '\nShall we copy the share message to your clipboard?';
+        'It seems that this browser does not support "Web Share".' +
+        '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
           .then(() => {
@@ -149,12 +129,12 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
   return (
     <>
-      <Stopwatch ref={stopwatchRef}/>
+      <Stopwatch ref={stopwatchRef} />
       {currentPuzzle.type === "Encode" &&
         <EncodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWon}
+          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />
@@ -163,7 +143,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
         <DecodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWon}
+          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />
@@ -172,4 +152,5 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   );
 };
 
-export { DailyPuzzle };
+export { PlayPuzzle };
+
