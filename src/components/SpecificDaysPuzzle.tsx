@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { getDailyPuzzleForDate } from "../PuzzleApi.ts";
-import { DailyPuzzle } from "./DailyPuzzle.tsx";
+import { PlayPuzzle } from "./PlayPuzzle";
 import { FC, useEffect, useState } from "react";
 import { Puzzle } from "../Menu.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
@@ -119,12 +119,13 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
 
   return (
     <>
-      {currentPuzzle && <DailyPuzzle 
-        key={currentPuzzle.slug}
-        puzzle={currentPuzzle} 
-        date={puzzleDate!} 
-        formattedDate={formattedDate}/>
-      }
+      {currentPuzzle && (
+        <PlayPuzzle
+          key={currentPuzzle.slug}
+          puzzle={currentPuzzle}
+          puzzleShareString={`I decoded the MAGiE puzzle for ${puzzleDate.getDate() === new Date().getDate() ? "today, " : ""}${formattedDate}!`}
+        />
+      )}
     </>
   );
 };
