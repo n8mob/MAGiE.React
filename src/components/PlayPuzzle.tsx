@@ -34,8 +34,8 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
       const m = stopwatchRef.current.getMinutes();
       const s = stopwatchRef.current.getSeconds();
       let timeDescription: string;
-      let seconds = s === 1 ? "second" : "seconds";
-      let minutes = m === 1 ? "minute" : "minutes";
+      const seconds = s === 1 ? "second" : "seconds";
+      const minutes = m === 1 ? "minute" : "minutes";
       if (h > 0) {
         timeDescription = stopwatchRef.current.displayTime();
       } else if (m > 0) {
