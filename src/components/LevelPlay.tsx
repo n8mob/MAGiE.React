@@ -1,10 +1,10 @@
 import { Level, Puzzle } from "../Menu.ts";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { EncodePuzzle } from "./EncodePuzzle.tsx";
-import { DecodePuzzle } from "./DecodePuzzle.tsx";
+import { PlayPuzzle } from "./PlayPuzzle";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
+import { useHeader } from "../hooks/useHeader.ts";
 
 interface LevelPlayProps {
   menuName?: string;
@@ -13,11 +13,11 @@ interface LevelPlayProps {
 const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
   const {menu, loading, error} = useMenu(menuName);
   const {categoryIndex, levelNumber, puzzleIndex} = useParams();
-  const { category } = useCategory(menu, categoryIndex);
+  const {category} = useCategory(menu, categoryIndex);
   const [level, setLevel] = useState<Level | null>(null);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
-  const [winMessage, setWinMessage] = useState<string[]>([]);
   const [hasWon, setHasWon] = useState(false);
+  const {setHeaderContent} = useHeader();
 
   useEffect(() => {
     if (!menu) {
@@ -49,10 +49,25 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
 
     setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);
 
-  }, [category, categoryIndex, levelNumber, menu, menuName, puzzleIndex]);
+    // Set header content with category and level name
+    if (category?.name && level) {
+      setHeaderContent(
+        <div>
+          <h3>{category.name}</h3>
+          <h3 className="level-item">{level.levelName.join(" ")}</h3>
+        </div>
+      )
+      ;
+    }
+    return () => setHeaderContent(null);
+  }, [category, categoryIndex, level, levelNumber, menu, menuName, puzzleIndex, setHeaderContent]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading menu!</div>;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Error loading menu!</div>;
+  }
 
   if (!menu || !currentPuzzle || !level) {
     return <><h2>Loading...</h2></>;
@@ -60,37 +75,21 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
     if (!currentPuzzle.encoding) {
       currentPuzzle.encoding = menu.encodingProviders[currentPuzzle.encoding_name]
     }
+    // Generate a share string for this puzzle context
+    const shareString = `I solved the ${level.levelName.join(" ")} puzzle in the ${category?.name || ""} category!`;
     return <>
-      <h2>{level?.levelName.join("\n")}</h2>
-      <div className="display">
-        {currentPuzzle?.clue.map((line, index) => <p key={index}>{line}</p>)}
-      </div>
-      {currentPuzzle.type === "Encode" ? (
-        <EncodePuzzle
-          puzzle={currentPuzzle}
-          onWin={handleWin}
-          hasWon={hasWon}
-          onShareWin={() => console.log("Share win not implemented")}
-          bitDisplayWidthPx={32}
-        />
-      ) : (
-        <DecodePuzzle
-          puzzle={currentPuzzle}
-          onWin={handleWin}
-          hasWon={hasWon}
-          onShareWin={() => console.log("Share win not implemented")}
-          bitDisplayWidthPx={32}
-        />
-      )}
-      <div className="display">
-        {winMessage.map((line, index) => <p key={`winMessageLine${index}`}>{line}</p>)}
-      </div>
+      <PlayPuzzle
+        puzzle={currentPuzzle}
+        puzzleShareString={shareString}
+        onWin={handleWin}
+        hasWon={hasWon}
+        onShareWin={() => console.log("Share win not implemented")}
+      />
       {hasWon && <input type="button" value="Next Puzzle" onClick={goNext}/>}
     </>
   }
 
   function handleWin() {
-    setWinMessage(currentPuzzle?.winMessage || ["CORRECT!"])
     setHasWon(true);
   }
 
@@ -101,18 +100,7 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
     const nextPuzzleIndex = level.puzzles.indexOf(currentPuzzle) + 1;
     if (nextPuzzleIndex < level.puzzles.length) {
       setCurrentPuzzle(level.puzzles[nextPuzzleIndex]);
-      setWinMessage([]);
       setHasWon(false);
-    } else {
-      const genericWinMessage = [
-        "You win!",
-        "You finishos",
-        "puzzles in",
-        "the level"
-      ];
-      const quote = ["."];
-      const closeQuote = [".", "Congrats!"]
-      setWinMessage([...genericWinMessage, ...quote, ...level.levelName, ...closeQuote]);
     }
   }
 }

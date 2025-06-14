@@ -55,7 +55,10 @@ export class Menu {
   encodings: Record<string, EncodingData>;
   encodingProviders: Record<string, BinaryEncoder>;
   constructor(data: MenuData) {
-    this.categories = data.categories;
+    this.categories = {};
+    Object.entries(data.categories).forEach(([key, category]) => {
+      this.categories[key] = { ...category, name: key };
+    });
     this.encodings = data.encodings;
     this.encodingProviders = {};
     Object.entries(data.encodings).forEach(([encodingName, encodingData]) => {
