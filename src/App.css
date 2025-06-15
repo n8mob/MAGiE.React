@@ -59,7 +59,11 @@ h3 {
 }
 
 /* Only use fixed height for game-content on small screens */
-@media (max-height: 700px) {
+@media (max-height: 900px) {
+  /* Use fixed height for game-content to prevent overflow */
+  /* 100dvh works better and is listed last. */
+  /* Listing it second will override 100vh on browsers that support dvh */
+  /*noinspection CssOverwrittenProperties*/
   #game-content {
     height: calc(100vh - 32px - 112px);
     height: calc(100dvh - 32px - 112px);

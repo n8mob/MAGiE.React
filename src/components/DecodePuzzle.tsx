@@ -6,6 +6,11 @@ import { Link } from "react-router-dom";
 import { ChangeEvent, createRef, RefObject } from "react";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 
+// Utility to match the mobile media query
+function isMobileScreen() {
+  return window.matchMedia('(max-height: 700px)').matches;
+}
+
 class DecodePuzzle extends BasePuzzle {
   gameContentRef: RefObject<HTMLDivElement>;
   mainDisplayRef: RefObject<HTMLDivElement>;
@@ -70,19 +75,28 @@ class DecodePuzzle extends BasePuzzle {
         }
       }
       // Scroll the row into view, but keep #puzzle-inputs visible
-      if (rowIndex !== -1 && this.displayMatrixRef.current && typeof this.displayMatrixRef.current.getBitRowElement === 'function') {
-        const rowElem = this.displayMatrixRef.current.getBitRowElement(rowIndex);
+      if (rowIndex !== -1
+        && this.displayMatrixRef.current
+        && typeof this.displayMatrixRef.current.getBitRowElement === 'function'
+      ) {
+        const lastChangedRow = this.displayMatrixRef.current.getBitRowElement(rowIndex);
         const mainDisplay = this.mainDisplayRef.current;
         const puzzleInputs = this.puzzleInputsRef.current;
-        if (rowElem && mainDisplay && puzzleInputs) {
+        if (lastChangedRow && mainDisplay && puzzleInputs) {
           // Scroll the row into view within main-display
-          const rowRect = rowElem.getBoundingClientRect();
+          const rowRect = lastChangedRow.getBoundingClientRect();
           const mainRect = mainDisplay.getBoundingClientRect();
           const inputsRect = puzzleInputs.getBoundingClientRect();
-          // If row is below main-display, scroll down, but not so far that puzzle-inputs is hidden
+          // scroll the row near the top of main-display (second visible row, if possible)
+          const contextFactor = 6; // Adjust this factor to control how much context is shown
+          const newScrollTop = rowRect.top - mainRect.top + mainDisplay.scrollTop - (mainRect.height / contextFactor);
+          mainDisplay.scrollTo({
+            top: newScrollTop,
+            behavior: 'smooth'
+          });
           if (rowRect.bottom > mainRect.bottom) {
             // Calculate max scroll so puzzle-inputs is still visible
-            const maxScroll = (inputsRect.top) - mainRect.top - rowElem.offsetHeight;
+            const maxScroll = (inputsRect.top) - mainRect.top - lastChangedRow.offsetHeight;
             mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
           } else if (rowRect.top < mainRect.top) {
             // If row is above main-display, scroll up
@@ -116,9 +130,12 @@ class DecodePuzzle extends BasePuzzle {
         const winRect = winMessage.getBoundingClientRect();
         // If win-message is below the visible area, scroll it into view
         if (winRect.bottom > mainRect.bottom || winRect.top < mainRect.top) {
-          // Scroll so the bottom of win-message aligns with the bottom of main-display
-          const scrollOffset = winMessage.offsetTop + winMessage.offsetHeight - mainDisplay.clientHeight;
-          mainDisplay.scrollTop = scrollOffset > 0 ? scrollOffset : 0;
+          // Only scroll on mobile screens
+          if (isMobileScreen()) {
+            // Scroll so the bottom of win-message aligns with the bottom of main-display
+            const scrollOffset = winMessage.offsetTop + winMessage.offsetHeight - mainDisplay.clientHeight;
+            mainDisplay.scrollTop = scrollOffset > 0 ? scrollOffset : 0;
+          }
         }
       }
     }
@@ -144,14 +161,23 @@ class DecodePuzzle extends BasePuzzle {
 
   adjustMainDisplayHeightForInput = () => {
     const gameContent = this.gameContentRef.current;
-    if (gameContent) {
-      gameContent.style.height = window.innerHeight + 'px';
-      gameContent.scrollIntoView({ behavior: 'smooth' });
-    }
-    const puzzleInputs = this.puzzleInputsRef.current;
-    if (puzzleInputs) {
-      // Ensure puzzle-inputs is visible
-      puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    const mainDisplay = this.mainDisplayRef.current;
+    if (gameContent && mainDisplay) {
+      // Only adjust height/scroll if window is not much larger than main display (i.e., likely mobile)
+      const windowHeight = window.innerHeight;
+      const mainDisplayHeight = mainDisplay.offsetHeight;
+      // If window is less than 1.5x main display, treat as mobile
+      if (windowHeight < mainDisplayHeight * 1.5) {
+        gameContent.style.height = windowHeight + 'px';
+        gameContent.scrollIntoView({behavior: 'smooth'});
+        const puzzleInputs = this.puzzleInputsRef.current;
+        if (puzzleInputs) {
+          puzzleInputs.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+        }
+      } else {
+        // On desktop, reset any forced height
+        gameContent.style.height = '';
+      }
     }
   };
 
@@ -161,8 +187,8 @@ class DecodePuzzle extends BasePuzzle {
     setTimeout(() => {
       const input = this.puzzleInputsRef.current?.querySelector('input');
       if (input) {
-        input.addEventListener('focus', this.handleInputFocus, { passive: true });
-        input.addEventListener('blur', this.handleInputBlur, { passive: true });
+        input.addEventListener('focus', this.handleInputFocus, {passive: true});
+        input.addEventListener('blur', this.handleInputBlur, {passive: true});
       }
     }, 0);
   }
@@ -189,11 +215,11 @@ class DecodePuzzle extends BasePuzzle {
       const scrollY = window.scrollY || window.pageYOffset;
       // If main-display is not at the top, scroll so it is
       if (mainRect.top < 0 || mainRect.top > 0) {
-        window.scrollTo({ top: scrollY + mainRect.top, behavior: 'smooth' });
+        window.scrollTo({top: scrollY + mainRect.top, behavior: 'smooth'});
       }
       // Optionally, ensure puzzle-inputs is visible (should be if main-display is at top)
       if (inputsRect.top < 0 || inputsRect.bottom > window.innerHeight) {
-        window.scrollTo({ top: scrollY + inputsRect.top, behavior: 'smooth' });
+        window.scrollTo({top: scrollY + inputsRect.top, behavior: 'smooth'});
       }
     }
   };

@@ -74,7 +74,7 @@ class EncodePuzzle extends BasePuzzle {
 
     return (
       <>
-        <div className="main-display">
+        <div id="main-display">
           {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={this.displayMatrixRef}
