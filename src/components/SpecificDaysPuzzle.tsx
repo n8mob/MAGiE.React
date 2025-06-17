@@ -5,6 +5,7 @@ import { FC, useEffect, useState } from "react";
 import { Puzzle } from "../Menu.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
+import { shortDate } from "./DateFormatter.tsx";
 
 
 const addDays = (date: Date, days: number) => {
@@ -12,13 +13,6 @@ const addDays = (date: Date, days: number) => {
   newDate.setDate(newDate.getDate() + days);
   return newDate;
 }
-
-const prettyOptions: Intl.DateTimeFormatOptions = {
-  weekday: 'short',
-  month: 'short',
-  day: 'numeric'
-};
-
 
 const dateLinkFormat = (date: Date) => {
   const year = date.getFullYear();
@@ -64,7 +58,7 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
           }
           console.log("Fetched puzzle for date:", puzzleDate, "Puzzle:", puzzle.slug);
           setCurrentPuzzle(puzzle);
-          const formattedDateForPuzzle = puzzleDate.toLocaleDateString(navigator.language, prettyOptions);
+          const formattedDateForPuzzle = shortDate(puzzleDate);
           setFormattedDate(formattedDateForPuzzle);
           console.log("Formatted date as: " + formattedDateForPuzzle);
         }).catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));

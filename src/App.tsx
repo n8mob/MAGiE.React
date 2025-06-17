@@ -11,6 +11,9 @@ import { useHeader } from "./hooks/useHeader.ts";
 import { MenuBrowser } from './components/MenuBrowser.tsx';
 import { CategoryBrowser } from './components/CategoryBrowser.tsx';
 import LevelPlay from "./components/LevelPlay.tsx";
+import { FEATURES } from "./app.config.ts";
+import { PageNotFound } from "./components/PageNotFound.tsx";
+import { LevelBrowser } from "./components/LevelBrowser.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -80,9 +83,13 @@ function App() {
       <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-      <Route path="/mall" element={<MenuBrowser menuName={mallMenuName} />}/>
-      <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName={mallMenuName} />}/>
-      <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName={mallMenuName} />} />
+      {FEATURES.storyRoutes && (<>
+        <Route path="/mall" element={<MenuBrowser menuName={mallMenuName}/>}/>
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName={mallMenuName}/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName={mallMenuName} />}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName={mallMenuName}/>}/>
+      </>)}
+      <Route path={"*"} element={<PageNotFound />}/>
     </Routes>), []);
 
   return (

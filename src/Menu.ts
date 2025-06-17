@@ -35,7 +35,7 @@ export interface Puzzle {
 
 export interface Level {
   levelName: string[];
-  levelNumber: string;
+  levelNumber: number;
   sort_order: number | null;
   puzzles: Puzzle[];
 }

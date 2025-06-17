@@ -1,10 +1,11 @@
-import { Level, Puzzle } from "../Menu.ts";
+import { Puzzle } from "../Menu.ts";
 import { FC, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { PlayPuzzle } from "./PlayPuzzle";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
+import { useLevel } from "../hooks/useLevel.tsx";
 
 interface LevelPlayProps {
   menuName?: string;
@@ -14,7 +15,7 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
   const {menu, loading, error} = useMenu(menuName);
   const {categoryIndex, levelNumber, puzzleIndex} = useParams();
   const {category} = useCategory(menu, categoryIndex);
-  const [level, setLevel] = useState<Level | null>(null);
+  const { level } = useLevel(category, levelNumber);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [hasWon, setHasWon] = useState(false);
   const {setHeaderContent} = useHeader();
@@ -25,39 +26,34 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
       return;
     }
 
-    if (!levelNumber) {
-      console.warn('Waiting for the level number.');
-      return;
-    }
-
     if (!category) {
       console.warn(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
       return;
     }
 
-    const level = category.levels.find(level => level.levelNumber == levelNumber);
-    if (!level) {
-      console.error(`Cannot find level ${levelNumber}`);
+    if (!levelNumber) {
+      console.warn('Waiting for the level number.');
       return;
-    } else {
-      setLevel(level);
     }
 
     if (!puzzleIndex) {
       console.warn("The puzzleNumber is missing. We'll use the first puzzle.");
     }
 
-    setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);
+    if (!level) {
+      console.warn(`Waiting for the level with number ${levelNumber})`);
+      return;
+    }
 
     // Set header content with category and level name
     if (category?.name && level) {
       setHeaderContent(
         <div>
-          <h3>{category.name}</h3>
-          <h3 className="level-item">{level.levelName.join(" ")}</h3>
+          <h3><Link to={`/mall/${categoryIndex}`}>{category.name}</Link></h3>
+          <h3 className="level-item"><Link to={`/mall/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>
-      )
-      ;
+      );
+      setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);
     }
     return () => setHeaderContent(null);
   }, [category, categoryIndex, level, levelNumber, menu, menuName, puzzleIndex, setHeaderContent]);
