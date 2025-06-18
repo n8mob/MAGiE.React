@@ -1,12 +1,11 @@
 import './Menu.css';
-import { useEffect, useState } from "react";
-import { Menu } from "../Menu.ts";
-import { getMenu } from "../PuzzleApi.ts";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHeader } from "../hooks/useHeader.ts";
+import { useMenu } from "../hooks/useMenu.tsx";
 
 function MenuBrowser({menuName}: { menuName: string }) {
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const {menu} = useMenu(menuName);
   const {setHeaderContent} = useHeader();
 
   useEffect(() => {
@@ -16,11 +15,6 @@ function MenuBrowser({menuName}: { menuName: string }) {
       <h3>The Abandoned Mall</h3>
     </div>);
   }, [setHeaderContent]);
-
-  useEffect(() => {
-    getMenu(menuName).then(setMenu);
-  }, [menuName]);
-
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;

@@ -76,18 +76,28 @@ function App() {
     }
   }, [hasSeenHowTo, showHowTo]);
 
-  const mallMenuName = "AbandonedMall-March2025";
-
   const routes = useMemo(() => (
     <Routes>
       <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
       {FEATURES.storyRoutes && (<>
-        <Route path="/mall" element={<MenuBrowser menuName={mallMenuName}/>}/>
-        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName={mallMenuName}/>}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName={mallMenuName} />}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName={mallMenuName}/>}/>
+        <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="mall"/>}/>
+      </>)}
+      {FEATURES.tutorialRoutes && (<>
+        <Route path="/tutorial" element={<MenuBrowser menuName="tutorial"/>}/>
+        <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial" />}/>
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="tutorial"/>}/>
+      </>)}
+      {FEATURES.bigGameRoutes && (<>
+        <Route path="/bigGame" element={<MenuBrowser menuName="bigGame"/>}/>
+        <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame"/>}/>
+        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame" />}/>
+        <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="bigGame"/>}/>
       </>)}
       <Route path={"*"} element={<PageNotFound />}/>
     </Routes>), []);

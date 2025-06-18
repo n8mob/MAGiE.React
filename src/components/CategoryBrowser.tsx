@@ -1,33 +1,38 @@
 import './Menu.css';
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu } from "../Menu.ts";
-import { getMenu } from "../PuzzleApi.ts";
 import { useHeader } from "../hooks/useHeader.ts";
+import { useMenu } from "../hooks/useMenu.tsx";
 
 function CategoryBrowser({menuName}: { menuName: string }) {
   const {setHeaderContent} = useHeader();
   const {categoryIndex: categoryIndexParam} = useParams();
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
-  const [menu, setMenu] = useState<Menu | null>(null);
   const [categoryName, setCategoryName] = useState<string>('');
-
-  useEffect(() => {
-    getMenu(menuName)
-      .then(fetchedMenu => {
-        setMenu(fetchedMenu);
-      })
-      .catch(error => {
-        console.error("Error fetching menu:", error);
-        setHeaderContent(<p>Error loading menu</p>);
-      });
-  }, [menuName, setHeaderContent]);
+  const {menu, loading, error} = useMenu(menuName);
 
   useEffect(() => {
     if (!menu) {
+      console.warn('Waiting for the menu.');
       setHeaderContent(<p>Loading category...</p>);
       return;
     }
+
+    if (error) {
+      console.error("Error loading menu:", error);
+      setHeaderContent(<div className={'menu-title'}>
+        <p className={'error-message'}>Error loading menu: {error.message}</p>
+      </div> );
+      return;
+    }
+
+    if (loading) {
+      setHeaderContent(<div className={'menu-title'}>
+        <p>Loading category...</p>
+      </div>);
+      return;
+    }
+
     const categoryKeys = Object.keys(menu.categories);
     if (categoryIndex < 0 || categoryIndex >= categoryKeys.length) {
       setHeaderContent(<p>Invalid category index</p>);
@@ -39,7 +44,7 @@ function CategoryBrowser({menuName}: { menuName: string }) {
       <Link to={'/mall/'}><h3>THE ABANDONED MALL</h3></Link>
       <p>{categoryName}</p>
     </div>);
-  }, [menu, categoryIndex, setHeaderContent]);
+  }, [menu, categoryIndex, setHeaderContent, error, loading]);
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;

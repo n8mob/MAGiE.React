@@ -1,3 +1,5 @@
 export const FEATURES = {
-  storyRoutes: false,
+  storyRoutes: true,
+  tutorialRoutes: false,
+  bigGameRoutes: true
 };
