@@ -28,7 +28,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
       return;
     }
 
-    setHeaderContent(<div className={'menu-title'}><h3><Link to={`/mall/${categoryIndex}`}>{category.name}</Link></h3>
+    setHeaderContent(<div className={'menu-title'}><h3><Link to={`/${menuName}/${categoryIndex}`}>{category.name}</Link></h3>
       {level.levelName.map(nameLine => <h3>{nameLine}</h3>)}
     </div>);
 
@@ -46,7 +46,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
           bit={IndexedBit.falseAtIndex(i)}
           correctness={Correctness.unguessed}    // Update with real progress
           onClick={() =>
-            navigate(`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`)
+            navigate(`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`)
           }
         />
       ))}

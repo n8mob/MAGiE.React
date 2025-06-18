@@ -11,7 +11,9 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
   }
 
   try {
-    const response = await axios.get(`${API_BASE_URL}/menus/${menuName}`);
+    const menuUrl = `${API_BASE_URL}/menus/${menuName}`;
+    console.log(`Fetching menu data from ${menuUrl}`);
+    const response = await axios.get(menuUrl);
     localStorage.setItem(menuName, JSON.stringify(response.data));
     return response.data;
   } catch (error) {

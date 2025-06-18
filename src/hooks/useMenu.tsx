@@ -31,7 +31,7 @@ export function useMenu(menuName: string | undefined) {
         setError(e);
         setLoading(false);
       })
-  }, [fullMenuName]);
+  }, [menuName, fullMenuName]);
 
   return { menu, loading, error };
 }

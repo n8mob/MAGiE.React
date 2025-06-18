@@ -49,8 +49,8 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
     if (category?.name && level) {
       setHeaderContent(
         <div className={'menu-title'}>
-          <h3><Link to={`/mall/${categoryIndex}`}>{category.name}</Link></h3>
-          <h3 className="level-item"><Link to={`/mall/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
+          <h3><Link to={`/${menuName}/${categoryIndex}`}>{category.name}</Link></h3>
+          <h3 className="level-item"><Link to={`/${menuName}/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>
       );
       setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);

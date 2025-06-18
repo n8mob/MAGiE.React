@@ -1,15 +1,16 @@
 import './Menu.css';
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
+import { useCategory } from "../hooks/useCategory.tsx";
 
 function CategoryBrowser({menuName}: { menuName: string }) {
   const {setHeaderContent} = useHeader();
   const {categoryIndex: categoryIndexParam} = useParams();
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
-  const [categoryName, setCategoryName] = useState<string>('');
   const {menu, loading, error} = useMenu(menuName);
+  const { category } = useCategory(menu, categoryIndexParam);
 
   useEffect(() => {
     if (!menu) {
@@ -38,21 +39,19 @@ function CategoryBrowser({menuName}: { menuName: string }) {
       setHeaderContent(<p>Invalid category index</p>);
       return;
     }
-    setCategoryName(categoryKeys[categoryIndex]);
+
     const categoryName = categoryKeys[categoryIndex];
     setHeaderContent(<div className={'menu-title'}>
-      <Link to={'/mall/'}><h3>THE ABANDONED MALL</h3></Link>
+      <Link to={`/${menuName}/`}><h3>THE ABANDONED MALL</h3></Link>
       <p>{categoryName}</p>
     </div>);
-  }, [menu, categoryIndex, setHeaderContent, error, loading]);
+  }, [menuName, menu, categoryIndex, setHeaderContent, error, loading]);
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;
   }
 
-  const category = menu.categories[categoryName];
-
-  console.log(`categoryIndex: ${categoryIndex} => ${categoryName}`);
+  console.log(`categoryIndex: ${categoryIndex} => ${category?.name}`);
   console.log("category", category);
 
   return (
@@ -62,7 +61,7 @@ function CategoryBrowser({menuName}: { menuName: string }) {
           {category?.levels.map((level, i) => {
             const hasNumbers = /^[\d\W]/.test(level.levelName[0]); // starts with digit or symbol
             return <li key={level.levelNumber} className={hasNumbers ? 'numbered-item' : undefined}>
-              <Link to={`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}>{!hasNumbers ? `${i+1}. ` : ''}{level.levelName.join("\n")}</Link>
+              <Link to={`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}>{!hasNumbers ? `${i+1}. ` : ''}{level.levelName.join("\n")}</Link>
             </li>
           })
           }

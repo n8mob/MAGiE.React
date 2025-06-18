@@ -26,7 +26,7 @@ function MenuBrowser({menuName}: { menuName: string }) {
             {Object.keys(menu.categories).map((categoryName, index) => {
               const hasNumbers = /^[\d\W]/.test(categoryName); // starts with digit or symbol
               return <li key={index} className={hasNumbers ? 'numbered-item' : undefined}>
-                <Link to={`/mall/${index}`}>{categoryName}</Link>
+                <Link to={`/${menuName}/${index}`}>{categoryName}</Link>
               </li>
             })
             }
