@@ -1,3 +1,3 @@
 export const FEATURES = {
-  storyRoutes: true,
+  storyRoutes: false,
 };
