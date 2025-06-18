@@ -19,23 +19,26 @@ function CategoryBrowser({menuName}: { menuName: string }) {
       })
       .catch(error => {
         console.error("Error fetching menu:", error);
-        setHeaderContent('Error loading menu');
+        setHeaderContent(<p>Error loading menu</p>);
       });
   }, [menuName, setHeaderContent]);
 
   useEffect(() => {
     if (!menu) {
-      setHeaderContent('Loading category...');
+      setHeaderContent(<p>Loading category...</p>);
       return;
     }
     const categoryKeys = Object.keys(menu.categories);
     if (categoryIndex < 0 || categoryIndex >= categoryKeys.length) {
-      setHeaderContent('Invalid category index');
+      setHeaderContent(<p>Invalid category index</p>);
       return;
     }
     setCategoryName(categoryKeys[categoryIndex]);
     const categoryName = categoryKeys[categoryIndex];
-    setHeaderContent(`${categoryName}`);
+    setHeaderContent(<div className={'menu-title'}>
+      <Link to={'/mall/'}><h3>THE ABANDONED MALL</h3></Link>
+      <p>{categoryName}</p>
+    </div>);
   }, [menu, categoryIndex, setHeaderContent]);
 
   if (!menu) {
@@ -50,13 +53,15 @@ function CategoryBrowser({menuName}: { menuName: string }) {
   return (
     <div id={'category'}>
       <div className={'menu-list'}>
-        <ul>
-          {category?.levels.map((level) => (
-            <li key={level.levelNumber}>
-              <Link to={`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}>{level.levelName.join("\n")}</Link>
+        <ol>
+          {category?.levels.map((level, i) => {
+            const hasNumbers = /^[\d\W]/.test(level.levelName[0]); // starts with digit or symbol
+            return <li key={level.levelNumber} className={hasNumbers ? 'numbered-item' : undefined}>
+              <Link to={`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}>{!hasNumbers ? `${i+1}. ` : ''}{level.levelName.join("\n")}</Link>
             </li>
-          ))}
-        </ul>
+          })
+          }
+        </ol>
       </div>
     </div>
   );

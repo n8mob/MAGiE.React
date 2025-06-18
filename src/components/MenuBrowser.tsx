@@ -7,10 +7,14 @@ import { useHeader } from "../hooks/useHeader.ts";
 
 function MenuBrowser({menuName}: { menuName: string }) {
   const [menu, setMenu] = useState<Menu | null>(null);
-  const { setHeaderContent } = useHeader();
+  const {setHeaderContent} = useHeader();
 
   useEffect(() => {
-    setHeaderContent('-=Proti and Hepi=-');
+    setHeaderContent(<div className={'menu-title'}>
+      <p>-= Proti and Hepi =-</p>
+      <p>in</p>
+      <h3>The Abandoned Mall</h3>
+    </div>);
   }, [setHeaderContent]);
 
   useEffect(() => {
@@ -24,14 +28,15 @@ function MenuBrowser({menuName}: { menuName: string }) {
     return (
       <div id={'menu'}>
         <div className={'menu-list'}>
-          <ul>
-            {Object.keys(menu.categories).map((categoryName, index) => (
-              <li key={index}>
+          <ol>
+            {Object.keys(menu.categories).map((categoryName, index) => {
+              const hasNumbers = /^[\d\W]/.test(categoryName); // starts with digit or symbol
+              return <li key={index} className={hasNumbers ? 'numbered-item' : undefined}>
                 <Link to={`/mall/${index}`}>{categoryName}</Link>
               </li>
-            ))
+            })
             }
-          </ul>
+          </ol>
         </div>
       </div>
     );

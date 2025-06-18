@@ -1,3 +1,4 @@
+import './Level.css';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BitButton } from "./BitButton";
 import { IndexedBit } from "../IndexedBit.ts";
@@ -13,7 +14,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
   const {menu} = useMenu(menuName);
   const {category} = useCategory(menu, categoryIndex);
   const {setHeaderContent} = useHeader();
-  const { level } = useLevel(category, levelNumber);
+  const {level} = useLevel(category, levelNumber);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +28,9 @@ function LevelBrowser({menuName}: { menuName: string }) {
       return;
     }
 
-    setHeaderContent(<Link to={`/mall/${categoryIndex}`}>{category.name}</Link>);
+    setHeaderContent(<div className={'menu-title'}><h3><Link to={`/mall/${categoryIndex}`}>{category.name}</Link></h3>
+      {level.levelName.map(nameLine => <h3>{nameLine}</h3>)}
+    </div>);
 
   }, [category, categoryIndex, level, levelNumber, menuName, setHeaderContent]);
 
@@ -36,21 +39,17 @@ function LevelBrowser({menuName}: { menuName: string }) {
   }
 
   return (
-    <div>
-      <h3>{Array.isArray(level.levelName) ? level.levelName.join(" ") : level.levelName}</h3>
-      <div style={{display: "flex", flexDirection: "row", margin: "16px 0"}}>
-        {level.puzzles.map((puzzle, i) => (
-          <BitButton
-            key={puzzle.slug ?? `puzzle-${i}`}
-            bit={IndexedBit.falseAtIndex(i)}
-            correctness={Correctness.unguessed}    // Update with real progress
-            onClick={() =>
-              navigate(`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`)
-            }
-          />
-        ))}
-      </div>
-      {/* You can add "Back" or progress info here */}
+    <div className={'level-puzzle-bits'} style={{display: "flex", flexDirection: "row", margin: "16px 0"}}>
+      {level.puzzles.map((puzzle, i) => (
+        <BitButton
+          key={puzzle.slug ?? `puzzle-${i}`}
+          bit={IndexedBit.falseAtIndex(i)}
+          correctness={Correctness.unguessed}    // Update with real progress
+          onClick={() =>
+            navigate(`/mall/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`)
+          }
+        />
+      ))}
     </div>
   );
 }

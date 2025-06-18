@@ -48,7 +48,7 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
     // Set header content with category and level name
     if (category?.name && level) {
       setHeaderContent(
-        <div>
+        <div className={'menu-title'}>
           <h3><Link to={`/mall/${categoryIndex}`}>{category.name}</Link></h3>
           <h3 className="level-item"><Link to={`/mall/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>

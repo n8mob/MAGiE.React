@@ -1,3 +1,14 @@
-.menu-list li {
+.menu-title {
+  text-align: center;
+  margin: 1em;
+}
+
+.menu-title p {
+  margin: 0;
+}
+
+.menu-list ul,
+.menu-list ol {
+  margin: 0;
   list-style: none;
 }
