@@ -4,19 +4,42 @@ import { PuzzleForDate, Menu, Puzzle } from "./Menu.ts";
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
-  const menuData = localStorage.getItem(menuName);
-  if (menuData) {
-    return JSON.parse(menuData);
+  const rawMenuData = localStorage.getItem(menuName);
+  if (rawMenuData) {
+    try {
+      const menuData = JSON.parse(rawMenuData);
+      return new Menu(menuData);
+    } catch (e) {
+      // If parsing fails, remove the bad cache and continue to fetch
+      localStorage.removeItem(menuName);
+    }
   }
 
+  let response;
   try {
-    const response = await axios.get(`${API_BASE_URL}/menus/${menuName}`);
-    localStorage.setItem(menuName, JSON.stringify(response.data));
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch menu data:', error);
-    throw error;
+    const menuUrl = `${API_BASE_URL}/menus/${menuName}`;
+    console.log(`Fetching menu data from ${menuUrl}`);
+    response = await axios.get(menuUrl, {responseType: 'json'});
+  } catch (webError) {
+    console.error('Failed to fetch or parse menu data:', webError);
+    throw webError;
   }
+
+  const data = response.data;
+  // Validate that data is a valid Menu
+  if (!data || typeof data !== 'object' || !('categories' in data)) {
+    throw new Error('Invalid menu data received from API');
+  }
+
+  // Try to construct a Menu instance to further validate
+  let menuInstance;
+  try {
+    menuInstance = new Menu(data);
+  } catch (parsingError) {
+    throw new Error('Menu data could not be parsed into a Menu instance');
+  }
+  localStorage.setItem(menuName, JSON.stringify(data));
+  return menuInstance;
 }
 
 export const getDailyPuzzleForDate = async (puzzleDate: Date): Promise<PuzzleForDate> => {
@@ -52,7 +75,11 @@ function isPuzzle(data: unknown): data is Puzzle {
   );
 }
 
-export const getDailyPuzzleForYearMonthDay = async (year: number, month: number, day: number): Promise<PuzzleForDate> => {
+export const getDailyPuzzleForYearMonthDay = async (
+  year: number,
+  month: number,
+  day: number
+): Promise<PuzzleForDate> => {
   const paddedMonth = String(month).padStart(2, '0');
   const paddedDay = String(day).padStart(2, '0');
   const dateKey = `daily-puzzle-${year}-${paddedMonth}-${paddedDay}`;

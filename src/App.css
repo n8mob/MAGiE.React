@@ -32,6 +32,10 @@ h1#magie-title {
   text-transform: none;
 }
 
+.error-message {
+  color: #962c2c;
+}
+
 #root {
   display: flex;
   flex-direction: column;
@@ -49,11 +53,25 @@ h3 {
 }
 
 #game-content {
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 32px - 112px); /* Fallback for browsers that do not support dvh */
-  height: calc(100dvh - 32px - 112px); /* 32 for stopwatch, 112 for the header */
+}
+
+/* Only use fixed height for game-content on small screens */
+@media (max-height: 900px) {
+  /* Use fixed height for game-content to prevent overflow */
+  /* 100dvh works better and is listed last. */
+  /* Listing it second will override 100vh on browsers that support dvh */
+  /*noinspection CssOverwrittenProperties*/
+  #game-content {
+    height: calc(100vh - 32px - 112px);
+    height: calc(100dvh - 32px - 112px);
+  }
+  #puzzle-inputs {
+    position: sticky;
+    bottom: 0;
+  }
 }
 
 #main-display {
@@ -72,14 +90,20 @@ h3 {
 
 #puzzle-inputs {
   flex: 0 0 auto;
-  position: sticky; /* Or fixed if needed */
-  bottom: 0;
   display: flex;
   justify-self: end;
   justify-content: center;
   padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
   background-color: #d0d4d4;
   flex-direction: column;
+}
+
+/* Only make sticky on small screens */
+@media (max-height: 700px) {
+  #puzzle-inputs {
+    position: sticky;
+    bottom: 0;
+  }
 }
 
 #puzzle-inputs > * {
