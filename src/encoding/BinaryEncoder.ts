@@ -2,7 +2,7 @@ import { EncodingType } from "../Menu.ts";
 import { DisplayRow } from "./DisplayRow.ts";
 import { BitSequence } from "../BitSequence.ts";
 
-interface BinaryEncoder {
+export interface BinaryEncoder {
   getType(): EncodingType;
 
   decodeText(encodedText: BitSequence): string;
@@ -17,6 +17,3 @@ interface BinaryEncoder {
 
   splitForDisplay(bits: BitSequence, displayWidth: number): Generator<DisplayRow, void>;
 }
-
-export default BinaryEncoder;
-

@@ -1,4 +1,4 @@
-import BinaryEncoder from "./BinaryEncoder.ts";
+import { BinaryEncoder } from "./BinaryEncoder.ts";
 import { EncodingType } from "../Menu.ts";
 import { DisplayRow } from "./DisplayRow.ts";
 import { BitSequence } from "../BitSequence.ts";

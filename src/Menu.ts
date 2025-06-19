@@ -1,4 +1,4 @@
-import BinaryEncoder from "./encoding/BinaryEncoder.ts";
+import { BinaryEncoder } from "./encoding/BinaryEncoder.ts";
 import { FixedWidthEncoder } from "./encoding/FixedWidthEncoder.ts";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
