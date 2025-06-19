@@ -24,7 +24,7 @@ export async function getFeatureFlagsFromURL(): Promise<string[]> {
   const challenge = getOrCreateSessionChallenge();
 
   try {
-    const publicKey = await importSPKI(PUBLIC_KEY, 'RS256', );
+    const publicKey = await importSPKI(PUBLIC_KEY, 'RS256');
     const { payload } = await jwtVerify(token, publicKey);
     console.log(payload);
     if (payload.challenge !== challenge) {
