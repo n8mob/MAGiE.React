@@ -10,7 +10,7 @@ function CategoryBrowser({menuName}: { menuName: string }) {
   const {categoryIndex: categoryIndexParam} = useParams();
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
   const {menu, loading, error} = useMenu(menuName);
-  const { category } = useCategory(menu, categoryIndexParam);
+  const { category } = useCategory(menu, categoryIndex);
 
   useEffect(() => {
     if (!menu) {

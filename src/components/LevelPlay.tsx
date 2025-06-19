@@ -68,14 +68,16 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
   if (!menu || !currentPuzzle || !level) {
     return <><h2>Loading...</h2></>;
   } else {
-    if (!currentPuzzle.encoding) {
-      currentPuzzle.encoding = menu.encodingProviders[currentPuzzle.encoding_name]
-    }
+    const puzzleWithEncoder = currentPuzzle.encoding ? currentPuzzle : {
+      ...currentPuzzle,
+      encoding: menu.encodingProviders[currentPuzzle.encoding_name]
+    };
+
     // Generate a share string for this puzzle context
     const shareString = `I solved the ${level.levelName.join(" ")} puzzle in the ${category?.name || ""} category!`;
     return <>
       <PlayPuzzle
-        puzzle={currentPuzzle}
+        puzzle={puzzleWithEncoder}
         puzzleShareString={shareString}
         onWin={handleWin}
         hasWon={hasWon}

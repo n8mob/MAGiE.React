@@ -29,7 +29,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
     }
 
     setHeaderContent(<div className={'menu-title'}><h3><Link to={`/${menuName}/${categoryIndex}`}>{category.name}</Link></h3>
-      {level.levelName.map(nameLine => <h3>{nameLine}</h3>)}
+      {level.levelName.map((nameLine, i) => <h3 key={i}>{nameLine}</h3>)}
     </div>);
 
   }, [category, categoryIndex, level, levelNumber, menuName, setHeaderContent]);
