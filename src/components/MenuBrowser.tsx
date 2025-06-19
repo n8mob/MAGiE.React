@@ -3,18 +3,15 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
+import { MENU_NAME_MAP } from '../MenuNames.tsx';
 
 function MenuBrowser({menuName}: { menuName: string }) {
   const {menu} = useMenu(menuName);
   const {setHeaderContent} = useHeader();
 
   useEffect(() => {
-    setHeaderContent(<div className={'menu-title'}>
-      <p>-= Proti and Hepi =-</p>
-      <p>in</p>
-      <h3>The Abandoned Mall</h3>
-    </div>);
-  }, [setHeaderContent]);
+    setHeaderContent(MENU_NAME_MAP[menuName]?.titleNode ?? menuName);
+  }, [setHeaderContent, menuName]);
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;
