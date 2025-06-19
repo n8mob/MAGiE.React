@@ -11,9 +11,10 @@ import { useHeader } from "./hooks/useHeader.ts";
 import { MenuBrowser } from './components/MenuBrowser.tsx';
 import { CategoryBrowser } from './components/CategoryBrowser.tsx';
 import LevelPlay from "./components/LevelPlay.tsx";
-import { FEATURES } from "./app.config.ts";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
+import { getFeatureFlagsFromURL } from "./FeatureFlags.ts";
+import { getOrCreateSessionChallenge } from "./SessionChallenge.ts";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -48,6 +49,7 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
+  getOrCreateSessionChallenge();
   const {headerContent} = useHeader();
 
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
@@ -58,8 +60,33 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
+  const [features, setFeatures] = useState<string[]>([]);
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
+
+  useEffect(() => {
+    const initialRetries = 6;
+
+    function checkAndSetFeatures(retries = initialRetries, delay_ms = 200) {
+      if (!window.crypto?.subtle) {
+        console.warn(`${retries}. Web Crypto library not ready yet.`);
+        if (retries > 0) {
+          setTimeout(() => checkAndSetFeatures(retries - 1, delay_ms), delay_ms);
+        } else {
+          console.warn(`Gave up after ${initialRetries} retries.`);
+        }
+        return;
+      }
+
+      console.log('Web Crypto library is ready...');
+
+      getFeatureFlagsFromURL()
+        .then(setFeatures)
+        .catch(console.error);
+    }
+
+    checkAndSetFeatures(initialRetries, 100);
+  }, []);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
@@ -76,31 +103,35 @@ function App() {
     }
   }, [hasSeenHowTo, showHowTo]);
 
+
   const routes = useMemo(() => (
     <Routes>
       <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
       <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
-      {FEATURES.storyRoutes && (<>
+      {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="mall"/>}/>
       </>)}
-      {FEATURES.tutorialRoutes && (<>
+      {features.includes('tutorialRoutes') && (<>
         <Route path="/tutorial" element={<MenuBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial" />}/>
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="tutorial"/>}/>
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial"/>}/>
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="tutorial"/>}/>
       </>)}
-      {FEATURES.bigGameRoutes && (<>
+      {features.includes('bigGameRoutes') && (<>
         <Route path="/bigGame" element={<MenuBrowser menuName="bigGame"/>}/>
         <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame"/>}/>
-        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame" />}/>
-        <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex" element={<LevelPlay menuName="bigGame"/>}/>
+        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame"/>}/>
+        <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="bigGame"/>}/>
       </>)}
-      <Route path={"*"} element={<PageNotFound />}/>
-    </Routes>), []);
+      <Route path={"*"} element={<PageNotFound/>}/>
+    </Routes>), [features]);
 
   return (
     <>
