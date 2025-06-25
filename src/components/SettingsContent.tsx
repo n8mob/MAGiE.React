@@ -21,7 +21,7 @@ export default function SettingsContent({ useLcdFont, setUseLcdFont }: SettingsC
 
   return (
     <>
-      <h2>Settings</h2>
+      <h2>Setting</h2>
       <label>
         <input
           type="checkbox"
