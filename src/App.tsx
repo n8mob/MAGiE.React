@@ -65,27 +65,9 @@ function App() {
   useEffect(() => localStorage.removeItem('seenBefore'), []);
 
   useEffect(() => {
-    const initialRetries = 6;
-
-    function checkAndSetFeatures(retries = initialRetries, delay_ms = 200) {
-      if (!window.crypto?.subtle) {
-        console.warn(`${retries}. Web Crypto library not ready yet.`);
-        if (retries > 0) {
-          setTimeout(() => checkAndSetFeatures(retries - 1, delay_ms), delay_ms);
-        } else {
-          console.warn(`Gave up after ${initialRetries} retries.`);
-        }
-        return;
-      }
-
-      console.log('Web Crypto library is ready...');
-
-      getFeatureFlagsFromURL()
-        .then(setFeatures)
-        .catch(console.error);
-    }
-
-    checkAndSetFeatures(initialRetries, 100);
+    getFeatureFlagsFromURL()
+      .then(setFeatures)
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -116,7 +98,7 @@ function App() {
         <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="mall"/>}/>
       </>)}
-      {features.includes('tutorialRoutes') && (<>
+      {features.includes('tutorial') && (<>
         <Route path="/tutorial" element={<MenuBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial"/>}/>

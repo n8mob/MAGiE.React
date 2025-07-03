@@ -17,8 +17,8 @@ export async function getFeatureFlagsFromURL(): Promise<string[]> {
   const token = params.get('features');
 
   if (!token) {
-    console.warn("No 'features' token found in URL");
-    return [];
+    console.debug('No feature flags found., returning default flags.');
+    return ['tutorial'];
   }
 
   const challenge = getOrCreateSessionChallenge();
