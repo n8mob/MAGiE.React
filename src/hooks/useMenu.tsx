@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { Menu } from "../Menu.ts";
 import { getMenu } from "../PuzzleApi.ts";
 import { MENU_NAME_MAP } from "../MenuNames.tsx";
 
-export function useMenu(menuName: string | undefined) {
+export function useMenu(menuName: string | undefined, setHeaderContent?: Dispatch<SetStateAction<ReactNode>>) {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -27,6 +27,10 @@ export function useMenu(menuName: string | undefined) {
       </div>
     }
 
+    if (setHeaderContent) {
+      setHeaderContent(menuInfo.titleNode ?? menuName);
+    }
+
     getMenu(menuInfo.fullName)
       .then(m => {
         setMenu(m);
@@ -36,7 +40,7 @@ export function useMenu(menuName: string | undefined) {
         setError(e);
         setLoading(false);
       })
-  }, [menuName]);
+  }, [menuName, setHeaderContent]);
 
   return {menu, loading, error};
 }
