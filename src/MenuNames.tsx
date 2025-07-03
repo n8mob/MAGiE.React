@@ -1,5 +1,6 @@
 // Central mapping for menu short names, full names, and display names
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 export interface MenuNameInfo {
   shortName: string;
@@ -21,12 +22,11 @@ export const MENU_NAME_MAP: Record<string, MenuNameInfo> = {
   },
   tutorial: {
     shortName: "tutorial",
-    fullName: "Tutorial-Feb2024",
+    fullName: "Tutorial-June2025",
     titleNode: (
       <div className={'menu-title'}>
-        <p>-= Proti and Hepi =-</p>
-        <p>in</p>
-        <h3>Tutorial</h3>
+        <h3>-= How to Play =-</h3>
+        <p><Link to={'/tutorial/'}>TUTORIAL</Link></p>
       </div>
     )
   },

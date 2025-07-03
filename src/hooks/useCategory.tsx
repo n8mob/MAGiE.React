@@ -1,7 +1,7 @@
 import { Menu } from "../Menu.ts";
 
 export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | number | undefined) {
-  if (!categoryKeyOrIndex || !menu || !menu.categories) {
+  if (!menu || !menu.categories || categoryKeyOrIndex == null) {
     return {category: null};
   }
 
@@ -20,6 +20,8 @@ export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | numb
   }
 
   const category = menu.categories[categoryKey] || null;
-  return {category};
+  if (category && (!category.name || category.name === '')) {
+    category.name = categoryKey;
+  }
+  return { category };
 }
-

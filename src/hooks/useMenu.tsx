@@ -1,9 +1,12 @@
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Menu } from "../Menu.ts";
 import { getMenu } from "../PuzzleApi.ts";
 import { MENU_NAME_MAP } from "../MenuNames.tsx";
 
-export function useMenu(menuName: string | undefined, setHeaderContent?: Dispatch<SetStateAction<ReactNode>>) {
+export function useMenu(
+  menuName: string | undefined,
+  setHeaderContent?: (value: ReactNode) => void
+) {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
