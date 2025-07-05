@@ -104,7 +104,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         'It seems that this browser does not support "Web Share".' +
         '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
-        navigator.clipboard.writeText(shareText)
+        navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
           .then(() => {
             alert("The share message has been copied to your clipboard.");
           })
