@@ -188,11 +188,12 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
       {
         currentPuzzle: puzzle,
         displayRows: [],
+        guessText: puzzle.init || '',
         judgment: new FullJudgment(false, BitSequence.empty(), []),
       }, () => {
         this.updateJudge(puzzle, () => {
-          const newWinText = puzzle.encoding.encodeText(puzzle.winText);
-          this.setState({winBits: newWinText});
+          const newWinBits = puzzle.encoding.encodeText(puzzle.winText);
+          this.setState({winBits: newWinBits});
           this.updateJudgment();
         });
       });
