@@ -189,6 +189,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
         currentPuzzle: puzzle,
         displayRows: [],
         guessText: puzzle.init || '',
+        guessBits: puzzle.encoding ? puzzle.encoding.encodeText(puzzle.init || '') : BitSequence.empty(),
         judgment: new FullJudgment(false, BitSequence.empty(), []),
       }, () => {
         this.updateJudge(puzzle, () => {
