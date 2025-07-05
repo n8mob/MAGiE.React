@@ -257,7 +257,7 @@ class DecodePuzzle extends BasePuzzle {
           {hasWon ? (
             <>
               <div className="share-controls">
-                <button onClick={this.props.onShareWin}>Share Your Win</button>
+                <button type={"button"} onClick={this.props.onShareWin}>Share Your Win</button>
               </div>
               <div className="post-win-links">
                 <p>

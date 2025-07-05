@@ -211,13 +211,6 @@ input[data-correctness="incorrect"]:checked {
   flex-direction: column;
 }
 
-.share-controls button {
-  margin: 0.5em;
-  padding: 1em;
-  border: 2px solid;
-  color: inherit;
-}
-
 .activate-dialog {
   position: fixed;
   top: 1rem;
@@ -238,16 +231,6 @@ input[data-correctness="incorrect"]:checked {
 
 .activate-dialog.right {
   right: 1rem;
-}
-
-
-input[type="button"] {
-  margin: 8px;
-  min-height: 40px;
-  min-width: 40px;
-  font-size: x-large;
-  font-weight: bold;
-  padding: 15px 20px;
 }
 
 @keyframes blink {

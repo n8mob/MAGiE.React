@@ -83,7 +83,7 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
         hasWon={hasWon}
         onShareWin={() => console.log("Share win not implemented")}
       />
-      {hasWon && <input type="button" value="Next Puzzle" onClick={goNext}/>}
+      {hasWon && <button type={"button"} onClick={goNext}>Next Puzzle</button>}
     </>
   }
 

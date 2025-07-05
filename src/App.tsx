@@ -118,25 +118,31 @@ function App() {
   return (
     <>
       <div id="magie-header">
-        <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
-          setShowSettings(true);
-          ReactGA4.event('open_settings_dialog', {
-            source: 'activate_dialog',
-            dialog: 'settings',
-          });
-        }}>
+        <button
+          type={"button"}
+          aria-label={"open settings"}
+          className="activate-dialog left"
+          onClick={() => {
+            setShowSettings(true);
+            ReactGA4.event('open_settings_dialog', {
+              source: 'activate_dialog',
+              dialog: 'settings',
+            });
+          }}>
           ⋮
         </button>
-        <button aria-label={"show how-to information"}
-                className="activate-dialog right"
-                onClick={() => {
-                  setShowHowTo(true);
-                  ReactGA4.event('open_help_dialog', {
-                    source: 'activate_dialog',
-                    dialog: 'help',
-                    is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
-                  });
-                }}>
+        <button
+          type={"button"}
+          aria-label={"show how-to information"}
+          className="activate-dialog right"
+          onClick={() => {
+            setShowHowTo(true);
+            ReactGA4.event('open_help_dialog', {
+              source: 'activate_dialog',
+              dialog: 'help',
+              is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+            });
+          }}>
           ?
         </button>
 

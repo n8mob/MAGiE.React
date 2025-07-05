@@ -273,7 +273,7 @@ abstract class BasePuzzle<TProps extends PuzzleProps = PuzzleProps, TState exten
           }} // read-only bits, EncodePuzzle can add an update function.
         />
         <div className={"encodingInputs"}>
-          <input type="button" value="Check Answer" onClick={this.handleSubmitClick}/>
+          <button type={"button"} onClick={this.handleSubmitClick}>Check Answer</button>
         </div>
       </>
     );
