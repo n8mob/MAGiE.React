@@ -26,7 +26,7 @@ type DayPuzzleProps = {
   initialDate?: Date;
 }
 
-const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
+export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
   const { setHeaderContent } = useHeader();
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [formattedDate, setFormattedDate] = useState("");
@@ -123,5 +123,3 @@ const SpecificDaysPuzzle: FC<DayPuzzleProps> = ({initialDate}) => {
     </>
   );
 };
-
-export default SpecificDaysPuzzle;

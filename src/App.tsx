@@ -1,7 +1,7 @@
 import './App.css'
 import { Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
-import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
+import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useEffect, useMemo, useState } from "react";
 import Dialog from './components/Dialog.tsx';
@@ -88,9 +88,9 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-      <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-      <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
+      <Route path="/" element={<DatePlay initialDate={new Date()}/>}/>
+      <Route path="/today" element={<DatePlay initialDate={new Date()}/>}/>
+      <Route path="/date/:year/:month/:day" element={<DatePlay/>}/>
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>

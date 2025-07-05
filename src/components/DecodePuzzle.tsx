@@ -233,6 +233,7 @@ class DecodePuzzle extends BasePuzzle {
       return <></>;
     }
 
+    const linkBackToStart = "/date/2025/04/04";
     return (
       <>
         <div id="game-content" ref={this.gameContentRef}>
@@ -248,8 +249,11 @@ class DecodePuzzle extends BasePuzzle {
               }} // Bits remain read-only
             />
             <div id="win-message" ref={this.winMessageRef}>
-              {hasWon && <p>{guessText}</p>}
-              {hasWon && <p>...</p>}
+              {/*
+              I added this to hide the weird correct guess for some tutorial puzzles
+              see: https://github.com/n8mob/MAGiE.React/issues/128
+              */}
+              {hasWon && currentPuzzle.init != currentPuzzle.winText && <p>{guessText}</p>}
               {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
                 key={`win-message-${winIndex}`}>{winLine}</p>)}
             </div>
@@ -262,7 +266,7 @@ class DecodePuzzle extends BasePuzzle {
               <div className="post-win-links">
                 <p>
                   <Link
-                    to={"/date/2025/04/04"}
+                    to={linkBackToStart}
                     onClick={() => {
                       ReactGA4.event('story_start_clicked', {
                         source: 'post-win-link',
