@@ -1,7 +1,14 @@
 import { Category } from "../Menu";
 
 export function useLevel(category: Category | null, levelNumberParam: string | number | undefined) {
-  if (!levelNumberParam || !category || !category.levels) {
+  if (!levelNumberParam) {
+    console.debug("No level number provided.");
+    return {level: null};
+  } else if (!category) {
+    console.debug(`Asking for level number ${levelNumberParam}, but no category provided.`);
+    return {level: null};
+  } else if (!category.levels) {
+    console.debug(`Asking for level number ${levelNumberParam}, but category has no levels.`);
     return {level: null};
   }
 
