@@ -47,17 +47,21 @@ export interface Category {
 
 export interface MenuData {
   name: string;
+  updated_at?: string;
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
 }
 
 export class Menu {
   name: string;
+  updated_at?: string;
+
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
   encodingProviders: Record<string, BinaryEncoder>;
   constructor(data: MenuData) {
     this.name = data.name || "Unknown Menu";
+    this.updated_at = data.updated_at;
     this.categories = {};
     Object.entries(data.categories).forEach(([key, category]) => {
       this.categories[key] = { ...category, name: key };
@@ -83,4 +87,5 @@ export interface PuzzleForDate {
   date: string;
   puzzle: Puzzle;
   encoding: EncodingData;
+  updated_at?: string;
 }

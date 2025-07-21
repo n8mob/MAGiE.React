@@ -22,26 +22,18 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
 
   useEffect(() => {
     if (!menu) {
-      console.warn('Waiting for the menu.');
+      console.debug(`Waiting for the ${menuName} menu data.`);
       return;
-    }
-
-    if (!category) {
-      console.warn(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
+    } else if (!category) {
+      console.debug(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
       return;
-    }
-
-    if (!levelNumber) {
-      console.warn('Waiting for the level number.');
+    } else if (!levelNumber) {
+      console.debug('Waiting for the level number.');
       return;
-    }
-
-    if (!puzzleIndex) {
-      console.warn("The puzzleNumber is missing. We'll use the first puzzle.");
-    }
-
-    if (!level) {
-      console.warn(`Waiting for the level with number ${levelNumber})`);
+    } if (puzzleIndex === undefined || puzzleIndex === null || puzzleIndex === '') {
+      console.debug("The puzzleNumber is missing. TODO: default to the first puzzle");
+    } else if (!level) {
+      console.debug(`Waiting for the level with number ${levelNumber})`);
       return;
     }
 
@@ -80,7 +72,6 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
         puzzle={puzzleWithEncoder}
         puzzleShareString={shareString}
         onWin={handleWin}
-        hasWon={hasWon}
         onShareWin={() => console.log("Share win not implemented")}
       />
       {hasWon && <button type={"button"} onClick={goNext}>Next Puzzle</button>}

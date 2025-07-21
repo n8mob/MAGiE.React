@@ -13,8 +13,7 @@ import { CategoryBrowser } from './components/CategoryBrowser.tsx';
 import LevelPlay from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
-import { getFeatureFlagsFromURL } from "./FeatureFlags.ts";
-import { getOrCreateSessionChallenge } from "./SessionChallenge.ts";
+import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -49,7 +48,6 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
-  getOrCreateSessionChallenge();
   const {headerContent} = useHeader();
 
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
@@ -60,15 +58,9 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
-  const [features, setFeatures] = useState<string[]>([]);
+  const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
-
-  useEffect(() => {
-    getFeatureFlagsFromURL()
-      .then(setFeatures)
-      .catch(console.error);
-  }, []);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
@@ -111,6 +103,13 @@ function App() {
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame"/>}/>
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="bigGame"/>}/>
+      </>)}
+      {features.includes('mall') && (<>
+        <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="mall"/>}/>
       </>)}
       <Route path={"*"} element={<PageNotFound/>}/>
     </Routes>), [features]);

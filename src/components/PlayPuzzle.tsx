@@ -10,7 +10,7 @@ import ReactGA4 from "react-ga4";
 interface PlayPuzzleProps {
   puzzle: Puzzle;
   puzzleShareString: string;
-  onWin?: () => void;
+  onWin?: (stopwatch: StopwatchHandle) => void;
   onShareWin?: () => void;
   hasWon?: boolean;
 }
@@ -75,7 +75,9 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         pagePath: window.location.pathname + window.location.search,
         solve_time_seconds: solveTimeSeconds,
       });
-      if (onWin) onWin();
+      if (onWin) {
+        onWin(stopwatchRef.current!);
+      }
     };
     window.addEventListener("winEvent", handleWinEvent);
     return () => {

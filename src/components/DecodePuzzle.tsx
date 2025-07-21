@@ -233,7 +233,6 @@ class DecodePuzzle extends BasePuzzle {
       return <></>;
     }
 
-    const linkBackToStart = "/date/2025/04/04";
     return (
       <>
         <div id="game-content" ref={this.gameContentRef}>
@@ -266,12 +265,12 @@ class DecodePuzzle extends BasePuzzle {
               <div className="post-win-links">
                 <p>
                   <Link
-                    to={linkBackToStart}
+                    to={"/date/2025/04/04"}
                     onClick={() => {
                       ReactGA4.event('story_start_clicked', {
                         source: 'post-win-link',
                         puzzle_slug: currentPuzzle?.slug,
-                        is_first_visit: this.isFirstVisit,
+                        is_first_visit: 'unknown',
                       });
                     }}
                   >
