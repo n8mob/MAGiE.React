@@ -21,39 +21,21 @@ export interface PuzzleProps {
   newSequenceJudgment?: NewSequenceJudgment;
 }
 
-export interface PuzzleState {
-  currentPuzzle?: Puzzle;
-  judge?: BinaryJudge;
-  guessText: string;
-  guessBits: BitSequence;
-  winBits: BitSequence;
-  displayRows: DisplayRow[];
-  judgment: FullJudgment;
-  bitJudge?: BitJudge;
-  newSequenceJudgment?: NewSequenceJudgment;
-  hasWon?: boolean;
-  updating: boolean;
-  bitDisplayWidthPx: number;
-  displayWidth: number;
-}
-
 export function useBasePuzzle(props: PuzzleProps) {
   const displayMatrixRef = useRef<any>(null);
-  const [state, setState] = useState<PuzzleState>(() => {
-    const puzzle = props.puzzle;
-    return {
-      currentPuzzle: puzzle,
-      guessText: puzzle.init || "",
-      guessBits: puzzle.encoding ? puzzle.encoding.encodeText(puzzle.init || "") : BitSequence.empty(),
-      winBits: puzzle.encoding ? puzzle.encoding.encodeText(puzzle.winText) : BitSequence.empty(),
-      displayRows: [],
-      judgment: new FullJudgment(false, BitSequence.empty(), []),
-      hasWon: false,
-      updating: false,
-      bitDisplayWidthPx: props.bitDisplayWidthPx,
-      displayWidth: 0,
-    };
-  });
+
+  // Individual state variables
+  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(props.puzzle);
+  const [guessText, setGuessText] = useState<string>(props.puzzle.init || "");
+  const [guessBits, setGuessBits] = useState<BitSequence>(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.init || "") : BitSequence.empty());
+  const [winBits, setWinBits] = useState<BitSequence>(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.winText) : BitSequence.empty());
+  const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
+  const [judgment, setJudgment] = useState<FullJudgment>(new FullJudgment(false, BitSequence.empty(), []));
+  const [hasWon, setHasWon] = useState<boolean>(false);
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [bitDisplayWidthPx, setBitDisplayWidthPx] = useState<number>(props.bitDisplayWidthPx);
+  const [displayWidth, setDisplayWidth] = useState<number>(0);
+  const [judge, setJudge] = useState<BinaryJudge | undefined>(undefined);
 
   // Preload images
   useEffect(() => {
@@ -74,10 +56,10 @@ export function useBasePuzzle(props: PuzzleProps) {
   const updateDisplayWidth = useCallback(() => {
     if (displayMatrixRef.current) {
       const displayMatrixWidth = displayMatrixRef.current.getWidth();
-      const newDisplayWidth = Math.floor(displayMatrixWidth / state.bitDisplayWidthPx);
-      setState(s => ({ ...s, displayWidth: newDisplayWidth }));
+      const newDisplayWidth = Math.floor(displayMatrixWidth / bitDisplayWidthPx);
+      setDisplayWidth(newDisplayWidth);
     }
-  }, [state.bitDisplayWidthPx]);
+  }, [bitDisplayWidthPx]);
 
   useEffect(() => {
     updateDisplayWidth();
@@ -88,27 +70,26 @@ export function useBasePuzzle(props: PuzzleProps) {
   // Judge setup
   const updateJudge = useCallback((puzzle: Puzzle) => {
     if (!puzzle.encoding) return;
-    let judge: BinaryJudge | undefined;
+    let newJudge: BinaryJudge | undefined;
     if (puzzle.encoding instanceof VariableWidthEncoder) {
-      judge = puzzle.type === "Encode"
+      newJudge = puzzle.type === "Encode"
         ? new VariableWidthEncodingJudge(puzzle.encoding)
         : new VariableWidthDecodingJudge(puzzle.encoding);
     } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      judge = puzzle.type === "Encode"
+      newJudge = puzzle.type === "Encode"
         ? new FixedWidthEncodingJudge(puzzle.encoding)
         : new FixedWidthDecodingJudge(puzzle.encoding);
     }
-    setState(s => ({ ...s, judge }));
+    setJudge(newJudge);
   }, []);
 
   // Update judgment
   const updateJudgment = useCallback(() => {
-    const { currentPuzzle, judge, guessBits, winBits, bitJudge, newSequenceJudgment, guessText } = state;
     if (!currentPuzzle || !judge) return;
-    const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, state.displayWidth);
-    const newJudgment = judge.judgeBits(guessBits, winBits, splitter, bitJudge, newSequenceJudgment);
-    if (newJudgment && !newJudgment.equals(state.judgment)) {
-      setState(s => ({ ...s, judgment: newJudgment }));
+    const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, displayWidth);
+    const newJudgment = judge.judgeBits(guessBits, winBits, splitter, props.bitJudge, props.newSequenceJudgment);
+    if (newJudgment && !newJudgment.equals(judgment)) {
+      setJudgment(newJudgment);
       displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
       const eventParams = {
         puzzle_slug: currentPuzzle.slug,
@@ -128,41 +109,59 @@ export function useBasePuzzle(props: PuzzleProps) {
       }
     }
     updateDisplayRows();
-  }, [state, props, displayMatrixRef]);
+  }, [currentPuzzle, judge, guessBits, winBits, judgment, displayWidth, guessText, props]);
 
   // Update display rows
   const updateDisplayRows = useCallback(() => {
-    const { currentPuzzle, displayWidth } = state;
     if (!currentPuzzle) return;
-    const newDisplayRows: DisplayRow[] = [...currentPuzzle.encoding.splitForDisplay(state.guessBits, displayWidth)];
-    setState(s => ({ ...s, displayRows: newDisplayRows }));
-  }, [state]);
+    const newDisplayRows: DisplayRow[] = [...currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth)];
+    setDisplayRows(newDisplayRows);
+  }, [currentPuzzle, guessBits, displayWidth]);
 
   // Update puzzle when prop changes
   useEffect(() => {
-    setState(s => ({
-      ...s,
-      currentPuzzle: props.puzzle,
-      displayRows: [],
-      guessText: props.puzzle.init || "",
-      guessBits: props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.init || "") : BitSequence.empty(),
-      judgment: new FullJudgment(false, BitSequence.empty(), []),
-      winBits: props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.winText) : BitSequence.empty(),
-    }));
+    setCurrentPuzzle(props.puzzle);
+    setGuessText(props.puzzle.init || "");
+    setGuessBits(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.init || "") : BitSequence.empty());
+    setWinBits(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.winText) : BitSequence.empty());
+    setJudgment(new FullJudgment(false, BitSequence.empty(), []));
+    setHasWon(false);
+    setUpdating(false);
+    setBitDisplayWidthPx(props.bitDisplayWidthPx);
+    setDisplayRows([]);
     updateJudge(props.puzzle);
-  }, [props.puzzle, updateJudge]);
+  }, [props.puzzle, props.bitDisplayWidthPx, updateJudge]);
 
   // Update judgment when relevant state changes
   useEffect(() => {
     updateJudgment();
-  }, [state.currentPuzzle, state.guessText, state.guessBits, state.winBits, state.judge]);
+  }, [currentPuzzle, guessText, guessBits, winBits, judge, displayWidth]);
 
   return {
-    state,
-    setState,
     displayMatrixRef,
+    currentPuzzle,
+    setCurrentPuzzle,
+    guessText,
+    setGuessText,
+    guessBits,
+    setGuessBits,
+    winBits,
+    setWinBits,
+    displayRows,
+    setDisplayRows,
+    judgment,
+    setJudgment,
+    hasWon,
+    setHasWon,
+    updating,
+    setUpdating,
+    bitDisplayWidthPx,
+    setBitDisplayWidthPx,
+    displayWidth,
+    setDisplayWidth,
+    judge,
+    setJudge,
     updateJudgment,
     updateDisplayRows,
   };
 }
-

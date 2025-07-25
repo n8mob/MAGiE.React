@@ -15,7 +15,6 @@ interface DailyPuzzleProps {
 
 const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
-  const [hasWon, setHasWon] = useState(false);
   const [puzzleDayString, setPuzzleDayString] = useState("");
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
@@ -58,7 +57,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
-    setHasWon(false);
 
     const todayString = date.getDate() == new Date().getDate() ? "today, " : "";
     setPuzzleDayString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
@@ -67,7 +65,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
 
   useEffect(() => {
     const handleWinEvent = () => {
-      setHasWon(true);
       let solveTimeSeconds = -1;
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
@@ -103,7 +100,7 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
     return () => {
       window.removeEventListener("winEvent", handleWinEvent);
     };
-  }, []);
+  }, [currentPuzzle.encoding, currentPuzzle.encoding_name, currentPuzzle.slug, currentPuzzle.winText]);
 
   const handleWin = () => {
     const winEvent = new Event("winEvent");
@@ -154,7 +151,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
         <EncodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />
@@ -163,7 +159,6 @@ const DailyPuzzle = ({puzzle, date, formattedDate}: DailyPuzzleProps) => {
         <DecodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />

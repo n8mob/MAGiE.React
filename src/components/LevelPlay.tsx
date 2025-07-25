@@ -79,6 +79,7 @@ const LevelPlay: FC<LevelPlayProps> = ({menuName}) => {
   }
 
   function handleWin() {
+    console.debug('LevelPlay.handleWin');
     setHasWon(true);
   }
 

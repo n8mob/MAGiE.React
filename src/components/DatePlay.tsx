@@ -148,6 +148,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
   };
 
   function handleWin(stopwatch: StopwatchHandle) {
+    console.debug(`DatePlay handles win at ${{stopwatch}}`);
     setHasWon(true);
     updateSolveTime(stopwatch);
 

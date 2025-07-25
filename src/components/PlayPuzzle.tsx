@@ -12,12 +12,10 @@ interface PlayPuzzleProps {
   puzzleShareString: string;
   onWin?: (stopwatch: StopwatchHandle) => void;
   onShareWin?: () => void;
-  hasWon?: boolean;
 }
 
-const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasWonProp }: PlayPuzzleProps) => {
+const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
-  const [hasWon, setHasWon] = useState(false);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
@@ -49,13 +47,12 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
-    setHasWon(false);
     setSolveTimeString("");
   }, [puzzle]);
 
   useEffect(() => {
     const handleWinEvent = () => {
-      setHasWon(true);
+      console.debug("PlayPuzzle detected winEvent");
       let solveTimeSeconds = -1;
       if (stopwatchRef.current) {
         stopwatchRef.current.stop();
@@ -136,7 +133,6 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         <EncodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />
@@ -145,7 +141,6 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         <DecodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
           bitDisplayWidthPx={32}
         />

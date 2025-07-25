@@ -101,6 +101,9 @@ export const getDailyPuzzleForYearMonthDay = async (
   if (storedPuzzleForDate) {
     try {
       puzzleData = JSON.parse(storedPuzzleForDate);
+      if (!puzzleData) {
+        console.warn(`storedPuzzleForDate for ${dateKey} failed to parse into a PuzzleForDate object.`);
+      }
     } catch (error) {
       console.error('Failed to parse puzzle data from local storage:', error);
       localStorage.removeItem(dateKey);
@@ -110,17 +113,24 @@ export const getDailyPuzzleForYearMonthDay = async (
   const datePuzzleUrl = `${API_BASE_URL}/puzzles/daily/${year}/${paddedMonth}/${paddedDay}/`;
   let response;
   const headers: Record<string, string> = {};
+  let updated_at_header_value = '';
+  if (puzzleData && puzzleData.updated_at) {
+    updated_at_header_value = new Date(puzzleData.updated_at).toUTCString();
+  }
+
   try {
-    if (puzzleData && puzzleData.updated_at) {
-      headers['If-Modified-Since'] = new Date(puzzleData.updated_at).toUTCString();
+    if (updated_at_header_value) {
+      console.debug(`If-Modified-Since: ${updated_at_header_value}`);
+      headers['If-Modified-Since'] = updated_at_header_value;
     }
-    response = await axios.get(datePuzzleUrl, { responseType: 'json', headers });
+    response = await axios.get(datePuzzleUrl, {responseType: 'json', headers});
   } catch (webError) {
     console.error(`Failed to fetch or parse puzzle data for ${year}-${paddedMonth}-${paddedDay}:`, webError);
     throw webError;
   }
 
   if (response.status == 304 && puzzleData) {
+    console.debug(`Puzzle has not changed since `)
     return puzzleData;
   }
 

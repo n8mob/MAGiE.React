@@ -1,96 +1,72 @@
-import { PuzzleProps, PuzzleState } from "./BasePuzzle.tsx";
+import React, { useCallback, useEffect } from "react";
+import { useBasePuzzle, PuzzleProps } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
-import { BasePuzzle } from "./BasePuzzle";
-import { ChangeEvent } from "react";
-import { DisplayRow } from "../encoding/DisplayRow.ts";
 
-class EncodePuzzle extends BasePuzzle {
-  constructor(props: PuzzleProps) {
-    super(props);
-  }
+const EncodePuzzle: React.FC<PuzzleProps> = (props) => {
+  const {
+    displayMatrixRef,
+    currentPuzzle,
+    guessBits,
+    setGuessBits,
+    displayRows,
+    judgment,
+    updateJudgment,
+  } = useBasePuzzle(props);
 
-  handleKeyDown(event: KeyboardEvent) {
-    const {guessBits} = this.state;
-
+  // Handle key down for bit input
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (!currentPuzzle) return;
     switch (event.key) {
       case "0":
-      case "1":
-        this.setState(
-          {guessBits: guessBits.appendBit(event.key)} as PuzzleState, // Append the bit
-          () => this.updateJudgment() // Recheck win condition
-        );
+      case "1": {
+        setGuessBits(guessBits.appendBit(event.key));
+        updateJudgment();
         break;
-
-      case "Backspace":
-        this.setState(
-          {guessBits: guessBits.slice(0, -1)} as PuzzleState, // Remove the last bit
-          () => this.updateJudgment() // Recheck win condition
-        );
+      }
+      case "Backspace": {
+        setGuessBits(guessBits.slice(0, -1));
+        updateJudgment();
         break;
+      }
       default:
-        break; // Ignore other keys
+        break;
     }
-  }
+  }, [currentPuzzle, guessBits, setGuessBits, updateJudgment]);
 
-  handleBitClick = (event: ChangeEvent<HTMLInputElement>) => {
-    const {bitIndex} = event.target.dataset;
-    const {guessBits} = this.state;
-    console.log(`guess state: ${guessBits.toString()}`);
-
-    if (bitIndex === undefined) {
-      console.error("Missing bitIndex in dataset");
-      return;
-    }
-
+  // Handle bit click for toggling bits
+  const handleBitClick = useCallback((event: any) => {
+    const bitIndex = event.target.dataset.bitIndex;
+    if (bitIndex === undefined) return;
     const index = parseInt(bitIndex);
-    const before = guessBits.toPlainString().slice(0, index);
-    const toToggle = guessBits.slice(index, index + 1);
-    const didToggle = toToggle.toPlainString() === "1" ? "0" : "1";
-    const after = guessBits.slice(index + 1);
-    const toggled = guessBits.toggleBit(index);
+    setGuessBits(guessBits.toggleBit(index));
+    updateJudgment();
+  }, [guessBits, setGuessBits, updateJudgment]);
 
-    console.log(`toggle ${before}[${toToggle}/${didToggle}]${after}`);
-    this.setState(
-      { guessBits: toggled } as PuzzleState,
-      () => this.updateJudgment()
-    );
-  };
+  // Attach keydown listener
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
-  *splitForDisplay(displayWidth: number): Generator<DisplayRow, void> {
-    if (!this.state.currentPuzzle) {
-      return;
-    }
+  if (!currentPuzzle) return <></>;
 
-    yield* this.state.currentPuzzle.encoding.splitForDisplay(this.state.guessBits, displayWidth);
-  }
-
-  render() {
-    const {currentPuzzle, displayRows, judgment} = this.state;
-
-    if (!currentPuzzle) {
-      console.error('Missing puzzle');
-      return <></>;
-    }
-
-    return (
-      <>
-        <div id="main-display">
-          {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-          <DisplayMatrix
-            ref={this.displayMatrixRef}
-            displayRows={displayRows}
-            judgments={judgment.sequenceJudgments}
-            handleBitClick={this.handleBitClick}
-          />
-          {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p
-            key={`win-text-${winIndex}`}>{winLine}</p>)}
-        </div>
-        <div id="puzzle-inputs">
-          <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
-        </div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div id="main-display">
+        {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+        <DisplayMatrix
+          ref={displayMatrixRef}
+          displayRows={displayRows}
+          judgments={judgment.sequenceJudgments}
+          handleBitClick={handleBitClick}
+        />
+        {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+      </div>
+      <div id="puzzle-inputs">
+        <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
+      </div>
+    </>
+  );
+};
 
 export { EncodePuzzle };
