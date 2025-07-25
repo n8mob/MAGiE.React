@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Menu } from "../Menu.ts";
+import { Menu } from "../model.ts";
 import { getMenu } from "../PuzzleApi.ts";
 import { MENU_NAME_MAP } from "../MenuNames.tsx";
 

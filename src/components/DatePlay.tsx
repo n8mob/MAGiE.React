@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDailyPuzzleForDate } from "../PuzzleApi.ts";
 import { PlayPuzzle } from "./PlayPuzzle";
 import { FC, useEffect, useState } from "react";
-import { Puzzle } from "../Menu.ts";
+import { Puzzle } from "../model.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
 import { shortDate } from "./DateFormatter.tsx";

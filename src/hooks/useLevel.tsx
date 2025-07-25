@@ -1,4 +1,4 @@
-import { Category } from "../Menu";
+import { Category } from "../model.ts";
 
 export function useLevel(category: Category | null, levelNumberParam: string | number | undefined) {
   if (!levelNumberParam) {

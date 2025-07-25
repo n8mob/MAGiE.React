@@ -1,5 +1,5 @@
 import { Component, createRef, RefObject } from "react";
-import { Puzzle } from "../Menu.ts";
+import { Puzzle } from "../model.ts";
 import { BinaryJudge, BitJudge, NewSequenceJudgment } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { DisplayMatrix, DisplayMatrixUpdate } from "./DisplayMatrix.tsx";

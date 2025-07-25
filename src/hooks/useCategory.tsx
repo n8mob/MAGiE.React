@@ -1,4 +1,4 @@
-import { Menu } from "../Menu.ts";
+import { Menu } from "../model.ts";
 
 export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | number | undefined) {
   if (!categoryKeyOrIndex) {

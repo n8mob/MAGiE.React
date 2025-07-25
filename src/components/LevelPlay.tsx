@@ -1,4 +1,4 @@
-import { Puzzle } from "../Menu.ts";
+import { Puzzle } from "../model.ts";
 import { FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PlayPuzzle } from "./PlayPuzzle";

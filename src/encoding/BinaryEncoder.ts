@@ -1,4 +1,4 @@
-import { EncodingType } from "../Menu.ts";
+import { EncodingType } from "../model.ts";
 import { DisplayRow } from "./DisplayRow.ts";
 import { BitSequence } from "../BitSequence.ts";
 

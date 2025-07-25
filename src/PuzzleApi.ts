@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PuzzleForDate, Menu, Puzzle, MenuData } from "./Menu.ts";
+import { PuzzleForDate, Menu, Puzzle, MenuData } from "./model.ts";
 
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 

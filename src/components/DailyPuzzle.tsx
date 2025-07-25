@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
-import { Puzzle } from "../Menu.ts";
+import { Puzzle } from "../model.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 
