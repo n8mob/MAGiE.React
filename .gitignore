@@ -22,10 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/vite.config.local.ts
 
 # Ignore source map files
 *.map
+
+# ignore vite local config and its transpiled .js file
+vite.config.local.ts
+vite.config.local.js
 
 .env
 .env.prod
