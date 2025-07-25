@@ -68,20 +68,27 @@ export function useBasePuzzle(props: PuzzleProps) {
   }, [updateDisplayWidth]);
 
   // Judge setup
-  const updateJudge = useCallback((puzzle: Puzzle) => {
-    if (!puzzle.encoding) return;
+  useEffect(() => {
+    if (!currentPuzzle || !currentPuzzle.encoding) return;
     let newJudge: BinaryJudge | undefined;
-    if (puzzle.encoding instanceof VariableWidthEncoder) {
-      newJudge = puzzle.type === "Encode"
-        ? new VariableWidthEncodingJudge(puzzle.encoding)
-        : new VariableWidthDecodingJudge(puzzle.encoding);
-    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
-      newJudge = puzzle.type === "Encode"
-        ? new FixedWidthEncodingJudge(puzzle.encoding)
-        : new FixedWidthDecodingJudge(puzzle.encoding);
+    if (currentPuzzle.encoding instanceof VariableWidthEncoder) {
+      newJudge = currentPuzzle.type === "Encode"
+        ? new VariableWidthEncodingJudge(currentPuzzle.encoding)
+        : new VariableWidthDecodingJudge(currentPuzzle.encoding);
+    } else if (currentPuzzle.encoding instanceof FixedWidthEncoder) {
+      newJudge = currentPuzzle.type === "Encode"
+        ? new FixedWidthEncodingJudge(currentPuzzle.encoding)
+        : new FixedWidthDecodingJudge(currentPuzzle.encoding);
     }
     setJudge(newJudge);
-  }, []);
+  }, [currentPuzzle]);
+
+  // Update display rows
+  const updateDisplayRows = useCallback(() => {
+    if (!currentPuzzle) return;
+    const newDisplayRows: DisplayRow[] = [...currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth)];
+    setDisplayRows(newDisplayRows);
+  }, [currentPuzzle, guessBits, displayWidth]);
 
   // Update judgment
   const updateJudgment = useCallback(() => {
@@ -109,14 +116,7 @@ export function useBasePuzzle(props: PuzzleProps) {
       }
     }
     updateDisplayRows();
-  }, [currentPuzzle, judge, guessBits, winBits, judgment, displayWidth, guessText, props]);
-
-  // Update display rows
-  const updateDisplayRows = useCallback(() => {
-    if (!currentPuzzle) return;
-    const newDisplayRows: DisplayRow[] = [...currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth)];
-    setDisplayRows(newDisplayRows);
-  }, [currentPuzzle, guessBits, displayWidth]);
+  }, [currentPuzzle, judge, guessBits, winBits, props, judgment, updateDisplayRows, displayWidth, guessText]);
 
   // Update puzzle when prop changes
   useEffect(() => {
@@ -129,13 +129,12 @@ export function useBasePuzzle(props: PuzzleProps) {
     setUpdating(false);
     setBitDisplayWidthPx(props.bitDisplayWidthPx);
     setDisplayRows([]);
-    updateJudge(props.puzzle);
-  }, [props.puzzle, props.bitDisplayWidthPx, updateJudge]);
+  }, [props.puzzle, props.bitDisplayWidthPx]);
 
   // Update judgment when relevant state changes
   useEffect(() => {
     updateJudgment();
-  }, [currentPuzzle, guessText, guessBits, winBits, judge, displayWidth]);
+  }, [currentPuzzle, guessText, guessBits, winBits, judge, displayWidth, updateJudgment]);
 
   return {
     displayMatrixRef,

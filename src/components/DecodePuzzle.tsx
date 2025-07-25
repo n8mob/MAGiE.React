@@ -1,8 +1,9 @@
-import { useBasePuzzle, PuzzleProps } from "./useBasePuzzle";
+import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
-import { ChangeEvent, FC, useRef, useEffect } from "react";
+import { ChangeEvent, FC, useCallback, useEffect, useRef, useState } from "react";
+import { BitSequence } from "../BitSequence";
 
 const DecodePuzzle: FC<PuzzleProps> = (props) => {
   const {
@@ -24,16 +25,38 @@ const DecodePuzzle: FC<PuzzleProps> = (props) => {
   const winMessageRef = useRef<HTMLDivElement>(null);
   const puzzleInputsRef = useRef<HTMLDivElement>(null);
   const resizeTimeout = useRef<number | null>(null);
+  const [displayWidth, setDisplayWidth] = useState<number>(13);
 
-  // Initialize displayRows to winText bits with 'unknown' judgment on mount/puzzle change
   useEffect(() => {
+    setDisplayWidth(bitDisplayWidthPx ? Math.floor((displayMatrixRef.current?.getWidth?.() ?? 0) / bitDisplayWidthPx) : 0);
+  }, [displayMatrixRef, bitDisplayWidthPx]);
+
+  const getDisplayRows = useCallback(
+    (winBits: BitSequence, guessBits: BitSequence, displayWidth: number) => {
+      const allBits = winBits.appendBits(guessBits.slice(winBits.length));
+      if (!currentPuzzle || !currentPuzzle.encoding) {
+        console.warn('No current puzzle or encoding available for display rows.');
+        return [];
+      } else {
+        return [...currentPuzzle.encoding.splitForDisplay(allBits, displayWidth)];
+      }
+    },
+    [currentPuzzle]
+  );
+
+  useEffect(() => {
+    console.debug("Initialize displayRows to winText bits with 'unknown' judgment on mount/puzzle change")
     if (currentPuzzle && currentPuzzle.type === "Decode") {
+      if (!currentPuzzle.encoding) {
+        console.error(`Puzzle ${currentPuzzle.slug} has no encoding (expecting ${currentPuzzle.encoding_name}.`);
+      }
       const winBits = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
-      const displayWidth = bitDisplayWidthPx ? Math.floor((displayMatrixRef.current?.getWidth?.() ?? 0) / bitDisplayWidthPx) : 0;
-      const rows = currentPuzzle.encoding ? [...currentPuzzle.encoding.splitForDisplay(winBits, displayWidth)] : [];
+      // Use getDisplayRows to include extra guess bits
+      const rows = getDisplayRows(winBits, guessBits, displayWidth);
+      updateJudgment();
       setDisplayRows(rows);
     }
-  }, [currentPuzzle, bitDisplayWidthPx, displayMatrixRef, setDisplayRows]);
+  }, [currentPuzzle, displayWidth, getDisplayRows, setDisplayRows, updateJudgment, guessBits]);
 
   // Handle guess update
   const handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +93,10 @@ const DecodePuzzle: FC<PuzzleProps> = (props) => {
       }
     }
     // Scroll the row into view, but keep #puzzle-inputs visible
-    if (rowIndex !== -1 && displayMatrixRef.current && typeof displayMatrixRef.current.getBitRowElement === 'function') {
+    if (rowIndex !== -1
+      && displayMatrixRef.current
+      && typeof displayMatrixRef.current.getBitRowElement === 'function'
+    ) {
       const lastChangedRow = displayMatrixRef.current.getBitRowElement(rowIndex);
       const mainDisplay = mainDisplayRef.current;
       const puzzleInputs = puzzleInputsRef.current;
