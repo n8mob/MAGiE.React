@@ -1,7 +1,7 @@
 import { Menu } from "../model.ts";
 
 export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | number | undefined) {
-  if (!categoryKeyOrIndex) {
+  if (categoryKeyOrIndex === undefined || categoryKeyOrIndex === null) {
     console.debug("No category key or index provided.");
     return {category: null};
   } else if (!menu) {
