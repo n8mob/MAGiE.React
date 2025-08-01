@@ -134,7 +134,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
-          bitDisplayWidthPx={32}
+          bitButtonWidthPx={32}
         />
       }
       {currentPuzzle.type === "Decode" &&
@@ -142,7 +142,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
-          bitDisplayWidthPx={32}
+          bitButtonWidthPx={32}
         />
       }
     </>

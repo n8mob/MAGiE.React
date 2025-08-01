@@ -1,46 +1,67 @@
-import React, { useCallback, useEffect } from "react";
-import { useBasePuzzle, PuzzleProps } from "./useBasePuzzle";
+import { ChangeEvent, FC, useCallback, useEffect, useMemo, useState } from "react";
+import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
+import { BitSequence } from "../BitSequence.ts";
 
-const EncodePuzzle: React.FC<PuzzleProps> = (props) => {
+const EncodePuzzle: FC<PuzzleProps> = (
+    {
+      puzzle,
+      onWin = () => {},
+      onShareWin = () => {},
+      bitButtonWidthPx = 32
+    }) => {
+  const [guessBits, setGuessBits] = useState(BitSequence.empty());
+
   const {
     displayMatrixRef,
-    currentPuzzle,
-    guessBits,
-    setGuessBits,
-    displayRows,
     judgment,
-    updateJudgment,
-  } = useBasePuzzle(props);
+    hasWon,
+    displayWidth
+  } = useBasePuzzle({
+    puzzle,
+    guessBits,
+    onWin,
+    onShareWin,
+    bitButtonWidthPx,
+    bitJudge: undefined,
+    newSequenceJudgment: undefined,
+  });
 
-  // Handle key down for bit input
+  const displayRows = useMemo(
+    () => Array.from(puzzle.encoding.splitForDisplay(guessBits, displayWidth)
+    ), [puzzle, guessBits, displayWidth]);
+
+  // Handle key down for entering bits from the 1 and 0 keys
+  // (and backspace for deleting bits)
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!currentPuzzle) return;
+    if (!puzzle) {
+      return;
+    }
     switch (event.key) {
       case "0":
       case "1": {
         setGuessBits(guessBits.appendBit(event.key));
-        updateJudgment();
         break;
       }
       case "Backspace": {
         setGuessBits(guessBits.slice(0, -1));
-        updateJudgment();
         break;
       }
       default:
         break;
     }
-  }, [currentPuzzle, guessBits, setGuessBits, updateJudgment]);
+  }, [puzzle, guessBits, setGuessBits]);
 
   // Handle bit click for toggling bits
-  const handleBitClick = useCallback((event: any) => {
+  // HTMLInputElement instead of a button type because the buttons are actually checkboxes
+  const handleBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const bitIndex = event.target.dataset.bitIndex;
-    if (bitIndex === undefined) return;
+    if (bitIndex === undefined) {
+      return;
+    }
     const index = parseInt(bitIndex);
     setGuessBits(guessBits.toggleBit(index));
-    updateJudgment();
-  }, [guessBits, setGuessBits, updateJudgment]);
+  }, [guessBits, setGuessBits]);
 
   // Attach keydown listener
   useEffect(() => {
@@ -48,23 +69,29 @@ const EncodePuzzle: React.FC<PuzzleProps> = (props) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  if (!currentPuzzle) return <></>;
+  if (!puzzle) {
+    return <></>;
+  }
 
   return (
     <>
       <div id="main-display">
-        {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+        {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
         <DisplayMatrix
           ref={displayMatrixRef}
           displayRows={displayRows}
           judgments={judgment.sequenceJudgments}
           handleBitClick={handleBitClick}
         />
-        {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+        {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
+          <p key={`win-text-${winIndex}`}>{winLine}</p>)}
       </div>
-      <div id="puzzle-inputs">
-        <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
-      </div>
+      {hasWon
+        ? (<div id="puzzle-inputs">
+          <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
+        </div>)
+        : (<div className={"debug-win-message"}><p>You win!</p></div>)
+      }
     </>
   );
 };

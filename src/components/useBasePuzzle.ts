@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Puzzle } from "../model.ts";
 import { BinaryJudge, BitJudge, NewSequenceJudgment } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
-import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
 import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
@@ -11,31 +10,58 @@ import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
 import { FixedWidthDecodingJudge } from "../judgment/FixedWidthDecodingJudge.ts";
 import { VariableWidthEncodingJudge } from "../judgment/VariableWidthEncodingJudge.ts";
 import { FixedWidthEncodingJudge } from "../judgment/FixedWidthEncodingJudge.ts";
+import { DisplayMatrixUpdate } from "./DisplayMatrix.tsx";
 
 export interface PuzzleProps {
   puzzle: Puzzle;
+  onWin?: () => void;
+  onShareWin?: () => void;
+  bitButtonWidthPx: number;
+}
+
+export interface UseBasePuzzleProps {
+  puzzle: Puzzle;
+  guessBits: BitSequence;
   onWin: () => void;
   onShareWin: () => void;
-  bitDisplayWidthPx: number;
+  bitButtonWidthPx: number;
   bitJudge?: BitJudge;
   newSequenceJudgment?: NewSequenceJudgment;
 }
 
-export function useBasePuzzle(props: PuzzleProps) {
-  const displayMatrixRef = useRef<any>(null);
+export function useBasePuzzle(
+  {
+    puzzle,
+    guessBits,
+    onWin,
+    bitButtonWidthPx,
+    bitJudge,
+    newSequenceJudgment
+  }: UseBasePuzzleProps
+) {
+  const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
+  const [displayWidthInPx, setDisplayWidthInPx] = useState<number>(window.innerWidth);
 
   // Individual state variables
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | undefined>(props.puzzle);
-  const [guessText, setGuessText] = useState<string>(props.puzzle.init || "");
-  const [guessBits, setGuessBits] = useState<BitSequence>(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.init || "") : BitSequence.empty());
-  const [winBits, setWinBits] = useState<BitSequence>(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.winText) : BitSequence.empty());
-  const [displayRows, setDisplayRows] = useState<DisplayRow[]>([]);
   const [judgment, setJudgment] = useState<FullJudgment>(new FullJudgment(false, BitSequence.empty(), []));
+  const previousJudgment = useRef<FullJudgment>(judgment);
   const [hasWon, setHasWon] = useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
-  const [bitDisplayWidthPx, setBitDisplayWidthPx] = useState<number>(props.bitDisplayWidthPx);
-  const [displayWidth, setDisplayWidth] = useState<number>(0);
-  const [judge, setJudge] = useState<BinaryJudge | undefined>(undefined);
+  const displayWidthInBitCount = useMemo(() => {
+    // Use a sensible default if ref is not ready
+    if (displayWidthInPx && displayWidthInPx > 0) {
+      return Math.floor(displayWidthInPx / bitButtonWidthPx);
+    }
+    // Default to 8 bits per row if not ready
+    return 8;
+  }, [bitButtonWidthPx, displayWidthInPx]);
+
+  const winBits = useMemo(() => {
+    if (!puzzle || !puzzle.winText) {
+      return BitSequence.empty();
+    }
+    return puzzle.encoding.encodeText(puzzle.winText);
+  }, [puzzle]);
 
   // Preload images
   useEffect(() => {
@@ -52,115 +78,92 @@ export function useBasePuzzle(props: PuzzleProps) {
     });
   }, []);
 
-  // Update display width on mount and resize
-  const updateDisplayWidth = useCallback(() => {
-    if (displayMatrixRef.current) {
-      const displayMatrixWidth = displayMatrixRef.current.getWidth();
-      const newDisplayWidth = Math.floor(displayMatrixWidth / bitDisplayWidthPx);
-      setDisplayWidth(newDisplayWidth);
-    }
-  }, [bitDisplayWidthPx]);
-
+  // Update display width on resize
   useEffect(() => {
-    updateDisplayWidth();
-    window.addEventListener("resize", updateDisplayWidth);
-    return () => window.removeEventListener("resize", updateDisplayWidth);
-  }, [updateDisplayWidth]);
-
-  // Judge setup
-  useEffect(() => {
-    if (!currentPuzzle || !currentPuzzle.encoding) return;
-    let newJudge: BinaryJudge | undefined;
-    if (currentPuzzle.encoding instanceof VariableWidthEncoder) {
-      newJudge = currentPuzzle.type === "Encode"
-        ? new VariableWidthEncodingJudge(currentPuzzle.encoding)
-        : new VariableWidthDecodingJudge(currentPuzzle.encoding);
-    } else if (currentPuzzle.encoding instanceof FixedWidthEncoder) {
-      newJudge = currentPuzzle.type === "Encode"
-        ? new FixedWidthEncodingJudge(currentPuzzle.encoding)
-        : new FixedWidthDecodingJudge(currentPuzzle.encoding);
-    }
-    setJudge(newJudge);
-  }, [currentPuzzle]);
-
-  // Update display rows
-  const updateDisplayRows = useCallback(() => {
-    if (!currentPuzzle) return;
-    const newDisplayRows: DisplayRow[] = [...currentPuzzle.encoding.splitForDisplay(guessBits, displayWidth)];
-    setDisplayRows(newDisplayRows);
-  }, [currentPuzzle, guessBits, displayWidth]);
-
-  // Update judgment
-  const updateJudgment = useCallback(() => {
-    if (!currentPuzzle || !judge) return;
-    const splitter = (bits: BitSequence) => currentPuzzle.encoding.splitForDisplay(bits, displayWidth);
-    const newJudgment = judge.judgeBits(guessBits, winBits, splitter, props.bitJudge, props.newSequenceJudgment);
-    if (newJudgment && !newJudgment.equals(judgment)) {
-      setJudgment(newJudgment);
-      displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
-      const eventParams = {
-        puzzle_slug: currentPuzzle.slug,
-        guess_bits: guessBits,
-        guess_text: guessText,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
-        judgment_is_correct: newJudgment.isCorrect,
-        pagePath: window.location.pathname + window.location.search,
-      };
-      if (newJudgment.isCorrect) {
-        ReactGA4.event("winning_judgment", eventParams);
-        props.onWin();
-      } else {
-        ReactGA4.event("guess", eventParams);
+    const updateDisplayWidth = () => {
+      if (displayMatrixRef.current) {
+        setDisplayWidthInPx(displayMatrixRef.current.getWidth());
       }
     }
-    updateDisplayRows();
-  }, [currentPuzzle, judge, guessBits, winBits, props, judgment, updateDisplayRows, displayWidth, guessText]);
 
-  // Update puzzle when prop changes
-  useEffect(() => {
-    setCurrentPuzzle(props.puzzle);
-    setGuessText(props.puzzle.init || "");
-    setGuessBits(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.init || "") : BitSequence.empty());
-    setWinBits(props.puzzle.encoding ? props.puzzle.encoding.encodeText(props.puzzle.winText) : BitSequence.empty());
-    setJudgment(new FullJudgment(false, BitSequence.empty(), []));
-    setHasWon(false);
-    setUpdating(false);
-    setBitDisplayWidthPx(props.bitDisplayWidthPx);
-    setDisplayRows([]);
-  }, [props.puzzle, props.bitDisplayWidthPx]);
+    updateDisplayWidth();
 
-  // Update judgment when relevant state changes
+    window.addEventListener("resize", updateDisplayWidth);
+
+    return () => window.removeEventListener("resize", updateDisplayWidth);
+  }, []);
+
+  // Judge setup
+  const judge = useMemo(() => {
+    if (!puzzle || !puzzle.encoding) {
+      return;
+    }
+
+    let newJudge: BinaryJudge | undefined;
+    if (puzzle.encoding instanceof VariableWidthEncoder) {
+      newJudge = puzzle.type === "Encode"
+        ? new VariableWidthEncodingJudge(puzzle.encoding)
+        : new VariableWidthDecodingJudge(puzzle.encoding);
+    } else if (puzzle.encoding instanceof FixedWidthEncoder) {
+      newJudge = puzzle.type === "Encode"
+        ? new FixedWidthEncodingJudge(puzzle.encoding)
+        : new FixedWidthDecodingJudge(puzzle.encoding);
+    }
+    console.debug(`hooking up judge based on puzzle type: ${puzzle.type} with encoding: ${puzzle.encoding_name} (${puzzle.encoding.getType()})`);
+    if (!newJudge) {
+      console.warn("No judge available for this puzzle encoding type.");
+      return;
+    } else {
+      console.debug(`Hooked-up judge: ${newJudge.constructor.name}`);
+    }
+    return newJudge;
+  }, [puzzle]);
+
   useEffect(() => {
-    updateJudgment();
-  }, [currentPuzzle, guessText, guessBits, winBits, judge, displayWidth, updateJudgment]);
+    if (!puzzle || !judge || !displayWidthInBitCount || displayWidthInBitCount <= 0) {
+      return;
+    }
+
+    const guessText = puzzle.encoding?.decodeText(guessBits) ?? "missing encoding";
+
+    const splitter = (bits: BitSequence) => puzzle.encoding.splitForDisplay(bits, displayWidthInBitCount);
+
+    const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
+    if (previousJudgment.current && previousJudgment.current.equals(newJudgment)) {
+      console.debug("No change in judgment, skipping update.");
+      return;
+    }
+
+    setJudgment(newJudgment);
+    displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
+
+    const eventParams = {
+      puzzle_slug: puzzle.slug,
+      guess_text: guessText,
+      winText: puzzle.winText,
+      encoding: puzzle.encoding_name,
+      encoding_type: puzzle.encoding.getType(),
+      judgment_is_correct: newJudgment.isCorrect,
+      pagePath: window.location.pathname + window.location.search,
+    };
+    if (newJudgment.isCorrect) {
+      ReactGA4.event("winning_judgment", eventParams);
+      onWin();
+    } else {
+      ReactGA4.event("guess", eventParams);
+    }
+  }, [puzzle, judge, guessBits, winBits, bitJudge, newSequenceJudgment, displayWidthInBitCount, onWin]);
 
   return {
     displayMatrixRef,
-    currentPuzzle,
-    setCurrentPuzzle,
-    guessText,
-    setGuessText,
-    guessBits,
-    setGuessBits,
-    winBits,
-    setWinBits,
-    displayRows,
-    setDisplayRows,
     judgment,
     setJudgment,
     hasWon,
     setHasWon,
     updating,
     setUpdating,
-    bitDisplayWidthPx,
-    setBitDisplayWidthPx,
-    displayWidth,
-    setDisplayWidth,
-    judge,
-    setJudge,
-    updateJudgment,
-    updateDisplayRows,
+    setBitDisplayWidthPx: setDisplayWidthInPx,
+    displayWidth: displayWidthInBitCount,
+    judge
   };
 }

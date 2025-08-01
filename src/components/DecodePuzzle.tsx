@@ -2,71 +2,56 @@ import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import ReactGA4 from "react-ga4";
 import { Link } from "react-router-dom";
-import { ChangeEvent, FC, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
+import { FC } from "react";
 
-const DecodePuzzle: FC<PuzzleProps> = (props) => {
+const DecodePuzzle: FC<PuzzleProps> = (
+  {
+    puzzle,
+    onWin = () => {},
+    onShareWin = () => {},
+    bitButtonWidthPx = 32
+  }) => {
+  const [guessText, setGuessText] = useState<string>('');
+  const guessBits = useMemo(
+    () => puzzle.encoding.encodeText(guessText) || BitSequence.empty(),
+    [puzzle, guessText]
+  );
+
   const {
     displayMatrixRef,
-    currentPuzzle,
-    guessText,
-    setGuessText,
-    guessBits,
-    setGuessBits,
-    displayRows,
-    setDisplayRows,
     judgment,
     hasWon,
-    updateJudgment,
-    bitDisplayWidthPx,
-  } = useBasePuzzle(props);
+    displayWidth
+  } = useBasePuzzle({
+    puzzle: puzzle,
+    guessBits,
+    onWin,
+    onShareWin,
+    bitButtonWidthPx,
+    bitJudge: undefined,
+    newSequenceJudgment: undefined,
+  });
+
+  // Compute winBits and displayRows for decode-type puzzles
+  const winBits = useMemo(() => puzzle.encoding.encodeText(puzzle.winText), [puzzle]);
+  const displayRows = useMemo(() => Array.from(puzzle.encoding.splitForDisplay(winBits, displayWidth)), [puzzle, winBits, displayWidth]);
+
   const gameContentRef = useRef<HTMLDivElement>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const winMessageRef = useRef<HTMLDivElement>(null);
   const puzzleInputsRef = useRef<HTMLDivElement>(null);
   const resizeTimeout = useRef<number | null>(null);
-  const [displayWidth, setDisplayWidth] = useState<number>(13);
-
-  useEffect(() => {
-    setDisplayWidth(bitDisplayWidthPx ? Math.floor((displayMatrixRef.current?.getWidth?.() ?? 0) / bitDisplayWidthPx) : 0);
-  }, [displayMatrixRef, bitDisplayWidthPx]);
-
-  const getDisplayRows = useCallback(
-    (winBits: BitSequence, guessBits: BitSequence, displayWidth: number) => {
-      const allBits = winBits.appendBits(guessBits.slice(winBits.length));
-      if (!currentPuzzle || !currentPuzzle.encoding) {
-        console.warn('No current puzzle or encoding available for display rows.');
-        return [];
-      } else {
-        return [...currentPuzzle.encoding.splitForDisplay(allBits, displayWidth)];
-      }
-    },
-    [currentPuzzle]
-  );
-
-  useEffect(() => {
-    console.debug("Initialize displayRows to winText bits with 'unknown' judgment on mount/puzzle change")
-    if (currentPuzzle && currentPuzzle.type === "Decode") {
-      if (!currentPuzzle.encoding) {
-        console.error(`Puzzle ${currentPuzzle.slug} has no encoding (expecting ${currentPuzzle.encoding_name}.`);
-      }
-      const winBits = currentPuzzle.encoding.encodeText(currentPuzzle.winText);
-      // Use getDisplayRows to include extra guess bits
-      const rows = getDisplayRows(winBits, guessBits, displayWidth);
-      updateJudgment();
-      setDisplayRows(rows);
-    }
-  }, [currentPuzzle, displayWidth, getDisplayRows, setDisplayRows, updateJudgment, guessBits]);
 
   // Handle guess update
   const handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     const prevGuessBits = guessBits;
     const newGuessText = event.target.value.toUpperCase();
-    const newGuessBits = currentPuzzle?.encoding.encodeText(newGuessText) || prevGuessBits;
+    const newGuessBits = puzzle?.encoding.encodeText(newGuessText) || prevGuessBits;
     setGuessText(newGuessText);
-    setGuessBits(newGuessBits);
 
-    // Scroll logic: scroll the row containing the last changed bit into view
+    // Scroll logic: scroll the row containing the last-changed bit into view
     let lastChangedIndex = -1;
     const minLen = Math.min(prevGuessBits.length, newGuessBits.length);
     for (let i = 0; i < minLen; ++i) {
@@ -118,23 +103,9 @@ const DecodePuzzle: FC<PuzzleProps> = (props) => {
         }
       }
     }
-    // Ensure displayRows updates immediately
-    updateJudgment();
   };
 
-  // Focus/blur handlers for mobile
-  const handleInputFocus = () => {
-    if (resizeTimeout.current) clearTimeout(resizeTimeout.current);
-    resizeTimeout.current = window.setTimeout(() => {
-      adjustMainDisplayHeightForInput();
-    }, 300);
-  };
-  const handleInputBlur = () => {
-    resizeTimeout.current = window.setTimeout(() => {
-      adjustMainDisplayHeightForInput();
-    }, 300);
-  };
-  const adjustMainDisplayHeightForInput = () => {
+  const adjustMainDisplayHeightForInput = useCallback(() => {
     const gameContent = gameContentRef.current;
     const mainDisplay = mainDisplayRef.current;
     if (gameContent && mainDisplay) {
@@ -144,59 +115,91 @@ const DecodePuzzle: FC<PuzzleProps> = (props) => {
         gameContent.style.height = windowHeight + 'px';
         gameContent.scrollIntoView({behavior: 'smooth'});
         const puzzleInputs = puzzleInputsRef.current;
-        if (puzzleInputs) puzzleInputs.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+        if (puzzleInputs) {
+          puzzleInputs.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+        }
       } else {
         gameContent.style.height = '';
       }
     }
-  };
+  }, []);
+
+  const handleInputFocus = useCallback(() => {
+    if (resizeTimeout.current) {
+      clearTimeout(resizeTimeout.current);
+    }
+    resizeTimeout.current = window.setTimeout(() => {
+      adjustMainDisplayHeightForInput();
+    }, 300);
+  }, [adjustMainDisplayHeightForInput]);
+
+  const handleInputBlur = useCallback(() => {
+    if (resizeTimeout.current) {
+      clearTimeout(resizeTimeout.current);
+    }
+    resizeTimeout.current = window.setTimeout(() => {
+      adjustMainDisplayHeightForInput();
+    }, 300);
+  }, [adjustMainDisplayHeightForInput]);
 
   useEffect(() => {
     const input = puzzleInputsRef.current?.querySelector('input');
-    if (input) {
-      input.addEventListener('focus', handleInputFocus, {passive: true});
-      input.addEventListener('blur', handleInputBlur, {passive: true});
+    if (!input) {
+      return;
     }
-    return () => {
-      if (input) {
-        input.removeEventListener('focus', handleInputFocus);
-        input.removeEventListener('blur', handleInputBlur);
-      }
-      if (resizeTimeout.current) clearTimeout(resizeTimeout.current);
-    };
-  }, [guessText]);
 
-  if (!currentPuzzle) return <></>;
+    input.addEventListener('focus', handleInputFocus, {passive: true});
+    input.addEventListener('blur', handleInputBlur, {passive: true});
+
+    return () => {
+      if (!input) {
+        return;
+      }
+
+      input.removeEventListener('focus', handleInputFocus);
+      input.removeEventListener('blur', handleInputBlur);
+
+      if (resizeTimeout.current) {
+        clearTimeout(resizeTimeout.current);
+      }
+    };
+  }, [guessText, handleInputBlur, handleInputFocus]);
+
+  if (!puzzle) {
+    return <></>;
+  }
 
   return (
     <>
       <div id="game-content" ref={gameContentRef}>
         <div id="main-display" className="display" ref={mainDisplayRef}>
           <div id="clue-text">
-            {[...currentPuzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+            {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           </div>
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
             judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {}}
+            handleBitClick={() => {
+            }}
           />
           <div id="win-message" ref={winMessageRef}>
-            {hasWon && currentPuzzle.init !== currentPuzzle.winText && <p>{guessText}</p>}
-            {judgment.isCorrect && [...currentPuzzle.winMessage].map((winLine, winIndex) => <p key={`win-message-${winIndex}`}>{winLine}</p>)}
+            {hasWon && puzzle.init !== puzzle.winText && <p>{guessText}</p>}
+            {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
+              <p key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
         </div>
         {hasWon ? (
           <>
             <div className="share-controls">
-              <button type="button" onClick={props.onShareWin}>Share Your Win</button>
+              <button type="button" onClick={onShareWin}>Share Your Win</button>
             </div>
             <div className="post-win-links">
               <p>
                 <Link to="/date/2025/04/04" onClick={() => {
                   ReactGA4.event('story_start_clicked', {
                     source: 'post-win-link',
-                    puzzle_slug: currentPuzzle?.slug,
+                    puzzle_slug: puzzle?.slug,
                     is_first_visit: 'unknown',
                   });
                 }}>
