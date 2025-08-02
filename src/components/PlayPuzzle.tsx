@@ -50,41 +50,30 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
     setSolveTimeString("");
   }, [puzzle]);
 
-  useEffect(() => {
-    const handleWinEvent = () => {
-      console.debug("PlayPuzzle detected winEvent");
-      let solveTimeSeconds = -1;
-      if (stopwatchRef.current) {
-        stopwatchRef.current.stop();
-        solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
-        updateSolveTimeString();
-      }
-      if (winAudio.current) {
-        winAudio.current.play().catch((error) => {
-          console.warn("Audio playback failed:", error);
-        });
-      }
-      ReactGA4.event("win", {
-        puzzle_slug: currentPuzzle.slug,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
-        pagePath: window.location.pathname + window.location.search,
-        solve_time_seconds: solveTimeSeconds,
-      });
-      if (onWin) {
-        onWin(stopwatchRef.current!);
-      }
-    };
-    window.addEventListener("winEvent", handleWinEvent);
-    return () => {
-      window.removeEventListener("winEvent", handleWinEvent);
-    };
-  }, [currentPuzzle, onWin]);
-
   const handleWin = () => {
-    const winEvent = new Event("winEvent");
-    window.dispatchEvent(winEvent);
+    console.debug("PlayPuzzle detected winEvent");
+    let solveTimeSeconds = -1;
+    if (stopwatchRef.current) {
+      stopwatchRef.current.stop();
+      solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
+      updateSolveTimeString();
+    }
+    if (winAudio.current) {
+      winAudio.current.play().catch((error) => {
+        console.warn("Audio playback failed:", error);
+      });
+    }
+    ReactGA4.event("win", {
+      puzzle_slug: currentPuzzle.slug,
+      winText: currentPuzzle.winText,
+      encoding: currentPuzzle.encoding_name,
+      encoding_type: currentPuzzle.encoding.getType(),
+      pagePath: window.location.pathname + window.location.search,
+      solve_time_seconds: solveTimeSeconds,
+    });
+    if (onWin) {
+      onWin(stopwatchRef.current!);
+    }
   };
 
   const handleShareWin = () => {

@@ -189,26 +189,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
               <p key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
         </div>
-        {hasWon ? (
-          <>
-            <div className="share-controls">
-              <button type="button" onClick={onShareWin}>Share Your Win</button>
-            </div>
-            <div className="post-win-links">
-              <p>
-                <Link to="/date/2025/04/04" onClick={() => {
-                  ReactGA4.event('story_start_clicked', {
-                    source: 'post-win-link',
-                    puzzle_slug: puzzle?.slug,
-                    is_first_visit: 'unknown',
-                  });
-                }}>
-                  |&lt;&lt; Back to the beginning
-                </Link>
-              </p>
-            </div>
-          </>
-        ) : (
+        {!hasWon && (
           <div id="puzzle-inputs" ref={puzzleInputsRef}>
             <input type="text"
                    inputMode="text"
