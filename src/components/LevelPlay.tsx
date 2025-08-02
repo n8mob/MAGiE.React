@@ -1,5 +1,6 @@
 import { Puzzle } from "../model.ts";
 import { FC, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { PlayPuzzle } from "./PlayPuzzle";
 import { useMenu } from "../hooks/useMenu.tsx";
@@ -14,8 +15,9 @@ interface LevelPlayProps {
 }
 
 const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
+  const navigate = useNavigate();
   const { menu, loading, error } = useMenu(menuName);
-  const { categoryIndex, levelNumber, puzzleIndex } = useParams();
+  const { categoryIndex, levelNumber, puzzleIndex: puzzleIndexParam } = useParams();
   const { category } = useCategory(menu, categoryIndex);
   const { level } = useLevel(category, levelNumber);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
@@ -29,20 +31,18 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   }, [currentPuzzle, menu?.encodingProviders]);
 
   const isAutoWin = !!puzzle && puzzle.winText === puzzle.init;
+  const puzzleIndex = parseInt(puzzleIndexParam || "0", 10);
+  const nextPuzzleIndex = puzzleIndex + 1;
+  const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
 
-  const nextPuzzleLink = useMemo(() => {
-    if (!level) {
-      return "";
-    }
-
-    const nextPuzzleIndex = Number(puzzleIndex) + 1;
-
-    if (nextPuzzleIndex < level.puzzles.length) {
-      return `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`
-    }
-
-    return "";
-  }, [level, puzzleIndex, menuName, categoryIndex, levelNumber]);
+  const linkAfterWin = { to: "", text: "" };
+  if (isLastInLevel) {
+    linkAfterWin.to = `/${menuName}/${categoryIndex}`;
+    linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+  } else {
+    linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
+    linkAfterWin.text = "Next |>>";
+  }
 
   useEffect(() => {
     if (!menu) {
@@ -55,8 +55,9 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
       console.debug('Waiting for the level number.');
       return;
     }
-    if (puzzleIndex === undefined || puzzleIndex === null || puzzleIndex === '') {
+    if (puzzleIndex === undefined || puzzleIndex === null) {
       console.debug("The puzzleNumber is missing. TODO: default to the first puzzle");
+      return;
     } else if (!level) {
       console.debug(`Waiting for the level with number ${levelNumber})`);
       return;
@@ -71,7 +72,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
             <Link to={`/${menuName}/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>
       );
-      setCurrentPuzzle(level.puzzles[parseInt(puzzleIndex || '0', 10)]);
+      setCurrentPuzzle(level.puzzles[puzzleIndex]);
     }
     return () => setHeaderContent(null);
   }, [category, categoryIndex, level, levelNumber, menu, menuName, puzzleIndex, setHeaderContent]);
@@ -107,28 +108,17 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
           />
         )}
         {hasWon && (
-          <>
-            {!isAutoWin && (<>
-              <div className="share-controls">
-                <button type={"button"}>TODO: Share Your Win</button>
-              </div>
-            </>)}
-            <div className="post-win-links">
-              <p>
-                <Link
-                  to={nextPuzzleLink}
-                  onClick={() => {
-                    ReactGA4.event('story_start_clicked', {
-                      source: 'post-win-link',
-                      puzzle_slug: puzzle?.slug,
-                    });
-                  }}
-                >
-                  |&lt;&lt; Back to the beginning
-                </Link>
-              </p>
-            </div>
-          </>
+          <div className="after-win-controls">
+            {!isAutoWin && <button type={"button"}>TODO: Share Your Win</button>}
+            <button type={"button"}
+                    onClick={() => {
+                      ReactGA4.event('story_start_clicked', {
+                        source: 'post-win-link',
+                        puzzle_slug: puzzle?.slug,
+                      });
+                      navigate(linkAfterWin.to);
+                    }}>{linkAfterWin.text}</button>
+          </div>
         )}
       </>
     );

@@ -205,7 +205,7 @@ input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
 
-.share-controls {
+.after-win-controls {
   display: flex;
   justify-content: left;
   flex-direction: column;

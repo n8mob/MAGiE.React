@@ -212,7 +212,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
         />
       )}
       {hasWon && (<>
-          <div className="share-controls">
+          <div className="after-win-controls">
             <button type={"button"} onClick={handleShareWin}>Share Your Win</button>
           </div>
           <div className="post-win-links">
