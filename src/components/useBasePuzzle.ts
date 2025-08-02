@@ -63,6 +63,8 @@ export function useBasePuzzle(
     return puzzle.encoding.encodeText(puzzle.winText);
   }, [puzzle]);
 
+  const isAutoWin = useMemo(() => puzzle.init === puzzle.winText, [puzzle]);
+
   // Preload images
   useEffect(() => {
     [
@@ -148,6 +150,7 @@ export function useBasePuzzle(
     };
     if (newJudgment.isCorrect) {
       ReactGA4.event("winning_judgment", eventParams);
+      setHasWon(true);
       onWin();
     } else {
       ReactGA4.event("guess", eventParams);
@@ -164,6 +167,7 @@ export function useBasePuzzle(
     setUpdating,
     setBitDisplayWidthPx: setDisplayWidthInPx,
     displayWidth: displayWidthInBitCount,
-    judge
+    judge,
+    isAutoWin
   };
 }

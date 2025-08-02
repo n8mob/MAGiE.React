@@ -1,10 +1,7 @@
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
-import ReactGA4 from "react-ga4";
-import { Link } from "react-router-dom";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
-import { FC } from "react";
 
 const DecodePuzzle: FC<PuzzleProps> = (
   {
@@ -13,9 +10,9 @@ const DecodePuzzle: FC<PuzzleProps> = (
     onShareWin = () => {},
     bitButtonWidthPx = 32
   }) => {
-  const [guessText, setGuessText] = useState<string>('');
+  const [guessText, setGuessText] = useState<string>(puzzle.init);
   const guessBits = useMemo(
-    () => puzzle.encoding.encodeText(guessText) || BitSequence.empty(),
+    () => puzzle?.encoding?.encodeText(guessText) || BitSequence.empty(),
     [puzzle, guessText]
   );
 
@@ -77,7 +74,8 @@ const DecodePuzzle: FC<PuzzleProps> = (
         }
       }
     }
-    // Scroll the row into view, but keep #puzzle-inputs visible
+    // Scroll the row into view
+    // but keep #puzzle-inputs visible
     if (rowIndex !== -1
       && displayMatrixRef.current
       && typeof displayMatrixRef.current.getBitRowElement === 'function'
@@ -168,6 +166,8 @@ const DecodePuzzle: FC<PuzzleProps> = (
   if (!puzzle) {
     return <></>;
   }
+
+  console.debug(`hasWon: ${hasWon}, puzzle.init: ${puzzle.init}, winText: ${puzzle.winText}, guessText: ${guessText}`);
 
   return (
     <>
