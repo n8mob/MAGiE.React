@@ -30,15 +30,19 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
     } as Puzzle;
   }, [currentPuzzle, menu?.encodingProviders]);
 
-  const isAutoWin = !!puzzle && puzzle.winText === puzzle.init;
   const puzzleIndex = parseInt(puzzleIndexParam || "0", 10);
   const nextPuzzleIndex = puzzleIndex + 1;
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
 
   const linkAfterWin = { to: "", text: "" };
   if (isLastInLevel) {
-    linkAfterWin.to = `/${menuName}/${categoryIndex}`;
-    linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+    if (menuName === "tutorial") {
+      linkAfterWin.to = "/";
+      linkAfterWin.text = "PLAY TODAY'S PUZZLE";
+    } else {
+      linkAfterWin.to = `/${menuName}/${categoryIndex}`;
+      linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+    }
   } else {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next |>>";
@@ -109,7 +113,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
         )}
         {hasWon && (
           <div className="after-win-controls">
-            {!isAutoWin && <button type={"button"}>TODO: Share Your Win</button>}
             <button type={"button"}
                     onClick={() => {
                       ReactGA4.event('story_start_clicked', {

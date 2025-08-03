@@ -45,8 +45,8 @@ const DecodePuzzle: FC<PuzzleProps> = (
   const handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     const prevGuessBits = guessBits;
     const newGuessText = event.target.value.toUpperCase();
-    const newGuessBits = puzzle?.encoding.encodeText(newGuessText) || prevGuessBits;
     setGuessText(newGuessText);
+    const newGuessBits = puzzle?.encoding.encodeText(newGuessText) || prevGuessBits;
 
     // Scroll logic: scroll the row containing the last-changed bit into view
     let lastChangedIndex = -1;
