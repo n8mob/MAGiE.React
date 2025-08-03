@@ -1,9 +1,9 @@
-import { VariableWidthEncodingJudge } from "../judgment/VariableWidthEncodingJudge.ts";
+import { VariableWidthEncodingJudge } from "../../judgment/VariableWidthEncodingJudge.ts";
 import { beforeEach, describe, expect, it } from "vitest";
-import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
-import { DisplayRow } from "../encoding/DisplayRow.ts";
-import { BitSequence } from "../BitSequence.ts";
-import { BitJudgment } from "../judgment/BitJudgment.ts";
+import { VariableWidthEncoder } from "../../encoding/VariableWidthEncoder.ts";
+import { DisplayRow } from "../../encoding/DisplayRow.ts";
+import { BitSequence } from "../../BitSequence.ts";
+import { BitJudgment } from "../../judgment/BitJudgment.ts";
 
 describe('VariableWidthEncodingJudge', () => {
   let unitUnderTest: VariableWidthEncodingJudge;

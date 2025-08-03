@@ -1,9 +1,9 @@
-import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
-import { FullJudgment } from "../judgment/FullJudgment.ts";
-import { VariableWidthDecodingJudge } from "../judgment/VariableWidthDecodingJudge.ts";
+import { SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
+import { FullJudgment } from "../../judgment/FullJudgment.ts";
+import { VariableWidthDecodingJudge } from "../../judgment/VariableWidthDecodingJudge.ts";
 import { beforeEach, describe, expect, it } from "vitest";
-import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
-import { BitSequence } from "../BitSequence.ts";
+import { VariableWidthEncoder } from "../../encoding/VariableWidthEncoder.ts";
+import { BitSequence } from "../../BitSequence.ts";
 
 describe('VariableWidthDecodingJudge', () => {
   let testEncoder: VariableWidthEncoder;
@@ -65,12 +65,30 @@ describe('VariableWidthDecodingJudge', () => {
     expect(actual.correctGuess.equals(guessBits)).to.be.true;
     const charJudgments = actual.getCharJudgments();
     let nextCharJudgment = charJudgments.next();
-    while(!nextCharJudgment.done) {
+    while (!nextCharJudgment.done) {
       nextCharJudgment.value.bitJudgments.forEach(bitJudgment => {
         expect(bitJudgment.isCorrect).to.be.true;
       })
       nextCharJudgment = charJudgments.next();
     }
+  });
+
+  it("should judge a string with incorrect characters", () => {
+    const guessText = "A CAB.";
+    const winText = "A CCB.";
+    const actual = unitUnderTest.judgeText(guessText, winText);
+    expect(actual).to.be.instanceof(FullJudgment);
+    expect(actual.isCorrect).to.be.false;
+    expect(actual.correctGuess.toPlainString()).to.equal("100111010");
+  });
+
+  it("should judge a string with missing characters", () => {
+    const guessText = "A CAB.";
+    const winText = "A CAB. A";
+    const actual = unitUnderTest.judgeText(guessText, winText);
+    expect(actual).to.be.instanceof(FullJudgment);
+    expect(actual.isCorrect).to.be.false;
+    expect(actual.correctGuess.toPlainString()).to.equal("10011101011000");
   });
 });
 

@@ -1,6 +1,6 @@
-import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
+import { VariableWidthEncoder } from "../../encoding/VariableWidthEncoder.ts";
 import { beforeEach, describe, expect, it } from "vitest";
-import { BitSequence } from "../BitSequence.ts";
+import { BitSequence } from "../../BitSequence.ts";
 
 const simple3Bit = {
   "1": {
