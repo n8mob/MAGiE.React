@@ -1,5 +1,13 @@
+@font-face {
+  font-family: "HD44780";
+  /*noinspection CssUnknownTarget*/
+  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
-  font-family: "Press Start 2P", Menlo, Consolas, monospace, sans-serif; /* Retro-friendly default */
+  font-family: "HD44780", "Press Start 2P", Monaco, Consolas, monospace, sans-serif;
   line-height: 1.5;
   background-color: #d0d4d4;
   font-synthesis: none;
