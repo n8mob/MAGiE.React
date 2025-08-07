@@ -28,10 +28,10 @@ type DayPuzzleProps = {
   initialDate?: Date;
 }
 
-export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
-  const {setHeaderContent} = useHeader();
+export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
+  const { setHeaderContent } = useHeader();
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
-  const {year, month, day} = useParams<{ year?: string, month?: string, day?: string }>();
+  const { year, month, day } = useParams<{ year?: string, month?: string, day?: string }>();
   const [formattedDate, setFormattedDate] = useState("");
   const [dateShareString, setDateShareString] = useState("");
   const [solveTimeDisplay, setSolveTimeDisplay] = useState("");
@@ -106,7 +106,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
   const isFutureDate = puzzleDate > new Date();
   if (isFutureDate) {
     return <>
-      <p>/// <span className="blink">Restricted</span> ///<br/>{formattedDate}<br/>//////////////////</p>
+      <p>/// <span className="blink">Restricted</span> ///<br />{formattedDate}<br />//////////////////</p>
       <p>Please rewind.</p>
       {linkToToday}
     </>
@@ -116,7 +116,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
     return (
       <>
         <p>Tape missing.</p>
-        <p>No puzzle found for<br/>{formattedDate}.</p>
+        <p>No puzzle found for<br />{formattedDate}.</p>
         {linkToToday}
       </>
     )
@@ -148,7 +148,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
   };
 
   function handleWin(stopwatch: StopwatchHandle) {
-    console.debug(`DatePlay handles win at ${{stopwatch}}`);
+    console.debug(`DatePlay handles win at ${{ stopwatch }}`);
     setHasWon(true);
     updateSolveTime(stopwatch);
 
@@ -162,7 +162,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
       solve_time_seconds: stopwatch.getTotalSeconds(),
     };
 
-    ReactGA4.event("win", {...eventParams});
+    ReactGA4.event("win", { ...eventParams });
   }
 
   const handleShareWin = () => {
@@ -214,20 +214,17 @@ export const DatePlay: FC<DayPuzzleProps> = ({initialDate}) => {
       {hasWon && (<>
           <div className="after-win-controls">
             <button type={"button"} onClick={handleShareWin}>Share Your Win</button>
-          </div>
-          <div className="post-win-links">
-            <p>
+            <p className={""}>
               <Link
-                to={`/${dateLinkFormat(addDays(puzzleDate, -1))}`}
+                to={`/date/${dateLinkFormat(addDays(puzzleDate, -1))}`}
                 onClick={() => {
                   ReactGA4.event('story_start_clicked', {
                     source: 'post-win-link',
                     puzzle_slug: currentPuzzle?.slug,
                     is_first_visit: isFirstVisit,
                   });
-                }}
-              >
-                |&lt;&lt; Back to the beginning
+                }}>
+                &lt;&lt; Yesterday's puzzle
               </Link>
             </p>
           </div>

@@ -90,5 +90,15 @@ describe('VariableWidthDecodingJudge', () => {
     expect(actual.isCorrect).to.be.false;
     expect(actual.correctGuess.toPlainString()).to.equal("10011101011000");
   });
+
+  it("should judge a string with extra characters", () => {
+    const guessText = "A CAB. A";
+    const winText = "A CAB.";
+    const actual = unitUnderTest.judgeText(guessText, winText);
+    expect(actual).to.be.instanceof(FullJudgment);
+    expect(actual.isCorrect).to.be.false;
+    expect(actual.correctGuess.toPlainString()).to.equal("10011101011000");
+    const charJudgments = [...actual.getCharJudgments()];
+  });
 });
 

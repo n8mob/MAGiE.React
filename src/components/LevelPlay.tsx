@@ -45,7 +45,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
     }
   } else {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
-    linkAfterWin.text = "Next |>>";
+    linkAfterWin.text = "Next ▶▶";
   }
 
   useEffect(() => {

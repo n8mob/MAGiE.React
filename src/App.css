@@ -40,6 +40,8 @@ h1#magie-title {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100vh;
+  height: 100dvh;
   text-transform: uppercase;
 }
 
@@ -54,12 +56,15 @@ h3 {
 
 #game-content {
   overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Only use fixed height for game-content on small screens */
-@media (max-height: 900px) {
+@media (max-height: 500px) {
   /* Use fixed height for game-content to prevent overflow */
   /* 100dvh works better and is listed last. */
   /* Listing it second will override 100vh on browsers that support dvh */
@@ -96,6 +101,8 @@ h3 {
   padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
   background-color: #d0d4d4;
   flex-direction: column;
+  /* Remove sticky by default, only sticky on small screens */
+  position: static;
 }
 
 /* Only make sticky on small screens */
