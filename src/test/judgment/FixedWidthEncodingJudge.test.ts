@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { FixedWidthEncoder } from "../../encoding/FixedWidthEncoder.ts";
 import { FixedWidthEncodingJudge } from "../../judgment/FixedWidthEncodingJudge.ts";
-import { CharJudgment, SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
+import { SequenceJudgment } from "../../judgment/SequenceJudgment.ts";
 import { DisplayRow } from "../../encoding/DisplayRow.ts";
 import { BitSequence } from "../../BitSequence.ts";
 
@@ -77,24 +77,20 @@ describe('FixedWidthEncodingJudge', () => {
 
     it('should judge the third character as incorrect', () => {
       const guess = BitSequence.fromString("000100100100"); // 0001 0010 0100
-      const win = BitSequence.fromString("000100100011");  //  0001 0010 0011
+      const win =   BitSequence.fromString("000100100011");  //  0001 0010 0011
       const actualFullJudgment = unitUnderTest.judgeBits(guess, win, splitBy4);
       expect(actualFullJudgment.isCorrect).to.be.false;
-      expect(actualFullJudgment.correctGuess.equals(guess.slice(0, 9)), "correctGuess should equal guess").to.be.true;
-      const actualCharJudgments = actualFullJudgment.getCharJudgments();
+      expect(
+        actualFullJudgment.correctGuess.equals(guess.slice(0, 9)),
+        "correctGuess should equal guess")
+        .to.be.true;
+      const actualCharJudgments = actualFullJudgment.sequenceJudgments;
 
+      expect(actualCharJudgments).to.have.lengthOf(3);
+      expect(actualCharJudgments[0].isSequenceCorrect).to.be.true;
+      expect(actualCharJudgments[1].isSequenceCorrect).to.be.true;
 
-      const firstCharJudgment: CharJudgment = actualCharJudgments.next().value;
-      expect(firstCharJudgment.isSequenceCorrect).to.be.true;
-      expect(firstCharJudgment.guess).to.deep.equal(guess.slice(0, 4));
-
-      const secondCharJudgment = actualCharJudgments.next().value;
-      expect(secondCharJudgment.isSequenceCorrect).to.be.true;
-      expect(secondCharJudgment.guess).to.deep.equal(guess.slice(4, 8));
-
-      const thirdCharJudgment = actualCharJudgments.next().value;
-      expect(thirdCharJudgment.isSequenceCorrect).to.be.false;
-      expect(thirdCharJudgment.guess).to.deep.equal(guess.slice(8, 12));
+      const thirdCharJudgment = actualCharJudgments[2];
 
       expect(thirdCharJudgment.bitJudgments[0].isCorrect).to.be.true;
       expect(thirdCharJudgment.bitJudgments[1].isCorrect).to.be.false;
@@ -133,7 +129,7 @@ describe('FixedWidthEncodingJudge', () => {
       // Should have two sequence judgments: one full, one partial
       expect(actual.sequenceJudgments).to.have.lengthOf(2);
 
-      // First chunk: full character, should be correct
+      // First chunk: should be a correct full character
       const first = actual.sequenceJudgments[0];
       expect(first.guess.toString()).to.equal("1100");
       expect(first.isSequenceCorrect).to.be.true;

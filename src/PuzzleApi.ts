@@ -1,16 +1,19 @@
 import axios from 'axios';
-import { PuzzleForDate, Menu, Puzzle } from "./Menu.ts";
+import { PuzzleForDate, Menu, Puzzle, MenuData } from "./model.ts";
+import { debug } from "./Logger.ts";
 
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
 export const getMenu = async (menuName: string): Promise<Menu> => {
   const rawMenuData = localStorage.getItem(menuName);
+  let updatedAt: string | undefined;
+  let cachedMenuData: MenuData | null = null;
+
   if (rawMenuData) {
     try {
-      const menuData = JSON.parse(rawMenuData);
-      return new Menu(menuData);
+      cachedMenuData = JSON.parse(rawMenuData);
+      updatedAt = cachedMenuData?.updated_at;
     } catch (e) {
-      // If parsing fails, remove the bad cache and continue to fetch
       localStorage.removeItem(menuName);
     }
   }
@@ -18,20 +21,29 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
   let response;
   try {
     const menuUrl = `${API_BASE_URL}/menus/${menuName}`;
-    console.log(`Fetching menu data from ${menuUrl}`);
-    response = await axios.get(menuUrl, {responseType: 'json'});
+    const headers: Record<string, string> = {};
+    if (updatedAt) {
+      headers['If-Modified-Since'] = new Date(updatedAt).toUTCString();
+    }
+    response = await axios.get(menuUrl, {
+      responseType: 'json',
+      headers,
+      validateStatus: (status) => status >= 200 && status < 400,
+    });
   } catch (webError) {
     console.error('Failed to fetch or parse menu data:', webError);
     throw webError;
   }
 
+  if (response.status === 304 && cachedMenuData) {
+    return new Menu(cachedMenuData);
+  }
+
   const data = response.data;
-  // Validate that data is a valid Menu
   if (!data || typeof data !== 'object' || !('categories' in data)) {
     throw new Error('Invalid menu data received from API');
   }
 
-  // Try to construct a Menu instance to further validate
   let menuInstance;
   try {
     menuInstance = new Menu(data);
@@ -85,12 +97,14 @@ export const getDailyPuzzleForYearMonthDay = async (
   const dateKey = `daily-puzzle-${year}-${paddedMonth}-${paddedDay}`;
 
   const storedPuzzleForDate = localStorage.getItem(dateKey);
-  let puzzleData: PuzzleForDate;
+  let puzzleData: PuzzleForDate | null = null;
 
   if (storedPuzzleForDate) {
     try {
       puzzleData = JSON.parse(storedPuzzleForDate);
-      return puzzleData;
+      if (!puzzleData) {
+        console.warn(`storedPuzzleForDate for ${dateKey} failed to parse into a PuzzleForDate object.`);
+      }
     } catch (error) {
       console.error('Failed to parse puzzle data from local storage:', error);
       localStorage.removeItem(dateKey);
@@ -98,13 +112,35 @@ export const getDailyPuzzleForYearMonthDay = async (
   }
 
   const datePuzzleUrl = `${API_BASE_URL}/puzzles/daily/${year}/${paddedMonth}/${paddedDay}/`;
-  const response = await axios.get(datePuzzleUrl);
+  let response;
+  const headers: Record<string, string> = {};
+  let updated_at_header_value = '';
+  if (puzzleData && puzzleData.updated_at) {
+    updated_at_header_value = new Date(puzzleData.updated_at).toUTCString();
+  }
+
+  try {
+    if (updated_at_header_value) {
+      debug(`If-Modified-Since: ${updated_at_header_value}`);
+      headers['If-Modified-Since'] = updated_at_header_value;
+    }
+    response = await axios.get(datePuzzleUrl, {responseType: 'json', headers});
+  } catch (webError) {
+    console.error(`Failed to fetch or parse puzzle data for ${year}-${paddedMonth}-${paddedDay}:`, webError);
+    throw webError;
+  }
+
+  if (response.status == 304 && puzzleData) {
+    debug(`Puzzle has not changed since `)
+    return puzzleData;
+  }
+
   if (!checkPuzzleForDate(response.data)) {
     console.error('Invalid puzzle data format:', response.data);
     throw new Error('Invalid puzzle data format');
   }
-  puzzleData = response.data;
 
+  puzzleData = response.data;
 
   localStorage.setItem(dateKey, JSON.stringify(puzzleData));
   return puzzleData;

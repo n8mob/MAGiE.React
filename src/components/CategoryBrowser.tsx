@@ -4,17 +4,18 @@ import { useEffect } from "react";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
+import { MENU_NAME_MAP } from "../MenuNames.tsx";
 
 function CategoryBrowser({menuName}: { menuName: string }) {
   const {setHeaderContent} = useHeader();
   const {categoryIndex: categoryIndexParam} = useParams();
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
-  const {menu, loading, error} = useMenu(menuName);
+  const {menu, loading, error} = useMenu(menuName, setHeaderContent);
   const { category } = useCategory(menu, categoryIndex);
+
 
   useEffect(() => {
     if (!menu) {
-      console.warn('Waiting for the menu.');
       setHeaderContent(<p>Loading category...</p>);
       return;
     }
@@ -29,30 +30,31 @@ function CategoryBrowser({menuName}: { menuName: string }) {
 
     if (loading) {
       setHeaderContent(<div className={'menu-title'}>
-        <p>Loading category...</p>
+        <p>Loading menu...</p>
       </div>);
       return;
     }
 
-    const categoryKeys = Object.keys(menu.categories);
-    if (categoryIndex < 0 || categoryIndex >= categoryKeys.length) {
+    if (!menu.categories) {
+      setHeaderContent(<div className={'menu-title'}>
+        <p>No categories found</p>
+        <p>In {menuName} menu.</p>
+      </div>);
+      return;
+    }
+
+    if (categoryIndex < 0 || categoryIndex >= Object.keys(menu.categories).length) {
       setHeaderContent(<p>Invalid category index</p>);
       return;
     }
 
-    const categoryName = categoryKeys[categoryIndex];
-    setHeaderContent(<div className={'menu-title'}>
-      <Link to={`/${menuName}/`}><h3>THE ABANDONED MALL</h3></Link>
-      <p>{categoryName}</p>
-    </div>);
-  }, [menuName, menu, categoryIndex, setHeaderContent, error, loading]);
-
-  if (!menu) {
-    return <div>Loading {menuName}...</div>;
-  }
-
-  console.log(`categoryIndex: ${categoryIndex} => ${category?.name}`);
-  console.log("category", category);
+    setHeaderContent(
+      <div className={'menu-title'}>
+        <Link to={`/${menuName}/`}><h3>{MENU_NAME_MAP[menuName]?.shortName ?? menuName}</h3></Link>
+        <p>{category?.name}</p>
+      </div>
+    );
+  }, [menuName, menu, categoryIndex, setHeaderContent, error, loading, categoryIndexParam, category?.name, category]);
 
   return (
     <div id={'category'}>

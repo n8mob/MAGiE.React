@@ -3,21 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
-import { Puzzle } from "../Menu.ts";
+import { Puzzle } from "../model.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { debug  } from "../Logger.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
   puzzleShareString: string;
-  onWin?: () => void;
+  onWin?: (stopwatch: StopwatchHandle) => void;
   onShareWin?: () => void;
-  hasWon?: boolean;
 }
 
-const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasWonProp }: PlayPuzzleProps) => {
+const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzleProps) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
-  const [hasWon, setHasWon] = useState(false);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
@@ -49,43 +48,33 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
 
   useEffect(() => {
     setCurrentPuzzle(puzzle);
-    setHasWon(false);
     setSolveTimeString("");
   }, [puzzle]);
 
-  useEffect(() => {
-    const handleWinEvent = () => {
-      setHasWon(true);
-      let solveTimeSeconds = -1;
-      if (stopwatchRef.current) {
-        stopwatchRef.current.stop();
-        solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
-        updateSolveTimeString();
-      }
-      if (winAudio.current) {
-        winAudio.current.play().catch((error) => {
-          console.warn("Audio playback failed:", error);
-        });
-      }
-      ReactGA4.event("win", {
-        puzzle_slug: currentPuzzle.slug,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
-        pagePath: window.location.pathname + window.location.search,
-        solve_time_seconds: solveTimeSeconds,
-      });
-      if (onWin) onWin();
-    };
-    window.addEventListener("winEvent", handleWinEvent);
-    return () => {
-      window.removeEventListener("winEvent", handleWinEvent);
-    };
-  }, [currentPuzzle, onWin]);
-
   const handleWin = () => {
-    const winEvent = new Event("winEvent");
-    window.dispatchEvent(winEvent);
+    debug("PlayPuzzle detected winEvent");
+    let solveTimeSeconds = -1;
+    if (stopwatchRef.current) {
+      stopwatchRef.current.stop();
+      solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
+      updateSolveTimeString();
+    }
+    if (winAudio.current) {
+      winAudio.current.play().catch((error) => {
+        console.warn("Audio playback failed:", error);
+      });
+    }
+    ReactGA4.event("win", {
+      puzzle_slug: currentPuzzle.slug,
+      winText: currentPuzzle.winText,
+      encoding: currentPuzzle.encoding_name,
+      encoding_type: currentPuzzle.encoding.getType(),
+      pagePath: window.location.pathname + window.location.search,
+      solve_time_seconds: solveTimeSeconds,
+    });
+    if (onWin) {
+      onWin(stopwatchRef.current!);
+    }
   };
 
   const handleShareWin = () => {
@@ -104,7 +93,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         'It seems that this browser does not support "Web Share".' +
         '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
-        navigator.clipboard.writeText(shareText)
+        navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
           .then(() => {
             alert("The share message has been copied to your clipboard.");
           })
@@ -134,18 +123,16 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin, hasWon: hasW
         <EncodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
-          bitDisplayWidthPx={32}
+          bitButtonWidthPx={32}
         />
       }
       {currentPuzzle.type === "Decode" &&
         <DecodePuzzle
           puzzle={currentPuzzle}
           onWin={handleWin}
-          hasWon={hasWonProp ?? hasWon}
           onShareWin={handleShareWin}
-          bitDisplayWidthPx={32}
+          bitButtonWidthPx={32}
         />
       }
     </>

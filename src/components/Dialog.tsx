@@ -13,7 +13,7 @@ export default function Dialog({ onClose, children }: DialogProps) {
       <div className="dialog-content" onClick={e => e.stopPropagation()}>
         {children}
         <div className="dialog-actions">
-          <button onClick={onClose}>Close</button>
+          <button type={"button"} onClick={onClose}>Close</button>
         </div>
       </div>
     </div>

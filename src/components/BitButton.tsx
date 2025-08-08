@@ -1,13 +1,13 @@
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { IndexedBit } from "../IndexedBit.ts";
-import * as React from "react";
+import { ChangeEventHandler, MouseEventHandler } from "react";
 
 interface BitButtonProps {
   bit: IndexedBit,
   key?: string,
   correctness: Correctness,
-  onChange?: React.ChangeEventHandler<HTMLInputElement>
-  onClick?: React.MouseEventHandler<HTMLInputElement>
+  onChange?: ChangeEventHandler<HTMLInputElement>,
+  onClick?: MouseEventHandler<HTMLInputElement>
 }
 
 const BitButton: React.FC<BitButtonProps> = (

@@ -12,7 +12,7 @@ html, body {
   padding: 0;
   max-width: 500px;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
-  color: #1e2a1e;
+  color: #1e272a;
   background-color: #d0d4d4; /* Background color for the entire viewport */
 }
 
@@ -40,11 +40,12 @@ h1#magie-title {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100vh;
+  height: 100dvh;
   text-transform: uppercase;
 }
 
 #magie-header {
-  flex: 1 1 auto;
   align-items: stretch;
 }
 
@@ -54,12 +55,15 @@ h3 {
 
 #game-content {
   overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Only use fixed height for game-content on small screens */
-@media (max-height: 900px) {
+@media (max-height: 500px) {
   /* Use fixed height for game-content to prevent overflow */
   /* 100dvh works better and is listed last. */
   /* Listing it second will override 100vh on browsers that support dvh */
@@ -96,6 +100,8 @@ h3 {
   padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
   background-color: #d0d4d4;
   flex-direction: column;
+  /* Remove sticky by default, only sticky on small screens */
+  position: static;
 }
 
 /* Only make sticky on small screens */
@@ -205,17 +211,10 @@ input[data-correctness="incorrect"]:checked {
   background-image: url("assets/Bit_on_Purple.png");
 }
 
-.share-controls {
+.after-win-controls {
   display: flex;
   justify-content: left;
   flex-direction: column;
-}
-
-.share-controls button {
-  margin: 0.5em;
-  padding: 1em;
-  border: 2px solid;
-  color: inherit;
 }
 
 .activate-dialog {
@@ -238,16 +237,6 @@ input[data-correctness="incorrect"]:checked {
 
 .activate-dialog.right {
   right: 1rem;
-}
-
-
-input[type="button"] {
-  margin: 8px;
-  min-height: 40px;
-  min-width: 40px;
-  font-size: x-large;
-  font-weight: bold;
-  padding: 15px 20px;
 }
 
 @keyframes blink {

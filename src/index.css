@@ -1,5 +1,13 @@
+@font-face {
+  font-family: "HD44780";
+  /*noinspection CssUnknownTarget*/
+  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
-  font-family: "Press Start 2P", Menlo, Consolas, monospace, sans-serif; /* Retro-friendly default */
+  font-family: "HD44780", "Press Start 2P", Monaco, Consolas, monospace, sans-serif;
   line-height: 1.5;
   background-color: #d0d4d4;
   font-synthesis: none;
@@ -29,11 +37,12 @@ input, textarea {
 button {
   border-radius: 8px;
   border: 2px solid;
-  padding: 2em 1.2em;
+  margin: 0.5em;
+  padding: 1em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  text-transform: uppercase;
+  text-transform: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
   color: inherit;

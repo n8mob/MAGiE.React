@@ -1,7 +1,7 @@
 import './App.css'
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
-import SpecificDaysPuzzle from "./components/SpecificDaysPuzzle.tsx";
+import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useEffect, useMemo, useState } from "react";
 import Dialog from './components/Dialog.tsx';
@@ -13,8 +13,7 @@ import { CategoryBrowser } from './components/CategoryBrowser.tsx';
 import LevelPlay from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
-import { getFeatureFlagsFromURL } from "./FeatureFlags.ts";
-import { getOrCreateSessionChallenge } from "./SessionChallenge.ts";
+import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -49,7 +48,6 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
-  getOrCreateSessionChallenge();
   const {headerContent} = useHeader();
 
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
@@ -60,33 +58,9 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
-  const [features, setFeatures] = useState<string[]>([]);
+  const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
-
-  useEffect(() => {
-    const initialRetries = 6;
-
-    function checkAndSetFeatures(retries = initialRetries, delay_ms = 200) {
-      if (!window.crypto?.subtle) {
-        console.warn(`${retries}. Web Crypto library not ready yet.`);
-        if (retries > 0) {
-          setTimeout(() => checkAndSetFeatures(retries - 1, delay_ms), delay_ms);
-        } else {
-          console.warn(`Gave up after ${initialRetries} retries.`);
-        }
-        return;
-      }
-
-      console.log('Web Crypto library is ready...');
-
-      getFeatureFlagsFromURL()
-        .then(setFeatures)
-        .catch(console.error);
-    }
-
-    checkAndSetFeatures(initialRetries, 100);
-  }, []);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
@@ -106,9 +80,9 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-      <Route path="/today" element={<SpecificDaysPuzzle initialDate={new Date()}/>}/>
-      <Route path="/date/:year/:month/:day" element={<SpecificDaysPuzzle/>}/>
+      <Route path="/" element={<DatePlay initialDate={new Date()}/>}/>
+      <Route path="/today" element={<DatePlay initialDate={new Date()}/>}/>
+      <Route path="/date/:year/:month/:day" element={<DatePlay/>}/>
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
@@ -116,8 +90,10 @@ function App() {
         <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="mall"/>}/>
       </>)}
-      {features.includes('tutorialRoutes') && (<>
-        <Route path="/tutorial" element={<MenuBrowser menuName="tutorial"/>}/>
+      {features.includes('tutorial') && (<>
+        <Route path="/tutorial" element={
+          <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />
+        } />
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
@@ -130,31 +106,44 @@ function App() {
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="bigGame"/>}/>
       </>)}
+      {features.includes('mall') && (<>
+        <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall"/>}/>
+        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="mall"/>}/>
+      </>)}
       <Route path={"*"} element={<PageNotFound/>}/>
     </Routes>), [features]);
 
   return (
     <>
       <div id="magie-header">
-        <button aria-label={"open settings"} className="activate-dialog left" onClick={() => {
-          setShowSettings(true);
-          ReactGA4.event('open_settings_dialog', {
-            source: 'activate_dialog',
-            dialog: 'settings',
-          });
-        }}>
+        <button
+          type={"button"}
+          aria-label={"open settings"}
+          className="activate-dialog left"
+          onClick={() => {
+            setShowSettings(true);
+            ReactGA4.event('open_settings_dialog', {
+              source: 'activate_dialog',
+              dialog: 'settings',
+            });
+          }}>
           ⋮
         </button>
-        <button aria-label={"show how-to information"}
-                className="activate-dialog right"
-                onClick={() => {
-                  setShowHowTo(true);
-                  ReactGA4.event('open_help_dialog', {
-                    source: 'activate_dialog',
-                    dialog: 'help',
-                    is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
-                  });
-                }}>
+        <button
+          type={"button"}
+          aria-label={"show how-to information"}
+          className="activate-dialog right"
+          onClick={() => {
+            setShowHowTo(true);
+            ReactGA4.event('open_help_dialog', {
+              source: 'activate_dialog',
+              dialog: 'help',
+              is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+            });
+          }}>
           ?
         </button>
 

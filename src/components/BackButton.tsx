@@ -13,7 +13,9 @@ const BackButton: FC<BackButtonProps> = ({ backPath }) => {
   };
 
   return (
-    <button onClick={handleBackClick}>
+    <button
+      type={"button"}
+      onClick={handleBackClick}>
       &lt;&nbsp;Back
     </button>
   );
