@@ -130,11 +130,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
       const s = stopwatch.getSeconds();
 
       let seconds = "seconds";
-      if (s == 1) {
+      if (s === 1) {
         seconds = "second";
       }
       let minutes = "minutes";
-      if (m == 1) {
+      if (m === 1) {
         minutes = "minute";
       }
 
