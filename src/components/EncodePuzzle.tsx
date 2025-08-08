@@ -22,9 +22,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
     guessBits,
     onWin,
     onShareWin,
-    bitButtonWidthPx,
-    bitJudge: undefined,
-    newSequenceJudgment: undefined,
+    bitButtonWidthPx
   });
 
   const displayRows = useMemo(

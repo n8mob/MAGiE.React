@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Puzzle } from "../model.ts";
-import { BinaryJudge, BitJudge, NewSequenceJudgment } from "../judgment/BinaryJudge.ts";
+import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
 import ReactGA4 from "react-ga4";
@@ -26,8 +26,6 @@ export interface UseBasePuzzleProps {
   onWin: () => void;
   onShareWin: () => void;
   bitButtonWidthPx: number;
-  bitJudge?: BitJudge;
-  newSequenceJudgment?: NewSequenceJudgment;
 }
 
 export function useBasePuzzle(
@@ -35,9 +33,7 @@ export function useBasePuzzle(
     puzzle,
     guessBits,
     onWin,
-    bitButtonWidthPx,
-    bitJudge,
-    newSequenceJudgment
+    bitButtonWidthPx
   }: UseBasePuzzleProps
 ) {
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
@@ -155,7 +151,7 @@ export function useBasePuzzle(
     } else {
       ReactGA4.event("guess", eventParams);
     }
-  }, [puzzle, judge, guessBits, winBits, bitJudge, newSequenceJudgment, displayWidthInBitCount, onWin]);
+  }, [puzzle, judge, guessBits, winBits, displayWidthInBitCount, onWin]);
 
   return {
     displayMatrixRef,

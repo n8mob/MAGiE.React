@@ -28,8 +28,6 @@ const DecodePuzzle: FC<PuzzleProps> = (
     onWin,
     onShareWin,
     bitButtonWidthPx,
-    bitJudge: undefined,
-    newSequenceJudgment: undefined,
   });
 
   // Compute winBits and displayRows for decode-type puzzles
