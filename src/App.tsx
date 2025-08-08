@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -91,7 +91,9 @@ function App() {
                element={<LevelPlay menuName="mall"/>}/>
       </>)}
       {features.includes('tutorial') && (<>
-        <Route path="/tutorial" element={<MenuBrowser menuName="tutorial"/>}/>
+        <Route path="/tutorial" element={
+          <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />
+        } />
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial"/>}/>
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
