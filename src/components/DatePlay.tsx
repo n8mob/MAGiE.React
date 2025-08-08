@@ -8,6 +8,7 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { shortDate } from "./DateFormatter.tsx";
 import ReactGA4 from "react-ga4";
 import { StopwatchHandle } from "./Stopwatch.tsx";
+import { debug } from "../Logger.ts";
 
 
 const addDays = (date: Date, days: number) => {
@@ -148,7 +149,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   };
 
   function handleWin(stopwatch: StopwatchHandle) {
-    console.debug(`DatePlay handles win at ${{ stopwatch }}`);
+    debug(`DatePlay handles win at ${{ stopwatch }}`);
     setHasWon(true);
     updateSolveTime(stopwatch);
 

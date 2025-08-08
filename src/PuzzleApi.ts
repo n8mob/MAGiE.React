@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PuzzleForDate, Menu, Puzzle, MenuData } from "./model.ts";
+import { debug } from "./Logger.ts";
 
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
@@ -120,7 +121,7 @@ export const getDailyPuzzleForYearMonthDay = async (
 
   try {
     if (updated_at_header_value) {
-      console.debug(`If-Modified-Since: ${updated_at_header_value}`);
+      debug(`If-Modified-Since: ${updated_at_header_value}`);
       headers['If-Modified-Since'] = updated_at_header_value;
     }
     response = await axios.get(datePuzzleUrl, {responseType: 'json', headers});
@@ -130,7 +131,7 @@ export const getDailyPuzzleForYearMonthDay = async (
   }
 
   if (response.status == 304 && puzzleData) {
-    console.debug(`Puzzle has not changed since `)
+    debug(`Puzzle has not changed since `)
     return puzzleData;
   }
 

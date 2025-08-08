@@ -1,14 +1,15 @@
 import { Category } from "../model.ts";
+import { debug } from "../Logger.ts";
 
 export function useLevel(category: Category | null, levelNumberParam: string | number | undefined) {
   if (!levelNumberParam) {
-    console.debug("No level number provided.");
+    debug("No level number provided.");
     return {level: null};
   } else if (!category) {
-    console.debug(`Asking for level number ${levelNumberParam}, but no category provided.`);
+    debug(`Asking for level number ${levelNumberParam}, but no category provided.`);
     return {level: null};
   } else if (!category.levels) {
-    console.debug(`Asking for level number ${levelNumberParam}, but category has no levels.`);
+    debug(`Asking for level number ${levelNumberParam}, but category has no levels.`);
     return {level: null};
   }
 

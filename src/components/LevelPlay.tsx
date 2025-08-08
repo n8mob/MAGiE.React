@@ -9,6 +9,7 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
   menuName?: string;
@@ -50,20 +51,20 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
 
   useEffect(() => {
     if (!menu) {
-      console.debug(`Waiting for the ${menuName} menu data.`);
+      debug(`Waiting for the ${menuName} menu data.`);
       return;
     } else if (!category) {
-      console.debug(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
+      debug(`Cannot find category[${categoryIndex}] on the menu "${menuName}]".`);
       return;
     } else if (!levelNumber) {
-      console.debug('Waiting for the level number.');
+      debug('Waiting for the level number.');
       return;
     }
     if (puzzleIndex === undefined || puzzleIndex === null) {
-      console.debug("The puzzleNumber is missing. TODO: default to the first puzzle");
+      debug("The puzzleNumber is missing. TODO: default to the first puzzle");
       return;
     } else if (!level) {
-      console.debug(`Waiting for the level with number ${levelNumber})`);
+      debug(`Waiting for the level with number ${levelNumber})`);
       return;
     }
 
@@ -89,7 +90,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   }
 
   function handleWin(stopwatch: StopwatchHandle) {
-    console.debug(`LevelPlay.handleWin: ${stopwatch.displayTime()}`);
+    debug(`LevelPlay.handleWin: ${stopwatch.displayTime()}`);
     setHasWon(true);
   }
 
@@ -99,7 +100,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
 
     // Generate a share string for this puzzle context
     const shareString = `I solved the ${level.levelName.join(" ")} puzzle in the ${category?.name || ""} category!`;
-    console.debug(`${puzzle.slug}: has won?: ${hasWon}`);
+    debug(`${puzzle.slug}: has won?: ${hasWon}`);
 
     return (
       <>

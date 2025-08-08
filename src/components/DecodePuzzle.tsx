@@ -2,6 +2,7 @@ import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
+import { debug } from "../Logger.ts";
 
 const DecodePuzzle: FC<PuzzleProps> = (
   {
@@ -172,7 +173,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
     return <></>;
   }
 
-  console.debug(`hasWon: ${hasWon}, puzzle.init: ${puzzle.init}, winText: ${puzzle.winText}, guessText: ${guessText}`);
+  debug(`hasWon: ${hasWon}, puzzle.init: ${puzzle.init}, winText: ${puzzle.winText}, guessText: ${guessText}`);
 
   return (
     <>

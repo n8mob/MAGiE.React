@@ -6,6 +6,7 @@ import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { Puzzle } from "../model.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { debug  } from "../Logger.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -51,7 +52,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
   }, [puzzle]);
 
   const handleWin = () => {
-    console.debug("PlayPuzzle detected winEvent");
+    debug("PlayPuzzle detected winEvent");
     let solveTimeSeconds = -1;
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();

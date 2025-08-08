@@ -11,6 +11,7 @@ import { FixedWidthDecodingJudge } from "../judgment/FixedWidthDecodingJudge.ts"
 import { VariableWidthEncodingJudge } from "../judgment/VariableWidthEncodingJudge.ts";
 import { FixedWidthEncodingJudge } from "../judgment/FixedWidthEncodingJudge.ts";
 import { DisplayMatrixUpdate } from "./DisplayMatrix.tsx";
+import { debug } from "../Logger.ts";
 
 export interface PuzzleProps {
   puzzle: Puzzle;
@@ -110,12 +111,12 @@ export function useBasePuzzle(
         ? new FixedWidthEncodingJudge(puzzle.encoding)
         : new FixedWidthDecodingJudge(puzzle.encoding);
     }
-    console.debug(`hooking up judge based on puzzle type: ${puzzle.type} with encoding: ${puzzle.encoding_name} (${puzzle.encoding.getType()})`);
+    debug(`hooking up judge based on puzzle type: ${puzzle.type} with encoding: ${puzzle.encoding_name} (${puzzle.encoding.getType()})`);
     if (!newJudge) {
       console.warn("No judge available for this puzzle encoding type.");
       return;
     } else {
-      console.debug(`Hooked-up judge: ${newJudge.constructor.name}`);
+      debug(`Hooked-up judge: ${newJudge.constructor.name}`);
     }
     return newJudge;
   }, [puzzle]);
@@ -131,7 +132,7 @@ export function useBasePuzzle(
 
     const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
     if (previousJudgment.current && previousJudgment.current.equals(newJudgment)) {
-      console.debug("No change in judgment, skipping update.");
+      debug("No change in judgment, skipping update.");
       return;
     }
 

@@ -1,14 +1,15 @@
 import { Menu } from "../model.ts";
+import { debug } from "../Logger.ts";
 
 export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | number | undefined) {
   if (categoryKeyOrIndex === undefined || categoryKeyOrIndex === null) {
-    console.debug("No category key or index provided.");
+    debug("No category key or index provided.");
     return {category: null};
   } else if (!menu) {
-    console.debug(`Asking for category[${categoryKeyOrIndex}], but no menu provided.`);
+    debug(`Asking for category[${categoryKeyOrIndex}], but no menu provided.`);
     return {category: null};
   } else if (!menu.categories) {
-    console.debug(`Asking for category[${categoryKeyOrIndex}], but menu has no categories.`);
+    debug(`Asking for category[${categoryKeyOrIndex}], but menu has no categories.`);
     return {category: null};
   }
 

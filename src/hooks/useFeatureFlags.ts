@@ -1,5 +1,6 @@
 import { importSPKI, jwtVerify } from 'jose';
 import { useEffect, useState } from "react";
+import { debug } from "../Logger.ts";
 
 // noinspection SpellCheckingInspection
 const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
@@ -33,7 +34,7 @@ export function useFeatureFlags() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('features');
     if (!token) {
-      console.debug('No feature flags token found, returning default flags.');
+      debug('No feature flags token found, returning default flags.');
       return;
     }
 
