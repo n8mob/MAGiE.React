@@ -128,7 +128,7 @@ describe('VariableWidthEncodingJudge', () => {
     }
 
     expect(nextCharJudgment.done).to.be.false;
-    const lastCharJudgment = nextCharJudgment.value;
+    const lastCharJudgment = nextCharJudgment.value!;
     expect(lastCharJudgment.isSequenceCorrect).to.be.false;
     const bitJudgments = lastCharJudgment.bitJudgments.map((bj: BitJudgment) => bj.bit).join("");
     expect(bitJudgments).to.equal("000");
@@ -167,7 +167,7 @@ describe('VariableWidthEncodingJudge', () => {
     }
 
     expect(nextCharJudgment.done).to.be.false;
-    const lastCharJudgment = nextCharJudgment.value;
+    const lastCharJudgment = nextCharJudgment.value!;
     expect(lastCharJudgment.isSequenceCorrect).to.be.false;
     const judgmentGuess = lastCharJudgment.bitJudgments.map((bj: BitJudgment) => bj.bit).join("");
     expect(judgmentGuess).to.equal("1");
