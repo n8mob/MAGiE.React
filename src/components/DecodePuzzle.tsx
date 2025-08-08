@@ -32,8 +32,13 @@ const DecodePuzzle: FC<PuzzleProps> = (
   });
 
   // Compute winBits and displayRows for decode-type puzzles
-  const winBits = useMemo(() => puzzle.encoding.encodeText(puzzle.winText), [puzzle]);
-  const displayRows = useMemo(() => Array.from(puzzle.encoding.splitForDisplay(winBits, displayWidth)), [puzzle, winBits, displayWidth]);
+  const displayRows = useMemo(
+    () => {
+      const winBits = puzzle.encoding.encodeText(puzzle.winText);
+      const displayBits = winBits.appendBits(guessBits.slice(winBits.length))
+      return Array.from(puzzle.encoding.splitForDisplay(displayBits, displayWidth));
+    },
+    [puzzle.encoding, puzzle.winText, guessBits, displayWidth]);
 
   const gameContentRef = useRef<HTMLDivElement>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
@@ -111,10 +116,10 @@ const DecodePuzzle: FC<PuzzleProps> = (
       const mainDisplayHeight = mainDisplay.offsetHeight;
       if (windowHeight < mainDisplayHeight * 1.5) {
         gameContent.style.height = windowHeight + 'px';
-        gameContent.scrollIntoView({behavior: 'smooth'});
+        gameContent.scrollIntoView({ behavior: 'smooth' });
         const puzzleInputs = puzzleInputsRef.current;
         if (puzzleInputs) {
-          puzzleInputs.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+          puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
         }
       } else {
         gameContent.style.height = '';
@@ -146,8 +151,8 @@ const DecodePuzzle: FC<PuzzleProps> = (
       return;
     }
 
-    input.addEventListener('focus', handleInputFocus, {passive: true});
-    input.addEventListener('blur', handleInputBlur, {passive: true});
+    input.addEventListener('focus', handleInputFocus, { passive: true });
+    input.addEventListener('blur', handleInputBlur, { passive: true });
 
     return () => {
       if (!input) {
@@ -200,7 +205,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
                    spellCheck="false"
                    value={guessText}
                    onChange={handleGuessUpdate}
-                   enterKeyHint={"done"}/>
+                   enterKeyHint={"done"} />
           </div>
         )}
       </div>

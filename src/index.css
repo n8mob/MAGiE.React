@@ -42,7 +42,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  text-transform: uppercase;
+  text-transform: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
   color: inherit;

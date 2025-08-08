@@ -99,6 +99,24 @@ describe('VariableWidthDecodingJudge', () => {
     expect(actual.isCorrect).to.be.false;
     expect(actual.correctGuess.toPlainString()).to.equal("10011101011000");
     const charJudgments = [...actual.getCharJudgments()];
+    expect(charJudgments.length).to.equal(9);
+    expect(charJudgments[0].isSequenceCorrect).to.be.true;
+    expect(charJudgments[0].guess.toPlainString()).to.equal("1");
+    expect(charJudgments[1].isSequenceCorrect).to.be.true;
+    expect(charJudgments[1].guess.toPlainString()).to.equal("00");
+    expect(charJudgments[2].isSequenceCorrect).to.be.true;
+    expect(charJudgments[2].guess.toPlainString()).to.equal("111");
+    expect(charJudgments[3].isSequenceCorrect).to.be.true;
+    expect(charJudgments[3].guess.toPlainString()).to.equal("0");
+    expect(charJudgments[4].isSequenceCorrect).to.be.true;
+    expect(charJudgments[4].guess.toPlainString()).to.equal("1");
+    expect(charJudgments[5].isSequenceCorrect).to.be.true;
+    expect(charJudgments[5].guess.toPlainString()).to.equal("0");
+    expect(charJudgments[6].isSequenceCorrect).to.be.true;
+    expect(charJudgments[6].guess.toPlainString()).to.equal("11");
+    expect(charJudgments[7].isSequenceCorrect).to.be.true;
+    expect(charJudgments[7].bitJudgments.length).to.equal(3);
+    expect(charJudgments[8].isSequenceCorrect).to.be.false;
   });
 });
 

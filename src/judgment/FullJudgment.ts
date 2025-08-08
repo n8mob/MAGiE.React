@@ -17,46 +17,16 @@ class FullJudgment {
     this.sequenceJudgments = sequenceJudgments;
   }
 
-  getCharJudgments() {
-    let pointer = 0;
-    const components = this.sequenceJudgments;
-
-    return {
-      next(): IteratorResult<SequenceJudgment> {
-        if (pointer < components.length) {
-          return {
-            done: false,
-            value: components[pointer++],
-          };
-        } else {
-          return {
-            done: true,
-            value: null,
-          };
-        }
-      },
-    };
+  * getCharJudgments() {
+    for (const judgment of this.sequenceJudgments) {
+      yield judgment;
+    }
   }
 
-  getRowJudgments() {
-    let pointer = 0;
-    const components = this.sequenceJudgments;
-
-    return {
-      next(): IteratorResult<SequenceJudgment> {
-        if (pointer < components.length) {
-          return {
-            done: false,
-            value: components[pointer++],
-          };
-        } else {
-          return {
-            done: true,
-            value: null,
-          };
-        }
-      },
-    };
+  * getRowJudgments() {
+    for (const judgment of this.sequenceJudgments) {
+      yield judgment;
+    }
   }
 
   equals(that: FullJudgment): boolean {

@@ -12,7 +12,7 @@ html, body {
   padding: 0;
   max-width: 500px;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
-  color: #1e2a1e;
+  color: #1e272a;
   background-color: #d0d4d4; /* Background color for the entire viewport */
 }
 
@@ -46,7 +46,6 @@ h1#magie-title {
 }
 
 #magie-header {
-  flex: 1 1 auto;
   align-items: stretch;
 }
 

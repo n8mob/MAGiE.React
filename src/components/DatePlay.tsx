@@ -77,9 +77,9 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
       const content = (
         <h3 className="split-content">
-          {<Link className="left-item" to={previousLink}>&lt;&lt;</Link>}
+          {<Link className="left-item" to={previousLink}>◀◀</Link>}
           <span className="date-item">{formattedDate}</span>
-          {<Link className="right-item" to={nextLink}>&gt;&gt;</Link>}
+          {<Link className="right-item" to={nextLink}>▶▶</Link>}
         </h3>
       );
 
@@ -214,7 +214,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
       {hasWon && (<>
           <div className="after-win-controls">
             <button type={"button"} onClick={handleShareWin}>Share Your Win</button>
-            <p className={""}>
+            <p className={"split-content"}>
               <Link
                 to={`/date/${dateLinkFormat(addDays(puzzleDate, -1))}`}
                 onClick={() => {
@@ -224,7 +224,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
                     is_first_visit: isFirstVisit,
                   });
                 }}>
-                &lt;&lt; Yesterday's puzzle
+                ◀◀ Yesterday's puzzle
               </Link>
             </p>
           </div>

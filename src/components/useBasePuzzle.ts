@@ -48,12 +48,11 @@ export function useBasePuzzle(
   const [hasWon, setHasWon] = useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
   const displayWidthInBitCount = useMemo(() => {
-    // Use a sensible default if ref is not ready
     if (displayWidthInPx && displayWidthInPx > 0) {
       return Math.floor(displayWidthInPx / bitButtonWidthPx);
     }
-    // Default to 8 bits per row if not ready
-    return 8;
+    // Default to 13 bits if calculation fails.
+    return 13;
   }, [bitButtonWidthPx, displayWidthInPx]);
 
   const winBits = useMemo(() => {
