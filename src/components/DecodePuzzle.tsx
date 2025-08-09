@@ -107,42 +107,75 @@ const DecodePuzzle: FC<PuzzleProps> = (
     }
   };
 
+  const viewportCleanupRef = useRef<null | (() => void)>(null);
+
   const adjustMainDisplayHeightForInput = useCallback(() => {
+    debug('adjusting scroll after input focus (brings up keyboard)')
     const gameContent = gameContentRef.current;
-    const mainDisplay = mainDisplayRef.current;
-    if (gameContent && mainDisplay) {
-      const windowHeight = window.innerHeight;
-      const mainDisplayHeight = mainDisplay.offsetHeight;
-      if (windowHeight < mainDisplayHeight * 1.5) {
-        gameContent.style.height = windowHeight + 'px';
-        gameContent.scrollIntoView({ behavior: 'smooth' });
-        const puzzleInputs = puzzleInputsRef.current;
-        if (puzzleInputs) {
-          puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-        }
-      } else {
-        gameContent.style.height = '';
-      }
+    if (!gameContent) return;
+
+    const inputEl = puzzleInputsRef.current?.querySelector('input') as HTMLInputElement | null;
+    const vv = window.visualViewport;
+
+    if (vv && typeof vv.height === 'number') {
+      // Calculate how much of the layout viewport is occluded by the keyboard
+      const occluded = Math.max(0, (window.innerHeight - (vv.height + (vv.offsetTop || 0))));
+      // Add some extra breathing room
+      const extra = 8;
+      gameContent.style.paddingBottom = `${occluded + extra}px`;
+
+      // Ensure the input is visible within the visual viewport
+      inputEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    } else {
+      // Fallback: simple scroll into view without forcing container height
+      gameContent.style.paddingBottom = '';
+      inputEl?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     }
   }, []);
+
+  const attachViewportListeners = useCallback(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const onChange = () => {
+      adjustMainDisplayHeightForInput();
+    };
+
+    vv.addEventListener('resize', onChange);
+    vv.addEventListener('scroll', onChange);
+
+    viewportCleanupRef.current = () => {
+      vv.removeEventListener('resize', onChange);
+      vv.removeEventListener('scroll', onChange);
+    };
+  }, [adjustMainDisplayHeightForInput]);
 
   const handleInputFocus = useCallback(() => {
     if (resizeTimeout.current) {
       clearTimeout(resizeTimeout.current);
     }
+    // Attach listeners immediately and adjust soon after focus to allow keyboard animation
+    attachViewportListeners();
     resizeTimeout.current = window.setTimeout(() => {
       adjustMainDisplayHeightForInput();
-    }, 300);
-  }, [adjustMainDisplayHeightForInput]);
+    }, 250);
+  }, [adjustMainDisplayHeightForInput, attachViewportListeners]);
 
   const handleInputBlur = useCallback(() => {
     if (resizeTimeout.current) {
       clearTimeout(resizeTimeout.current);
     }
-    resizeTimeout.current = window.setTimeout(() => {
-      adjustMainDisplayHeightForInput();
-    }, 300);
-  }, [adjustMainDisplayHeightForInput]);
+    if (viewportCleanupRef.current) {
+      viewportCleanupRef.current();
+      viewportCleanupRef.current = null;
+    }
+    // Reset any style adjustments
+    const gameContent = gameContentRef.current;
+    if (gameContent) {
+      gameContent.style.paddingBottom = '';
+      gameContent.style.height = '';
+    }
+  }, []);
 
   useEffect(() => {
     const input = puzzleInputsRef.current?.querySelector('input');
@@ -161,11 +194,21 @@ const DecodePuzzle: FC<PuzzleProps> = (
       input.removeEventListener('focus', handleInputFocus);
       input.removeEventListener('blur', handleInputBlur);
 
+      if (viewportCleanupRef.current) {
+        viewportCleanupRef.current();
+        viewportCleanupRef.current = null;
+      }
+      const gc = gameContentRef.current;
+      if (gc) {
+        gc.style.paddingBottom = '';
+        gc.style.height = '';
+      }
+
       if (resizeTimeout.current) {
         clearTimeout(resizeTimeout.current);
       }
     };
-  }, [guessText, handleInputBlur, handleInputFocus]);
+  }, [handleInputBlur, handleInputFocus]);
 
   if (!puzzle) {
     return <></>;

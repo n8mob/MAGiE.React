@@ -86,6 +86,7 @@ h3 {
   overflow-x: hidden; /* Prevent horizontal scrolling */
   word-wrap: break-word; /* Ensure long words break and wrap within the container */
   text-align: left;
+  scroll-padding-bottom: 64px;
 }
 
 .decode-input {
