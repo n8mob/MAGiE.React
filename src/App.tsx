@@ -1,5 +1,5 @@
 import './App.css'
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, matchPath } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -48,7 +48,24 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
-  const {headerContent} = useHeader();
+  const { headerContent } = useHeader();
+  const location = useLocation();
+
+  const hideHeader = useMemo(() => {
+    const p = location.pathname;
+
+    const playMatchers = [
+      // DatePlay
+      "/today",
+      "/date/:year/:month/:day",
+      // LevelPlay
+      "/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex",
+      "/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex",
+      "/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+    ];
+
+    return playMatchers.some(pattern => matchPath({ path: pattern, end: true }, p));
+  }, [location.pathname]);
 
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
     const storedHasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
@@ -118,34 +135,35 @@ function App() {
 
   return (
     <>
-      <div id="magie-header">
-        <button
-          type={"button"}
-          aria-label={"open settings"}
-          className="activate-dialog left"
-          onClick={() => {
-            setShowSettings(true);
-            ReactGA4.event('open_settings_dialog', {
-              source: 'activate_dialog',
-              dialog: 'settings',
-            });
-          }}>
-          ⋮
-        </button>
-        <button
-          type={"button"}
-          aria-label={"show how-to information"}
-          className="activate-dialog right"
-          onClick={() => {
-            setShowHowTo(true);
-            ReactGA4.event('open_help_dialog', {
-              source: 'activate_dialog',
-              dialog: 'help',
-              is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
-            });
-          }}>
-          ?
-        </button>
+      {!hideHeader && (
+        <div id="magie-header">
+          <button
+            type={"button"}
+            aria-label={"open settings"}
+            className="activate-dialog left"
+            onClick={() => {
+              setShowSettings(true);
+              ReactGA4.event('open_settings_dialog', {
+                source: 'activate_dialog',
+                dialog: 'settings',
+              });
+            }}>
+            ⋮
+          </button>
+          <button
+            type={"button"}
+            aria-label={"show how-to information"}
+            className="activate-dialog right"
+            onClick={() => {
+              setShowHowTo(true);
+              ReactGA4.event('open_help_dialog', {
+                source: 'activate_dialog',
+                dialog: 'help',
+                is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+              });
+            }}>
+            ?
+          </button>
 
           {showHowTo && (<Dialog onClose={() => {
               setHasSeenHowTo(true);
