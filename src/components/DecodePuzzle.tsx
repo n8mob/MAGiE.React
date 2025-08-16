@@ -93,6 +93,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
         const inputsRect = puzzleInputs.getBoundingClientRect();
         const contextFactor = 6;
         const newScrollTop = rowRect.top - mainRect.top + mainDisplay.scrollTop - (mainRect.height / contextFactor);
+        debug(`scrolling to row ${rowIndex} with top ${rowRect.top} and newScrollTop ${newScrollTop}`);
         mainDisplay.scrollTo({
           top: newScrollTop,
           behavior: 'smooth'
@@ -185,6 +186,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
 
     input.addEventListener('focus', handleInputFocus, { passive: true });
     input.addEventListener('blur', handleInputBlur, { passive: true });
+    const gameContent = gameContentRef.current;
 
     return () => {
       if (!input) {
@@ -198,10 +200,9 @@ const DecodePuzzle: FC<PuzzleProps> = (
         viewportCleanupRef.current();
         viewportCleanupRef.current = null;
       }
-      const gc = gameContentRef.current;
-      if (gc) {
-        gc.style.paddingBottom = '';
-        gc.style.height = '';
+      if (gameContent) {
+        gameContent.style.paddingBottom = '';
+        gameContent.style.height = '';
       }
 
       if (resizeTimeout.current) {
