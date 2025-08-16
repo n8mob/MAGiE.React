@@ -38,9 +38,9 @@ declare global {
 
 if (window.gtag) {
   if (debugMode) {
-    window.gtag('config', ga4id, {'debug_mode': debugMode});
+    window.gtag('config', ga4id, { 'debug_mode': debugMode });
     console.log('Google Analytics 4 initialized with debug mode enabled.');
-    ReactGA4.event("debug_mode_enabled", {debug_mode: debugMode});
+    ReactGA4.event("debug_mode_enabled", { debug_mode: debugMode });
   }
 } else {
   console.warn('Google Analytics 4 is not available. Make sure you have included the GA4 script in your HTML.');
@@ -80,40 +80,40 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<DatePlay initialDate={new Date()}/>}/>
-      <Route path="/today" element={<DatePlay initialDate={new Date()}/>}/>
-      <Route path="/date/:year/:month/:day" element={<DatePlay/>}/>
+      <Route path="/" element={<DatePlay initialDate={new Date()} />} />
+      <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
+      <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       {features.includes("storyRoutes") && (<>
-        <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
-        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall"/>}/>
+        <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="mall"/>}/>
+               element={<LevelPlay menuName="mall" />} />
       </>)}
       {features.includes('tutorial') && (<>
         <Route path="/tutorial" element={
           <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />
         } />
-        <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial"/>}/>
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial"/>}/>
+        <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial" />} />
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial" />} />
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="tutorial"/>}/>
+               element={<LevelPlay menuName="tutorial" />} />
       </>)}
       {features.includes('bigGameRoutes') && (<>
-        <Route path="/bigGame" element={<MenuBrowser menuName="bigGame"/>}/>
-        <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame"/>}/>
-        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame"/>}/>
+        <Route path="/bigGame" element={<MenuBrowser menuName="bigGame" />} />
+        <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame" />} />
+        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame" />} />
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="bigGame"/>}/>
+               element={<LevelPlay menuName="bigGame" />} />
       </>)}
       {features.includes('mall') && (<>
-        <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
-        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall"/>}/>
+        <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
+        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
+        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="mall"/>}/>
+               element={<LevelPlay menuName="mall" />} />
       </>)}
-      <Route path={"*"} element={<PageNotFound/>}/>
+      <Route path={"*"} element={<PageNotFound />} />
     </Routes>), [features]);
 
   return (
@@ -147,24 +147,24 @@ function App() {
           ?
         </button>
 
-        {showHowTo && (<Dialog onClose={() => {
-            setHasSeenHowTo(true);
-            localStorage.setItem('hasSeenHowTo', 'true');
-            setShowHowTo(false);
-          }}>
-            <FirstTimeContent/>
-          </Dialog>
-        )}
+          {showHowTo && (<Dialog onClose={() => {
+              setHasSeenHowTo(true);
+              localStorage.setItem('hasSeenHowTo', 'true');
+              setShowHowTo(false);
+            }}>
+              <FirstTimeContent />
+            </Dialog>
+          )}
 
-        {showSettings && (
-          <Dialog onClose={() => setShowSettings(false)}>
-            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont}/>
-          </Dialog>
-        )}
+          {showSettings && (
+            <Dialog onClose={() => setShowSettings(false)}>
+              <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
+            </Dialog>
+          )}
 
-        <h1 id="magie-title">MAGiE</h1>
-        {headerContent ?? <span>No header content</span>}
-      </div>
+          <h1 id="magie-title">MAGiE</h1>
+          {headerContent ?? <span>No header content</span>}
+        </div>)}
       {routes}
     </>
   );
