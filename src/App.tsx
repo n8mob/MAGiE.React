@@ -10,7 +10,7 @@ import SettingsContent from './components/SettingsContent.tsx';
 import { useHeader } from "./hooks/useHeader.ts";
 import { MenuBrowser } from './components/MenuBrowser.tsx';
 import { CategoryBrowser } from './components/CategoryBrowser.tsx';
-import LevelPlay from "./components/LevelPlay.tsx";
+import { LevelPlay } from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";

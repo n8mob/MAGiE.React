@@ -15,7 +15,7 @@ interface LevelPlayProps {
   menuName?: string;
 }
 
-const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
+export const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   const navigate = useNavigate();
   const { menu, loading, error } = useMenu(menuName);
   const { categoryIndex, levelNumber, puzzleIndex: puzzleIndexParam } = useParams();
@@ -128,5 +128,3 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
     );
   }
 }
-
-export default LevelPlay;
