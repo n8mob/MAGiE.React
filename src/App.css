@@ -10,22 +10,10 @@
 html, body {
   margin: 0;
   padding: 0;
-  max-width: 500px;
+  max-width: 800px;
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   color: #1e272a;
   background-color: #d0d4d4; /* Background color for the entire viewport */
-}
-
-h1#magie-title {
-  font-size: 3em;
-  display: flex;
-  align-self: center;
-  justify-content: center;
-  margin: 16px 0;
-  max-width: 100%; /* Prevents expanding beyond the viewport */
-  text-align: center; /* Centers the text */
-  word-wrap: break-word; /* Allows text to wrap within the specified width */
-  text-transform: none;
 }
 
 .magie-case {
@@ -38,19 +26,69 @@ h1#magie-title {
 
 #root {
   display: flex;
+  height: 100%;
   flex-direction: column;
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
   text-transform: uppercase;
 }
 
-#magie-header {
+header {
   align-items: stretch;
+}
+
+h1.title {
+  font-size: 3em;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  margin: 16px 0;
+  max-width: 100%; /* Prevents expanding beyond the viewport */
+  text-align: center; /* Centers the text */
+  word-wrap: break-word; /* Allows text to wrap within the specified width */
+  text-transform: none;
 }
 
 h3 {
   margin: 0;
+}
+
+.landing {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  box-sizing: border-box; /* padding included in height */
+  padding: 2rem 2rem calc(env(safe-area-inset-bottom) + 2rem);
+}
+
+.action-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  border-radius: 8px;
+  border: 2px solid;
+  margin: 0.5em;
+  padding: 1em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: inherit;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn.primary {
+  box-shadow: 0 2px 0 currentColor;
+}
+
+.btn.secondary {
+  opacity: 0.8;
 }
 
 #game-content {

@@ -7,7 +7,7 @@ interface DialogProps {
   children: ReactNode;
 }
 
-export default function Dialog({ onClose, children }: DialogProps) {
+export function Dialog({ onClose, children }: DialogProps) {
   return (
     <div className="dialog-overlay" onClick={onClose}>
       <div className="dialog-content" onClick={e => e.stopPropagation()}>

@@ -1,19 +1,19 @@
 import './App.css'
-import { Navigate, Route, Routes, useLocation, matchPath } from "react-router-dom";
+import { matchPath, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useEffect, useMemo, useState } from "react";
-import Dialog from './components/Dialog.tsx';
+import { Dialog } from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
-import { useHeader } from "./hooks/useHeader.ts";
 import { MenuBrowser } from './components/MenuBrowser.tsx';
 import { CategoryBrowser } from './components/CategoryBrowser.tsx';
 import { LevelPlay } from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
+import { Landing } from "./components/Landing.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -48,7 +48,6 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
-  const { headerContent } = useHeader();
   const location = useLocation();
 
   const hideHeader = useMemo(() => {
@@ -74,7 +73,7 @@ function App() {
   });
   const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
-  const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
+  const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') !== 'false');
   const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
@@ -97,7 +96,7 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<DatePlay initialDate={new Date()} />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       {features.includes("storyRoutes") && (<>
@@ -136,7 +135,7 @@ function App() {
   return (
     <>
       {!hideHeader && (
-        <div id="magie-header">
+        <header>
           <button
             type={"button"}
             aria-label={"open settings"}
@@ -179,10 +178,7 @@ function App() {
               <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
             </Dialog>
           )}
-
-          <h1 id="magie-title">MAGiE</h1>
-          {headerContent ?? <span>No header content</span>}
-        </div>)}
+        </header>)}
       {routes}
     </>
   );
