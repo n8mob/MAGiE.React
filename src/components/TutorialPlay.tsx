@@ -37,8 +37,8 @@ export const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
 
   const linkAfterWin = { to: "", text: "" };
   if (isLastInLevel) {
-    linkAfterWin.to = "/today";
-    linkAfterWin.text = "PLAY TODAY'S PUZZLE";
+    linkAfterWin.to = `/${menuName}/${categoryIndex}`;
+    linkAfterWin.text = `Back to ${category?.name || "Category"}`;
   } else {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next ▶▶";

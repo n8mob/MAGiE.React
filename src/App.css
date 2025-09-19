@@ -49,6 +49,7 @@ h1.title {
 
 h3 {
   margin: 0;
+  align-self: center;
 }
 
 .landing {

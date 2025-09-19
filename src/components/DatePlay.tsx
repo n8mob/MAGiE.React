@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { getDailyPuzzleForDate } from "../PuzzleApi.ts";
 import { PlayPuzzle } from "./PlayPuzzle";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Puzzle } from "../model.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
@@ -71,20 +71,24 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     }
   }, [puzzleDate]);
 
+  const previous_link = useMemo(() => {
+    if (!puzzleDate) {
+      return "";
+    } else {
+      return `/date/${dateLinkFormat(addDays(puzzleDate, -1))}`;
+    }
+  }, [puzzleDate]);
+
+  const next_link = useMemo(() => {
+    if (!puzzleDate) {
+      return "";
+    } else {
+      return `/date/${dateLinkFormat(addDays(puzzleDate, 1))}`;
+    }
+  }, [puzzleDate]);
+
   useEffect(() => {
     if (currentPuzzle && formattedDate && puzzleDate) {
-      const previousLink = `/date/${dateLinkFormat(addDays(puzzleDate, -1))}`;
-      const nextLink = `/date/${dateLinkFormat(addDays(puzzleDate, 1))}`;
-
-      const content = (
-        <h3 className="split-content">
-          {<Link className="left-item" to={previousLink}>◀◀</Link>}
-          <span className="date-item">{formattedDate}</span>
-          {<Link className="right-item" to={nextLink}>▶▶</Link>}
-        </h3>
-      );
-
-      setHeaderContent(content);
       const todayString = puzzleDate.getDate() == new Date().getDate() ? "today, " : "";
       setDateShareString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
     }
@@ -107,9 +111,16 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const isFutureDate = puzzleDate > new Date();
   if (isFutureDate) {
     return <>
-      <p>/// <span className="blink">Restricted</span> ///<br />{formattedDate}<br />//////////////////</p>
-      <p>Please rewind.</p>
-      {linkToToday}
+      <header>
+        <h1 className="title">MAGiE</h1>
+      </header>
+      <main>
+        <div className="action-row">
+          <p>/// <span className="blink">Restricted</span> ///<br />{formattedDate}<br />//////////////////</p>
+        <p>Please rewind.</p>
+        {linkToToday}
+        </div>
+      </main>
     </>
   }
 
@@ -149,7 +160,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   };
 
   function handleWin(stopwatch: StopwatchHandle) {
-    debug(`DatePlay handles win at ${ stopwatch.displayTime() }`);
+    debug(`DatePlay handles win at ${stopwatch.displayTime()}`);
     setHasWon(true);
     updateSolveTime(stopwatch);
 
@@ -202,6 +213,14 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
   return (
     <>
+      <header>
+        <h3>MAGiE</h3>
+        <h3 className="split-content">
+          {<Link className="left-item" to={previous_link}>◀◀</Link>}
+          <span className="date-item">{formattedDate}</span>
+          {<Link className="right-item" to={next_link}>▶▶</Link>}
+        </h3>
+      </header>
       {currentPuzzle && (
         <PlayPuzzle
           key={currentPuzzle.slug}

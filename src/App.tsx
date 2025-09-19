@@ -58,6 +58,9 @@ function App() {
       "/today",
       "/date/:year/:month/:day",
       // LevelPlay
+      "/mall",
+      "/mall/:categoryIndex",
+      "/mall/:categoryIndex/levels/:levelNumber",
       "/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex",
       "/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex",
       "/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
