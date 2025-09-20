@@ -14,6 +14,7 @@ import LevelPlay from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
+import { StoryPage } from "./components/StoryPage.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 
@@ -83,6 +84,7 @@ function App() {
       <Route path="/" element={<DatePlay initialDate={new Date()}/>}/>
       <Route path="/today" element={<DatePlay initialDate={new Date()}/>}/>
       <Route path="/date/:year/:month/:day" element={<DatePlay/>}/>
+      <Route path="/story/02" element={<StoryPage />}/>
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall"/>}/>
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall"/>}/>

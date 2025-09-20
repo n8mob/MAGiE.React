@@ -1,16 +1,16 @@
-@font-face {
-  font-family: "HD44780";
-  /*noinspection CssUnknownTarget*/
-  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-}
+/*@font-face {*/
+/*  font-family: "HD44780";*/
+/*  !*noinspection CssUnknownTarget*!*/
+/*  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");*/
+/*  font-weight: normal;*/
+/*  font-style: normal;*/
+/*}*/
 
 
 html, body {
   margin: 0;
   padding: 0;
-  max-width: 500px;
+  /*max-width: 500px;*/
   text-shadow: 1.2px 1.2px 0 rgba(0, 0, 0, 0.3);
   color: #1e272a;
   background-color: #d0d4d4; /* Background color for the entire viewport */
@@ -78,13 +78,17 @@ h3 {
   }
 }
 
+.story-page > p {
+  text-transform: none;
+  hyphens: auto;
+}
+
 #main-display {
   /* allow main-display to shrink, but not grow */
   flex: 1 1 auto;
   min-height: 0;    /* Important for flex children! */
   padding: 1em;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  word-wrap: break-word; /* Ensure long words break and wrap within the container */
   text-align: left;
 }
 
