@@ -83,6 +83,11 @@ h3 {
   hyphens: auto;
 }
 
+.display-frame {
+  padding: 16px; /* bezel width */
+  background: center / 100% 100% no-repeat url('assets/Screen_Border.png');
+}
+
 #main-display {
   /* allow main-display to shrink, but not grow */
   flex: 1 1 auto;
