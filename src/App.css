@@ -84,8 +84,10 @@ h3 {
 }
 
 .display-frame {
-  padding: 16px; /* bezel width */
-  background: center / 100% 100% no-repeat url('assets/Screen_Border.png');
+  border-image-source: url("assets/Screen_Border.png");
+  border-image-slice: 28 40 28 28 fill;
+  border-image-width: 28px 40px 28px 28px;
+  border-image-repeat: stretch;
 }
 
 #main-display {
@@ -106,8 +108,7 @@ h3 {
   display: flex;
   justify-self: end;
   justify-content: center;
-  padding: 1rem 1rem env(safe-area-inset-bottom, 1rem);
-  background-color: #d0d4d4;
+  padding: 2rem;
   flex-direction: column;
   /* Remove sticky by default, only sticky on small screens */
   position: static;
