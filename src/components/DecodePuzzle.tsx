@@ -1,8 +1,39 @@
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
-import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
 import { debug } from "../Logger.ts";
+import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
+
+const LETTER_PATTERN = /^[a-z]$/i;
+const ALLOWED_PUNCTUATION = new Set<string>([",", ".", "!", "?", " "]);
+
+const normalizeDecodeCharacter = (rawCharacter: string): string | null => {
+  if (LETTER_PATTERN.test(rawCharacter)) {
+    return rawCharacter.toUpperCase();
+  }
+
+  if (ALLOWED_PUNCTUATION.has(rawCharacter)) {
+    return rawCharacter;
+  }
+
+  return null;
+};
+
+const sanitizeGuessText = (rawGuessText: string): string => Array.from(rawGuessText)
+  .map((character) => normalizeDecodeCharacter(character) ?? "")
+  .join("");
+
+const isEditableTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return target.isContentEditable
+    || target.tagName === "INPUT"
+    || target.tagName === "TEXTAREA"
+    || target.tagName === "SELECT";
+};
 
 const DecodePuzzle: FC<PuzzleProps> = (
   {
@@ -11,7 +42,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
     onShareWin = () => {},
     bitButtonWidthPx = 32
   }) => {
-  const [guessText, setGuessText] = useState<string>(puzzle.init);
+  const [guessText, setGuessText] = useState<string>(() => sanitizeGuessText(puzzle.init));
   const guessBits = useMemo(
     () => puzzle?.encoding?.encodeText(guessText) || BitSequence.empty(),
     [puzzle, guessText]
@@ -39,133 +70,153 @@ const DecodePuzzle: FC<PuzzleProps> = (
     },
     [puzzle.encoding, puzzle.winText, guessBits, displayWidth]);
 
-  const gameContentRef = useRef<HTMLDivElement>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
-  const winMessageRef = useRef<HTMLDivElement>(null);
   const puzzleInputsRef = useRef<HTMLDivElement>(null);
-  const resizeTimeout = useRef<number | null>(null);
-
-  // Handle guess update
-  const handleGuessUpdate = (event: ChangeEvent<HTMLInputElement>) => {
-    const prevGuessBits = guessBits;
-    const newGuessText = event.target.value.toUpperCase();
-    setGuessText(newGuessText);
-    const newGuessBits = puzzle?.encoding.encodeText(newGuessText) || prevGuessBits;
-
-    // Scroll logic: scroll the row containing the last-changed bit into view
-    let lastChangedIndex = -1;
-    const minLen = Math.min(prevGuessBits.length, newGuessBits.length);
-    for (let i = 0; i < minLen; ++i) {
-      if (prevGuessBits.getBit(i) !== newGuessBits.getBit(i)) {
-        lastChangedIndex = i;
-      }
-    }
-    if (newGuessBits.length > prevGuessBits.length) {
-      lastChangedIndex = newGuessBits.length - 1;
-    }
-    // Find which row contains this bit
-    let rowIndex = -1;
-    if (lastChangedIndex !== -1 && displayRows) {
-      for (let i = 0; i < displayRows.length; ++i) {
-        const row = displayRows[i];
-        if (row.length > 0) {
-          const firstBitIndex = row.firstBit().index;
-          const lastBitIndex = row.lastBit().index;
-          if (lastChangedIndex >= firstBitIndex && lastChangedIndex <= lastBitIndex) {
-            rowIndex = i;
-            break;
-          }
-        }
-      }
-    }
-    // Scroll the row into view
-    // but keep #puzzle-inputs visible
-    if (rowIndex !== -1
-      && displayMatrixRef.current
-      && typeof displayMatrixRef.current.getBitRowElement === 'function'
-    ) {
-      const lastChangedRow = displayMatrixRef.current.getBitRowElement(rowIndex);
-      const mainDisplay = mainDisplayRef.current;
-      const puzzleInputs = puzzleInputsRef.current;
-      if (lastChangedRow && mainDisplay && puzzleInputs) {
-        const rowRect = lastChangedRow.getBoundingClientRect();
-        const mainRect = mainDisplay.getBoundingClientRect();
-        const inputsRect = puzzleInputs.getBoundingClientRect();
-        const contextFactor = 6;
-        const newScrollTop = rowRect.top - mainRect.top + mainDisplay.scrollTop - (mainRect.height / contextFactor);
-        mainDisplay.scrollTo({
-          top: newScrollTop,
-          behavior: 'smooth'
-        });
-        if (rowRect.bottom > mainRect.bottom) {
-          const maxScroll = (inputsRect.top) - mainRect.top - lastChangedRow.offsetHeight;
-          mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
-        } else if (rowRect.top < mainRect.top) {
-          mainDisplay.scrollTop += rowRect.top - mainRect.top;
-        }
-      }
-    }
-  };
-
-  const adjustMainDisplayHeightForInput = useCallback(() => {
-    const gameContent = gameContentRef.current;
-    const mainDisplay = mainDisplayRef.current;
-    if (gameContent && mainDisplay) {
-      const windowHeight = window.innerHeight;
-      const mainDisplayHeight = mainDisplay.offsetHeight;
-      if (windowHeight < mainDisplayHeight * 1.5) {
-        gameContent.style.height = windowHeight + 'px';
-        gameContent.scrollIntoView({ behavior: 'smooth' });
-        const puzzleInputs = puzzleInputsRef.current;
-        if (puzzleInputs) {
-          puzzleInputs.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-        }
-      } else {
-        gameContent.style.height = '';
-      }
-    }
-  }, []);
-
-  const handleInputFocus = useCallback(() => {
-    if (resizeTimeout.current) {
-      clearTimeout(resizeTimeout.current);
-    }
-    resizeTimeout.current = window.setTimeout(() => {
-      adjustMainDisplayHeightForInput();
-    }, 300);
-  }, [adjustMainDisplayHeightForInput]);
-
-  const handleInputBlur = useCallback(() => {
-    if (resizeTimeout.current) {
-      clearTimeout(resizeTimeout.current);
-    }
-    resizeTimeout.current = window.setTimeout(() => {
-      adjustMainDisplayHeightForInput();
-    }, 300);
-  }, [adjustMainDisplayHeightForInput]);
 
   useEffect(() => {
-    const input = puzzleInputsRef.current?.querySelector('input');
-    if (!input) {
+    setGuessText(sanitizeGuessText(puzzle.init));
+  }, [puzzle.init]);
+
+  const scrollChangedBitIntoView = useCallback((lastChangedIndex: number) => {
+    if (lastChangedIndex < 0) {
       return;
     }
 
-    input.addEventListener('focus', handleInputFocus, { passive: true });
-    input.addEventListener('blur', handleInputBlur, { passive: true });
+    // Find which row contains this bit.
+    let rowIndex = -1;
+    for (let i = 0; i < displayRows.length; ++i) {
+      const row = displayRows[i];
+      if (row.length < 1) {
+        continue;
+      }
+      const firstBitIndex = row.firstBit().index;
+      const lastBitIndex = row.lastBit().index;
+      if (lastChangedIndex >= firstBitIndex && lastChangedIndex <= lastBitIndex) {
+        rowIndex = i;
+        break;
+      }
+    }
 
-    return () => {
-      if (!input) {
+    // Scroll the row into view but keep #puzzle-inputs visible.
+    if (rowIndex < 0
+      || !displayMatrixRef.current
+      || typeof displayMatrixRef.current.getBitRowElement !== "function"
+    ) {
+      return;
+    }
+
+    const lastChangedRow = displayMatrixRef.current.getBitRowElement(rowIndex);
+    const mainDisplay = mainDisplayRef.current;
+    const puzzleInputs = puzzleInputsRef.current;
+    if (!lastChangedRow || !mainDisplay || !puzzleInputs) {
+      return;
+    }
+
+    const rowRect = lastChangedRow.getBoundingClientRect();
+    const mainRect = mainDisplay.getBoundingClientRect();
+    const inputsRect = puzzleInputs.getBoundingClientRect();
+    const contextFactor = 6;
+    const newScrollTop = rowRect.top - mainRect.top + mainDisplay.scrollTop - (mainRect.height / contextFactor);
+    mainDisplay.scrollTo({
+      top: newScrollTop,
+      behavior: "smooth"
+    });
+    if (rowRect.bottom > mainRect.bottom) {
+      const maxScroll = (inputsRect.top) - mainRect.top - lastChangedRow.offsetHeight;
+      mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
+    } else if (rowRect.top < mainRect.top) {
+      mainDisplay.scrollTop += rowRect.top - mainRect.top;
+    }
+  }, [displayRows, displayMatrixRef]);
+
+  const updateGuessText = useCallback((rawGuessText: string) => {
+    if (hasWon) {
+      return;
+    }
+
+    const previousGuessBits = guessBits;
+    const nextGuessText = sanitizeGuessText(rawGuessText);
+    setGuessText(nextGuessText);
+    const nextGuessBits = puzzle.encoding.encodeText(nextGuessText);
+
+    // Scroll logic: scroll the row containing the last changed bit into view.
+    let lastChangedIndex = -1;
+    const minLen = Math.min(previousGuessBits.length, nextGuessBits.length);
+    for (let i = 0; i < minLen; ++i) {
+      if (previousGuessBits.getBit(i) !== nextGuessBits.getBit(i)) {
+        lastChangedIndex = i;
+      }
+    }
+    if (nextGuessBits.length > previousGuessBits.length) {
+      lastChangedIndex = nextGuessBits.length - 1;
+    } else if (nextGuessBits.length < previousGuessBits.length) {
+      lastChangedIndex = Math.max(nextGuessBits.length - 1, 0);
+    }
+
+    scrollChangedBitIntoView(lastChangedIndex);
+  }, [guessBits, hasWon, puzzle.encoding, scrollChangedBitIntoView]);
+
+  const appendCharacter = useCallback((character: string) => {
+    if (hasWon) {
+      return;
+    }
+
+    const normalizedCharacter = normalizeDecodeCharacter(character);
+    if (!normalizedCharacter) {
+      return;
+    }
+
+    updateGuessText(`${guessText}${normalizedCharacter}`);
+  }, [guessText, hasWon, updateGuessText]);
+
+  const deleteCharacter = useCallback(() => {
+    if (hasWon || guessText.length < 1) {
+      return;
+    }
+    updateGuessText(guessText.slice(0, -1));
+  }, [guessText, hasWon, updateGuessText]);
+
+  const checkAnswer = useCallback(() => {
+    if (hasWon) {
+      return;
+    }
+
+    // Decoding answers are judged on every keystroke; "Return" is an explicit re-check trigger.
+    updateGuessText(guessText);
+  }, [guessText, hasWon, updateGuessText]);
+
+  useEffect(() => {
+    const handleWindowKeyDown = (event: KeyboardEvent) => {
+      if (hasWon || isEditableTarget(event.target)) {
         return;
       }
 
-      input.removeEventListener('focus', handleInputFocus);
-      input.removeEventListener('blur', handleInputBlur);
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
 
-      if (resizeTimeout.current) {
-        clearTimeout(resizeTimeout.current);
+      if (event.key === "Backspace") {
+        event.preventDefault();
+        deleteCharacter();
+        return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        checkAnswer();
+        return;
+      }
+
+      const normalizedCharacter = normalizeDecodeCharacter(event.key);
+      if (normalizedCharacter) {
+        event.preventDefault();
+        appendCharacter(normalizedCharacter);
       }
     };
-  }, [guessText, handleInputBlur, handleInputFocus]);
+
+    window.addEventListener("keydown", handleWindowKeyDown);
+    return () => window.removeEventListener("keydown", handleWindowKeyDown);
+  }, [appendCharacter, checkAnswer, deleteCharacter, hasWon]);
 
   if (!puzzle) {
     return <></>;
@@ -175,7 +226,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
 
   return (
     <>
-      <div id="game-content" ref={gameContentRef}>
+      <div id="game-content">
         <div id="main-display" className="display" ref={mainDisplayRef}>
           <div id="clue-text">
             {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
@@ -187,7 +238,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
             handleBitClick={() => {
             }}
           />
-          <div id="win-message" ref={winMessageRef}>
+          <div id="win-message">
             {hasWon && puzzle.init !== puzzle.winText && <p>{guessText}</p>}
             {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
               <p key={`win-message-${winIndex}`}>{winLine}</p>)}
@@ -195,16 +246,18 @@ const DecodePuzzle: FC<PuzzleProps> = (
         </div>
         {!hasWon && (
           <div id="puzzle-inputs" ref={puzzleInputsRef}>
-            <input type="text"
-                   inputMode="text"
-                   className="decode-input"
-                   placeholder={'DECODE TEXT HERE'}
-                   autoComplete="off"
-                   autoCorrect="off"
-                   spellCheck="false"
-                   value={guessText}
-                   onChange={handleGuessUpdate}
-                   enterKeyHint={"done"} />
+            <div className="decode-guess-display" aria-label="Current guess">
+              <span className={guessText.length > 0 ? "decode-guess-text" : "decode-guess-placeholder"}>
+                {guessText.length > 0 ? guessText : "DECODE TEXT HERE"}
+              </span>
+              <span className="decode-guess-cursor blink" aria-hidden="true">_</span>
+            </div>
+            <OnScreenKeyboard
+              onCharacter={appendCharacter}
+              onDelete={deleteCharacter}
+              onReturn={checkAnswer}
+              disabled={hasWon}
+            />
           </div>
         )}
       </div>

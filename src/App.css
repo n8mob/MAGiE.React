@@ -99,8 +99,33 @@ h3 {
   text-align: left;
 }
 
-.decode-input {
-  padding: 1em;
+.decode-guess-display {
+  width: min(100%, 34rem);
+  margin: 0 auto 0.8rem;
+  padding: 0.5rem 0.75rem;
+  min-height: 2.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.05rem;
+  border: 2px solid rgba(0, 0, 0, 0.32);
+  background: rgba(20, 33, 36, 0.12);
+  overflow: hidden;
+}
+
+.decode-guess-text,
+.decode-guess-placeholder {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decode-guess-placeholder {
+  opacity: 0.55;
+}
+
+.decode-guess-cursor {
+  flex: 0 0 auto;
 }
 
 #puzzle-inputs {
