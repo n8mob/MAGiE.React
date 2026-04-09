@@ -1,9 +1,9 @@
 import './App.css'
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Dialog from './components/Dialog.tsx';
 import FirstTimeContent from './components/FirstTimeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
@@ -49,7 +49,8 @@ if (window.gtag) {
 
 function App() {
   usePageTracking();
-  const { headerContent } = useHeader();
+  const location = useLocation();
+  const { headerContent, stopwatchDisplay } = useHeader();
 
   const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
     const storedHasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
@@ -59,6 +60,9 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
+  const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
+  const routeContentRef = useRef<HTMLDivElement | null>(null);
+  const activeScrollContainer = useRef<HTMLElement | null>(null);
   const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
@@ -78,6 +82,46 @@ function App() {
     }
   }, [hasSeenHowTo, showHowTo]);
 
+  useEffect(() => {
+    const routeContent = routeContentRef.current;
+    if (!routeContent) {
+      return;
+    }
+
+    const handleNestedScroll = (event: Event) => {
+      const scrollTarget = event.target;
+      if (!(scrollTarget instanceof HTMLElement)) {
+        return;
+      }
+
+      if (scrollTarget !== routeContent && !routeContent.contains(scrollTarget)) {
+        return;
+      }
+
+      activeScrollContainer.current = scrollTarget;
+      setHeaderScrollOffset(scrollTarget.scrollTop);
+    };
+
+    routeContent.addEventListener('scroll', handleNestedScroll, true);
+    return () => routeContent.removeEventListener('scroll', handleNestedScroll, true);
+  }, []);
+
+  useEffect(() => {
+    setHeaderScrollOffset(0);
+    activeScrollContainer.current = null;
+    routeContentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.pathname, location.search]);
+
+  const expandHeader = useCallback(() => {
+    const scrollContainer = activeScrollContainer.current ?? routeContentRef.current;
+    if (!scrollContainer) {
+      return;
+    }
+    scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const canCollapseHeader = Boolean(headerContent && stopwatchDisplay);
+  const isHeaderCollapsed = canCollapseHeader && headerScrollOffset > 48;
 
   const routes = useMemo(() => (
     <Routes>
@@ -120,8 +164,8 @@ function App() {
 
   return (
     <>
-      <div className="display-frame">
-        <div id="magie-header">
+      <div className={`display-frame ${isHeaderCollapsed ? "header-collapsed" : ""}`}>
+        <div id="magie-header" className={isHeaderCollapsed ? "collapsed" : ""}>
           <button
             type={"button"}
             aria-label={"open settings"}
@@ -165,14 +209,30 @@ function App() {
             </Dialog>
           )}
 
-          {headerContent && (
+          {headerContent && !isHeaderCollapsed && (
             <>
               <h1 id="magie-title">MAGiE</h1>
               {headerContent ?? <span>No header content</span>}
             </>
           )}
+
+          {headerContent && isHeaderCollapsed && (
+            <div id="magie-header-compact">
+              <span id="magie-header-stopwatch">{stopwatchDisplay}</span>
+              <button
+                type="button"
+                id="magie-header-expand"
+                aria-label="expand header"
+                onClick={expandHeader}
+              >
+                Expand ▲
+              </button>
+            </div>
+          )}
         </div>
-        {routes}
+        <div id="route-content" ref={routeContentRef}>
+          {routes}
+        </div>
       </div>
     </>
   );

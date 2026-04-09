@@ -12,7 +12,15 @@ interface StopwatchHandle {
   getSeconds: () => number;
 }
 
-export const Stopwatch = forwardRef((_props, ref) => {
+interface StopwatchProps {
+  onDisplayChange?: (display: string) => void;
+  visible?: boolean;
+}
+
+export const Stopwatch = forwardRef<StopwatchHandle, StopwatchProps>(({
+  onDisplayChange,
+  visible = true,
+}, ref) => {
   const [solveTimeSeconds, setSolveTimeSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
 
@@ -51,6 +59,10 @@ export const Stopwatch = forwardRef((_props, ref) => {
     }
   };
 
+  useEffect(() => {
+    onDisplayChange?.(displayTime());
+  }, [onDisplayChange, solveTimeSeconds]);
+
   useImperativeHandle(ref, () => ({
     stop() {
       setIsRunning(false);
@@ -75,9 +87,11 @@ export const Stopwatch = forwardRef((_props, ref) => {
     }
   }));
 
-  return (
-      <div id="stopwatch-display">{displayTime()}</div>
-  );
+  if (!visible) {
+    return null;
+  }
+
+  return <div id="stopwatch-display">{displayTime()}</div>;
 });
 
 

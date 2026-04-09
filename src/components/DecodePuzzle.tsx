@@ -245,7 +245,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
           </div>
         </div>
         {!hasWon && (
-          <div id="puzzle-inputs" ref={puzzleInputsRef}>
+          <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
             <div className="decode-guess-display" aria-label="Current guess">
               <span className={guessText.length > 0 ? "decode-guess-text" : "decode-guess-placeholder"}>
                 {guessText.length > 0 ? guessText : "DECODE TEXT HERE"}
