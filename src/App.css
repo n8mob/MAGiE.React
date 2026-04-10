@@ -51,6 +51,15 @@ h1#magie-title {
   align-items: stretch;
   flex: 0 0 auto;
   min-height: 0;
+  overflow: hidden;
+}
+
+#magie-header-full {
+  overflow: hidden;
+  max-height: 24rem;
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 220ms ease, opacity 180ms ease, transform 220ms ease;
 }
 
 #magie-header-compact {
@@ -58,7 +67,13 @@ h1#magie-title {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  padding: 0.4rem clamp(3.25rem, 10vw, 4.75rem);
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.35rem);
+  padding: 0 clamp(3.25rem, 10vw, 4.75rem);
+  transition: max-height 220ms ease, opacity 180ms ease, transform 220ms ease, padding 220ms ease, visibility 0ms linear 220ms;
 }
 
 #magie-header-stopwatch {
@@ -82,6 +97,26 @@ h1#magie-title {
 #magie-header-expand:focus-visible {
   outline: 2px solid #dfed84;
   outline-offset: 2px;
+}
+
+#magie-header-expand:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#magie-header.collapsed #magie-header-full {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-0.45rem);
+}
+
+#magie-header.collapsed #magie-header-compact {
+  max-height: 4rem;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  padding: 0.4rem clamp(3.25rem, 10vw, 4.75rem);
+  transition: max-height 220ms ease, opacity 180ms ease, transform 220ms ease, padding 220ms ease, visibility 0ms linear 0ms;
 }
 
 h3 {

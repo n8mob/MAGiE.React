@@ -17,6 +17,8 @@ import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
+const HEADER_COLLAPSE_THRESHOLD = 72;
+const HEADER_EXPAND_GESTURE_DELTA = 44;
 
 ReactGA4.initialize(ga4id);
 
@@ -61,8 +63,11 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => localStorage.getItem('useLcdFont') === 'true');
   const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
   const activeScrollContainer = useRef<HTMLElement | null>(null);
+  const wheelExpandAccumulator = useRef(0);
+  const touchStartY = useRef<number | null>(null);
   const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
@@ -106,13 +111,132 @@ function App() {
     return () => routeContent.removeEventListener('scroll', handleNestedScroll, true);
   }, []);
 
+  const getScrollContainerFromEventTarget = useCallback((target: EventTarget | null): HTMLElement | null => {
+    const routeContent = routeContentRef.current;
+    if (!routeContent) {
+      return null;
+    }
+
+    if (!(target instanceof HTMLElement)) {
+      return routeContent;
+    }
+
+    if (!routeContent.contains(target)) {
+      return routeContent;
+    }
+
+    let node: HTMLElement | null = target;
+    while (node && node !== routeContent) {
+      if (node.scrollHeight > node.clientHeight) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+
+    return routeContent;
+  }, []);
+
+  useEffect(() => {
+    const routeContent = routeContentRef.current;
+    if (!routeContent) {
+      return;
+    }
+
+    const resetGestureTracking = () => {
+      wheelExpandAccumulator.current = 0;
+      touchStartY.current = null;
+    };
+
+    const maybeExpandFromPullDown = (scrollContainer: HTMLElement, pullDistance: number) => {
+      if (!isHeaderCollapsed) {
+        return;
+      }
+
+      if (scrollContainer.scrollTop > 0) {
+        wheelExpandAccumulator.current = 0;
+        return;
+      }
+
+      wheelExpandAccumulator.current += pullDistance;
+      if (wheelExpandAccumulator.current >= HEADER_EXPAND_GESTURE_DELTA) {
+        setIsHeaderCollapsed(false);
+        wheelExpandAccumulator.current = 0;
+      }
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      if (!isHeaderCollapsed) {
+        return;
+      }
+
+      const scrollContainer = getScrollContainerFromEventTarget(event.target);
+      if (!scrollContainer) {
+        return;
+      }
+
+      if (event.deltaY < 0) {
+        maybeExpandFromPullDown(scrollContainer, -event.deltaY);
+      } else {
+        wheelExpandAccumulator.current = 0;
+      }
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length < 1) {
+        return;
+      }
+      touchStartY.current = event.touches[0].clientY;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!isHeaderCollapsed || event.touches.length < 1 || touchStartY.current === null) {
+        return;
+      }
+
+      const scrollContainer = getScrollContainerFromEventTarget(event.target);
+      if (!scrollContainer || scrollContainer.scrollTop > 0) {
+        wheelExpandAccumulator.current = 0;
+        return;
+      }
+
+      const currentTouchY = event.touches[0].clientY;
+      const pullDistance = currentTouchY - touchStartY.current;
+      if (pullDistance <= 0) {
+        return;
+      }
+
+      maybeExpandFromPullDown(scrollContainer, pullDistance);
+      touchStartY.current = currentTouchY;
+    };
+
+    routeContent.addEventListener('wheel', handleWheel, { capture: true, passive: true });
+    routeContent.addEventListener('touchstart', handleTouchStart, { capture: true, passive: true });
+    routeContent.addEventListener('touchmove', handleTouchMove, { capture: true, passive: true });
+    routeContent.addEventListener('touchend', resetGestureTracking, { capture: true, passive: true });
+    routeContent.addEventListener('touchcancel', resetGestureTracking, { capture: true, passive: true });
+
+    return () => {
+      routeContent.removeEventListener('wheel', handleWheel, true);
+      routeContent.removeEventListener('touchstart', handleTouchStart, true);
+      routeContent.removeEventListener('touchmove', handleTouchMove, true);
+      routeContent.removeEventListener('touchend', resetGestureTracking, true);
+      routeContent.removeEventListener('touchcancel', resetGestureTracking, true);
+    };
+  }, [getScrollContainerFromEventTarget, isHeaderCollapsed]);
+
   useEffect(() => {
     setHeaderScrollOffset(0);
+    setIsHeaderCollapsed(false);
+    wheelExpandAccumulator.current = 0;
+    touchStartY.current = null;
     activeScrollContainer.current = null;
     routeContentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   }, [location.pathname, location.search]);
 
   const expandHeader = useCallback(() => {
+    setIsHeaderCollapsed(false);
+    wheelExpandAccumulator.current = 0;
+    touchStartY.current = null;
     const scrollContainer = activeScrollContainer.current ?? routeContentRef.current;
     if (!scrollContainer) {
       return;
@@ -121,7 +245,20 @@ function App() {
   }, []);
 
   const canCollapseHeader = Boolean(headerContent && stopwatchDisplay);
-  const isHeaderCollapsed = canCollapseHeader && headerScrollOffset > 48;
+
+  useEffect(() => {
+    if (!canCollapseHeader) {
+      setIsHeaderCollapsed(false);
+      return;
+    }
+
+    setIsHeaderCollapsed((previousState) => {
+      if (!previousState && headerScrollOffset >= HEADER_COLLAPSE_THRESHOLD) {
+        return true;
+      }
+      return previousState;
+    });
+  }, [canCollapseHeader, headerScrollOffset]);
 
   const routes = useMemo(() => (
     <Routes>
@@ -209,20 +346,21 @@ function App() {
             </Dialog>
           )}
 
-          {headerContent && !isHeaderCollapsed && (
-            <>
+          {headerContent && (
+            <div id="magie-header-full" aria-hidden={isHeaderCollapsed}>
               <h1 id="magie-title">MAGiE</h1>
               {headerContent ?? <span>No header content</span>}
-            </>
+            </div>
           )}
 
-          {headerContent && isHeaderCollapsed && (
+          {headerContent && (
             <div id="magie-header-compact">
               <span id="magie-header-stopwatch">{stopwatchDisplay}</span>
               <button
                 type="button"
                 id="magie-header-expand"
                 aria-label="expand header"
+                disabled={!isHeaderCollapsed}
                 onClick={expandHeader}
               >
                 Expand ▲
