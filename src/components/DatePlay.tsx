@@ -54,6 +54,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   }, [initialDate, year, month, day]);
 
   useEffect(() => {
+    setHasWon(false);
+    setSolveTimeDisplay("");
+  }, [initialDate, year, month, day]);
+
+  useEffect(() => {
     if (puzzleDate) {
       console.log("About to fetch puzzle for date:", puzzleDate);
       fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))

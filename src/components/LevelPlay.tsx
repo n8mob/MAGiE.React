@@ -39,7 +39,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   if (isLastInLevel) {
     if (menuName === "tutorial") {
       linkAfterWin.to = "/";
-      linkAfterWin.text = "PLAY TODAY'S PUZZLE";
+      linkAfterWin.text = "RESTART TUTORIAL";
     } else {
       linkAfterWin.to = `/${menuName}/${categoryIndex}`;
       linkAfterWin.text = `Back to ${category?.name || "Category"}`;
@@ -48,6 +48,10 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next ▶▶";
   }
+
+  useEffect(() => {
+    setHasWon(false);
+  }, [menuName, categoryIndex, levelNumber, puzzleIndex]);
 
   useEffect(() => {
     if (!menu) {

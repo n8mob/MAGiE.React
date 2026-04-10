@@ -1,0 +1,15 @@
+.story-navigation {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.story-navigation .center {
+  flex: 1;
+  margin: 0 1rem;
+  text-align: center;
+}
+
+.right-item {
+  text-align: right;
+}

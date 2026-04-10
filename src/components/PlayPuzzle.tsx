@@ -7,6 +7,7 @@ import { Puzzle } from "../model.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { debug  } from "../Logger.ts";
+import { useHeader } from "../hooks/useHeader.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -16,6 +17,7 @@ interface PlayPuzzleProps {
 }
 
 const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzleProps) => {
+  const { setStopwatchDisplay } = useHeader();
   const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
@@ -50,6 +52,11 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
     setCurrentPuzzle(puzzle);
     setSolveTimeString("");
   }, [puzzle]);
+
+  useEffect(() => {
+    setStopwatchDisplay("00:00");
+    return () => setStopwatchDisplay("");
+  }, [setStopwatchDisplay]);
 
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
@@ -118,7 +125,11 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
 
   return (
     <>
-      <Stopwatch ref={stopwatchRef} />
+      <Stopwatch
+        ref={stopwatchRef}
+        onDisplayChange={setStopwatchDisplay}
+        visible={false}
+      />
       {currentPuzzle.type === "Encode" &&
         <EncodePuzzle
           puzzle={currentPuzzle}
@@ -140,4 +151,3 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
 };
 
 export { PlayPuzzle };
-
