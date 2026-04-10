@@ -50,6 +50,10 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   }
 
   useEffect(() => {
+    setHasWon(false);
+  }, [menuName, categoryIndex, levelNumber, puzzleIndex]);
+
+  useEffect(() => {
     if (!menu) {
       debug(`Waiting for the ${menuName} menu data.`);
       return;
