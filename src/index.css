@@ -41,8 +41,6 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   color: inherit;
-  min-height: 44px;
-  min-width: 44px;
 }
 button:hover {
   color: #646cff;
