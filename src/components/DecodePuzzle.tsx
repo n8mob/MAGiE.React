@@ -2,7 +2,6 @@ import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
-import { debug } from "../Logger.ts";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
 
 const LETTER_PATTERN = /^[a-z]$/i;
@@ -221,8 +220,6 @@ const DecodePuzzle: FC<PuzzleProps> = (
   if (!puzzle) {
     return <></>;
   }
-
-  debug(`hasWon: ${hasWon}, puzzle.init: ${puzzle.init}, winText: ${puzzle.winText}, guessText: ${guessText}`);
 
   return (
     <>
