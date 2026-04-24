@@ -1,4 +1,5 @@
 import './App.css'
+import scrollCover from './assets/ScrollCover.png'
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
@@ -301,6 +302,7 @@ function App() {
 
   return (
     <>
+      <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
       <div className={`display-frame ${isHeaderCollapsed ? "header-collapsed" : ""}`}>
         <div id="magie-header" className={isHeaderCollapsed ? "collapsed" : ""}>
           <button
