@@ -1,6 +1,12 @@
 import { IndexedBit } from "../IndexedBit.ts";
 import { BitSequence } from "../BitSequence.ts";
 
+/**
+ * The primary container for displaying a row of bits on the simulated MAGiE screen.
+ *
+ * @param bits The bits that make up the row.
+ * @param annotation An optional annotation to be displayed alongside the row.
+ */
 class DisplayRow extends BitSequence {
   annotation: string;
 

@@ -324,6 +324,7 @@ input[data-correctness="incorrect"]:checked {
 
 .activate-dialog {
   position: fixed;
+  z-index: 1;
   top: 1rem;
   display: flex;
   justify-content: center;
@@ -332,8 +333,8 @@ input[data-correctness="incorrect"]:checked {
   text-align: center;
   overflow: hidden; /* clip overflow */
   padding: 1rem;
-  width: 2rem;
-  height: 2rem;
+  width: 44px;
+  height: 44px;
 }
 
 .activate-dialog.left {
