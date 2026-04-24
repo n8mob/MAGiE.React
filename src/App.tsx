@@ -85,7 +85,7 @@ function App() {
       localStorage.setItem('isFirstVisit', 'false');
       // TODO fire analytics event for first visit
     }
-  }, [hasSeenHowTo, showHowTo]);
+  }, [hasSeenHowTo]);
 
   useEffect(() => {
     const routeContent = routeContentRef.current;
@@ -313,9 +313,7 @@ function App() {
                 source: 'activate_dialog',
                 dialog: 'settings',
               });
-            }}>
-            ⋮
-          </button>
+            }}>⋮</button>
           <button
             type={"button"}
             aria-label={"show how-to information"}
