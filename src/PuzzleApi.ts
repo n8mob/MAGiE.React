@@ -13,7 +13,7 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
     try {
       cachedMenuData = JSON.parse(rawMenuData);
       updatedAt = cachedMenuData?.updated_at;
-    } catch (e) {
+    } catch {
       localStorage.removeItem(menuName);
     }
   }
@@ -48,7 +48,7 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
   try {
     menuInstance = new Menu(data);
   } catch (parsingError) {
-    throw new Error('Menu data could not be parsed into a Menu instance');
+    throw new Error('Menu data could not be parsed into a Menu instance', { cause: parsingError });
   }
   localStorage.setItem(menuName, JSON.stringify(data));
   return menuInstance;

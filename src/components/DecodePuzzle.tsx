@@ -73,6 +73,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
   const puzzleInputsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGuessText(sanitizeGuessText(puzzle.init));
   }, [puzzle.init]);
 

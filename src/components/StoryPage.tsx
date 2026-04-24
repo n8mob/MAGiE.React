@@ -11,7 +11,7 @@ const stories = [
 ];
 
 function importStory(fileName: string) {
-  return import.meta.glob("../assets/story/*.md", { as: "raw", eager: true })[
+  return import.meta.glob("../assets/story/*.md", { query: "?raw", import: "default", eager: true })[
     `../assets/story/${fileName}`
     ] as string;
 }

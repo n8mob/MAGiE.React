@@ -50,6 +50,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasWon(false);
   }, [menuName, categoryIndex, levelNumber, puzzleIndex]);
 
@@ -81,6 +82,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
             <Link to={`/${menuName}/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>
       );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPuzzle(level.puzzles[puzzleIndex]);
     }
     return () => setHeaderContent(null);

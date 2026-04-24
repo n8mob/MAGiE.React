@@ -49,6 +49,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPuzzle(puzzle);
     setSolveTimeString("");
   }, [puzzle]);

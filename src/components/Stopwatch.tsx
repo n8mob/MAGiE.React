@@ -61,6 +61,7 @@ export const Stopwatch = forwardRef<StopwatchHandle, StopwatchProps>(({
 
   useEffect(() => {
     onDisplayChange?.(displayTime());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onDisplayChange, solveTimeSeconds]);
 
   useImperativeHandle(ref, () => ({

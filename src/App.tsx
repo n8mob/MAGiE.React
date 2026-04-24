@@ -82,6 +82,7 @@ function App() {
   useEffect(() => {
     const isFirstVisit = !localStorage.getItem('isFirstVisit');
     if (isFirstVisit || !hasSeenHowTo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowHowTo(true)
       localStorage.setItem('isFirstVisit', 'false');
       // TODO fire analytics event for first visit
@@ -226,6 +227,7 @@ function App() {
   }, [getScrollContainerFromEventTarget, isHeaderCollapsed]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHeaderScrollOffset(0);
     setIsHeaderCollapsed(false);
     wheelExpandAccumulator.current = 0;
@@ -249,6 +251,7 @@ function App() {
 
   useEffect(() => {
     if (!canCollapseHeader) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHeaderCollapsed(false);
       return;
     }

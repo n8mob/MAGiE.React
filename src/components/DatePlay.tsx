@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { getDailyPuzzleForDate } from "../PuzzleApi.ts";
 import { PlayPuzzle } from "./PlayPuzzle";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Puzzle } from "../model.ts";
 import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
@@ -33,47 +33,44 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const { setHeaderContent } = useHeader();
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const { year, month, day } = useParams<{ year?: string, month?: string, day?: string }>();
-  const [formattedDate, setFormattedDate] = useState("");
-  const [dateShareString, setDateShareString] = useState("");
   const [solveTimeDisplay, setSolveTimeDisplay] = useState("");
-  const [solveTimeDescription, setSolveTimeDescription] = useState("");
   const [hasWon, setHasWon] = useState(false);
-  const [puzzleDate, setPuzzleDate] = useState<Date | null>(null);
   const linkToToday = <Link to={"/today"}>Rewind to today</Link>;
   const isFirstVisit = !localStorage.getItem('isFirstVisit');
 
-  useEffect(() => {
-    if (initialDate) {
-      console.log("Setting puzzle date to initial date:", initialDate);
-      setPuzzleDate(initialDate);
-    } else if (year && month && day) {
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      console.log(`Setting puzzle date to ${year}-${month}-${day}:`, date);
-      setPuzzleDate(date);
+  const puzzleDate = useMemo<Date | null>(() => {
+    if (initialDate) return initialDate;
+    if (year && month && day) {
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
+    return null;
   }, [initialDate, year, month, day]);
 
+  const formattedDate = puzzleDate ? shortDate(puzzleDate) : '';
+  const dateShareString = formattedDate
+    ? `I decoded the MAGiE puzzle for ${puzzleDate?.getDate() === new Date().getDate() ? 'today, ' : ''}${formattedDate}!`
+    : '';
+  const solveTimeDescription = solveTimeDisplay ? `It took me ${solveTimeDisplay}.` : '';
+
+  // Reset gameplay state when navigating to a different date
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasWon(false);
     setSolveTimeDisplay("");
-  }, [initialDate, year, month, day]);
+  }, [puzzleDate]);
 
   useEffect(() => {
-    if (puzzleDate) {
-      console.log("About to fetch puzzle for date:", puzzleDate);
-      fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))
-        .then(puzzle => {
-          if (!puzzle) {
-            console.warn("No puzzle found for date:", puzzleDate);
-            return;
-          }
-          console.log("Fetched puzzle for date:", puzzleDate, "Puzzle:", puzzle.slug);
-          setCurrentPuzzle(puzzle);
-          const formattedDateForPuzzle = shortDate(puzzleDate);
-          setFormattedDate(formattedDateForPuzzle);
-          console.log("Formatted date as: " + formattedDateForPuzzle);
-        }).catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
-    }
+    if (!puzzleDate) return;
+    console.log("About to fetch puzzle for date:", puzzleDate);
+    fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))
+      .then(puzzle => {
+        if (!puzzle) {
+          console.warn("No puzzle found for date:", puzzleDate);
+          return;
+        }
+        console.log("Fetched puzzle for date:", puzzleDate, "Puzzle:", puzzle.slug);
+        setCurrentPuzzle(puzzle);
+      }).catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
   }, [puzzleDate]);
 
   useEffect(() => {
@@ -90,16 +87,10 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
       );
 
       setHeaderContent(content);
-      const todayString = puzzleDate.getDate() == new Date().getDate() ? "today, " : "";
-      setDateShareString(`I decoded the MAGiE puzzle for ${todayString}${formattedDate}!`);
     }
     return () => setHeaderContent(null); // Clear header when component unmounts
 
   }, [currentPuzzle, formattedDate, puzzleDate, setHeaderContent]);
-
-  useEffect(() => {
-    setSolveTimeDescription(`It took me ${solveTimeDisplay}.`)
-  }, [solveTimeDisplay]);
 
   if (!puzzleDate) {
     return <>

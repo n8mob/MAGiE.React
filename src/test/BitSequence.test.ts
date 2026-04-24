@@ -67,7 +67,6 @@ describe("BitSequence other tests", () => {
   it("does not end with anything if it is empty", () => {
     const emptySequence = BitSequence.empty();
     // noinspection TypeScriptValidateTypes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(emptySequence.endsWith(null as any)).to.be.false;
     expect(emptySequence.endsWith("0")).to.be.false;
     expect(emptySequence.endsWith("1")).to.be.false;
@@ -76,7 +75,6 @@ describe("BitSequence other tests", () => {
 
   it("should return false when .endsWith(null) is called on a non-empty BitSequence", () => {
     const nonEmptySequence = BitSequence.fromString("101");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(nonEmptySequence.endsWith(null as any)).to.be.false;
   });
 

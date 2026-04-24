@@ -84,10 +84,9 @@ class FixedWidthEncoder implements BinaryEncoder {
    */
   * splitByChar(bits: BitSequence): Generator<DisplayRow, void> {
     let start = 0;
-    let end = 0;
 
     while (start < bits.length) {
-      end = start + this.width;
+      const end = start + this.width;
 
       const nextCharWidth = bits.slice(start, end);
       // TODO make sure we have a test case that checks this
@@ -107,7 +106,6 @@ class FixedWidthEncoder implements BinaryEncoder {
    */
   * splitForDisplay(bits: BitSequence, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
-    let end = 0;
 
     if (displayWidth < 1) {
       throw new Error(`Display width ${displayWidth} is too short to show characters of width ${this.width}`);
@@ -120,7 +118,7 @@ class FixedWidthEncoder implements BinaryEncoder {
     }
 
     while (start < bits.length) {
-      end = start + splitWidth;
+      const end = start + splitWidth;
       const bitsForRow = bits.slice(start, end);
       yield new DisplayRow(bitsForRow, this.decodeText(bitsForRow));
       start = end;
