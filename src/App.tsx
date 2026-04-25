@@ -305,53 +305,49 @@ function App() {
 
   return (
     <>
-      <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
+      <div id="bezel-header">
+        <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
+        <h1 id="magie-title">MAGiE</h1>
+        <button type={"button"} aria-label={"open settings"} className="activate-dialog left" onClick={() => {
+          setShowSettings(true);
+          ReactGA4.event('open_settings_dialog', {
+            source: 'activate_dialog',
+            dialog: 'settings',
+          });
+        }}>⋮
+        </button>
+        <button type={"button"}
+                aria-label={"show how-to information"}
+                className="activate-dialog right"
+                onClick={() => {
+                  setShowHowTo(true);
+                  ReactGA4.event('open_help_dialog', {
+                    source: 'activate_dialog',
+                    dialog: 'help',
+                    is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+                  });
+                }}>?
+        </button>
+
+        {showHowTo && (<Dialog onClose={() => {
+            setHasSeenHowTo(true);
+            localStorage.setItem('hasSeenHowTo', 'true');
+            setShowHowTo(false);
+          }}>
+            <FirstTimeContent />
+          </Dialog>
+        )}
+
+        {showSettings && (
+          <Dialog onClose={() => setShowSettings(false)}>
+            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
+          </Dialog>
+        )}
+      </div>
       <div className={`display-frame ${isHeaderCollapsed ? "header-collapsed" : ""}`}>
         <div id="magie-header" className={isHeaderCollapsed ? "collapsed" : ""}>
-          <button
-            type={"button"}
-            aria-label={"open settings"}
-            className="activate-dialog left"
-            onClick={() => {
-              setShowSettings(true);
-              ReactGA4.event('open_settings_dialog', {
-                source: 'activate_dialog',
-                dialog: 'settings',
-              });
-            }}>⋮</button>
-          <button
-            type={"button"}
-            aria-label={"show how-to information"}
-            className="activate-dialog right"
-            onClick={() => {
-              setShowHowTo(true);
-              ReactGA4.event('open_help_dialog', {
-                source: 'activate_dialog',
-                dialog: 'help',
-                is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
-              });
-            }}>
-            ?
-          </button>
-
-          {showHowTo && (<Dialog onClose={() => {
-              setHasSeenHowTo(true);
-              localStorage.setItem('hasSeenHowTo', 'true');
-              setShowHowTo(false);
-            }}>
-              <FirstTimeContent />
-            </Dialog>
-          )}
-
-          {showSettings && (
-            <Dialog onClose={() => setShowSettings(false)}>
-              <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
-            </Dialog>
-          )}
-
           {headerContent && (
             <div id="magie-header-full" aria-hidden={isHeaderCollapsed}>
-              <h1 id="magie-title">MAGiE</h1>
               {headerContent ?? <span>No header content</span>}
             </div>
           )}

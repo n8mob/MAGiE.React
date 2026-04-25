@@ -58,8 +58,6 @@ const punctuationKey = (id: string, label: string, symbol: string, fileName: str
   assetUrl: resolveAsset(fileName),
 });
 
-const KEYBOARD_BORDER = resolveAsset("Keyboard_Border.png");
-
 const KEY_ROWS: KeyboardKeySpec[][] = [
   [..."QWERTYUIOP"].map(letterKey),
   [..."ASDFGHJKL"].map(letterKey),
@@ -123,11 +121,6 @@ const OnScreenKeyboard: FC<OnScreenKeyboardProps> = (
 
   return (
     <div className="decode-keyboard" role="group" aria-label="On-screen keyboard">
-      <div
-        className="decode-keyboard-border"
-        style={{ backgroundImage: `url(${KEYBOARD_BORDER})` }}
-        aria-hidden="true"
-      />
       {KEY_ROWS.map((keyRow, rowIndex) => (
         <div className="decode-keyboard-row" key={`decode-keyboard-row-${rowIndex}`}>
           {keyRow.map((key) => (
