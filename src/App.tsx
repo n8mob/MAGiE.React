@@ -305,7 +305,7 @@ function App() {
 
   return (
     <>
-      <div id="scroll-cover-wrapper">
+      <div id="bezel-header">
         <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
         <h1 id="magie-title">MAGiE</h1>
         <button type={"button"} aria-label={"open settings"} className="activate-dialog left" onClick={() => {

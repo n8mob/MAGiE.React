@@ -16,7 +16,7 @@ html, body {
   background-color: #d0d4d4; /* Background color for the entire viewport */
 }
 
-#scroll-cover-wrapper {
+#bezel-header {
   position: relative;
 }
 
@@ -30,6 +30,8 @@ h1#magie-title {
   text-align: center;
   word-wrap: break-word;
   text-transform: none;
+  color: silver;
+  text-shadow: 3px 3px rgba(0, 0, 0);
 }
 
 .magie-case {
@@ -208,7 +210,7 @@ h3 {
   display: flex;
   justify-self: end;
   justify-content: center;
-  padding: 2rem;
+  padding: 20px;
   flex-direction: column;
 }
 
@@ -218,8 +220,6 @@ h3 {
   z-index: 2;
   padding-top: 0.9rem;
   padding-bottom: max(0.9rem, env(safe-area-inset-bottom));
-  background: #d0d4d4;
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 #puzzle-inputs > * {

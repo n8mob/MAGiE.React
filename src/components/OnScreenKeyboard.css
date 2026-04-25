@@ -9,14 +9,6 @@
   touch-action: manipulation;
 }
 
-.decode-keyboard-border {
-  height: clamp(4px, 1.4vw, 8px);
-  width: 100%;
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  image-rendering: pixelated;
-}
-
 .decode-keyboard-row {
   display: flex;
   flex-wrap: nowrap;
