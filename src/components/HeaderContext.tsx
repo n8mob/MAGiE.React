@@ -7,6 +7,7 @@ interface HeaderContextType {
   setStopwatchDisplay: (display: string) => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
 
 export const HeaderProvider = ({children}: { children: ReactNode }) => {

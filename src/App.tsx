@@ -1,4 +1,5 @@
 import './App.css'
+import scrollCover from './assets/ScrollCover.png'
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
@@ -81,6 +82,7 @@ function App() {
   useEffect(() => {
     const isFirstVisit = !localStorage.getItem('isFirstVisit');
     if (isFirstVisit || !hasSeenHowTo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowHowTo(true)
       localStorage.setItem('isFirstVisit', 'false');
       // TODO fire analytics event for first visit
@@ -225,6 +227,7 @@ function App() {
   }, [getScrollContainerFromEventTarget, isHeaderCollapsed]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHeaderScrollOffset(0);
     setIsHeaderCollapsed(false);
     wheelExpandAccumulator.current = 0;
@@ -248,6 +251,7 @@ function App() {
 
   useEffect(() => {
     if (!canCollapseHeader) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsHeaderCollapsed(false);
       return;
     }
@@ -301,6 +305,7 @@ function App() {
 
   return (
     <>
+      <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
       <div className={`display-frame ${isHeaderCollapsed ? "header-collapsed" : ""}`}>
         <div id="magie-header" className={isHeaderCollapsed ? "collapsed" : ""}>
           <button

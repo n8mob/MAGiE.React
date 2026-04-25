@@ -146,6 +146,7 @@ export function useBasePuzzle(
     };
     if (newJudgment.isCorrect) {
       ReactGA4.event("winning_judgment", eventParams);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasWon(true);
       onWin();
     } else {

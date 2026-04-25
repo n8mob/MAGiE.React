@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm outdated *)",
+      "Bash(npm show *)",
+      "Bash(npm run lint *)"
+    ]
+  }
+}

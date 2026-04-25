@@ -13,6 +13,7 @@ export function useMenu(
 
   useEffect(() => {
     if (!menuName) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(new Error("There's no menu name: we need that to get all the puzzles."));
       setLoading(false);
       return;
