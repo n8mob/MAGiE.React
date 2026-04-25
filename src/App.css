@@ -16,15 +16,19 @@ html, body {
   background-color: #d0d4d4; /* Background color for the entire viewport */
 }
 
+#scroll-cover-wrapper {
+  position: relative;
+}
+
 h1#magie-title {
+  position: absolute;
+  bottom: 18%;
+  left: 0;
+  right: 0;
+  margin: 0;
   font-size: 3em;
-  display: flex;
-  align-self: center;
-  justify-content: center;
-  margin: 16px 0;
-  max-width: 100%; /* Prevents expanding beyond the viewport */
-  text-align: center; /* Centers the text */
-  word-wrap: break-word; /* Allows text to wrap within the specified width */
+  text-align: center;
+  word-wrap: break-word;
   text-transform: none;
 }
 
@@ -146,6 +150,7 @@ h3 {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
+  padding: 20px;
 }
 
 #route-content {
