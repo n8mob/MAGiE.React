@@ -253,7 +253,7 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<CategoryBrowser menuName="tutorial" />} />
+      <Route path="/" element={<Navigate to={"/tutorial"} replace={true} />} />
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       <Route path="/story/:slug" element={<StoryPage />} />
