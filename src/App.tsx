@@ -1,6 +1,6 @@
 import './App.css'
 import scrollCover from './assets/ScrollCover.png'
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -49,6 +49,11 @@ if (window.gtag) {
   }
 } else {
   console.warn('Google Analytics 4 is not available. Make sure you have included the GA4 script in your HTML.');
+}
+
+function RedirectLevelRootToPuzzle0() {
+  const {categoryIndex, levelNumber } = useParams();
+  return <Navigate to={`/tutorial/${categoryIndex}/levels/${levelNumber}/puzzles/0`} replace={true} />;
 }
 
 function App() {
@@ -269,7 +274,9 @@ function App() {
           <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />
         } />
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial" />} />
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="tutorial" />} />
+        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={
+          <RedirectLevelRootToPuzzle0 />
+        } />
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="tutorial" />} />
       </>)}
