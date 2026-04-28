@@ -6,7 +6,8 @@ import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Dialog from './components/Dialog.tsx';
-import FirstTimeContent from './components/FirstTimeContent.tsx';
+import HowTo from './components/HowTo.tsx';
+import WelcomeContent from './components/WelcomeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
 import { useHeader } from "./hooks/useHeader.ts";
 import { MenuBrowser } from './components/MenuBrowser.tsx';
@@ -55,12 +56,8 @@ function App() {
   const location = useLocation();
   const { headerContent, stopwatchDisplay } = useHeader();
 
-  const [hasSeenHowTo, setHasSeenHowTo] = useState(() => {
-    const storedHasSeenHowTo = localStorage.getItem('hasSeenHowTo') === 'true';
-    const storedSeenBefore = localStorage.getItem('seenBefore') === 'true';
-    return storedHasSeenHowTo || storedSeenBefore;
-  });
-  const [showHowTo, setShowHowTo] = useState(() => localStorage.getItem('hasSeenHowTo') !== 'true');
+  const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem('isFirstVisit') === null);
+  const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
   const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
@@ -78,16 +75,6 @@ function App() {
       ? '"HD44780", Menlo, Consolas, monospace'
       : '"Press Start 2P", Menlo, Consolas, monospace';
   }, [useLcdFont]);
-
-  useEffect(() => {
-    const isFirstVisit = !localStorage.getItem('isFirstVisit');
-    if (isFirstVisit || !hasSeenHowTo) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowHowTo(true)
-      localStorage.setItem('isFirstVisit', 'false');
-      // TODO fire analytics event for first visit
-    }
-  }, [hasSeenHowTo]);
 
   useEffect(() => {
     const routeContent = routeContentRef.current;
@@ -324,17 +311,23 @@ function App() {
                   ReactGA4.event('open_help_dialog', {
                     source: 'activate_dialog',
                     dialog: 'help',
-                    is_first_visit: localStorage.getItem('isFirstVisit') === 'true',
+                    is_first_visit: localStorage.getItem('isFirstVisit') === null,
                   });
                 }}>?
         </button>
 
-        {showHowTo && (<Dialog onClose={() => {
-            setHasSeenHowTo(true);
-            localStorage.setItem('hasSeenHowTo', 'true');
-            setShowHowTo(false);
+        {showWelcome && (
+          <Dialog onClose={() => {
+            localStorage.setItem('isFirstVisit', 'visited');
+            setShowWelcome(false);
           }}>
-            <FirstTimeContent />
+            <WelcomeContent />
+          </Dialog>
+        )}
+
+        {showHowTo && (
+          <Dialog onClose={() => setShowHowTo(false)}>
+            <HowTo />
           </Dialog>
         )}
 
