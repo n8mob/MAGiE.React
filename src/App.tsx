@@ -6,7 +6,7 @@ import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Dialog from './components/Dialog.tsx';
-import FirstTimeContent from './components/FirstTimeContent.tsx';
+import HowTo from './components/HowTo.tsx';
 import WelcomeContent from './components/WelcomeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
 import { useHeader } from "./hooks/useHeader.ts";
@@ -327,7 +327,7 @@ function App() {
 
         {showHowTo && (
           <Dialog onClose={() => setShowHowTo(false)}>
-            <FirstTimeContent />
+            <HowTo />
           </Dialog>
         )}
 
