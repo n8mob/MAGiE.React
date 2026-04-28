@@ -2,17 +2,12 @@ export default function WelcomeContent() {
   return (
     <>
       <h2>Welcome to <span className="magie-case">MAGiE</span>!</h2>
-      <p><em>A retro-future puzzle game with bits and a totally rad mall!</em></p>
+      <p>A puzzle game!</p>
 
-      <p>
-        Each puzzle hides a secret message encoded in binary.
-        Your job is to decode it—one bit at a time.
-      </p>
-
-      <p>
-        Start with the tutorial to learn the basics, or dive straight into today's daily puzzle.
-        Hit the <strong>?</strong> button any time for a how-to refresher.
-      </p>
+      <p>The first few levels will have you decoding messages.</p>
+      <p>Later on, you'll encode messages too!</p>
+      <p>Try this tutorial level to get started.</p>
+      <p>The [?] button will give you a few more tips.</p>
     </>
   );
 }
