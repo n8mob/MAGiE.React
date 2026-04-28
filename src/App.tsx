@@ -25,7 +25,7 @@ const HEADER_EXPAND_GESTURE_DELTA = 44;
 ReactGA4.initialize(ga4id);
 
 const urlParams = new URLSearchParams(window.location.search);
-const debugMode = urlParams.has('debug') || urlParams.has('_dbg');
+const debugMode = import.meta.env.VITE_GA_DEBUG === 'true' || urlParams.has('_dbg');
 
 /**
  * Global declaration for gtag function
