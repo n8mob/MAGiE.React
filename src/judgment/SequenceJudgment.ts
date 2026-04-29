@@ -26,7 +26,7 @@ class SequenceJudgment {
    */
   constructor(guess: IndexedBit[] | BitSequence, bitJudgments: string | BitJudgment[]) {
     this.guess = guess instanceof BitSequence ? guess : new BitSequence(guess);
-     if (bitJudgments instanceof Array) {
+    if (bitJudgments instanceof Array) {
       this.bitJudgments = bitJudgments;
     } else {
       this.bitJudgments = [];
@@ -53,7 +53,9 @@ class SequenceJudgment {
       guessBitString += bitJudgment.bit;
       judgmentBitString += bitJudgment.isCorrect ? "1" : "0";
     })
-    return `${guessBitString}\n${judgmentBitString} <---${this.isSequenceCorrect ? "all '1's: correct!" : "not all correct"}`;
+    return `${guessBitString}\n${judgmentBitString} <---${this.isSequenceCorrect
+      ? "all '1's: correct!"
+      : "not all correct"}`;
   }
 
   [Symbol.iterator](): Iterator<BitJudgment> {
@@ -81,7 +83,7 @@ class SequenceJudgment {
     if (o instanceof SequenceJudgment) {
       return this.isSequenceCorrect === o.isSequenceCorrect &&
         this.guess.equals(o.guess) &&
-        this.bitJudgments === o.bitJudgments;
+        this.bitJudgments.every((bitJudgment, index) => bitJudgment.equals(o.bitJudgments[index]))
     }
     return false;
   }

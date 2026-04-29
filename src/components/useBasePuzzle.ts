@@ -132,6 +132,7 @@ export function useBasePuzzle(
       return;
     }
 
+    previousJudgment.current = newJudgment;
     setJudgment(newJudgment);
     displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 
