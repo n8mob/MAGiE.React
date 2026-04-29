@@ -76,6 +76,12 @@ function App() {
   useEffect(() => localStorage.removeItem('seenBefore'), []);
 
   useEffect(() => {
+    if (showWelcome) {
+      ReactGA4.event('welcome_dialog_shown', { source: 'first_visit' });
+    }
+  }, [showWelcome]);
+
+  useEffect(() => {
     document.body.style.fontFamily = useLcdFont
       ? '"HD44780", Menlo, Consolas, monospace'
       : '"Press Start 2P", Menlo, Consolas, monospace';
@@ -327,6 +333,7 @@ function App() {
           <Dialog onClose={() => {
             localStorage.setItem('isFirstVisit', 'visited');
             setShowWelcome(false);
+            ReactGA4.event('welcome_dialog_dismissed');
           }}>
             <WelcomeContent />
           </Dialog>

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { PuzzleForDate, Menu, Puzzle, MenuData } from "./model.ts";
 import { debug } from "./Logger.ts";
+import ReactGA4 from "react-ga4";
 
 const API_BASE_URL = import.meta.env.VITE_MAGIE_PUZZLE_API;
 
@@ -32,6 +33,11 @@ export const getMenu = async (menuName: string): Promise<Menu> => {
     });
   } catch (webError) {
     console.error('Failed to fetch or parse menu data:', webError);
+    ReactGA4.event('puzzle_load_error', {
+      source: 'menu',
+      menu_name: menuName,
+      status_code: axios.isAxiosError(webError) ? webError.response?.status : undefined,
+    });
     throw webError;
   }
 
@@ -127,6 +133,10 @@ export const getDailyPuzzleForYearMonthDay = async (
     response = await axios.get(datePuzzleUrl, {responseType: 'json', headers});
   } catch (webError) {
     console.error(`Failed to fetch or parse puzzle data for ${year}-${paddedMonth}-${paddedDay}:`, webError);
+    ReactGA4.event('puzzle_load_error', {
+      source: 'daily',
+      status_code: axios.isAxiosError(webError) ? webError.response?.status : undefined,
+    });
     throw webError;
   }
 

@@ -87,6 +87,9 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
 
   const handleShareWin = () => {
     const shareText = `${puzzleShareString}\n${solveTimeString}`;
+    ReactGA4.event('share_win_clicked', {
+      puzzle_slug: currentPuzzle.slug,
+    });
     if (onShareWin) {
       onShareWin();
     }
@@ -95,6 +98,11 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         title: "MAGiE binary puzzles",
         text: shareText,
         url: window.location.href,
+      }).then(() => {
+        ReactGA4.event('share_win_completed', {
+          puzzle_slug: currentPuzzle.slug,
+          share_method: 'native',
+        });
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
@@ -103,6 +111,10 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
           .then(() => {
+            ReactGA4.event('share_win_completed', {
+              puzzle_slug: currentPuzzle.slug,
+              share_method: 'clipboard',
+            });
             alert("The share message has been copied to your clipboard.");
           })
           .catch((error) => {
