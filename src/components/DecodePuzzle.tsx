@@ -63,9 +63,13 @@ const DecodePuzzle: FC<PuzzleProps> = (
   // Compute winBits and displayRows for decode-type puzzles
   const displayRows = useMemo(
     () => {
-      const winBits = puzzle.encoding.encodeText(puzzle.winText);
-      const displayBits = winBits.appendBits(guessBits.slice(winBits.length))
-      return Array.from(puzzle.encoding.splitForDisplay(displayBits, displayWidth));
+      if (puzzle.encoding && puzzle.winText && guessBits && displayWidth) {
+        const winBits = puzzle.encoding?.encodeText(puzzle.winText);
+        const displayBits = winBits?.appendBits(guessBits.slice(winBits.length))
+        return Array.from(puzzle.encoding?.splitForDisplay(displayBits, displayWidth));
+      } else {
+        return [];
+      }
     },
     [puzzle.encoding, puzzle.winText, guessBits, displayWidth]);
 
@@ -137,7 +141,14 @@ const DecodePuzzle: FC<PuzzleProps> = (
     const previousGuessBits = guessBits;
     const nextGuessText = sanitizeGuessText(rawGuessText);
     setGuessText(nextGuessText);
-    const nextGuessBits = puzzle.encoding.encodeText(nextGuessText);
+
+    let nextGuessBits = BitSequence.empty();
+
+    if (!puzzle.encoding) {
+      console.log("No puzzle encoding available for decoding");
+    } else {
+      nextGuessBits = puzzle.encoding.encodeText(nextGuessText);
+    }
 
     // Scroll logic: scroll the row containing the last changed bit into view.
     let lastChangedIndex = -1;
