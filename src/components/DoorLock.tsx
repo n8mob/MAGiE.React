@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { BitSequence } from "../BitSequence.ts";
 
 const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
   eager: true,
@@ -17,10 +18,10 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
 );
 
 const DoorLock = () => {
-  const [guess, setGuess] = useState("");
+  const [guess, setGuess] = useState(() => BitSequence.empty());
 
   const appendBit = useCallback((bit: "0" | "1") => {
-    setGuess(prev => prev + bit);
+    setGuess(prev => prev.appendBit(bit));
   }, []);
 
   const deleteBit = useCallback(() => {
@@ -45,7 +46,7 @@ const DoorLock = () => {
   return (
     <div id="game-content">
       <div id="main-display" className="display">
-        <p className="decode-guess-text">{guess || <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>}</p>
+        <p className="decode-guess-text">{guess.isEmpty ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span> : guess.toString()}</p>
       </div>
       <div id="puzzle-inputs">
         <div className="decode-keyboard-row" role="group" aria-label="Bit input">
