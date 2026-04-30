@@ -17,6 +17,7 @@ import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
+import { DoorLock } from "./components/DoorLock.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 const HEADER_COLLAPSE_THRESHOLD = 72;
@@ -268,6 +269,7 @@ function App() {
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       <Route path="/story/:slug" element={<StoryPage />} />
+      <Route path="/doorLock" element={<DoorLock />} />
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
