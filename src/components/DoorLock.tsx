@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { BitSequence } from "../BitSequence.ts";
+import bitOnUrl from "../assets/Bit_on_Yellow.png";
+import bitOffUrl from "../assets/Bit_off_Yellow.png";
 
 const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
   eager: true,
@@ -46,7 +48,20 @@ const DoorLock = () => {
   return (
     <div id="game-content">
       <div id="main-display" className="display">
-        <p className="decode-guess-text">{guess.isEmpty ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span> : guess.toString()}</p>
+        <div className="decode-guess-text">
+          {guess.isEmpty
+            ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
+            : [...guess].map((bit, i) => (
+                <img
+                  key={i}
+                  src={bit.bit === "1" ? bitOnUrl : bitOffUrl}
+                  alt={bit.bit}
+                  draggable={false}
+                  style={{ width: 32, height: 32 }}
+                />
+              ))
+          }
+        </div>
       </div>
       <div id="puzzle-inputs">
         <div className="decode-keyboard-row" role="group" aria-label="Bit input">
