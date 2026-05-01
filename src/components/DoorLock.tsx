@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence.ts";
-import bitOnUrl from "../assets/Bit_on_Yellow.png";
-import bitOffUrl from "../assets/Bit_off_Yellow.png";
+import { BitButton } from "./BitButton.tsx";
+import { Correctness } from "../judgment/BitJudgment.ts";
+
+const BIT_SIZE_PX = 32;
 
 const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
   eager: true,
@@ -21,6 +23,28 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
 
 const DoorLock = () => {
   const [guess, setGuess] = useState(() => BitSequence.empty());
+  const displayRef = useRef<HTMLDivElement>(null);
+  const [bitsPerRow, setBitsPerRow] = useState(8);
+
+  useEffect(() => {
+    const el = displayRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      setBitsPerRow(Math.max(1, Math.floor(width / BIT_SIZE_PX)));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const rows = useMemo(() => {
+    const bits = [...guess];
+    const result: typeof bits[] = [];
+    for (let i = 0; i < bits.length; i += bitsPerRow) {
+      result.push(bits.slice(i, i + bitsPerRow));
+    }
+    return result;
+  }, [guess, bitsPerRow]);
 
   const appendBit = useCallback((bit: "0" | "1") => {
     setGuess(prev => prev.appendBit(bit));
@@ -47,21 +71,21 @@ const DoorLock = () => {
 
   return (
     <div id="game-content">
-      <div id="main-display" className="display">
-        <div className="decode-guess-text">
-          {guess.isEmpty
-            ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
-            : [...guess].map((bit, i) => (
-                <img
-                  key={i}
-                  src={bit.bit === "1" ? bitOnUrl : bitOffUrl}
-                  alt={bit.bit}
-                  draggable={false}
-                  style={{ width: 32, height: 32 }}
-                />
-              ))
-          }
-        </div>
+      <div id="main-display" className="display" ref={displayRef}>
+        {guess.isEmpty
+          ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
+          : rows.map((row, rowIndex) => (
+              <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
+                {row.map((bit) => (
+                  <BitButton
+                    key={`bit-${bit.index}`}
+                    bit={bit}
+                    correctness={Correctness.unguessed}
+                  />
+                ))}
+              </div>
+            ))
+        }
       </div>
       <div id="puzzle-inputs">
         <div className="decode-keyboard-row" role="group" aria-label="Bit input">
