@@ -56,7 +56,7 @@ export function useBasePuzzle(
     if (!puzzle || !puzzle.winText) {
       return BitSequence.empty();
     }
-    return puzzle.encoding.encodeText(puzzle.winText);
+    return puzzle.encoding?.encodeText(puzzle.winText);
   }, [puzzle]);
 
   const isAutoWin = useMemo(() => puzzle.init === puzzle.winText, [puzzle]);
@@ -132,6 +132,7 @@ export function useBasePuzzle(
       return;
     }
 
+    previousJudgment.current = newJudgment;
     setJudgment(newJudgment);
     displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 

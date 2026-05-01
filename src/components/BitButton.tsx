@@ -3,34 +3,48 @@ import { IndexedBit } from "../IndexedBit.ts";
 import { ChangeEventHandler, MouseEventHandler } from "react";
 
 interface BitButtonProps {
-  bit: IndexedBit,
-  key?: string,
-  correctness: Correctness,
-  onChange?: ChangeEventHandler<HTMLInputElement>,
-  onClick?: MouseEventHandler<HTMLInputElement>
+  bit: IndexedBit;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onClick?: MouseEventHandler<HTMLInputElement>;
 }
 
 const BitButton: React.FC<BitButtonProps> = (
   {
     bit,
-    correctness,
-    onChange = () => { },
-    onClick = () => { },
-  }) => {
-  const isBitOn = bit.bit === "1";
+    onChange = () => {},
+    onClick = () => {},
+  }) => (
+  <input
+    type="checkbox"
+    className="bit-checkbox"
+    onChange={onChange}
+    onClick={onClick}
+    checked={bit.bit === "1"}
+    key={`bit-${bit.index}`}
+  />
+);
 
-  return (
-    <>
-      <input type="checkbox"
-             className={"bit-checkbox"}
-             onChange={onChange}
-             onClick={onClick}
-             checked={isBitOn}
-             data-correctness={correctness}
-             key={`bit-${bit.index}`}
-      />
-    </>
-  );
+interface CorrectnessBitButtonProps extends BitButtonProps {
+  correctness: Correctness;
 }
 
-export { BitButton };
+const CorrectnessBitButton: React.FC<CorrectnessBitButtonProps> = (
+  {
+    bit,
+    correctness,
+    onChange = () => {},
+    onClick = () => {},
+  }) => (
+  <input
+    type="checkbox"
+    className="bit-checkbox"
+    onChange={onChange}
+    onClick={onClick}
+    checked={bit.bit === "1"}
+    data-correctness={correctness}
+    key={`bit-${bit.index}`}
+  />
+);
+
+export { BitButton, CorrectnessBitButton };
+export type { BitButtonProps, CorrectnessBitButtonProps };

@@ -75,14 +75,21 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
   useEffect(() => {
     if (currentPuzzle && formattedDate && puzzleDate) {
-      const previousLink = `/date/${dateLinkFormat(addDays(puzzleDate, -1))}`;
-      const nextLink = `/date/${dateLinkFormat(addDays(puzzleDate, 1))}`;
+
+      const prevDate = dateLinkFormat(addDays(puzzleDate, -1));
+      const nextDate = dateLinkFormat(addDays(puzzleDate, 1));
 
       const content = (
         <h3 className="split-content">
-          {<Link className="left-item" to={previousLink}>◀◀</Link>}
+          {<Link className="left-item" to={`/date/${prevDate}`} onClick={() => ReactGA4.event('date_navigation', {
+            direction: 'prev',
+            target_date: prevDate,
+          })}>◀◀</Link>}
           <span className="date-item">{formattedDate}</span>
-          {<Link className="right-item" to={nextLink}>▶▶</Link>}
+          {<Link className="right-item" to={`/date/${nextDate}`} onClick={() => ReactGA4.event('date_navigation', {
+            direction: 'next',
+            target_date: nextDate,
+          })}>▶▶</Link>}
         </h3>
       );
 
@@ -164,6 +171,9 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
   const handleShareWin = () => {
     const shareText = `${dateShareString}\n${solveTimeDescription}`;
+    ReactGA4.event('share_win_clicked', {
+      puzzle_slug: currentPuzzle?.slug,
+    });
 
     // noinspection DuplicatedCode
     if (navigator.share) {
@@ -171,6 +181,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
         title: "MAGiE binary puzzles",
         text: shareText,
         url: window.location.href,
+      }).then(() => {
+        ReactGA4.event('share_win_completed', {
+          puzzle_slug: currentPuzzle?.slug,
+          share_method: 'native',
+        });
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
@@ -179,6 +194,10 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(shareText)
           .then(() => {
+            ReactGA4.event('share_win_completed', {
+              puzzle_slug: currentPuzzle?.slug,
+              share_method: 'clipboard',
+            });
             alert("The share message has been copied to your clipboard.");
           })
           .catch((error) => {

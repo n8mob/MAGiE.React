@@ -17,6 +17,7 @@ import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
+import { DoorLock } from "./components/DoorLock.tsx";
 
 const ga4id = 'G-ZL5RKDBBF6';
 const HEADER_COLLAPSE_THRESHOLD = 72;
@@ -25,7 +26,7 @@ const HEADER_EXPAND_GESTURE_DELTA = 44;
 ReactGA4.initialize(ga4id);
 
 const urlParams = new URLSearchParams(window.location.search);
-const debugMode = urlParams.has('debug') || urlParams.has('_dbg');
+const debugMode = import.meta.env.VITE_GA_DEBUG === 'true' || urlParams.has('_dbg');
 
 /**
  * Global declaration for gtag function
@@ -74,6 +75,12 @@ function App() {
   const features = useFeatureFlags();
 
   useEffect(() => localStorage.removeItem('seenBefore'), []);
+
+  useEffect(() => {
+    if (showWelcome) {
+      ReactGA4.event('welcome_dialog_shown', { source: 'first_visit' });
+    }
+  }, [showWelcome]);
 
   useEffect(() => {
     document.body.style.fontFamily = useLcdFont
@@ -262,6 +269,7 @@ function App() {
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       <Route path="/story/:slug" element={<StoryPage />} />
+      <Route path="/doorLock" element={<DoorLock />} />
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
@@ -327,6 +335,7 @@ function App() {
           <Dialog onClose={() => {
             localStorage.setItem('isFirstVisit', 'visited');
             setShowWelcome(false);
+            ReactGA4.event('welcome_dialog_dismissed');
           }}>
             <WelcomeContent />
           </Dialog>

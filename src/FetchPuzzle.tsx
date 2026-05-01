@@ -6,7 +6,9 @@ const fetchPuzzle = async (fetchFunction: () => Promise<PuzzleForDate>): Promise
   const puzzleData = await fetchFunction();
   const puzzle: Puzzle = puzzleData.puzzle;
   let encodingData: FixedWidthEncodingData | VariableWidthEncodingData;
-  if (puzzleData.encoding.type === "fixed") {
+  if (!puzzleData) {
+    console.log("No puzzle data received from fetch function");
+  } else if (puzzleData.encoding.type === "fixed") {
     encodingData = puzzleData.encoding as FixedWidthEncodingData;
     puzzle.encoding = new FixedWidthEncoder(encodingData.encoding.width, encodingData.encoding.encodingMap);
   } else {

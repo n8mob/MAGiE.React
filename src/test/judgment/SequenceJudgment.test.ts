@@ -59,9 +59,8 @@ describe("SequenceJudgment", () => {
     const seq = BitSequence.fromString("10");
     const sj1 = new SequenceJudgment(seq, "11");
     const sj2 = new SequenceJudgment(seq, "11");
-    // Note: bitJudgments array reference will differ, so this will be false with current implementation
     expect(sj1.equals(sj1)).to.be.true;
-    expect(sj1.equals(sj2)).to.be.false;
+    expect(sj1.equals(sj2)).to.be.true;
   });
 
   it("equals returns false for non-SequenceJudgment", () => {

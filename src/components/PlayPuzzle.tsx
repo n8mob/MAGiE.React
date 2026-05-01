@@ -27,6 +27,11 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
     winAudio.current = new Audio('/sounds/big-ta-da.wav');
     winAudio.current.load();
     winAudio.current.volume = 0.25;
+    return () => {
+      // TODO test if this quits playing if the user hits "next" very quickly.
+      // that may be fine. I dunno.
+      winAudio.current?.pause();
+    };
   }, []);
 
   const updateSolveTimeString = () => {
@@ -61,25 +66,28 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
 
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
+    const isAutoWin = currentPuzzle.init === currentPuzzle.winText;
     let solveTimeSeconds = -1;
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();
       solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
       updateSolveTimeString();
     }
-    if (winAudio.current) {
-      winAudio.current.play().catch((error) => {
-        console.warn("Audio playback failed:", error);
+    if (!isAutoWin) {
+      if (winAudio.current) {
+        winAudio.current.play().catch((error) => {
+          console.warn("Audio playback failed:", error);
+        });
+      }
+      ReactGA4.event("win", {
+        puzzle_slug: currentPuzzle.slug,
+        winText: currentPuzzle.winText,
+        encoding: currentPuzzle.encoding_name,
+        encoding_type: currentPuzzle.encoding.getType(),
+        pagePath: window.location.pathname + window.location.search,
+        solve_time_seconds: solveTimeSeconds,
       });
     }
-    ReactGA4.event("win", {
-      puzzle_slug: currentPuzzle.slug,
-      winText: currentPuzzle.winText,
-      encoding: currentPuzzle.encoding_name,
-      encoding_type: currentPuzzle.encoding.getType(),
-      pagePath: window.location.pathname + window.location.search,
-      solve_time_seconds: solveTimeSeconds,
-    });
     if (onWin) {
       onWin(stopwatchRef.current!);
     }
@@ -87,6 +95,9 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
 
   const handleShareWin = () => {
     const shareText = `${puzzleShareString}\n${solveTimeString}`;
+    ReactGA4.event('share_win_clicked', {
+      puzzle_slug: currentPuzzle.slug,
+    });
     if (onShareWin) {
       onShareWin();
     }
@@ -95,6 +106,11 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         title: "MAGiE binary puzzles",
         text: shareText,
         url: window.location.href,
+      }).then(() => {
+        ReactGA4.event('share_win_completed', {
+          puzzle_slug: currentPuzzle.slug,
+          share_method: 'native',
+        });
       }).catch(console.error);
     } else if (navigator.clipboard) {
       const shareViaClipboard =
@@ -103,6 +119,10 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
           .then(() => {
+            ReactGA4.event('share_win_completed', {
+              puzzle_slug: currentPuzzle.slug,
+              share_method: 'clipboard',
+            });
             alert("The share message has been copied to your clipboard.");
           })
           .catch((error) => {

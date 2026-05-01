@@ -1,6 +1,6 @@
 import './Level.css';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BitButton } from "./BitButton";
+import { CorrectnessBitButton } from "./BitButton";
 import { IndexedBit } from "../IndexedBit.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { useEffect } from "react";
@@ -8,6 +8,7 @@ import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
+import ReactGA4 from "react-ga4";
 
 function LevelBrowser({menuName}: { menuName: string }) {
   const {categoryIndex, levelNumber} = useParams();
@@ -41,13 +42,19 @@ function LevelBrowser({menuName}: { menuName: string }) {
   return (
     <div className={'level-puzzle-bits'} style={{display: "flex", flexDirection: "row", margin: "16px 0"}}>
       {level.puzzles.map((puzzle, i) => (
-        <BitButton
+        <CorrectnessBitButton
           key={puzzle.slug ?? `puzzle-${i}`}
           bit={IndexedBit.falseAtIndex(i)}
           correctness={Correctness.unguessed}    // Update with real progress
-          onClick={() =>
-            navigate(`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`)
-          }
+          onClick={() => {
+            ReactGA4.event('puzzle_selected', {
+              menu_name: menuName,
+              level_number: level.levelNumber,
+              puzzle_index: i,
+              puzzle_slug: puzzle.slug,
+            });
+            navigate(`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/${i}`);
+          }}
         />
       ))}
     </div>
