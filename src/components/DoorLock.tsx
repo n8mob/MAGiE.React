@@ -3,6 +3,7 @@ import { BitSequence } from "../BitSequence.ts";
 import { BitButton } from "./BitButton.tsx";
 
 const BIT_SIZE_PX = 32;
+const WIN_SEQUENCE = BitSequence.fromString("10101011");
 
 type DoorLockState = "idle" | "entering" | "accepted" | "rejected";
 
@@ -29,9 +30,19 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
   {}
 );
 
+const toRows = (seq: BitSequence, bitsPerRow: number) => {
+  const bits = [...seq];
+  const result: typeof bits[] = [];
+  for (let i = 0; i < bits.length; i += bitsPerRow) {
+    result.push(bits.slice(i, i + bitsPerRow));
+  }
+  return result;
+};
+
 const DoorLock = () => {
   const [gameState, setGameState] = useState<DoorLockState>("idle");
-  const [guess, setGuess] = useState(() => BitSequence.empty());
+  const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());
+  const [cardBits, setCardBits] = useState(() => BitSequence.empty());
   const displayRef = useRef<HTMLDivElement>(null);
   const [bitsPerRow, setBitsPerRow] = useState(8);
 
@@ -48,50 +59,36 @@ const DoorLock = () => {
     return () => observer.disconnect();
   }, []);
 
-  const rows = useMemo(() => {
-    const bits = [...guess];
-    const result: typeof bits[] = [];
-    for (let i = 0; i < bits.length; i += bitsPerRow) {
-      result.push(bits.slice(i, i + bitsPerRow));
-    }
-    return result;
-  }, [guess, bitsPerRow]);
+  const cardRows = useMemo(() => toRows(cardBits, bitsPerRow), [cardBits, bitsPerRow]);
+  const stagingRows = useMemo(() => toRows(stagingBits, bitsPerRow), [stagingBits, bitsPerRow]);
 
-  const appendBit = useCallback(
-    (bit: "0" | "1") => {
-      if (gameState !== "entering") {
-        setGameState("entering");
-      }
-      setGuess(prev => prev.appendBit(bit));
-    }, [gameState]);
+  const appendBit = useCallback((bit: "0" | "1") => {
+    if (gameState !== "entering") {
+      setGameState("entering");
+    }
+    setStagingBits(prev => prev.appendBit(bit));
+  }, [gameState]);
 
   const deleteBit = useCallback(() => {
-    if (guess.isEmpty) {
-      return;
-    }
-    setGuess(prev => prev.slice(0, -1));
-  }, [guess]);
+    setStagingBits(prev => prev.slice(0, -1));
+  }, []);
 
   const submit = useCallback(() => {
     if (gameState === "idle") {
       setGameState("entering");
       return;
     }
-
     if (gameState === "entering" || gameState === "rejected") {
-      const winSequence = BitSequence.fromString("10101011")
-      if (guess.equals(winSequence)) {
-        setGameState("accepted");
-        return;
-      }
-      setGameState("rejected");
+      setCardBits(stagingBits);
+      setGameState(stagingBits.equals(WIN_SEQUENCE) ? "accepted" : "rejected");
       return;
     }
     if (gameState === "accepted") {
-      setGuess(BitSequence.empty());
+      setStagingBits(BitSequence.empty());
+      setCardBits(BitSequence.empty());
       setGameState("idle");
     }
-  }, [gameState]);
+  }, [gameState, stagingBits]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -109,22 +106,27 @@ const DoorLock = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [appendBit, deleteBit, submit]);
 
+  const bitRows = (rows: ReturnType<typeof toRows>) => rows.map((row, rowIndex) => (
+    <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
+      {row.map((bit) => (
+        <BitButton key={`bit-${bit.index}`} bit={bit} />
+      ))}
+    </div>
+  ));
+
   return (
     <div id="game-content">
       <div id="main-display" className="display" ref={displayRef}>
         <p id="clue-text">{CLUES[gameState]}</p>
-        {guess.isEmpty
+        {cardBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
-          : rows.map((row, rowIndex) => (
-            <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
-              {row.map((bit) => (
-                <BitButton
-                  key={`bit-${bit.index}`}
-                  bit={bit}
-                />
-              ))}
-            </div>
-          ))
+          : bitRows(cardRows)
+        }
+      </div>
+      <div id="magie-staging" className="display">
+        {stagingBits.isEmpty
+          ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
+          : bitRows(stagingRows)
         }
       </div>
       <div id="puzzle-inputs">
