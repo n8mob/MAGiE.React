@@ -4,6 +4,15 @@ import { BitButton } from "./BitButton.tsx";
 
 const BIT_SIZE_PX = 32;
 
+type DoorLockState = "idle" | "entering" | "accepted" | "rejected";
+
+const CLUES: Record<DoorLockState, string> = {
+  idle:     "SWIPE CARD ⏎",
+  entering: "ENTER CODE",
+  accepted: "ACCESS GRANTED",
+  rejected: "ACCESS DENIED",
+};
+
 const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
   eager: true,
   import: "default",
@@ -21,6 +30,7 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
 );
 
 const DoorLock = () => {
+  const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [guess, setGuess] = useState(() => BitSequence.empty());
   const displayRef = useRef<HTMLDivElement>(null);
   const [bitsPerRow, setBitsPerRow] = useState(8);
@@ -46,16 +56,31 @@ const DoorLock = () => {
   }, [guess, bitsPerRow]);
 
   const appendBit = useCallback((bit: "0" | "1") => {
+    if (gameState !== "entering" && gameState !== "idle") return;
+    if (gameState === "idle") setGameState("entering");
     setGuess(prev => prev.appendBit(bit));
-  }, []);
+  }, [gameState]);
 
   const deleteBit = useCallback(() => {
+    if (gameState !== "entering") return;
     setGuess(prev => prev.slice(0, -1));
-  }, []);
+  }, [gameState]);
 
   const submit = useCallback(() => {
-    // TODO: judgment logic
-  }, []);
+    if (gameState === "idle") {
+      setGameState("entering");
+      return;
+    }
+    if (gameState === "entering") {
+      // TODO: check guess against win sequence
+      setGameState("rejected");
+      return;
+    }
+    if (gameState === "accepted" || gameState === "rejected") {
+      setGuess(BitSequence.empty());
+      setGameState("entering");
+    }
+  }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -71,6 +96,7 @@ const DoorLock = () => {
   return (
     <div id="game-content">
       <div id="main-display" className="display" ref={displayRef}>
+        <p id="clue-text">{CLUES[gameState]}</p>
         {guess.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : rows.map((row, rowIndex) => (
