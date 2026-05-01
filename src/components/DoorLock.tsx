@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence.ts";
 import { BitButton } from "./BitButton.tsx";
-import { Correctness } from "../judgment/BitJudgment.ts";
 
 const BIT_SIZE_PX = 32;
 
@@ -80,7 +79,6 @@ const DoorLock = () => {
                   <BitButton
                     key={`bit-${bit.index}`}
                     bit={bit}
-                    correctness={Correctness.unguessed}
                   />
                 ))}
               </div>

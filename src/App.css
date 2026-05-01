@@ -285,16 +285,17 @@ input.bit-checkbox {
   display: inline-block;
   width: 32px; /* to match the bit images */
   height: 32px;
-  background-image: url('assets/Bit_off_Yellow.png');
+  background-image: url('assets/Bit_off.png');
   background-size: cover;
   cursor: pointer; /* "pointer" is the 'this is a link' finger pointer */
   image-rendering: pixelated;
+  opacity: 0.85;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   margin: 0;
 }
 
 input.bit-checkbox:checked {
-  background-image: url('assets/Bit_on_Yellow.png');
+  background-image: url('assets/Bit_on.png');
 }
 
 input[data-correctness="unguessed"] {

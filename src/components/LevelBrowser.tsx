@@ -1,6 +1,6 @@
 import './Level.css';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BitButton } from "./BitButton";
+import { CorrectnessBitButton } from "./BitButton";
 import { IndexedBit } from "../IndexedBit.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { useEffect } from "react";
@@ -42,7 +42,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
   return (
     <div className={'level-puzzle-bits'} style={{display: "flex", flexDirection: "row", margin: "16px 0"}}>
       {level.puzzles.map((puzzle, i) => (
-        <BitButton
+        <CorrectnessBitButton
           key={puzzle.slug ?? `puzzle-${i}`}
           bit={IndexedBit.falseAtIndex(i)}
           correctness={Correctness.unguessed}    // Update with real progress

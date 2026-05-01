@@ -1,5 +1,5 @@
 import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { BitButton } from "./BitButton.tsx";
+import { CorrectnessBitButton } from "./BitButton.tsx";
 import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
@@ -46,10 +46,10 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
           {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`} ref={el => { rowRefs.current[rowIndex] = el; }}>
               {[...displayRow].map((bit, indexWithinRow) => (
-                <BitButton
+                <CorrectnessBitButton
                   bit={bit}
                   key={`bit-${bit.index}`}
-                  correctness={currentJudgments[rowIndex]?. bitJudgments?.[indexWithinRow]?.correctness || Correctness.incorrect}
+                  correctness={currentJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness || Correctness.incorrect}
                   onChange={handleBitClick}
                 />
               ))}
