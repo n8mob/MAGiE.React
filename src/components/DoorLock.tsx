@@ -7,7 +7,7 @@ const BIT_SIZE_PX = 32;
 type DoorLockState = "idle" | "entering" | "accepted" | "rejected";
 
 const CLUES: Record<DoorLockState, string> = {
-  idle:     "SWIPE CARD ⏎",
+  idle: "SWIPE CARD ⏎",
   entering: "ENTER CODE",
   accepted: "ACCESS GRANTED",
   rejected: "ACCESS DENIED",
@@ -37,7 +37,9 @@ const DoorLock = () => {
 
   useEffect(() => {
     const el = displayRef.current;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     const observer = new ResizeObserver(([entry]) => {
       const width = entry.contentRect.width;
       setBitsPerRow(Math.max(1, Math.floor(width / BIT_SIZE_PX)));
@@ -55,39 +57,53 @@ const DoorLock = () => {
     return result;
   }, [guess, bitsPerRow]);
 
-  const appendBit = useCallback((bit: "0" | "1") => {
-    if (gameState !== "entering" && gameState !== "idle") return;
-    if (gameState === "idle") setGameState("entering");
-    setGuess(prev => prev.appendBit(bit));
-  }, [gameState]);
+  const appendBit = useCallback(
+    (bit: "0" | "1") => {
+      if (gameState !== "entering") {
+        setGameState("entering");
+      }
+      setGuess(prev => prev.appendBit(bit));
+    }, [gameState]);
 
   const deleteBit = useCallback(() => {
-    if (gameState !== "entering") return;
+    if (guess.isEmpty) {
+      return;
+    }
     setGuess(prev => prev.slice(0, -1));
-  }, [gameState]);
+  }, [guess]);
 
   const submit = useCallback(() => {
     if (gameState === "idle") {
       setGameState("entering");
       return;
     }
-    if (gameState === "entering") {
-      // TODO: check guess against win sequence
+
+    if (gameState === "entering" || gameState === "rejected") {
+      const winSequence = BitSequence.fromString("10101011")
+      if (guess.equals(winSequence)) {
+        setGameState("accepted");
+        return;
+      }
       setGameState("rejected");
       return;
     }
-    if (gameState === "accepted" || gameState === "rejected") {
+    if (gameState === "accepted") {
       setGuess(BitSequence.empty());
-      setGameState("entering");
+      setGameState("idle");
     }
   }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "0") appendBit("0");
-      else if (event.key === "1") appendBit("1");
-      else if (event.key === "Backspace") deleteBit();
-      else if (event.key === "Enter") submit();
+      if (event.key === "0") {
+        appendBit("0");
+      } else if (event.key === "1") {
+        appendBit("1");
+      } else if (event.key === "Backspace") {
+        deleteBit();
+      } else if (event.key === "Enter") {
+        submit();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -100,30 +116,46 @@ const DoorLock = () => {
         {guess.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : rows.map((row, rowIndex) => (
-              <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
-                {row.map((bit) => (
-                  <BitButton
-                    key={`bit-${bit.index}`}
-                    bit={bit}
-                  />
-                ))}
-              </div>
-            ))
+            <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
+              {row.map((bit) => (
+                <BitButton
+                  key={`bit-${bit.index}`}
+                  bit={bit}
+                />
+              ))}
+            </div>
+          ))
         }
       </div>
       <div id="puzzle-inputs">
         <div className="decode-keyboard-row" role="group" aria-label="Bit input">
           <button type="button" className="decode-keyboard-key" aria-label="1" onClick={() => appendBit("1")}>
-            <img src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]} alt="" aria-hidden="true" draggable={false} className="decode-keyboard-key-image" />
+            <img src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]}
+                 alt=""
+                 aria-hidden="true"
+                 draggable={false}
+                 className="decode-keyboard-key-image" />
           </button>
           <button type="button" className="decode-keyboard-key" aria-label="0" onClick={() => appendBit("0")}>
-            <img src={keyboardAssetMap["keyboard_Bit_off_32x32.png"]} alt="" aria-hidden="true" draggable={false} className="decode-keyboard-key-image" />
+            <img src={keyboardAssetMap["keyboard_Bit_off_32x32.png"]}
+                 alt=""
+                 aria-hidden="true"
+                 draggable={false}
+                 className="decode-keyboard-key-image" />
           </button>
           <button type="button" className="decode-keyboard-key" aria-label="delete" onClick={deleteBit}>
-            <img src={keyboardAssetMap["keyboard_delete_32x32.png"]} alt="" aria-hidden="true" draggable={false} className="decode-keyboard-key-image" />
+            <img src={keyboardAssetMap["keyboard_delete_32x32.png"]}
+                 alt=""
+                 aria-hidden="true"
+                 draggable={false}
+                 className="decode-keyboard-key-image" />
           </button>
           <button type="button" className="decode-keyboard-key" aria-label="submit" onClick={submit}>
-            <img src={keyboardAssetMap["keyboard_return_32x32.png"]} alt="" aria-hidden="true" draggable={false} className="decode-keyboard-key-image" />
+            <img src={keyboardAssetMap["keyboard_return_32x32.png"]}
+                 alt=""
+                 aria-hidden="true"
+                 draggable={false}
+                 className="decode-keyboard-key-image" />
           </button>
         </div>
       </div>
