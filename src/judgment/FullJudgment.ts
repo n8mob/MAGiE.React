@@ -7,6 +7,12 @@ class FullJudgment {
   correctGuess: BitSequence;
   sequenceJudgments: SequenceJudgment[];
 
+  /**
+   * A FullJudgement means the judgment for a full message or bit sequence. As opposed to a SequenceJudgment, which is for a single row or character.
+   * @param isCorrect The overall correctness of this judgement
+   * @param correctGuess The correct guess up to the first incorrect bit. This should be the fully correct guess if isCorrect is true.
+   * @param sequenceJudgments The judgments for the sub-sequences of bits (generally, display rows or the bits for each character).
+   */
   constructor(
     isCorrect: boolean,
     correctGuess: BitSequence | IndexedBit[],

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence.ts";
+import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
 import { BitButton } from "./BitButton.tsx";
+import { DisplayMatrix } from "./DisplayMatrix.tsx";
 
 const BIT_SIZE_PX = 32;
 const WIN_SEQUENCE = BitSequence.fromString("10101011");
@@ -30,21 +32,17 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
   {}
 );
 
-const toRows = (seq: BitSequence, bitsPerRow: number) => {
-  const bits = [...seq];
-  const result: typeof bits[] = [];
-  for (let i = 0; i < bits.length; i += bitsPerRow) {
-    result.push(bits.slice(i, i + bitsPerRow));
-  }
-  return result;
-};
+interface DoorLockProps {
+  encoder: BinaryEncoder;
+}
 
-const DoorLock = () => {
+const DoorLock = (props: DoorLockProps) => {
   const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
-  const displayRef = useRef<HTMLDivElement>(null);
   const [bitsPerRow, setBitsPerRow] = useState(8);
+  const encoder = props.encoder;
+  const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = displayRef.current;
@@ -59,8 +57,10 @@ const DoorLock = () => {
     return () => observer.disconnect();
   }, []);
 
-  const cardRows = useMemo(() => toRows(cardBits, bitsPerRow), [cardBits, bitsPerRow]);
-  const stagingRows = useMemo(() => toRows(stagingBits, bitsPerRow), [stagingBits, bitsPerRow]);
+  const cardRows = useMemo(() => encoder.splitForDisplay(cardBits, bitsPerRow), [cardBits, bitsPerRow, encoder]);
+  const stagingRows = useMemo(
+    () => encoder.splitForDisplay(stagingBits, bitsPerRow),
+    [stagingBits, bitsPerRow, encoder]);
 
   const appendBit = useCallback((bit: "0" | "1") => {
     if (gameState !== "entering") {
@@ -106,27 +106,27 @@ const DoorLock = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [appendBit, deleteBit, submit]);
 
-  const bitRows = (rows: ReturnType<typeof toRows>) => rows.map((row, rowIndex) => (
-    <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
-      {row.map((bit) => (
-        <BitButton key={`bit-${bit.index}`} bit={bit} />
-      ))}
-    </div>
-  ));
-
   return (
     <div id="game-content">
       <div id="main-display" className="display" ref={displayRef}>
         <p id="clue-text">{CLUES[gameState]}</p>
         {cardBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
-          : bitRows(cardRows)
+          : <DisplayMatrix
+            displayRows={[...cardRows]}
+            judgments={[]}
+            renderBit={(bit) => <BitButton bit={bit} />}
+          />
         }
       </div>
       <div id="magie-staging" className="display">
         {stagingBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
-          : bitRows(stagingRows)
+          : <DisplayMatrix
+            displayRows={[...stagingRows]}
+            judgments={[]}
+            renderBit={(bit) => <BitButton bit={bit} />}
+          />
         }
       </div>
       <div id="puzzle-inputs">

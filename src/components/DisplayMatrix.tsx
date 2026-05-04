@@ -1,13 +1,12 @@
-import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { CorrectnessBitButton } from "./BitButton.tsx";
+import { forwardRef, ReactNode, useImperativeHandle, useRef, useState } from "react";
 import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
-import { Correctness } from "../judgment/BitJudgment.ts";
+import { IndexedBit } from "../IndexedBit.ts";
 
 interface DisplayMatrixProps {
   displayRows: DisplayRow[];
   judgments: SequenceJudgment[];
-  handleBitClick: (event: ChangeEvent<HTMLInputElement>) => void;
+  renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode;
 }
 
 interface DisplayMatrixUpdate {
@@ -18,8 +17,8 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({displayRows, judgments, handleBitClick}, ref) => {
-    const [currentJudgments, setCurrentJudgments] = useState(judgments);
+  ({displayRows, judgments, renderBit}, ref) => {
+    const [, setCurrentJudgments] = useState(judgments);
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
@@ -46,15 +45,14 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
           {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`} ref={el => { rowRefs.current[rowIndex] = el; }}>
               {[...displayRow].map((bit, indexWithinRow) => (
-                <CorrectnessBitButton
-                  bit={bit}
-                  key={`bit-${bit.index}`}
-                  correctness={currentJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness || Correctness.incorrect}
-                  onChange={handleBitClick}
-                />
+                renderBit(
+                  bit,
+                  rowIndex,
+                  indexWithinRow
+                )
               ))}
               {displayRow.annotation && (
-                <span className="annotation">{'\u00A0'}{displayRow.annotation}</span>
+                <span className="annotation">{' '}{displayRow.annotation}</span>
               )}
             </p>
           ))}

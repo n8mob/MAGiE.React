@@ -1,7 +1,9 @@
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useState } from "react";
+import { CorrectnessBitButton } from "./BitButton.tsx";
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
+import { Correctness } from "../judgment/BitJudgment.ts";
 
 const EncodePuzzle: FC<PuzzleProps> = (
     {
@@ -79,7 +81,14 @@ const EncodePuzzle: FC<PuzzleProps> = (
           ref={displayMatrixRef}
           displayRows={displayRows}
           judgments={judgment.sequenceJudgments}
-          handleBitClick={handleBitClick}
+          renderBit={(bit, rowIndex, indexWithinRow) => (
+            <CorrectnessBitButton
+              key={`bit-${bit.index}`}
+              bit={bit}
+              correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness ?? Correctness.unguessed}
+              onChange={handleBitClick}
+            />
+          )}
         />
         {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
           <p key={`win-text-${winIndex}`}>{winLine}</p>)}
