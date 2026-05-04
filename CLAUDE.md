@@ -16,9 +16,10 @@ The dev config (`vite.config.local.ts`) expects `magiegame.local` to resolve in 
 
 ## Architecture
 
-MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router v6. There are two gameplay modes:
+MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router v6. There are three gameplay modes:
 - **Daily puzzle** (`/today`, `/date/:year/:month/:day`) — fetches from the puzzle API by date
 - **Menu-based play** (`/tutorial/...`, `/mall/...`, `/bigGame/...`) — navigates Menu → Category → Level → Puzzle
+- **Door Lock** (`/doorLock`) — standalone generative/random puzzle mode; see below
 
 ### Data flow
 
@@ -48,6 +49,24 @@ Both implement `splitByChar()` (for judgment) and `splitForDisplay()` (for rende
 ### Header context
 
 `HeaderContext` (in `src/components/HeaderContext.tsx`) is a React context that lets route-level components push dynamic content into the app header (category/level breadcrumbs or date navigation) via `useHeader()`. The header auto-collapses when the user scrolls past 72 px and re-expands on a pull-down gesture.
+
+### Door Lock (`src/components/DoorLock.tsx`)
+
+A self-contained puzzle mode with a simple state machine (`idle → entering → accepted | rejected`). It has two separate `BitSequence` states:
+- **`stagingBits`** — live input from the on-screen buttons / keyboard, shown in a MAGiE device staging display
+- **`cardBits`** — committed guess, transferred from staging on Enter/submit, shown in the main display
+
+The player types bits into the staging area and presses Enter to "swipe" the virtual card. Judgment runs against `cardBits`, not `stagingBits`. `DoorLock` accepts a `BinaryEncoder` prop (passed from `App.tsx`) and uses `encoder.splitForDisplay()` to wrap bits into rows.
+
+### Bit button components (`src/components/BitButton.tsx`)
+
+Two components share the same `<input type="checkbox" className="bit-checkbox">` base:
+- **`BitButton`** — no `data-correctness` attribute; renders with the default (dark/black) sprites. Use when correctness is unknown or irrelevant (e.g. `DoorLock`).
+- **`CorrectnessBitButton`** — requires a `correctness: Correctness` prop; sets `data-correctness` which drives CSS sprite switching (yellow = unguessed, teal = correct, purple = incorrect). Use wherever judgment feedback is shown.
+
+### DisplayMatrix (`src/components/DisplayMatrix.tsx`)
+
+Renders a grid of bit buttons from `DisplayRow[]`. Accepts a `renderBit: (bit: IndexedBit, correctness: Correctness) => ReactNode` render prop — callers supply the button component and close over any click handlers. `DisplayMatrix` owns internal judgment state (updated via the `updateJudgment` imperative ref handle) and resolves `Correctness` before passing it to `renderBit`.
 
 ### Feature flags
 
