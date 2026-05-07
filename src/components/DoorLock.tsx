@@ -43,6 +43,7 @@ const DoorLock = (props: DoorLockProps) => {
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
   const [bitsPerRow, setBitsPerRow] = useState(8);
   const encoder = props.encoder;
+  debug(JSON.stringify(encoder));
   const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,11 +60,11 @@ const DoorLock = (props: DoorLockProps) => {
   }, []);
 
   const cardRows = useMemo(() => {
-      return encoder.splitForDisplay(cardBits, bitsPerRow);
+      return [...encoder.splitForDisplay(cardBits, bitsPerRow)];
     }, [cardBits, bitsPerRow, encoder]
   );
   const stagingRows = useMemo(() => {
-      return encoder.splitForDisplay(stagingBits, bitsPerRow);
+      return [...encoder.splitForDisplay(stagingBits, bitsPerRow)];
     }, [stagingBits, bitsPerRow, encoder]
   );
 
@@ -121,7 +122,7 @@ const DoorLock = (props: DoorLockProps) => {
         {cardBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
-            displayRows={[...cardRows]}
+            displayRows={cardRows}
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
@@ -130,7 +131,7 @@ const DoorLock = (props: DoorLockProps) => {
         {stagingBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
-            displayRows={[...stagingRows]}
+            displayRows={stagingRows}
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
