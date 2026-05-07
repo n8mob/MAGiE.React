@@ -80,7 +80,6 @@ const EncodePuzzle: FC<PuzzleProps> = (
         <DisplayMatrix
           ref={displayMatrixRef}
           displayRows={displayRows}
-          judgments={judgment.sequenceJudgments}
           renderBit={(bit, rowIndex, indexWithinRow) => (
             <CorrectnessBitButton
               key={`bit-${bit.index}`}

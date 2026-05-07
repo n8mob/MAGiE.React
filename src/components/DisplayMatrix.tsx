@@ -1,31 +1,24 @@
-import { forwardRef, ReactNode, useImperativeHandle, useRef, useState } from "react";
-import { SequenceJudgment } from "../judgment/SequenceJudgment.ts";
+import { forwardRef, ReactNode, useImperativeHandle, useRef } from "react";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { IndexedBit } from "../IndexedBit.ts";
 
 interface DisplayMatrixProps {
   displayRows: DisplayRow[];
-  judgments: SequenceJudgment[];
   renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode;
 }
 
 interface DisplayMatrixUpdate {
-  updateJudgment: (judgments: SequenceJudgment[]) => void;
   getWidth: () => number;
   scrollToBottom?: () => void;
   getBitRowElement?: (rowIndex: number) => HTMLElement | null;
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({displayRows, judgments, renderBit}, ref) => {
-    const [, setCurrentJudgments] = useState(judgments);
+  ({displayRows, renderBit}, ref) => {
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
     useImperativeHandle(ref, () => ({
-      updateJudgment(newJudgments: SequenceJudgment[]) {
-        setCurrentJudgments(newJudgments);
-      },
       getWidth: () => {
         return bitFieldRef.current?.offsetWidth ?? 0;
       },

@@ -3,6 +3,7 @@ import { BitSequence } from "../BitSequence.ts";
 import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
 import { BitButton } from "./BitButton.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
+import { debug } from "../Logger.ts";
 
 const BIT_SIZE_PX = 32;
 const WIN_SEQUENCE = BitSequence.fromString("10101011");
@@ -57,16 +58,23 @@ const DoorLock = (props: DoorLockProps) => {
     return () => observer.disconnect();
   }, []);
 
-  const cardRows = useMemo(() => encoder.splitForDisplay(cardBits, bitsPerRow), [cardBits, bitsPerRow, encoder]);
-  const stagingRows = useMemo(
-    () => encoder.splitForDisplay(stagingBits, bitsPerRow),
-    [stagingBits, bitsPerRow, encoder]);
+  const cardRows = useMemo(() => {
+      return encoder.splitForDisplay(cardBits, bitsPerRow);
+    }, [cardBits, bitsPerRow, encoder]
+  );
+  const stagingRows = useMemo(() => {
+      return encoder.splitForDisplay(stagingBits, bitsPerRow);
+    }, [stagingBits, bitsPerRow, encoder]
+  );
 
   const appendBit = useCallback((bit: "0" | "1") => {
     if (gameState !== "entering") {
       setGameState("entering");
     }
-    setStagingBits(prev => prev.appendBit(bit));
+    setStagingBits(prev => {
+      debug(`Appending bit ${bit} to staging sequence "${prev.toString()}"`)
+      return prev.appendBit(bit);
+    });
   }, [gameState]);
 
   const deleteBit = useCallback(() => {
@@ -114,8 +122,7 @@ const DoorLock = (props: DoorLockProps) => {
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={[...cardRows]}
-            judgments={[]}
-            renderBit={(bit) => <BitButton bit={bit} />}
+            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
       </div>
@@ -124,8 +131,7 @@ const DoorLock = (props: DoorLockProps) => {
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={[...stagingRows]}
-            judgments={[]}
-            renderBit={(bit) => <BitButton bit={bit} />}
+            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
       </div>

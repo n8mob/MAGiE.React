@@ -18,9 +18,9 @@ import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
-import { FixedWidthEncoder } from "./encoding/FixedWidthEncoder.ts";
+import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
-const doorLockEncoder = new FixedWidthEncoder(8, {});
+const doorLockEncoder = new VariableWidthEncoder({"0": {"a": "0"}, "1": {"b": "1"}});
 
 const ga4id = 'G-ZL5RKDBBF6';
 const HEADER_COLLAPSE_THRESHOLD = 72;
