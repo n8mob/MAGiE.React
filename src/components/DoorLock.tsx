@@ -48,6 +48,7 @@ const DoorLock = (props: DoorLockProps) => {
   const [winSequence, setWinSequence] = useState(() =>
     presets?.[0] ? BitSequence.fromString(presets[0]) : randomSequence()
   );
+
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
   const [hint, setHint] = useState("Guess the bit sequence!");
