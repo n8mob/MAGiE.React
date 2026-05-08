@@ -288,6 +288,8 @@ input.bit-checkbox {
   background-image: url('assets/Bit_off.png');
   background-size: cover;
   cursor: pointer; /* "pointer" is the 'this is a link' finger pointer */
+  image-rendering: -webkit-optimize-contrast; /* older iOS Safari */
+  image-rendering: crisp-edges;
   image-rendering: pixelated;
   opacity: 0.85;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
@@ -365,8 +367,8 @@ input[data-correctness="incorrect"]:checked {
 }
 
 .door-lock input.bit-checkbox {
-  width: calc((100vw - 2rem) / 8);
-  height: calc((100vw - 2rem) / 8);
+  width: var(--door-lock-bit-size, calc((100vw - 2rem) / 8));
+  height: var(--door-lock-bit-size, calc((100vw - 2rem) / 8));
 }
 
 .door-lock #clue-text,
@@ -382,7 +384,7 @@ input[data-correctness="incorrect"]:checked {
 }
 
 .door-lock .bit-field p {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .door-lock .after-win-controls {
