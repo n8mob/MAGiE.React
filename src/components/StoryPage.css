@@ -13,3 +13,9 @@
 .right-item {
   text-align: right;
 }
+
+.story-page pre,
+.story-page code {
+  font-family: inherit;
+  font-size: small;
+}
