@@ -134,7 +134,6 @@ export function useBasePuzzle(
 
     previousJudgment.current = newJudgment;
     setJudgment(newJudgment);
-    displayMatrixRef.current?.updateJudgment(newJudgment.sequenceJudgments);
 
     const eventParams = {
       puzzle_slug: puzzle.slug,

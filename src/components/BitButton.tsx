@@ -20,6 +20,7 @@ const BitButton: React.FC<BitButtonProps> = (
     onChange={onChange}
     onClick={onClick}
     checked={bit.bit === "1"}
+    data-bit-index={bit.index}
     key={`bit-${bit.index}`}
   />
 );
@@ -42,6 +43,7 @@ const CorrectnessBitButton: React.FC<CorrectnessBitButtonProps> = (
     onClick={onClick}
     checked={bit.bit === "1"}
     data-correctness={correctness}
+    data-bit-index={bit.index}
     key={`bit-${bit.index}`}
   />
 );

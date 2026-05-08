@@ -1,8 +1,10 @@
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
+import { CorrectnessBitButton } from "./BitButton.tsx";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
+import { Correctness } from "../judgment/BitJudgment.ts";
 
 const LETTER_PATTERN = /^[a-z]$/i;
 const ALLOWED_PUNCTUATION = new Set<string>([",", ".", "!", "?", " "]);
@@ -243,9 +245,13 @@ const DecodePuzzle: FC<PuzzleProps> = (
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
-            judgments={judgment.sequenceJudgments}
-            handleBitClick={() => {
-            }}
+            renderBit={(bit, rowIndex, indexWithinRow) => (
+              <CorrectnessBitButton
+                key={`bit-${bit.index}`}
+                bit={bit}
+                correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness ?? Correctness.unguessed}
+              />
+            )}
           />
           <div id="win-message">
             {hasWon && puzzle.init !== puzzle.winText && <p>{guessText}</p>}

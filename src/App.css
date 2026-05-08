@@ -264,7 +264,7 @@ h3 {
   max-height: 40vh;
 }
 
-#bit-field {
+.bit-field {
   box-sizing: border-box;
   margin: 0.5em 0;
   display: flex;
@@ -272,7 +272,7 @@ h3 {
   align-items: center;
 }
 
-#bit-field p {
+.bit-field p {
   display: flex;
   justify-content: flex-start;
   width: 100%;
@@ -358,4 +358,19 @@ input[data-correctness="incorrect"]:checked {
 
 .blink {
   animation: blink 2s step-start infinite;
+}
+
+.door-lock #main-display,
+.door-lock #magie-staging {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.door-lock .bit-field p {
+  justify-content: center;
+}
+
+.door-lock .after-win-controls {
+  align-items: center;
 }
