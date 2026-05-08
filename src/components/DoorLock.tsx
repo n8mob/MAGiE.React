@@ -6,7 +6,9 @@ import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
 
 const BIT_SIZE_PX = 32;
-const WIN_SEQUENCE = BitSequence.fromString("10101011");
+
+const randomSequence = (bits: number = 8) =>
+  BitSequence.fromString(Math.floor(Math.random() * (2 ** bits)).toString(2).padStart(bits, "0"));
 
 type DoorLockState = "idle" | "entering" | "accepted" | "rejected";
 
@@ -35,21 +37,26 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
 
 interface DoorLockProps {
   encoder: BinaryEncoder;
+  presets?: string[];
 }
 
 const DoorLock = (props: DoorLockProps) => {
+  const { encoder, presets } = props;
   const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
   const [bitsPerRow, setBitsPerRow] = useState(8);
-  const encoder = props.encoder;
+  const [presetIndex, setPresetIndex] = useState(0);
+  const [winSequence, setWinSequence] = useState(() =>
+    presets?.[0] ? BitSequence.fromString(presets[0]) : randomSequence()
+  );
   const displayRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
   const [hint, setHint] = useState("Guess the bit sequence!");
 
   useEffect(() => {
     winAudio.current = new Audio('/sounds/big-ta-da.wav');
-    winAudio.current.load();
+    winAudio.current.preload = "auto";
     winAudio.current.volume = 0.25;
     return () => { winAudio.current?.pause(); };
   }, []);
@@ -103,12 +110,15 @@ const DoorLock = (props: DoorLockProps) => {
     }
     if (gameState === "entering" || gameState === "rejected") {
       setCardBits(stagingBits);
-      const isCorrect = stagingBits.equals(WIN_SEQUENCE);
+      const isCorrect = stagingBits.equals(winSequence);
       if (isCorrect) {
         setHint("You got it!");
-        winAudio.current?.play().catch((error) => { console.warn("Audio playback failed:", error); });
+        if (winAudio.current) {
+          winAudio.current.currentTime = 0;
+          winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
+        }
       } else {
-        const diff = parseInt(WIN_SEQUENCE.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
+        const diff = parseInt(winSequence.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
         setHint(`BAD KEY ${diff > 0 ? "+" : ""}${diff}`);
       }
       setGameState(isCorrect ? "accepted" : "rejected");
@@ -116,12 +126,14 @@ const DoorLock = (props: DoorLockProps) => {
     }
 
     if (gameState === "accepted") {
-      setStagingBits(BitSequence.empty());
       setCardBits(BitSequence.empty());
       setGameState("idle");
       setHint("Guess the bit sequence!");
+      const nextIndex = presetIndex + 1;
+      setPresetIndex(nextIndex);
+      setWinSequence(presets?.[nextIndex] ? BitSequence.fromString(presets[nextIndex]) : randomSequence());
     }
-  }, [gameState, stagingBits]);
+  }, [gameState, stagingBits, winSequence, presetIndex, presets]);
 
   /**
    * keyboard handler
@@ -154,6 +166,11 @@ const DoorLock = (props: DoorLockProps) => {
           />
         }
         <p>{hint}</p>
+        {gameState === "accepted" && (
+          <div className="after-win-controls">
+            <button type="button" onClick={submit}>Next ▶▶</button>
+          </div>
+        )}
       </div>
       <div id="magie-staging" className="display">
         {stagingBits.isEmpty

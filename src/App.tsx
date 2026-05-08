@@ -272,7 +272,7 @@ function App() {
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
       <Route path="/story/:slug" element={<StoryPage />} />
-      <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} />} />
+      <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["0001", "0010", "0011", "0100", "0101"]} />} />
       {features.includes("storyRoutes") && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
