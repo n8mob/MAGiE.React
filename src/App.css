@@ -360,6 +360,10 @@ input[data-correctness="incorrect"]:checked {
   animation: blink 2s step-start infinite;
 }
 
+.door-lock .keyboard {
+  --keyboard-key-height: 64px;
+}
+
 .door-lock #main-display,
 .door-lock #magie-staging {
   display: flex;

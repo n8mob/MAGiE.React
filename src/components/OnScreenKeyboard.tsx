@@ -120,14 +120,14 @@ const OnScreenKeyboard: FC<OnScreenKeyboardProps> = (
   }, [disabled, onCharacter, onDelete, onReturn]);
 
   return (
-    <div className="decode-keyboard" role="group" aria-label="On-screen keyboard">
+    <div className="keyboard decode-keyboard" role="group" aria-label="On-screen keyboard">
       {KEY_ROWS.map((keyRow, rowIndex) => (
-        <div className="decode-keyboard-row" key={`decode-keyboard-row-${rowIndex}`}>
+        <div className="keyboard-row" key={`keyboard-row-${rowIndex}`}>
           {keyRow.map((key) => (
             <button
               type="button"
               key={key.id}
-              className="decode-keyboard-key"
+              className="keyboard-key"
               onClick={() => handlePress(key)}
               disabled={disabled}
               aria-label={key.ariaLabel}
@@ -137,7 +137,7 @@ const OnScreenKeyboard: FC<OnScreenKeyboardProps> = (
                 alt=""
                 aria-hidden="true"
                 draggable={false}
-                className="decode-keyboard-key-image"
+                className="keyboard-key-image"
               />
             </button>
           ))}
