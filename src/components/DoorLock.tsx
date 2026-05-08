@@ -104,11 +104,11 @@ const DoorLock = (props: DoorLockProps) => {
   }, []);
 
   const submit = useCallback(() => {
-    if (gameState === "idle") {
+    if (gameState === "idle" && stagingBits.isEmpty) {
       setGameState("entering");
       return;
     }
-    if (gameState === "entering" || gameState === "rejected") {
+    if (gameState === "idle" || gameState === "entering" || gameState === "rejected") {
       setCardBits(stagingBits);
       const isCorrect = stagingBits.equals(winSequence);
       if (isCorrect) {
@@ -118,7 +118,7 @@ const DoorLock = (props: DoorLockProps) => {
           winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
         }
       } else {
-        const diff = parseInt(winSequence.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
+        const diff = parseInt(stagingBits.toPlainString(), 2) - parseInt(winSequence.toPlainString(), 2);
         setHint(`BAD KEY ${diff > 0 ? "+" : ""}${diff}`);
       }
       setGameState(isCorrect ? "accepted" : "rejected");
@@ -155,7 +155,7 @@ const DoorLock = (props: DoorLockProps) => {
   }, [appendBit, deleteBit, submit]);
 
   return (
-    <div id="game-content">
+    <div id="game-content" className="door-lock">
       <div id="main-display" className="display" ref={displayRef}>
         <p id="clue-text">{CLUES[gameState]}</p>
         {cardBits.isEmpty
@@ -166,6 +166,7 @@ const DoorLock = (props: DoorLockProps) => {
           />
         }
         <p>{hint}</p>
+        {gameState === "accepted" && <p>{parseInt(winSequence.toPlainString(), 2)}</p>}
         {gameState === "accepted" && (
           <div className="after-win-controls">
             <button type="button" onClick={submit}>Next ▶▶</button>
