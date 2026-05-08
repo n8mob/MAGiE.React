@@ -5,8 +5,6 @@ import { BitButton } from "./BitButton.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
 
-const BIT_SIZE_PX = 32;
-
 const randomSequence = (bits: number = 8) =>
   BitSequence.fromString(Math.floor(Math.random() * (2 ** bits)).toString(2).padStart(bits, "0"));
 
@@ -45,12 +43,11 @@ const DoorLock = (props: DoorLockProps) => {
   const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
-  const [bitsPerRow, setBitsPerRow] = useState(8);
+  const bitsPerRow = 8;
   const [presetIndex, setPresetIndex] = useState(0);
   const [winSequence, setWinSequence] = useState(() =>
     presets?.[0] ? BitSequence.fromString(presets[0]) : randomSequence()
   );
-  const displayRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
   const [hint, setHint] = useState("Guess the bit sequence!");
 
@@ -59,19 +56,6 @@ const DoorLock = (props: DoorLockProps) => {
     winAudio.current.preload = "auto";
     winAudio.current.volume = 0.25;
     return () => { winAudio.current?.pause(); };
-  }, []);
-
-  useEffect(() => {
-    const el = displayRef.current;
-    if (!el) {
-      return;
-    }
-    const observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
-      setBitsPerRow(Math.max(1, Math.floor(width / BIT_SIZE_PX)));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
   }, []);
 
   const cardRows = useMemo(() => {
@@ -156,7 +140,7 @@ const DoorLock = (props: DoorLockProps) => {
 
   return (
     <div id="game-content" className="door-lock">
-      <div id="main-display" className="display" ref={displayRef}>
+      <div id="main-display" className="display">
         <p id="clue-text">{CLUES[gameState]}</p>
         {cardBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
