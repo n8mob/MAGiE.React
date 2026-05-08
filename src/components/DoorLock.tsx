@@ -48,6 +48,7 @@ const DoorLock = (props: DoorLockProps) => {
   const [winSequence, setWinSequence] = useState(() =>
     presets?.[0] ? BitSequence.fromString(presets[0]) : randomSequence()
   );
+  const mainDisplayRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
   const [hint, setHint] = useState("Guess the bit sequence!");
 
@@ -56,6 +57,18 @@ const DoorLock = (props: DoorLockProps) => {
     winAudio.current.preload = "auto";
     winAudio.current.volume = 0.25;
     return () => { winAudio.current?.pause(); };
+  }, []);
+
+  useEffect(() => {
+    const el = mainDisplayRef.current;
+    if (!el?.parentElement) return;
+    const gameContent = el.parentElement;
+    const observer = new ResizeObserver(([entry]) => {
+      const bitSize = Math.floor(entry.contentRect.width / 8);
+      gameContent.style.setProperty('--door-lock-bit-size', `${bitSize}px`);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const cardRows = useMemo(() => {
@@ -140,7 +153,7 @@ const DoorLock = (props: DoorLockProps) => {
 
   return (
     <div id="game-content" className="door-lock">
-      <div id="main-display" className="display">
+      <div id="main-display" className="display" ref={mainDisplayRef}>
         <p id="clue-text">{CLUES[gameState]}</p>
         {cardBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
