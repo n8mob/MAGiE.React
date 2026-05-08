@@ -110,7 +110,7 @@ const DoorLock = (props: DoorLockProps) => {
     }
     if (gameState === "idle" || gameState === "entering" || gameState === "rejected") {
       setCardBits(stagingBits);
-      const isCorrect = stagingBits.equals(winSequence);
+      const isCorrect = parseInt(stagingBits.toPlainString(), 2) === parseInt(winSequence.toPlainString(), 2);
       if (isCorrect) {
         setHint("You got it!");
         if (winAudio.current) {
@@ -183,35 +183,37 @@ const DoorLock = (props: DoorLockProps) => {
         }
       </div>
       <div id="puzzle-inputs">
-        <div className="decode-keyboard-row" role="group" aria-label="Bit input">
-          <button type="button" className="decode-keyboard-key" aria-label="1" onClick={() => appendBit("1")}>
-            <img src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]}
-                 alt=""
-                 aria-hidden="true"
-                 draggable={false}
-                 className="decode-keyboard-key-image" />
-          </button>
-          <button type="button" className="decode-keyboard-key" aria-label="0" onClick={() => appendBit("0")}>
-            <img src={keyboardAssetMap["keyboard_Bit_off_32x32.png"]}
-                 alt=""
-                 aria-hidden="true"
-                 draggable={false}
-                 className="decode-keyboard-key-image" />
-          </button>
-          <button type="button" className="decode-keyboard-key" aria-label="delete" onClick={deleteBit}>
-            <img src={keyboardAssetMap["keyboard_delete_32x32.png"]}
-                 alt=""
-                 aria-hidden="true"
-                 draggable={false}
-                 className="decode-keyboard-key-image" />
-          </button>
-          <button type="button" className="decode-keyboard-key" aria-label="submit" onClick={submit}>
-            <img src={keyboardAssetMap["keyboard_return_32x32.png"]}
-                 alt=""
-                 aria-hidden="true"
-                 draggable={false}
-                 className="decode-keyboard-key-image" />
-          </button>
+        <div className="keyboard">
+          <div className="keyboard-row" role="group" aria-label="Bit input">
+            <button type="button" className="keyboard-key" aria-label="1" onClick={() => appendBit("1")}>
+              <img src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]}
+                   alt=""
+                   aria-hidden="true"
+                   draggable={false}
+                   className="keyboard-key-image" />
+            </button>
+            <button type="button" className="keyboard-key" aria-label="0" onClick={() => appendBit("0")}>
+              <img src={keyboardAssetMap["keyboard_Bit_off_32x32.png"]}
+                   alt=""
+                   aria-hidden="true"
+                   draggable={false}
+                   className="keyboard-key-image" />
+            </button>
+            <button type="button" className="keyboard-key" aria-label="delete" onClick={deleteBit}>
+              <img src={keyboardAssetMap["keyboard_delete_32x32.png"]}
+                   alt=""
+                   aria-hidden="true"
+                   draggable={false}
+                   className="keyboard-key-image" />
+            </button>
+            <button type="button" className="keyboard-key" aria-label="submit" onClick={submit}>
+              <img src={keyboardAssetMap["keyboard_return_32x32.png"]}
+                   alt=""
+                   aria-hidden="true"
+                   draggable={false}
+                   className="keyboard-key-image" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,4 @@
-.decode-keyboard {
-  --decode-key-height: clamp(23px, 7.6vw, 32px);
-  width: min(100%, 34rem);
-  margin: 0 auto;
+.keyboard {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -9,14 +6,14 @@
   touch-action: manipulation;
 }
 
-.decode-keyboard-row {
+.keyboard-row {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
   gap: clamp(0.15rem, 0.9vw, 0.3rem);
 }
 
-.decode-keyboard-key {
+.keyboard-key {
   margin: 0;
   padding: 0;
   border: none;
@@ -28,32 +25,39 @@
   cursor: pointer;
 }
 
-.decode-keyboard-key:focus-visible {
+.keyboard-key:focus-visible {
   outline: 2px solid #dfed84;
   outline-offset: 2px;
   border-radius: 0.25rem;
 }
 
-.decode-keyboard-key:disabled {
+.keyboard-key:disabled {
   opacity: 0.65;
   cursor: default;
 }
 
-.decode-keyboard-key-image {
-  height: var(--decode-key-height);
+.keyboard-key-image {
+  height: var(--keyboard-key-height);
   width: auto;
   display: block;
   image-rendering: pixelated;
   transform: translateY(0);
 }
 
-.decode-keyboard-key:not(:disabled):active .decode-keyboard-key-image {
+.keyboard-key:not(:disabled):active .keyboard-key-image {
   transform: translateY(1px);
   filter: brightness(1.1);
 }
 
+/* Decode-specific sizing and width constraint */
+.decode-keyboard {
+  --keyboard-key-height: clamp(23px, 7.6vw, 32px);
+  width: min(100%, 34rem);
+  margin: 0 auto;
+}
+
 @media (max-width: 360px) {
   .decode-keyboard {
-    --decode-key-height: clamp(20px, 6.4vw, 26px);
+    --keyboard-key-height: clamp(20px, 6.4vw, 26px);
   }
 }
