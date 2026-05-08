@@ -364,6 +364,16 @@ input[data-correctness="incorrect"]:checked {
   --keyboard-key-height: 64px;
 }
 
+.door-lock input.bit-checkbox {
+  width: calc((100vw - 2rem) / 8);
+  height: calc((100vw - 2rem) / 8);
+}
+
+.door-lock #clue-text,
+.door-lock p {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+}
+
 .door-lock #main-display,
 .door-lock #magie-staging {
   display: flex;
