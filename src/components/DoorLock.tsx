@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BitSequence } from "../BitSequence.ts";
 import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
 import { BitButton } from "./BitButton.tsx";
@@ -43,8 +43,9 @@ const DoorLock = (props: DoorLockProps) => {
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
   const [bitsPerRow, setBitsPerRow] = useState(8);
   const encoder = props.encoder;
-  debug(JSON.stringify(encoder));
   const displayRef = useRef<HTMLDivElement>(null);
+  const [win, setWin] = useState("");
+  const [hint, setHint] = useState("Guess the bit sequence!");
 
   useEffect(() => {
     const el = displayRef.current;
@@ -82,6 +83,12 @@ const DoorLock = (props: DoorLockProps) => {
     setStagingBits(prev => prev.slice(0, -1));
   }, []);
 
+  const handleStagingBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const bitIndex = event.target.dataset.bitIndex;
+    if (bitIndex === undefined) return;
+    setStagingBits(prev => prev.toggleBit(parseInt(bitIndex)));
+  }, []);
+
   const submit = useCallback(() => {
     if (gameState === "idle") {
       setGameState("entering");
@@ -89,16 +96,30 @@ const DoorLock = (props: DoorLockProps) => {
     }
     if (gameState === "entering" || gameState === "rejected") {
       setCardBits(stagingBits);
-      setGameState(stagingBits.equals(WIN_SEQUENCE) ? "accepted" : "rejected");
+      const isCorrect = stagingBits.equals(WIN_SEQUENCE);
+      if (isCorrect) {
+        setHint("");
+        setWin("You got it!");
+      } else {
+        const diff = parseInt(WIN_SEQUENCE.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
+        setHint(`Off by ${diff > 0 ? "+" : ""}${diff}`);
+      }
+      setGameState(isCorrect ? "accepted" : "rejected");
       return;
     }
+
     if (gameState === "accepted") {
       setStagingBits(BitSequence.empty());
       setCardBits(BitSequence.empty());
       setGameState("idle");
+      setHint("");
+      setWin("You got it!");
     }
   }, [gameState, stagingBits]);
 
+  /**
+   * keyboard handler
+   */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "0") {
@@ -126,13 +147,14 @@ const DoorLock = (props: DoorLockProps) => {
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
+        <p>{hint ?? win}</p>
       </div>
       <div id="magie-staging" className="display">
         {stagingBits.isEmpty
           ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={stagingRows}
-            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
+            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} onChange={handleStagingBitClick} />}
           />
         }
       </div>
