@@ -44,8 +44,16 @@ const DoorLock = (props: DoorLockProps) => {
   const [bitsPerRow, setBitsPerRow] = useState(8);
   const encoder = props.encoder;
   const displayRef = useRef<HTMLDivElement>(null);
+  const winAudio = useRef<HTMLAudioElement | null>(null);
   const [win, setWin] = useState("");
   const [hint, setHint] = useState("Guess the bit sequence!");
+
+  useEffect(() => {
+    winAudio.current = new Audio('/sounds/big-ta-da.wav');
+    winAudio.current.load();
+    winAudio.current.volume = 0.25;
+    return () => { winAudio.current?.pause(); };
+  }, []);
 
   useEffect(() => {
     const el = displayRef.current;
@@ -100,6 +108,7 @@ const DoorLock = (props: DoorLockProps) => {
       if (isCorrect) {
         setHint("");
         setWin("You got it!");
+        winAudio.current?.play().catch((error) => { console.warn("Audio playback failed:", error); });
       } else {
         const diff = parseInt(WIN_SEQUENCE.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
         setHint(`Off by ${diff > 0 ? "+" : ""}${diff}`);
