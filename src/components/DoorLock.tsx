@@ -1,4 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ReactGA4 from "react-ga4";
 import { BitSequence } from "../BitSequence.ts";
 import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
 import { BitButton } from "./BitButton.tsx";
@@ -108,15 +109,20 @@ const DoorLock = (props: DoorLockProps) => {
     }
     if (gameState === "idle" || gameState === "entering" || gameState === "rejected") {
       setCardBits(stagingBits);
-      const isCorrect = parseInt(stagingBits.toPlainString(), 2) === parseInt(winSequence.toPlainString(), 2);
+      const guessValue = parseInt(stagingBits.toPlainString(), 2);
+      const winValue = parseInt(winSequence.toPlainString(), 2);
+      const isCorrect = guessValue === winValue;
+      const diff = guessValue - winValue;
+      const pagePath = window.location.pathname + window.location.search;
+      ReactGA4.event("door_lock_submit", { is_correct: isCorrect, diff, preset_index: presetIndex, pagePath });
       if (isCorrect) {
+        ReactGA4.event("door_lock_win", { preset_index: presetIndex, pagePath });
         setHint("You got it!");
         if (winAudio.current) {
           winAudio.current.currentTime = 0;
           winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
         }
       } else {
-        const diff = parseInt(stagingBits.toPlainString(), 2) - parseInt(winSequence.toPlainString(), 2);
         setHint(`BAD KEY ${diff > 0 ? "+" : ""}${diff}`);
       }
       setGameState(isCorrect ? "accepted" : "rejected");
