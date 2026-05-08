@@ -53,20 +53,22 @@ Both implement `splitByChar()` (for judgment) and `splitForDisplay()` (for rende
 ### Door Lock (`src/components/DoorLock.tsx`)
 
 A self-contained puzzle mode with a simple state machine (`idle → entering → accepted | rejected`). It has two separate `BitSequence` states:
-- **`stagingBits`** — live input from the on-screen buttons / keyboard, shown in a MAGiE device staging display
+- **`stagingBits`** — live input from the on-screen buttons / keyboard, shown in a MAGiE device staging display. Persists between rounds so the player can re-use a previously correct sequence on the next lock.
 - **`cardBits`** — committed guess, transferred from staging on Enter/submit, shown in the main display
 
-The player types bits into the staging area and presses Enter to "swipe" the virtual card. Judgment runs against `cardBits`, not `stagingBits`. `DoorLock` accepts a `BinaryEncoder` prop (passed from `App.tsx`) and uses `encoder.splitForDisplay()` to wrap bits into rows.
+The player types bits into the staging area and presses Enter to "swipe" the virtual card. Judgment runs against `cardBits`, not `stagingBits`. Individual staging bits can be toggled by clicking them. On a wrong guess, the hint shows the signed numeric difference (`WIN - GUESS`) to guide the player.
+
+`DoorLock` accepts a `BinaryEncoder` and an optional `presets?: string[]` prop. Win sequences are drawn from `presets` in order; once exhausted (or if no presets are provided), new sequences are generated randomly. The win audio (`/sounds/big-ta-da.wav`) is preloaded on mount with `preload = "auto"` and rewound to `currentTime = 0` before each play to support replays.
 
 ### Bit button components (`src/components/BitButton.tsx`)
 
-Two components share the same `<input type="checkbox" className="bit-checkbox">` base:
+Two components share the same `<input type="checkbox" className="bit-checkbox">` base. Both set `data-bit-index={bit.index}` on the input, which click/change handlers read via `event.target.dataset.bitIndex` to identify which bit was toggled.
 - **`BitButton`** — no `data-correctness` attribute; renders with the default (dark/black) sprites. Use when correctness is unknown or irrelevant (e.g. `DoorLock`).
 - **`CorrectnessBitButton`** — requires a `correctness: Correctness` prop; sets `data-correctness` which drives CSS sprite switching (yellow = unguessed, teal = correct, purple = incorrect). Use wherever judgment feedback is shown.
 
 ### DisplayMatrix (`src/components/DisplayMatrix.tsx`)
 
-Renders a grid of bit buttons from `DisplayRow[]`. Accepts a `renderBit: (bit: IndexedBit, correctness: Correctness) => ReactNode` render prop — callers supply the button component and close over any click handlers. `DisplayMatrix` owns internal judgment state (updated via the `updateJudgment` imperative ref handle) and resolves `Correctness` before passing it to `renderBit`.
+Renders a grid of bit buttons from `DisplayRow[]`. Accepts a `renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode` render prop — callers supply the button component and close over any click/change handlers. The inner grid div uses `className="bit-field"` (not an `id`) so multiple `DisplayMatrix` instances can coexist on the same page (e.g. DoorLock's card + staging displays). Exposes an imperative ref handle (`DisplayMatrixUpdate`) with `getWidth()`, `scrollToBottom()`, and `getBitRowElement(rowIndex)`.
 
 ### Feature flags
 
