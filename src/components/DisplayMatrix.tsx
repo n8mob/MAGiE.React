@@ -34,7 +34,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
 
     return (
       <>
-        <div ref={bitFieldRef} id="bit-field">
+        <div ref={bitFieldRef} className="bit-field">
           {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`} ref={el => { rowRefs.current[rowIndex] = el; }}>
               {[...displayRow].map((bit, indexWithinRow) => (

@@ -264,7 +264,7 @@ h3 {
   max-height: 40vh;
 }
 
-#bit-field {
+.bit-field {
   box-sizing: border-box;
   margin: 0.5em 0;
   display: flex;
@@ -272,7 +272,7 @@ h3 {
   align-items: center;
 }
 
-#bit-field p {
+.bit-field p {
   display: flex;
   justify-content: flex-start;
   width: 100%;

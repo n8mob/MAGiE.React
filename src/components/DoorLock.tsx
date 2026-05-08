@@ -45,7 +45,6 @@ const DoorLock = (props: DoorLockProps) => {
   const encoder = props.encoder;
   const displayRef = useRef<HTMLDivElement>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
-  const [win, setWin] = useState("");
   const [hint, setHint] = useState("Guess the bit sequence!");
 
   useEffect(() => {
@@ -106,12 +105,11 @@ const DoorLock = (props: DoorLockProps) => {
       setCardBits(stagingBits);
       const isCorrect = stagingBits.equals(WIN_SEQUENCE);
       if (isCorrect) {
-        setHint("");
-        setWin("You got it!");
+        setHint("You got it!");
         winAudio.current?.play().catch((error) => { console.warn("Audio playback failed:", error); });
       } else {
         const diff = parseInt(WIN_SEQUENCE.toPlainString(), 2) - parseInt(stagingBits.toPlainString(), 2);
-        setHint(`Off by ${diff > 0 ? "+" : ""}${diff}`);
+        setHint(`BAD KEY ${diff > 0 ? "+" : ""}${diff}`);
       }
       setGameState(isCorrect ? "accepted" : "rejected");
       return;
@@ -121,8 +119,7 @@ const DoorLock = (props: DoorLockProps) => {
       setStagingBits(BitSequence.empty());
       setCardBits(BitSequence.empty());
       setGameState("idle");
-      setHint("");
-      setWin("You got it!");
+      setHint("Guess the bit sequence!");
     }
   }, [gameState, stagingBits]);
 
@@ -156,7 +153,7 @@ const DoorLock = (props: DoorLockProps) => {
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
           />
         }
-        <p>{hint ?? win}</p>
+        <p>{hint}</p>
       </div>
       <div id="magie-staging" className="display">
         {stagingBits.isEmpty
