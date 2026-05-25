@@ -14,6 +14,11 @@
   text-align: right;
 }
 
+.story-list {
+  list-style: none;
+  padding: 0;
+}
+
 .story-page pre,
 .story-page code {
   font-family: inherit;

@@ -3,14 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { Link, useParams } from "react-router-dom";
-
-const stories = [
-  { slug: "01", fileName: "01.Open.md", title: "Open" },
-  { slug: "02", fileName: "02.PreparationPeriod.md", title: "Preparation Period" },
-  { slug: "03", fileName: "03.MetingUpWithHepi.md", title: "Meeting Up With Hepi" },
-  { slug: "04", fileName: "04.First_SignalHut_then_TheNewsstand.md", title: "First SignalHut, then The Newsstand" },
-  { slug: "10", fileName: "10.EnoughWaiting.md", title: "Enough Waiting" }
-];
+import { stories } from "../stories.ts";
 
 function importStory(fileName: string) {
   return import.meta.glob("../assets/story/*.md", { query: "?raw", import: "default", eager: true })[
@@ -50,7 +43,7 @@ export function StoryPage() {
       <nav className="story-navigation">
           {prev && <Link className="left-item" to={`/story/${prev.slug}`}>◀◀ {prev.slug}</Link>}
         <div className="center">
-          <Link to="/"> &#x23CF; MAGiE Home</Link>
+          <Link to="/story"> &#x23CF; Story Index</Link>
         </div>
           {next && <Link className="right-item" to={`/story/${next.slug}`}>{next.slug} ▶▶</Link>}
       </nav>

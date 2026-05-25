@@ -17,6 +17,7 @@ import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
+import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
@@ -271,6 +272,7 @@ function App() {
       <Route path="/" element={<Navigate to={"/tutorial"} replace={true} />} />
       <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
       <Route path="/date/:year/:month/:day" element={<DatePlay />} />
+      <Route path="/story" element={<StoryIndex />} />
       <Route path="/story/:slug" element={<StoryPage />} />
       <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
       {features.includes("storyRoutes") && (<>
