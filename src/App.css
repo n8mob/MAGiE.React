@@ -161,7 +161,7 @@ h3 {
   /* allow main-display to shrink, but not grow */
   flex: 1 1 auto;
   min-height: 0;    /* Important for flex children! */
-  padding: 1em;
+  margin: 0 1em;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   text-align: left;
 }
@@ -204,7 +204,7 @@ h3 {
   display: flex;
   justify-self: end;
   justify-content: center;
-  padding: 20px;
+  padding: 1em;
   flex-direction: column;
 }
 
@@ -212,8 +212,6 @@ h3 {
   position: sticky;
   bottom: 0;
   z-index: 2;
-  padding-top: 0.9rem;
-  padding-bottom: max(0.9rem, env(safe-area-inset-bottom));
 }
 
 #puzzle-inputs > * {

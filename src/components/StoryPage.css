@@ -1,13 +1,48 @@
+.story-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#main-display.paginated {
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.char-ruler {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
+  user-select: none;
+}
+
+.story-line {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
 .story-navigation {
   padding: 1rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .story-navigation .center {
   flex: 1;
   margin: 0 1rem;
   text-align: center;
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .right-item {
@@ -17,10 +52,4 @@
 .story-list {
   list-style: none;
   padding: 0;
-}
-
-.story-page pre,
-.story-page code {
-  font-family: inherit;
-  font-size: small;
 }
