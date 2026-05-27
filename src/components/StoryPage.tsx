@@ -150,18 +150,18 @@ export function StoryPage() {
       </div>
       <nav className="story-navigation">
         <div className="left-item">
-          {prev ? <Link to={`/story/${prev.slug}`}>◀ {prev.slug}</Link> : <span />}
+          {prev ? <Link to={`/story/${prev.slug}`}>|◀{prev.slug}</Link> : <span />}
         </div>
         <div className="center">
           <div className="page-controls">
             <button type="button" onClick={() => setPageIndex(p => p - 1)} disabled={!canGoBack}>▲</button>
-            <span>{pageIndex + 1} / {pages.length}</span>
+            <span>{pageIndex + 1}/{pages.length}</span>
             <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
           </div>
           <Link to="/story">&#x23CF; Story Index</Link>
         </div>
         <div className="right-item">
-          {next ? <Link to={`/story/${next.slug}`}>{next.slug} ▶</Link> : <span />}
+          {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶|</Link> : <span />}
         </div>
       </nav>
     </div>
