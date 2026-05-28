@@ -42,11 +42,20 @@ function wordWrap(text: string, cols: number): string[] {
 
 function buildLines(markdown: string, cols: number): string[] {
   const allLines: string[] = [];
-  for (const para of markdown.split(/\n\n+/)) {
-    const text = stripMarkdown(para.replace(/\n/g, ' ').trim());
-    if (!text) continue;
-    if (allLines.length > 0) allLines.push('');
-    allLines.push(...wordWrap(text, cols));
+  for (const part of markdown.split(/(```[\s\S]*?```)/)) {
+    if (part.startsWith('```') && part.endsWith('```')) {
+      const inner = part.slice(3, -3).replace(/^\n/, '').replace(/\n$/, '');
+      if (!inner) continue;
+      if (allLines.length > 0) allLines.push('');
+      allLines.push(...inner.split('\n'));
+    } else {
+      for (const para of part.split(/\n\n+/)) {
+        const text = stripMarkdown(para.replace(/\n/g, ' ').trim());
+        if (!text) continue;
+        if (allLines.length > 0) allLines.push('');
+        allLines.push(...wordWrap(text, cols));
+      }
+    }
   }
   return allLines;
 }
@@ -74,6 +83,7 @@ export function StoryPage() {
   const [pageIndex, setPageIndex] = useState(0);
   const [cols, setCols] = useState(40);
   const [rows, setRows] = useState(20);
+  const [fontSize, setFontSize] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
@@ -84,8 +94,14 @@ export function StoryPage() {
     const charWidth = ruler.offsetWidth;
     const lineHeight = ruler.offsetHeight;
     if (!charWidth || !lineHeight) return;
-    setCols(Math.floor(container.clientWidth / charWidth));
-    setRows(Math.floor(container.clientHeight / lineHeight));
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
+    const scale = containerWidth / (38 * charWidth);
+    const newFontSize = currentFontSize * scale;
+    setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 0.5 ? prev : newFontSize));
+    setCols(Math.floor(containerWidth / (charWidth * scale)));
+    setRows(Math.floor(containerHeight / (lineHeight * scale)));
   }, []);
 
   useLayoutEffect(() => {
@@ -134,7 +150,7 @@ export function StoryPage() {
   const canGoForward = pageIndex < pages.length - 1;
 
   return (
-    <div className="story-page">
+    <div className="story-page" style={fontSize != null ? { fontSize: `${fontSize}px` } : undefined}>
       <div
         ref={containerRef}
         id="main-display"
