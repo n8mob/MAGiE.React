@@ -70,6 +70,18 @@ Two components share the same `<input type="checkbox" className="bit-checkbox">`
 
 Renders a grid of bit buttons from `DisplayRow[]`. Accepts a `renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode` render prop — callers supply the button component and close over any click/change handlers. The inner grid div uses `className="bit-field"` (not an `id`) so multiple `DisplayMatrix` instances can coexist on the same page (e.g. DoorLock's card + staging displays). Exposes an imperative ref handle (`DisplayMatrixUpdate`) with `getWidth()`, `scrollToBottom()`, and `getBitRowElement(rowIndex)`.
 
+### Story mode (`src/components/StoryPage.tsx`, `StoryIndex.tsx`)
+
+A paginated text reader for narrative content stored as Markdown files in `src/assets/story/`. The story list is defined in `src/stories.ts`. Routes: `/story` (index) and `/story/:slug` (individual chapter).
+
+`StoryPage` is a terminal-style viewer with these key behaviors:
+- **Font sizing** — on mount and resize, `measure()` computes a scale factor (`containerWidth / (38 * charWidth)`) and sets `font-size` on `.story-page` so exactly 38 characters always fit the viewport. `cols` and `rows` are derived from the same scale factor so pagination is always consistent.
+- **Pagination** — `buildLines()` word-wraps prose and preserves code-fence blocks verbatim (no strip/wrap). `paginateLines()` slices into pages of `rows` lines each, stripping leading blank lines per page.
+- **Navigation** — arrow keys / spacebar / click advances pages; `▲`/`▼` buttons and prev/next story links are in the `<nav>`.
+- **`#main-display.paginated`** must have `flex: 1; min-height: 0` so `ResizeObserver` doesn't fire spuriously when font size changes (which would cause an infinite measurement loop).
+
+The `text-transform: uppercase` global on `#root` is suppressed for the whole story page via `text-transform: none` on `.story-page`.
+
 ### Feature flags
 
 Routes beyond `/today`/`/date/...`/`/tutorial/...` are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source. The default feature set is `['tutorial']`.
