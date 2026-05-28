@@ -131,11 +131,6 @@ h3 {
   margin: 0 auto;
 }
 
-.story-page > p {
-  text-transform: none;
-  hyphens: auto;
-}
-
 .display-frame {
   border-image-source: url("assets/Screen_Border.png");
   border-image-slice: 28 40 28 28 fill;
