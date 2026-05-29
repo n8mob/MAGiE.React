@@ -84,6 +84,11 @@ export function StoryPage() {
   const [cols, setCols] = useState(40);
   const [rows, setRows] = useState(20);
   const [fontSize, setFontSize] = useState<number | null>(null);
+  const [fontSizeAdjust, setFontSizeAdjust] = useState<number>(
+    () => parseInt(localStorage.getItem('storyFontAdjust') || '0', 10)
+  );
+  const fontSizeAdjustRef = useRef(fontSizeAdjust);
+  fontSizeAdjustRef.current = fontSizeAdjust;
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
@@ -98,10 +103,12 @@ export function StoryPage() {
     const containerHeight = container.clientHeight;
     const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
     const scale = containerWidth / (38 * charWidth);
-    const newFontSize = currentFontSize * scale;
+    const baseFontSize = currentFontSize * scale;
+    const newFontSize = baseFontSize + fontSizeAdjustRef.current;
+    const ratio = newFontSize / currentFontSize;
     setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 0.5 ? prev : newFontSize));
-    setCols(Math.floor(containerWidth / (charWidth * scale)));
-    setRows(Math.floor(containerHeight / (lineHeight * scale)));
+    setCols(Math.floor(containerWidth / (charWidth * ratio)));
+    setRows(Math.floor(containerHeight / (lineHeight * ratio)));
   }, []);
 
   useLayoutEffect(() => {
@@ -110,6 +117,10 @@ export function StoryPage() {
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, [measure]);
+
+  useLayoutEffect(() => {
+    measure();
+  }, [fontSizeAdjust, measure]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -173,6 +184,19 @@ export function StoryPage() {
             <button type="button" onClick={() => setPageIndex(p => p - 1)} disabled={!canGoBack}>▲</button>
             <span>{pageIndex + 1}/{pages.length}</span>
             <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
+          </div>
+          <div className="font-size-controls">
+            <button type="button" onClick={() => {
+              const next = fontSizeAdjust - 1;
+              setFontSizeAdjust(next);
+              localStorage.setItem('storyFontAdjust', String(next));
+            }}>-</button>
+            <span>font</span>
+            <button type="button" onClick={() => {
+              const next = fontSizeAdjust + 1;
+              setFontSizeAdjust(next);
+              localStorage.setItem('storyFontAdjust', String(next));
+            }}>+</button>
           </div>
           <Link to="/story">&#x23CF; Story Index</Link>
         </div>
