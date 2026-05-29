@@ -185,6 +185,9 @@ export function StoryPage() {
           ))}
         </div>
       </div>
+      <div className="story-cta" style={pageIndex !== pages.length - 1 ? { visibility: 'hidden' } : undefined}>
+        <Link to="/">Play the game!</Link>
+      </div>
       <nav className="story-navigation">
         <div className="left-item">
           {prev ? <Link to={`/story/${prev.slug}`}>|◀{prev.slug}</Link> : <span />}
