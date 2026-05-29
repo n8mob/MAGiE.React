@@ -17,10 +17,11 @@ import { PageNotFound } from "./components/PageNotFound.tsx";
 import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
+import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
-const doorLockEncoder = new VariableWidthEncoder({"0": {"a": "0"}, "1": {"b": "1"}});
+const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
 
 const ga4id = 'G-ZL5RKDBBF6';
 const HEADER_COLLAPSE_THRESHOLD = 72;
@@ -56,7 +57,7 @@ if (window.gtag) {
 }
 
 function RedirectLevelRootToPuzzle0() {
-  const {categoryIndex, levelNumber } = useParams();
+  const { categoryIndex, levelNumber } = useParams();
   return <Navigate to={`/tutorial/${categoryIndex}/levels/${levelNumber}/puzzles/0`} replace={true} />;
 }
 
@@ -69,6 +70,9 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
+  const [storyFontAdjust, setStoryFontAdjust] = useState(() => parseInt(
+    localStorage.getItem('storyFontAdjust') || '0',
+    10));
   const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
@@ -269,16 +273,16 @@ function App() {
   const routes = useMemo(() => (
     <Routes>
       <Route path="/" element={<Navigate to={"/tutorial"} replace={true} />} />
-      <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
-      <Route path="/date/:year/:month/:day" element={<DatePlay />} />
-      <Route path="/story/:slug" element={<StoryPage />} />
-      <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
-      {features.includes("storyRoutes") && (<>
-        <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="mall" />} />
+      {features.includes('date') && (<>
+        <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
+        <Route path="/date/:year/:month/:day" element={<DatePlay />} />
+      </>)}
+      {features.includes('story') && (<>
+        <Route path="/story" element={<StoryIndex />} />
+        <Route path="/story/:slug" element={<StoryPage />} />
+      </>)}
+      {features.includes('doorLock') && (<>
+        <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
       </>)}
       {features.includes('tutorial') && (<>
         <Route path="/tutorial" element={
@@ -352,7 +356,10 @@ function App() {
 
         {showSettings && (
           <Dialog onClose={() => setShowSettings(false)}>
-            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
+            <SettingsContent useLcdFont={useLcdFont}
+                             setUseLcdFont={setUseLcdFont}
+                             storyFontAdjust={storyFontAdjust}
+                             setStoryFontAdjust={setStoryFontAdjust} />
           </Dialog>
         )}
       </div>
