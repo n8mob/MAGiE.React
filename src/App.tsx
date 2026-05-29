@@ -70,6 +70,7 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
+  const [storyFontAdjust, setStoryFontAdjust] = useState(() => parseInt(localStorage.getItem('storyFontAdjust') || '0', 10));
   const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
@@ -354,7 +355,7 @@ function App() {
 
         {showSettings && (
           <Dialog onClose={() => setShowSettings(false)}>
-            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} />
+            <SettingsContent useLcdFont={useLcdFont} setUseLcdFont={setUseLcdFont} storyFontAdjust={storyFontAdjust} setStoryFontAdjust={setStoryFontAdjust} />
           </Dialog>
         )}
       </div>

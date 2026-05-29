@@ -88,6 +88,16 @@ export function StoryPage() {
     () => parseInt(localStorage.getItem('storyFontAdjust') || '0', 10)
   );
   const fontSizeAdjustRef = useRef(fontSizeAdjust);
+
+  useEffect(() => {
+    const handler = (e: StorageEvent) => {
+      if (e.key === 'storyFontAdjust') {
+        setFontSizeAdjust(parseInt(e.newValue || '0', 10));
+      }
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
   fontSizeAdjustRef.current = fontSizeAdjust;
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
@@ -185,20 +195,7 @@ export function StoryPage() {
             <span>{pageIndex + 1}/{pages.length}</span>
             <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
           </div>
-          <div className="font-size-controls">
-            <button type="button" onClick={() => {
-              const next = fontSizeAdjust - 1;
-              setFontSizeAdjust(next);
-              localStorage.setItem('storyFontAdjust', String(next));
-            }}>-</button>
-            <span>font</span>
-            <button type="button" onClick={() => {
-              const next = fontSizeAdjust + 1;
-              setFontSizeAdjust(next);
-              localStorage.setItem('storyFontAdjust', String(next));
-            }}>+</button>
-          </div>
-          <Link to="/story">&#x23CF; Story Index</Link>
+<Link to="/story">&#x23CF; Story Index</Link>
         </div>
         <div className="right-item">
           {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶|</Link> : <span />}
