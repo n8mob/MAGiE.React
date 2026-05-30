@@ -72,10 +72,13 @@ function buildLines(markdown: string, cols: number): string[] {
   return allLines;
 }
 
+const PAGE_OVERLAP = 1;
+
 function paginateLines(lines: string[], rows: number): string[][] {
   if (rows <= 0) {
     return [lines];
   }
+  const step = Math.max(1, rows - PAGE_OVERLAP);
   const pages: string[][] = [];
   let i = 0;
   while (i < lines.length) {
@@ -86,7 +89,7 @@ function paginateLines(lines: string[], rows: number): string[][] {
       break;
     }
     pages.push(lines.slice(i, i + rows));
-    i += rows;
+    i += step;
   }
   return pages.length > 0 ? pages : [[]];
 }
