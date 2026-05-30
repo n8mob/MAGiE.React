@@ -1,5 +1,5 @@
-import {FC, Fragment, ReactNode, useEffect} from "react";
-import {Link} from "react-router-dom";
+import { FC, Fragment, ReactNode, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 interface MenuProps {
   prompt: ReactNode;

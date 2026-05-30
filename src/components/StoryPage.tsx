@@ -119,7 +119,7 @@ export function StoryPage() {
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
   }, []);
-  fontSizeAdjustRef.current = fontSizeAdjust;
+  useEffect(() => { fontSizeAdjustRef.current = fontSizeAdjust; }, [fontSizeAdjust]);
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
@@ -229,7 +229,7 @@ export function StoryPage() {
       </div>
       <nav className="story-navigation">
         <div className="left-item">
-          {prev ? <Link to={`/story/${prev.slug}`}>|◀{prev.slug}</Link> : <span />}
+          {prev ? <Link to={`/story/${prev.slug}`}>|◀◀{prev.slug}</Link> : <span />}
         </div>
         <div className="center">
           <div className="page-controls">
@@ -240,7 +240,7 @@ export function StoryPage() {
           <Link to="/story">&#x23CF; Story Index</Link>
         </div>
         <div className="right-item">
-          {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶|</Link> : <span />}
+          {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶▶|</Link> : <span />}
         </div>
       </nav>
     </div>

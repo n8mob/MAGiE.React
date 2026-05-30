@@ -4,13 +4,13 @@ import { debug } from "../Logger.ts";
 export function useCategory(menu: Menu | null, categoryKeyOrIndex: string | number | undefined) {
   if (categoryKeyOrIndex === undefined || categoryKeyOrIndex === null) {
     debug("No category key or index provided.");
-    return {category: null};
+    return { category: null };
   } else if (!menu) {
     debug(`Asking for category[${categoryKeyOrIndex}], but no menu provided.`);
-    return {category: null};
+    return { category: null };
   } else if (!menu.categories) {
     debug(`Asking for category[${categoryKeyOrIndex}], but menu has no categories.`);
-    return {category: null};
+    return { category: null };
   }
 
   const categoryKeys = Object.keys(menu.categories);

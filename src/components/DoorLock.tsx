@@ -63,7 +63,7 @@ const DoorLock = (props: DoorLockProps) => {
 
   useEffect(() => {
     const el = mainDisplayRef.current;
-    if (!el?.parentElement) return;
+    if (!el?.parentElement) { return; }
     const gameContent = el.parentElement;
     const observer = new ResizeObserver(([entry]) => {
       const bitSize = Math.floor(entry.contentRect.width / 8);
@@ -98,7 +98,7 @@ const DoorLock = (props: DoorLockProps) => {
 
   const handleStagingBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const bitIndex = event.target.dataset.bitIndex;
-    if (bitIndex === undefined) return;
+    if (bitIndex === undefined) { return; }
     setStagingBits(prev => prev.toggleBit(parseInt(bitIndex)));
   }, []);
 

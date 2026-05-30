@@ -10,12 +10,12 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
 import ReactGA4 from "react-ga4";
 
-function LevelBrowser({menuName}: { menuName: string }) {
-  const {categoryIndex, levelNumber} = useParams();
-  const {menu} = useMenu(menuName);
-  const {category} = useCategory(menu, categoryIndex);
-  const {setHeaderContent} = useHeader();
-  const {level} = useLevel(category, levelNumber);
+function LevelBrowser({ menuName }: { menuName: string }) {
+  const { categoryIndex, levelNumber } = useParams();
+  const { menu } = useMenu(menuName);
+  const { category } = useCategory(menu, categoryIndex);
+  const { setHeaderContent } = useHeader();
+  const { level } = useLevel(category, levelNumber);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function LevelBrowser({menuName}: { menuName: string }) {
   }
 
   return (
-    <div className={'level-puzzle-bits'} style={{display: "flex", flexDirection: "row", margin: "16px 0"}}>
+    <div className={'level-puzzle-bits'} style={{ display: "flex", flexDirection: "row", margin: "16px 0" }}>
       {level.puzzles.map((puzzle, i) => (
         <CorrectnessBitButton
           key={puzzle.slug ?? `puzzle-${i}`}

@@ -4,9 +4,9 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
 import ReactGA4 from "react-ga4";
 
-function MenuBrowser({menuName}: { menuName: string }) {
-  const {setHeaderContent} = useHeader();
-  const {menu} = useMenu(menuName, setHeaderContent);
+function MenuBrowser({ menuName }: { menuName: string }) {
+  const { setHeaderContent } = useHeader();
+  const { menu } = useMenu(menuName, setHeaderContent);
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;
