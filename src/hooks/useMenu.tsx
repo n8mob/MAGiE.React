@@ -46,5 +46,5 @@ export function useMenu(
       })
   }, [menuName, setHeaderContent]);
 
-  return {menu, loading, error};
+  return { menu, loading, error };
 }

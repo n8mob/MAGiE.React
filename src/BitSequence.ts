@@ -191,9 +191,9 @@ class BitSequence {
     return {
       next(): IteratorResult<IndexedBit> {
         if (index < bits.length) {
-          return {value: bits[index++], done: false};
+          return { value: bits[index++], done: false };
         } else {
-          return {value: undefined, done: true};
+          return { value: undefined, done: true };
         }
       },
     };

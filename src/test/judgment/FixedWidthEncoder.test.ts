@@ -1,5 +1,5 @@
 import { FixedWidthEncoder } from "../../encoding/FixedWidthEncoder.ts";
-import {beforeEach, describe, expect, it} from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { BitSequence } from "../../BitSequence.ts";
 
 const hexadecimal = {

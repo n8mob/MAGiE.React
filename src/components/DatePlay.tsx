@@ -39,7 +39,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const isFirstVisit = !localStorage.getItem('isFirstVisit');
 
   const puzzleDate = useMemo<Date | null>(() => {
-    if (initialDate) return initialDate;
+    if (initialDate) { return initialDate; }
     if (year && month && day) {
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
@@ -60,7 +60,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   }, [puzzleDate]);
 
   useEffect(() => {
-    if (!puzzleDate) return;
+    if (!puzzleDate) { return; }
     console.log("About to fetch puzzle for date:", puzzleDate);
     fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))
       .then(puzzle => {

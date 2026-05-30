@@ -43,7 +43,7 @@ export function useFeatureFlags() {
     (async () => {
       try {
         const publicKey = await importSPKI(PUBLIC_KEY_PEM, 'RS256');
-        const {payload} = await jwtVerify(token, publicKey);
+        const { payload } = await jwtVerify(token, publicKey);
 
         if (challenge !== payload.challenge) {
           console.warn("Feature flags challenge does not match, ignoring token.");

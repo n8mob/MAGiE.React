@@ -14,7 +14,7 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({displayRows, renderBit}, ref) => {
+  ({ displayRows, renderBit }, ref) => {
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 

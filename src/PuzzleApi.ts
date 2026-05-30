@@ -130,7 +130,7 @@ export const getDailyPuzzleForYearMonthDay = async (
       debug(`If-Modified-Since: ${updated_at_header_value}`);
       headers['If-Modified-Since'] = updated_at_header_value;
     }
-    response = await axios.get(datePuzzleUrl, {responseType: 'json', headers});
+    response = await axios.get(datePuzzleUrl, { responseType: 'json', headers });
   } catch (webError) {
     console.error(`Failed to fetch or parse puzzle data for ${year}-${paddedMonth}-${paddedDay}:`, webError);
     ReactGA4.event('puzzle_load_error', {

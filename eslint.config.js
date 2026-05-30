@@ -20,6 +20,8 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'curly': ['error', 'all'],
+      'object-curly-spacing': ['error', 'always'],
     },
   },
   {

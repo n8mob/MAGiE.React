@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
 function PageNotFound() {
-  const {setHeaderContent} = useHeader();
+  const { setHeaderContent } = useHeader();
 
   useEffect(() => {
     const notFoundDiv = <>

@@ -7,11 +7,11 @@ import { useCategory } from "../hooks/useCategory.tsx";
 import { MENU_NAME_MAP } from "../MenuNames.tsx";
 import ReactGA4 from "react-ga4";
 
-function CategoryBrowser({menuName}: { menuName: string }) {
-  const {setHeaderContent} = useHeader();
-  const {categoryIndex: categoryIndexParam} = useParams();
+function CategoryBrowser({ menuName }: { menuName: string }) {
+  const { setHeaderContent } = useHeader();
+  const { categoryIndex: categoryIndexParam } = useParams();
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
-  const {menu, loading, error} = useMenu(menuName, setHeaderContent);
+  const { menu, loading, error } = useMenu(menuName, setHeaderContent);
   const { category } = useCategory(menu, categoryIndex);
 
 

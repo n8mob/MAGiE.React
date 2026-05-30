@@ -119,7 +119,7 @@ export function StoryPage() {
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
   }, []);
-  fontSizeAdjustRef.current = fontSizeAdjust;
+  useEffect(() => { fontSizeAdjustRef.current = fontSizeAdjust; }, [fontSizeAdjust]);
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
