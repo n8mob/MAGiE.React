@@ -23,7 +23,9 @@ function stripMarkdown(text: string): string {
 }
 
 function wordWrap(text: string, cols: number): string[] {
-  if (!text) return [];
+  if (!text) {
+    return [];
+  }
   const lines: string[] = [];
   let line = '';
   for (const word of text.split(/\s+/).filter(Boolean)) {
@@ -36,7 +38,9 @@ function wordWrap(text: string, cols: number): string[] {
       line = word;
     }
   }
-  if (line) lines.push(line);
+  if (line) {
+    lines.push(line);
+  }
   return lines;
 }
 
@@ -45,14 +49,22 @@ function buildLines(markdown: string, cols: number): string[] {
   for (const part of markdown.split(/(```[\s\S]*?```)/)) {
     if (part.startsWith('```') && part.endsWith('```')) {
       const inner = part.slice(3, -3).replace(/^\n/, '').replace(/\n$/, '');
-      if (!inner) continue;
-      if (allLines.length > 0) allLines.push('');
+      if (!inner) {
+        continue;
+      }
+      if (allLines.length > 0) {
+        allLines.push('');
+      }
       allLines.push(...inner.split('\n'));
     } else {
       for (const para of part.split(/\n\n+/)) {
         const text = stripMarkdown(para.replace(/\n/g, ' ').trim());
-        if (!text) continue;
-        if (allLines.length > 0) allLines.push('');
+        if (!text) {
+          continue;
+        }
+        if (allLines.length > 0) {
+          allLines.push('');
+        }
         allLines.push(...wordWrap(text, cols));
       }
     }
@@ -60,15 +72,24 @@ function buildLines(markdown: string, cols: number): string[] {
   return allLines;
 }
 
+const PAGE_OVERLAP = 1;
+
 function paginateLines(lines: string[], rows: number): string[][] {
-  if (rows <= 0) return [lines];
+  if (rows <= 0) {
+    return [lines];
+  }
+  const step = Math.max(1, rows - PAGE_OVERLAP);
   const pages: string[][] = [];
   let i = 0;
   while (i < lines.length) {
-    while (i < lines.length && !lines[i]) i++; // strip leading blank lines per page
-    if (i >= lines.length) break;
+    while (i < lines.length && !lines[i]) {
+      i++;
+    } // strip leading blank lines per page
+    if (i >= lines.length) {
+      break;
+    }
     pages.push(lines.slice(i, i + rows));
-    i += rows;
+    i += step;
   }
   return pages.length > 0 ? pages : [[]];
 }
@@ -105,10 +126,14 @@ export function StoryPage() {
   const measure = useCallback(() => {
     const ruler = rulerRef.current;
     const container = containerRef.current;
-    if (!ruler || !container) return;
+    if (!ruler || !container) {
+      return;
+    }
     const charWidth = ruler.offsetWidth;
     const lineHeight = ruler.offsetHeight;
-    if (!charWidth || !lineHeight) return;
+    if (!charWidth || !lineHeight) {
+      return;
+    }
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
@@ -116,16 +141,26 @@ export function StoryPage() {
     const baseFontSize = currentFontSize * scale;
     const newFontSize = baseFontSize + fontSizeAdjustRef.current;
     const ratio = newFontSize / currentFontSize;
-    setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 0.5 ? prev : newFontSize));
+    setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 1 ? prev : newFontSize));
     setCols(Math.floor(containerWidth / (charWidth * ratio)));
     setRows(Math.floor(containerHeight / (lineHeight * ratio)));
   }, []);
 
   useLayoutEffect(() => {
     measure();
-    const observer = new ResizeObserver(measure);
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    let timer: ReturnType<typeof setTimeout>;
+    const debouncedMeasure = () => {
+      clearTimeout(timer);
+      timer = setTimeout(measure, 50);
+    };
+    const observer = new ResizeObserver(debouncedMeasure);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
   }, [measure]);
 
   useLayoutEffect(() => {
@@ -176,7 +211,11 @@ export function StoryPage() {
         ref={containerRef}
         id="main-display"
         className="paginated"
-        onClick={() => { if (canGoForward) setPageIndex(p => p + 1); }}
+        onClick={() => {
+          if (canGoForward) {
+            setPageIndex(p => p + 1);
+          }
+        }}
       >
         <span ref={rulerRef} className="char-ruler">M</span>
         <div className="story-lines">
@@ -198,7 +237,7 @@ export function StoryPage() {
             <span>{pageIndex + 1}/{pages.length}</span>
             <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
           </div>
-<Link to="/story">&#x23CF; Story Index</Link>
+          <Link to="/story">&#x23CF; Story Index</Link>
         </div>
         <div className="right-item">
           {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶|</Link> : <span />}
