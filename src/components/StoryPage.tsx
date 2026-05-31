@@ -94,6 +94,8 @@ function paginateLines(lines: string[], rows: number): string[][] {
   return pages.length > 0 ? pages : [[]];
 }
 
+const DISPLAY_MIN_CHARS = 26;
+
 export function StoryPage() {
   const { slug } = useParams();
 
@@ -137,7 +139,7 @@ export function StoryPage() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
-    const scale = containerWidth / (38 * charWidth);
+    const scale = containerWidth / (DISPLAY_MIN_CHARS * charWidth);
     const baseFontSize = currentFontSize * scale;
     const newFontSize = baseFontSize + fontSizeAdjustRef.current;
     const ratio = newFontSize / currentFontSize;

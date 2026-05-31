@@ -156,7 +156,6 @@ h3 {
   /* allow main-display to shrink, but not grow */
   flex: 1 1 auto;
   min-height: 0;    /* Important for flex children! */
-  margin: 0 1em;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   text-align: left;
 }
