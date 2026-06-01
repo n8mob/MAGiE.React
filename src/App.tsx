@@ -19,6 +19,7 @@ import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
+import { BlinkingDoor } from "./components/BlinkingDoor.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
@@ -283,6 +284,9 @@ function App() {
       </>)}
       {features.includes('doorLock') && (<>
         <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
+      </>)}
+      {features.includes('blinkingDoor') && (<>
+        <Route path="/blinkingDoor" element={<BlinkingDoor />} />
       </>)}
       {features.includes('tutorial') && (<>
         <Route path="/tutorial" element={

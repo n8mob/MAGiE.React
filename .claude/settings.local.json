@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm outdated *)",
       "Bash(npm show *)",
-      "Bash(npm run lint *)"
+      "Bash(npm run lint *)",
+      "Bash(npm run *)",
+      "Bash(npx eslint *)"
     ]
   }
 }
