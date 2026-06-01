@@ -53,6 +53,7 @@ function BlinkingDoor() {
   const [playerBlinkCount, setPlayerBlinkCount] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
 
+  const winAudio = useRef<HTMLAudioElement | null>(null);
   const blinkStateRef = useRef<BlinkState>("idle");
   const phaseRef = useRef<Phase>("handshake");
   const playerBlinkCountRef = useRef(0);
@@ -61,10 +62,12 @@ function BlinkingDoor() {
   const evalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animateDoorBlinksRef = useRef<(remaining: number, onComplete: () => void) => void>(null!);
 
-  // Clear pending timers on unmount. In React 18, state setters called after
-  // unmount are safe no-ops, so no mountedRef guard is needed.
   useEffect(() => {
+    winAudio.current = new Audio('/sounds/big-ta-da.wav');
+    winAudio.current.preload = "auto";
+    winAudio.current.volume = 0.25;
     return () => {
+      winAudio.current?.pause();
       if (flashTimerRef.current) {clearTimeout(flashTimerRef.current);}
       if (evalTimerRef.current) {clearTimeout(evalTimerRef.current);}
     };
@@ -103,6 +106,10 @@ function BlinkingDoor() {
       if (playerCount === codeCount) {
         updateState("success");
         setResultMessage("");
+        if (winAudio.current) {
+          winAudio.current.currentTime = 0;
+          winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
+        }
       } else {
         updateState("failure");
         setResultMessage(`YOU: ${playerCount}  DOOR: ${codeCount}`);
