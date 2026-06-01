@@ -421,3 +421,13 @@ input[data-correctness="incorrect"]:checked {
 .blinking-door .keyboard {
   --keyboard-key-height: 64px;
 }
+
+.blinking-door-open-btn {
+  font-family: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}

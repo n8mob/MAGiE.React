@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const bitAssetModules = import.meta.glob("../assets/Bit_*.png", {
   eager: true,
@@ -47,11 +48,13 @@ const CLUES: Record<BlinkState, string> = {
 };
 
 function BlinkingDoor() {
+  const navigate = useNavigate();
   const [blinkState, setBlinkState] = useState<BlinkState>("idle");
   const [ledOn, setLedOn] = useState(false);
   const [playerLedOn, setPlayerLedOn] = useState(false);
   const [playerBlinkCount, setPlayerBlinkCount] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
+  const [showOpenButton, setShowOpenButton] = useState(false);
 
   const winAudio = useRef<HTMLAudioElement | null>(null);
   const blinkStateRef = useRef<BlinkState>("idle");
@@ -95,6 +98,7 @@ function BlinkingDoor() {
     setLedOn(false);
     setPlayerLedOn(false);
     setResultMessage("");
+    setShowOpenButton(false);
     updateState("idle");
   }, [clearFlashTimer, clearEvalTimer, updateState]);
 
@@ -105,11 +109,14 @@ function BlinkingDoor() {
       const codeCount = codeCountRef.current;
       if (playerCount === codeCount) {
         updateState("success");
-        setResultMessage("");
         if (winAudio.current) {
           winAudio.current.currentTime = 0;
           winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
         }
+        evalTimerRef.current = setTimeout(() => {
+          setResultMessage("the door unlocks...");
+          evalTimerRef.current = setTimeout(() => setShowOpenButton(true), 700);
+        }, 700);
       } else {
         updateState("failure");
         setResultMessage(`YOU: ${playerCount}  DOOR: ${codeCount}`);
@@ -248,6 +255,11 @@ function BlinkingDoor() {
       <div id="puzzle-inputs">
         <div className="keyboard">
           <div className="keyboard-row blinking-door-input-row" role="group" aria-label="Blink input">
+            {showOpenButton && (
+              <button type="button" className="blinking-door-open-btn" onClick={() => navigate("/story")}>
+                Open the door ▶▶
+              </button>
+            )}
             <div className="blinking-door-led blinking-door-led--player">
               <img
                 src={playerLedOn ? bitAssetMap["Bit_on.png"] : bitAssetMap["Bit_off.png"]}
