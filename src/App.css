@@ -396,6 +396,9 @@ input[data-correctness="incorrect"]:checked {
   width: clamp(64px, 33vw, 192px);
   height: clamp(64px, 33vw, 192px);
   image-rendering: pixelated;
+  opacity: 0.85;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+  margin: 0;
 }
 
 .blinking-door .keyboard {
