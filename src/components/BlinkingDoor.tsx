@@ -28,7 +28,7 @@ const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetMod
   {}
 );
 
-type BlinkState = "idle" | "door_blinking" | "await_first" | "player_responding" | "success" | "failure";
+type BlinkState = "idle" | "wake_received" | "door_blinking" | "await_first" | "player_responding" | "success" | "failure";
 type Phase = "handshake" | "code";
 
 const BLINK_ON_MS = 300;
@@ -38,6 +38,7 @@ const PLAYER_TIMEOUT_MS = 1000;
 
 const CLUES: Record<BlinkState, string> = {
   idle: "TAP TO WAKE",
+  wake_received: "...",
   door_blinking: "WATCH...",
   await_first: "YOUR TURN",
   player_responding: "...",
@@ -48,6 +49,7 @@ const CLUES: Record<BlinkState, string> = {
 function BlinkingDoor() {
   const [blinkState, setBlinkState] = useState<BlinkState>("idle");
   const [ledOn, setLedOn] = useState(false);
+  const [playerLedOn, setPlayerLedOn] = useState(false);
   const [playerBlinkCount, setPlayerBlinkCount] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
 
@@ -88,6 +90,7 @@ function BlinkingDoor() {
     playerBlinkCountRef.current = 0;
     setPlayerBlinkCount(0);
     setLedOn(false);
+    setPlayerLedOn(false);
     setResultMessage("");
     updateState("idle");
   }, [clearFlashTimer, clearEvalTimer, updateState]);
@@ -133,11 +136,26 @@ function BlinkingDoor() {
     });
   }, [updateState, resetToIdle]);
 
+  const startWakeTimer = useCallback(() => {
+    clearEvalTimer();
+    evalTimerRef.current = setTimeout(() => {
+      if (playerBlinkCountRef.current === 1) {
+        updateState("door_blinking");
+        animateDoorBlinksRef.current(1, () => {
+          updateState("await_first");
+          evalTimerRef.current = setTimeout(resetToIdle, AWAIT_FIRST_MS);
+        });
+      } else {
+        resetToIdle();
+      }
+    }, PLAYER_TIMEOUT_MS);
+  }, [clearEvalTimer, updateState, resetToIdle]);
+
   const flashPlayerLed = useCallback((onAfterFlash: () => void) => {
     clearFlashTimer();
-    setLedOn(true);
+    setPlayerLedOn(true);
     flashTimerRef.current = setTimeout(() => {
-      setLedOn(false);
+      setPlayerLedOn(false);
       onAfterFlash();
     }, BLINK_ON_MS);
   }, [clearFlashTimer]);
@@ -147,20 +165,25 @@ function BlinkingDoor() {
 
     if (state === "idle") {
       phaseRef.current = "handshake";
-      updateState("door_blinking");
-      animateDoorBlinksRef.current(1, () => {
-        updateState("await_first");
-        evalTimerRef.current = setTimeout(resetToIdle, AWAIT_FIRST_MS);
-      });
+      playerBlinkCountRef.current = 1;
+      updateState("wake_received");
+      flashPlayerLed(startWakeTimer);
+      return;
+    }
+
+    if (state === "wake_received") {
+      clearEvalTimer();
+      playerBlinkCountRef.current += 1;
+      flashPlayerLed(startWakeTimer);
       return;
     }
 
     if (state === "await_first") {
       clearEvalTimer();
       if (phaseRef.current === "handshake") {
-        // Player repeats the handshake blink — flash LED then start code phase
+        // Player repeats the handshake blink — flash LED, pause, then start code phase
         flashPlayerLed(() => {
-          startCodePhase();
+          evalTimerRef.current = setTimeout(startCodePhase, PLAYER_TIMEOUT_MS);
         });
       } else {
         // First blink of code response
@@ -189,7 +212,7 @@ function BlinkingDoor() {
       resetToIdle();
       return;
     }
-  }, [updateState, resetToIdle, clearEvalTimer, flashPlayerLed, startCodePhase, startEvalTimer]);
+  }, [updateState, resetToIdle, clearEvalTimer, flashPlayerLed, startWakeTimer, startCodePhase, startEvalTimer]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -206,21 +229,28 @@ function BlinkingDoor() {
     <div id="game-content" className="blinking-door">
       <div id="main-display" className="display">
         <p id="clue-text">{CLUES[blinkState]}</p>
-        <div className="blinking-door-led">
+        <div className="blinking-door-led blinking-door-led--door">
           <img
             src={ledOn ? bitAssetMap["Bit_on_Red.png"] : bitAssetMap["Bit_off_Red.png"]}
-            alt={ledOn ? "light on" : "light off"}
-            className="blinking-door-led-image"
+            alt={ledOn ? "door light on" : "door light off"}
+            className="blinking-door-led-image blinking-door-led-image--door"
           />
         </div>
-        {blinkState === "player_responding" && (
-          <p className="blink-count">{playerBlinkCount}</p>
-        )}
         {resultMessage && <p className="result-message">{resultMessage}</p>}
       </div>
       <div id="puzzle-inputs">
         <div className="keyboard">
-          <div className="keyboard-row" role="group" aria-label="Blink input">
+          <div className="keyboard-row blinking-door-input-row" role="group" aria-label="Blink input">
+            <div className="blinking-door-led blinking-door-led--player">
+              <img
+                src={playerLedOn ? bitAssetMap["Bit_on.png"] : bitAssetMap["Bit_off.png"]}
+                alt={playerLedOn ? "player light on" : "player light off"}
+                className="blinking-door-led-image blinking-door-led-image--player"
+              />
+              {blinkState === "player_responding" && (
+                <p className="blink-count">{playerBlinkCount}</p>
+              )}
+            </div>
             <button
               type="button"
               className="keyboard-key"

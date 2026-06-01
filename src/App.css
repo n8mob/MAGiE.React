@@ -389,16 +389,33 @@ input[data-correctness="incorrect"]:checked {
 }
 
 .blinking-door-led {
-  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.blinking-door-input-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .blinking-door-led-image {
-  width: clamp(64px, 33vw, 192px);
-  height: clamp(64px, 33vw, 192px);
   image-rendering: pixelated;
   opacity: 0.85;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   margin: 0;
+}
+
+.blinking-door-led-image--door {
+  width: clamp(64px, 25vw, 160px);
+  height: clamp(64px, 25vw, 160px);
+}
+
+.blinking-door-led-image--player {
+  width: clamp(32px, 12vw, 80px);
+  height: clamp(32px, 12vw, 80px);
 }
 
 .blinking-door .keyboard {
