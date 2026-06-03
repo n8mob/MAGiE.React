@@ -1,33 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const bitAssetModules = import.meta.glob("../assets/Bit_*.png", {
-  eager: true,
-  import: "default",
-}) as Record<string, string>;
-
-const bitAssetMap: Record<string, string> = Object.entries(bitAssetModules).reduce<Record<string, string>>(
-  (map, [path, url]) => {
-    const fileName = path.split("/").pop();
-    if (fileName) {map[fileName] = url;}
-    return map;
-  },
-  {}
-);
-
-const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
-  eager: true,
-  import: "default",
-}) as Record<string, string>;
-
-const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetModules).reduce<Record<string, string>>(
-  (map, [path, url]) => {
-    const fileName = path.split("/").pop();
-    if (fileName) {map[fileName] = url;}
-    return map;
-  },
-  {}
-);
+import bitOnRed from "../assets/Bit_on_Red.png";
+import bitOffRed from "../assets/Bit_off_Red.png";
+import bitOn from "../assets/Bit_on.png";
+import bitOff from "../assets/Bit_off.png";
+import keyboardBitOn from "../assets/keyboard/keyboard_Bit_on_32x32.png";
 
 type BlinkState = "idle" | "wake_received" | "door_blinking" | "await_first" | "player_responding" | "success" | "failure";
 type Phase = "handshake" | "code";
@@ -137,12 +114,7 @@ function BlinkingDoor() {
     };
   });
 
-  const startCodePhase = useCallback(() => {
-    const count = Math.floor(Math.random() * 5) + 3; // 3–7 inclusive
-    codeCountRef.current = count;
-    phaseRef.current = "code";
-    playerBlinkCountRef.current = 0;
-    setPlayerBlinkCount(0);
+  const startDoorBlink = useCallback((count: number) => {
     updateState("door_blinking");
     animateDoorBlinksRef.current(count, () => {
       updateState("await_first");
@@ -150,20 +122,25 @@ function BlinkingDoor() {
     });
   }, [updateState, resetToIdle]);
 
+  const startCodePhase = useCallback(() => {
+    const count = Math.floor(Math.random() * 5) + 3; // 3–7 inclusive
+    codeCountRef.current = count;
+    phaseRef.current = "code";
+    playerBlinkCountRef.current = 0;
+    setPlayerBlinkCount(0);
+    startDoorBlink(count);
+  }, [startDoorBlink]);
+
   const startWakeTimer = useCallback(() => {
     clearEvalTimer();
     evalTimerRef.current = setTimeout(() => {
       if (playerBlinkCountRef.current === 1) {
-        updateState("door_blinking");
-        animateDoorBlinksRef.current(1, () => {
-          updateState("await_first");
-          evalTimerRef.current = setTimeout(resetToIdle, AWAIT_FIRST_MS);
-        });
+        startDoorBlink(1);
       } else {
         resetToIdle();
       }
     }, PLAYER_TIMEOUT_MS);
-  }, [clearEvalTimer, updateState, resetToIdle]);
+  }, [clearEvalTimer, startDoorBlink, resetToIdle]);
 
   const flashPlayerLed = useCallback((onAfterFlash: () => void) => {
     clearFlashTimer();
@@ -204,9 +181,7 @@ function BlinkingDoor() {
         playerBlinkCountRef.current = 1;
         setPlayerBlinkCount(1);
         updateState("player_responding");
-        flashPlayerLed(() => {
-          startEvalTimer();
-        });
+        flashPlayerLed(startEvalTimer);
       }
       return;
     }
@@ -216,9 +191,7 @@ function BlinkingDoor() {
       const newCount = playerBlinkCountRef.current + 1;
       playerBlinkCountRef.current = newCount;
       setPlayerBlinkCount(newCount);
-      flashPlayerLed(() => {
-        startEvalTimer();
-      });
+      flashPlayerLed(startEvalTimer);
       return;
     }
 
@@ -245,7 +218,7 @@ function BlinkingDoor() {
         <p id="clue-text">{CLUES[blinkState]}</p>
         <div className="blinking-door-led blinking-door-led--door">
           <img
-            src={ledOn ? bitAssetMap["Bit_on_Red.png"] : bitAssetMap["Bit_off_Red.png"]}
+            src={ledOn ? bitOnRed : bitOffRed}
             alt={ledOn ? "door light on" : "door light off"}
             className="blinking-door-led-image blinking-door-led-image--door"
           />
@@ -262,7 +235,7 @@ function BlinkingDoor() {
             )}
             <div className="blinking-door-led blinking-door-led--player">
               <img
-                src={playerLedOn ? bitAssetMap["Bit_on.png"] : bitAssetMap["Bit_off.png"]}
+                src={playerLedOn ? bitOn : bitOff}
                 alt={playerLedOn ? "player light on" : "player light off"}
                 className="blinking-door-led-image blinking-door-led-image--player"
               />
@@ -278,7 +251,7 @@ function BlinkingDoor() {
               disabled={blinkState === "door_blinking"}
             >
               <img
-                src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]}
+                src={keyboardBitOn}
                 alt=""
                 aria-hidden="true"
                 draggable={false}
