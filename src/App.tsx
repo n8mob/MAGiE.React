@@ -323,7 +323,7 @@ function App() {
             source: 'activate_dialog',
             dialog: 'settings',
           });
-        }}>⋮
+        }}>Aa
         </button>
         <button type={"button"}
                 aria-label={"show how-to information"}
