@@ -94,7 +94,7 @@ function paginateLines(lines: string[], rows: number): string[][] {
   return pages.length > 0 ? pages : [[]];
 }
 
-const DISPLAY_MIN_CHARS = 26;
+const CHAR_COUNT_RANGE = [24, 70] as const;
 
 export function StoryPage() {
   const { slug } = useParams();
@@ -107,21 +107,24 @@ export function StoryPage() {
   const [cols, setCols] = useState(40);
   const [rows, setRows] = useState(20);
   const [fontSize, setFontSize] = useState<number | null>(null);
-  const [fontSizeAdjust, setFontSizeAdjust] = useState<number>(
+  /**
+   * User font adjustment factor
+   */
+  const [userFontAdjustment, setUserFontAdjustment] = useState<number>(
     () => parseInt(localStorage.getItem('storyFontAdjust') || '0', 10)
   );
-  const fontSizeAdjustRef = useRef(fontSizeAdjust);
+  const userFontAdjustRef = useRef(userFontAdjustment);
 
   useEffect(() => {
     const handler = (e: StorageEvent) => {
       if (e.key === 'storyFontAdjust') {
-        setFontSizeAdjust(parseInt(e.newValue || '0', 10));
+        setUserFontAdjustment(parseInt(e.newValue || '0', 10));
       }
     };
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
   }, []);
-  useEffect(() => { fontSizeAdjustRef.current = fontSizeAdjust; }, [fontSizeAdjust]);
+  useEffect(() => { userFontAdjustRef.current = userFontAdjustment; }, [userFontAdjustment]);
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
@@ -131,21 +134,34 @@ export function StoryPage() {
     if (!ruler || !container) {
       return;
     }
-    const charWidth = ruler.offsetWidth;
+
+    const currentFontCharWidth = ruler.offsetWidth;
     const lineHeight = ruler.offsetHeight;
-    if (!charWidth || !lineHeight) {
+    if (!currentFontCharWidth || !lineHeight) {
       return;
     }
+
+    // sizes in pixels
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
-    const scale = containerWidth / (DISPLAY_MIN_CHARS * charWidth);
-    const baseFontSize = currentFontSize * scale;
-    const newFontSize = baseFontSize + fontSizeAdjustRef.current;
-    const ratio = newFontSize / currentFontSize;
-    setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 1 ? prev : newFontSize));
-    setCols(Math.floor(containerWidth / (charWidth * ratio)));
-    setRows(Math.floor(containerHeight / (lineHeight * ratio)));
+    const measuredColCount = containerWidth / currentFontCharWidth;
+    // if the current (pre-adjusted) font size allows for more than 70 character columns, clamp it down to 70 (top of the range, see above)
+    const clampedMaxCols = Math.min(CHAR_COUNT_RANGE[1], measuredColCount);
+    // just check in case `clampedMaxCols` is way small (like, if measuredColCount is < 12 because the window is super narrow)
+    const clampedCols = Math.max(CHAR_COUNT_RANGE[0], clampedMaxCols);
+    // calculate the current, measured, expected, "natural" column count.
+    const colCountScaleFactor = measuredColCount / clampedCols; // e.g. measuredColCount: 8 / clampedCols: 12 => colCountScaleFactor = 8/12 => 0.67 (#SixSeven)
+    // scale the font size by the calculated column scale
+    const scaledFontSize = currentFontSize * colCountScaleFactor;
+    const adjustedFontSize = scaledFontSize + userFontAdjustRef.current;
+    const calculatedFontSizeRatio = adjustedFontSize / currentFontSize;
+    setFontSize(prev => (prev !== null && Math.abs(prev - adjustedFontSize) < 1 ? prev : adjustedFontSize));
+    setCols(Math.floor(containerWidth / (currentFontCharWidth * calculatedFontSizeRatio)));
+    setRows(Math.floor(containerHeight / (lineHeight * calculatedFontSizeRatio))); // is this correct?
+    // what should I set a watch for in the browser dev tools?
+    // I think I installed "react dev tools", can I just watch the fontSize state variable?
+
   }, []);
 
   useLayoutEffect(() => {
@@ -167,7 +183,7 @@ export function StoryPage() {
 
   useLayoutEffect(() => {
     measure();
-  }, [fontSizeAdjust, measure]);
+  }, [userFontAdjustment, measure]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
