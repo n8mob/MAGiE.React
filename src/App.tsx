@@ -70,10 +70,7 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
-  const [storyFontAdjust, setStoryFontAdjust] = useState(() => parseInt(
-    localStorage.getItem('storyFontAdjust') || '0',
-    10));
-  const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
+const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
   const activeScrollContainer = useRef<HTMLElement | null>(null);
@@ -323,7 +320,7 @@ function App() {
             source: 'activate_dialog',
             dialog: 'settings',
           });
-        }}>⋮
+        }}>Aa
         </button>
         <button type={"button"}
                 aria-label={"show how-to information"}
@@ -357,9 +354,7 @@ function App() {
         {showSettings && (
           <Dialog onClose={() => setShowSettings(false)}>
             <SettingsContent useLcdFont={useLcdFont}
-                             setUseLcdFont={setUseLcdFont}
-                             storyFontAdjust={storyFontAdjust}
-                             setStoryFontAdjust={setStoryFontAdjust} />
+                             setUseLcdFont={setUseLcdFont} />
           </Dialog>
         )}
       </div>

@@ -4,22 +4,23 @@ import { stories } from "../stories.ts";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 function importStory(fileName: string) {
-  return import.meta.glob("../assets/story/*.md", { query: "?raw", import: "default", eager: true })[
-    `../assets/story/${fileName}`
-    ] as string;
+  return import.meta.glob(
+          "../assets/story/*.md",
+          { query: "?raw", import: "default", eager: true }
+  )[`../assets/story/${fileName}`] as string;
 }
 
 function stripMarkdown(text: string): string {
   return text
-    .replace(/^#{1,6}\s+/, '')
-    .replace(/\*\*(.+?)\*\*/gs, '$1')
-    .replace(/\*(.+?)\*/gs, '$1')
-    .replace(/__(.+?)__/gs, '$1')
-    .replace(/_(.+?)_/gs, '$1')
-    .replace(/`(.+?)`/gs, '$1')
-    .replace(/\[(.+?)\]\(.+?\)/gs, '$1')
-    .replace(/^[-*_]{3,}$/, '')
-    .trim();
+  .replace(/^#{1,6}\s+/, '')
+  .replace(/\*\*(.+?)\*\*/gs, '$1')
+  .replace(/\*(.+?)\*/gs, '$1')
+  .replace(/__(.+?)__/gs, '$1')
+  .replace(/_(.+?)_/gs, '$1')
+  .replace(/`(.+?)`/gs, '$1')
+  .replace(/\[(.+?)\]\(.+?\)/gs, '$1')
+  .replace(/^[-*_]{3,}$/, '')
+  .trim();
 }
 
 function wordWrap(text: string, cols: number): string[] {
@@ -94,8 +95,6 @@ function paginateLines(lines: string[], rows: number): string[][] {
   return pages.length > 0 ? pages : [[]];
 }
 
-const DISPLAY_MIN_CHARS = 26;
-
 export function StoryPage() {
   const { slug } = useParams();
 
@@ -106,46 +105,18 @@ export function StoryPage() {
   const [pageIndex, setPageIndex] = useState(0);
   const [cols, setCols] = useState(40);
   const [rows, setRows] = useState(20);
-  const [fontSize, setFontSize] = useState<number | null>(null);
-  const [fontSizeAdjust, setFontSizeAdjust] = useState<number>(
-    () => parseInt(localStorage.getItem('storyFontAdjust') || '0', 10)
-  );
-  const fontSizeAdjustRef = useRef(fontSizeAdjust);
-
-  useEffect(() => {
-    const handler = (e: StorageEvent) => {
-      if (e.key === 'storyFontAdjust') {
-        setFontSizeAdjust(parseInt(e.newValue || '0', 10));
-      }
-    };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, []);
-  useEffect(() => { fontSizeAdjustRef.current = fontSizeAdjust; }, [fontSizeAdjust]);
   const containerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
 
   const measure = useCallback(() => {
     const ruler = rulerRef.current;
     const container = containerRef.current;
-    if (!ruler || !container) {
-      return;
-    }
+    if (!ruler || !container) { return; }
     const charWidth = ruler.offsetWidth;
     const lineHeight = ruler.offsetHeight;
-    if (!charWidth || !lineHeight) {
-      return;
-    }
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const currentFontSize = parseFloat(getComputedStyle(container).fontSize);
-    const scale = containerWidth / (DISPLAY_MIN_CHARS * charWidth);
-    const baseFontSize = currentFontSize * scale;
-    const newFontSize = baseFontSize + fontSizeAdjustRef.current;
-    const ratio = newFontSize / currentFontSize;
-    setFontSize(prev => (prev !== null && Math.abs(prev - newFontSize) < 1 ? prev : newFontSize));
-    setCols(Math.floor(containerWidth / (charWidth * ratio)));
-    setRows(Math.floor(containerHeight / (lineHeight * ratio)));
+    if (!charWidth || !lineHeight) { return; }
+    setCols(Math.floor(container.clientWidth / charWidth));
+    setRows(Math.floor(container.clientHeight / lineHeight));
   }, []);
 
   useLayoutEffect(() => {
@@ -165,18 +136,14 @@ export function StoryPage() {
     };
   }, [measure]);
 
-  useLayoutEffect(() => {
-    measure();
-  }, [fontSizeAdjust, measure]);
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPageIndex(0);
   }, [storyMarkdown, cols, rows]);
 
   const pages = useMemo(
-    () => storyMarkdown ? paginateLines(buildLines(storyMarkdown, cols), rows) : [[]],
-    [storyMarkdown, cols, rows]
+          () => storyMarkdown ? paginateLines(buildLines(storyMarkdown, cols), rows) : [[]],
+          [storyMarkdown, cols, rows]
   );
 
   useEffect(() => {
@@ -208,43 +175,43 @@ export function StoryPage() {
   const canGoForward = pageIndex < pages.length - 1;
 
   return (
-    <div className="story-page" style={fontSize != null ? { fontSize: `${fontSize}px` } : undefined}>
-      <div
-        ref={containerRef}
-        id="main-display"
-        className="paginated"
-        onClick={() => {
-          if (canGoForward) {
-            setPageIndex(p => p + 1);
-          }
-        }}
-      >
-        <span ref={rulerRef} className="char-ruler">M</span>
-        <div className="story-lines">
-          {currentPage.map((line, i) => (
-            <div key={i} className="story-line">{line || ' '}</div>
-          ))}
-        </div>
-      </div>
-      <div className="story-cta" style={pageIndex !== pages.length - 1 ? { visibility: 'hidden' } : undefined}>
-        <Link to="/">Play the game!</Link>
-      </div>
-      <nav className="story-navigation">
-        <div className="left-item">
-          {prev ? <Link to={`/story/${prev.slug}`}>|◀◀{prev.slug}</Link> : <span />}
-        </div>
-        <div className="center">
-          <div className="page-controls">
-            <button type="button" onClick={() => setPageIndex(p => p - 1)} disabled={!canGoBack}>▲</button>
-            <span>{pageIndex + 1}/{pages.length}</span>
-            <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
+          <div className="story-page">
+            <div
+                    ref={containerRef}
+                    id="main-display"
+                    className="paginated"
+                    onClick={() => {
+                      if (canGoForward) {
+                        setPageIndex(p => p + 1);
+                      }
+                    }}
+            >
+              <span ref={rulerRef} className="char-ruler">M</span>
+              <div className="story-lines">
+                {currentPage.map((line, i) => (
+                        <div key={i} className="story-line">{line || ' '}</div>
+                ))}
+              </div>
+            </div>
+            <div className="story-cta" style={pageIndex !== pages.length - 1 ? { visibility: 'hidden' } : undefined}>
+              <Link to="/">Play the game!</Link>
+            </div>
+            <nav className="story-navigation">
+              <div className="left-item">
+                {prev ? <Link to={`/story/${prev.slug}`}>|◀◀{prev.slug}</Link> : <span />}
+              </div>
+              <div className="center">
+                <div className="page-controls">
+                  <button type="button" onClick={() => setPageIndex(p => p - 1)} disabled={!canGoBack}>▲</button>
+                  <span>{pageIndex + 1}/{pages.length}</span>
+                  <button type="button" onClick={() => setPageIndex(p => p + 1)} disabled={!canGoForward}>▼</button>
+                </div>
+                <Link to="/story">&#x23CF; Story Index</Link>
+              </div>
+              <div className="right-item">
+                {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶▶|</Link> : <span />}
+              </div>
+            </nav>
           </div>
-          <Link to="/story">&#x23CF; Story Index</Link>
-        </div>
-        <div className="right-item">
-          {next ? <Link to={`/story/${next.slug}`}>{next.slug}▶▶|</Link> : <span />}
-        </div>
-      </nav>
-    </div>
   );
 }

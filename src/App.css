@@ -329,6 +329,7 @@ input[data-correctness="incorrect"]:checked {
   padding: 1rem;
   width: 44px;
   height: 44px;
+  text-transform: none;
 }
 
 .activate-dialog.left {

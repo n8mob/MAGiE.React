@@ -4,11 +4,9 @@ import ReactGA4 from "react-ga4";
 interface SettingsContentProps {
   useLcdFont: boolean;
   setUseLcdFont: (value: boolean) => void;
-  storyFontAdjust: number;
-  setStoryFontAdjust: (value: number) => void;
 }
 
-export default function SettingsContent({ useLcdFont, setUseLcdFont, storyFontAdjust, setStoryFontAdjust }: SettingsContentProps) {
+export default function SettingsContent({ useLcdFont, setUseLcdFont }: SettingsContentProps) {
 
   const handleFontToggle = (e: ChangeEvent<HTMLInputElement>) => {
     const isShowLcdFontSelected = e.target.checked;
@@ -19,13 +17,6 @@ export default function SettingsContent({ useLcdFont, setUseLcdFont, storyFontAd
       action: 'toggle_font',
       value: isShowLcdFontSelected ? 'hd44780' : 'press_start_2p',
     });
-  };
-
-  const adjustStoryFont = (delta: number) => {
-    const next = storyFontAdjust + delta;
-    setStoryFontAdjust(next);
-    localStorage.setItem('storyFontAdjust', String(next));
-    window.dispatchEvent(new StorageEvent('storage', { key: 'storyFontAdjust', newValue: String(next) }));
   };
 
   return (
@@ -39,12 +30,6 @@ export default function SettingsContent({ useLcdFont, setUseLcdFont, storyFontAd
         />
         Use LCD font
       </label>
-      <div>
-        <span>Story font size</span>
-        <button type="button" onClick={() => adjustStoryFont(-1)}>-</button>
-        <span>{storyFontAdjust > 0 ? `+${storyFontAdjust}` : storyFontAdjust}</span>
-        <button type="button" onClick={() => adjustStoryFont(1)}>+</button>
-      </div>
     </>
   );
 }
