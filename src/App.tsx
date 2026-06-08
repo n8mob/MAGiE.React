@@ -310,7 +310,7 @@ const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
     </Routes>), [features]);
 
   return (
-    <>
+    <div id="device">
       <div id="bezel-header">
         <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
         <h1 id="magie-title">MAGiE</h1>
@@ -385,7 +385,7 @@ const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
           {routes}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
