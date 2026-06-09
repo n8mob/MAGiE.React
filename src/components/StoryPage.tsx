@@ -18,6 +18,7 @@ const ITALIC_UNDERSCORE = /_(.+?)_/gs;
 const INLINE_CODE = /`(.+?)`/gs;
 const LINK = /\[(.+?)\]\(.+?\)/gs;
 const HORIZONTAL_RULE = /^[-*_]{3,}$/;
+const SETEXT_UNDERLINE = /^={3,}$/;
 
 function stripMarkdown(text: string): string {
   return text
@@ -39,6 +40,17 @@ function wordWrap(text: string, cols: number): string[] {
   const lines: string[] = [];
   let line = '';
   for (const word of text.split(/\s+/).filter(Boolean)) {
+    if (SETEXT_UNDERLINE.test(word)) {
+      // A title's "double underline" is authored at the title's length, but
+      // that no longer fits once the title wraps. Resize it to exactly span
+      // one display line — truncating a long run or extending a short one.
+      if (line) {
+        lines.push(line);
+        line = '';
+      }
+      lines.push('='.repeat(Math.max(0, cols)));
+      continue;
+    }
     if (!line) {
       line = word;
     } else if (line.length + 1 + word.length <= cols) {
