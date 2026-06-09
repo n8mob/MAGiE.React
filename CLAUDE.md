@@ -82,6 +82,10 @@ A paginated text reader for narrative content stored as Markdown files in `src/a
 
 The `text-transform: uppercase` global on `#root` is suppressed for the whole story page via `text-transform: none` on `.story-page`.
 
+### Colors
+
+See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-based bit-state color system.
+
 ### Feature flags
 
 Routes beyond `/today`/`/date/...`/`/tutorial/...` are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source. The default feature set is `['tutorial']`.
