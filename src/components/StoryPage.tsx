@@ -10,16 +10,26 @@ function importStory(fileName: string) {
   )[`../assets/story/${fileName}`] as string;
 }
 
+const HEADING_PREFIX = /^#{1,6}\s+/;
+const BOLD_ASTERISKS = /\*\*(.+?)\*\*/gs;
+const ITALIC_ASTERISK = /\*(.+?)\*/gs;
+const BOLD_UNDERSCORES = /__(.+?)__/gs;
+const ITALIC_UNDERSCORE = /_(.+?)_/gs;
+const INLINE_CODE = /`(.+?)`/gs;
+const LINK = /\[(.+?)\]\(.+?\)/gs;
+const HORIZONTAL_RULE = /^[-*_]{3,}$/;
+const SETEXT_UNDERLINE = /^={3,}$/;
+
 function stripMarkdown(text: string): string {
   return text
-  .replace(/^#{1,6}\s+/, '')
-  .replace(/\*\*(.+?)\*\*/gs, '$1')
-  .replace(/\*(.+?)\*/gs, '$1')
-  .replace(/__(.+?)__/gs, '$1')
-  .replace(/_(.+?)_/gs, '$1')
-  .replace(/`(.+?)`/gs, '$1')
-  .replace(/\[(.+?)\]\(.+?\)/gs, '$1')
-  .replace(/^[-*_]{3,}$/, '')
+  .replace(HEADING_PREFIX, '')
+  .replace(BOLD_ASTERISKS, '$1')
+  .replace(ITALIC_ASTERISK, '$1')
+  .replace(BOLD_UNDERSCORES, '$1')
+  .replace(ITALIC_UNDERSCORE, '$1')
+  .replace(INLINE_CODE, '$1')
+  .replace(LINK, '$1')
+  .replace(HORIZONTAL_RULE, '')
   .trim();
 }
 
@@ -30,6 +40,17 @@ function wordWrap(text: string, cols: number): string[] {
   const lines: string[] = [];
   let line = '';
   for (const word of text.split(/\s+/).filter(Boolean)) {
+    if (SETEXT_UNDERLINE.test(word)) {
+      // A title's "double underline" is authored at the title's length, but
+      // that no longer fits once the title wraps. Resize it to exactly span
+      // one display line — truncating a long run or extending a short one.
+      if (line) {
+        lines.push(line);
+        line = '';
+      }
+      lines.push('='.repeat(Math.max(0, cols)));
+      continue;
+    }
     if (!line) {
       line = word;
     } else if (line.length + 1 + word.length <= cols) {
