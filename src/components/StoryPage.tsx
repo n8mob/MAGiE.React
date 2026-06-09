@@ -2,6 +2,7 @@ import './StoryPage.css'
 import { Link, useParams } from "react-router-dom";
 import { stories } from "../stories.ts";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import ReactGA4 from 'react-ga4';
 
 function importStory(fileName: string) {
   return import.meta.glob(
@@ -166,6 +167,29 @@ export function StoryPage() {
           () => storyMarkdown ? paginateLines(buildLines(storyMarkdown, cols), rows) : [[]],
           [storyMarkdown, cols, rows]
   );
+
+  useEffect(() => {
+    if (!story) { return; }
+    ReactGA4.event('story_chapter_opened', {
+      story_slug: story.slug,
+      story_title: story.title,
+    });
+  }, [story]);
+
+  useEffect(() => {
+    if (!story || pages.length === 0) { return; }
+    ReactGA4.event('story_page_turned', {
+      story_slug: story.slug,
+      page_number: pageIndex + 1,
+      total_pages: pages.length,
+    });
+    if (pageIndex === pages.length - 1) {
+      ReactGA4.event('story_completed', {
+        story_slug: story.slug,
+        story_title: story.title,
+      });
+    }
+  }, [pageIndex, pages.length, story]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
