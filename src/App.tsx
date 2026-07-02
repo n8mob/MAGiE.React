@@ -292,6 +292,13 @@ function App() {
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="tutorial" />} />
       </>)}
+      {features.includes('vintage') && (<>
+        <Route path="/vintage" element={<MenuBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex" element={<CategoryBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="vintage" />} />
+      </>)}
       {features.includes('bigGameRoutes') && (<>
         <Route path="/bigGame" element={<MenuBrowser menuName="bigGame" />} />
         <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame" />} />
