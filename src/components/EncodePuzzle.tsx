@@ -6,12 +6,12 @@ import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 
 const EncodePuzzle: FC<PuzzleProps> = (
-    {
-      puzzle,
-      onWin = () => {},
-      onShareWin = () => {},
-      bitButtonWidthPx = 32
-    }) => {
+  {
+    puzzle,
+    onWin = () => {},
+    onShareWin = () => {},
+    bitButtonWidthPx = 32
+  }) => {
   const [guessBits, setGuessBits] = useState(BitSequence.empty());
 
   const {
@@ -84,7 +84,8 @@ const EncodePuzzle: FC<PuzzleProps> = (
             <CorrectnessBitButton
               key={`bit-${bit.index}`}
               bit={bit}
-              correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness ?? Correctness.unguessed}
+              correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
+                ?? Correctness.unguessed}
               onChange={handleBitClick}
             />
           )}
@@ -92,14 +93,21 @@ const EncodePuzzle: FC<PuzzleProps> = (
         {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
           <p key={`win-text-${winIndex}`}>{winLine}</p>)}
       </div>
-      {hasWon
-        ? (<div id="puzzle-inputs">
-          <p>Type "0" or "1" to input bits. Use "Backspace" to delete.</p>
-        </div>)
-        : (<div className={"debug-win-message"}><p>You win!</p></div>)
-      }
+      {!hasWon && (
+        <div id="puzzle-inputs" className="encode-puzzle-inputs">
+          <div className="encode-guess-display" area-label="Current guess">
+          <span className={guessBits.length > 0 ? "encode-guess-text" : "encode-guess-placeholder"}>
+            {guessBits.length > 0 ? guessBits.toString() : "DECODE TEXT HERE"}
+          </span>
+            <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
+          </div>
+          <div className="TEMP">
+            <h1>ENCODE INPUTS HERE</h1>
+          </div>
+        </div>)}
     </>
-  );
+  )
+    ;
 };
 
 export { EncodePuzzle };
