@@ -204,6 +204,18 @@ h3 {
   opacity: 0.55;
 }
 
+/* scroll-tail: instead of truncating with an ellipsis, clip overflow on the
+   left so the newest input stays visible (scrolled to the end via JS). */
+.guess-text-display.scroll-tail {
+  overflow-x: hidden;
+}
+
+.guess-text-display.scroll-tail .guess-text {
+  overflow: visible;
+  text-overflow: clip;
+  flex-shrink: 0;
+}
+
 .decode-guess-cursor {
   flex: 0 0 auto;
 }
