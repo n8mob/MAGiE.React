@@ -134,8 +134,13 @@ export function StoryPage() {
     const ruler = rulerRef.current;
     const container = containerRef.current;
     if (!ruler || !container) { return; }
-    const charWidth = ruler.offsetWidth;
-    const lineHeight = ruler.offsetHeight;
+    // getBoundingClientRect for subpixel accuracy: with a vw-based root font
+    // size the char width is fractional, and integer offsetWidth rounding
+    // compounds across a full line, overestimating cols. Measure a run of
+    // characters and divide to shrink the residual error further.
+    const rulerRect = ruler.getBoundingClientRect();
+    const charWidth = rulerRect.width / (ruler.textContent?.length || 1);
+    const lineHeight = rulerRect.height;
     if (!charWidth || !lineHeight) { return; }
     setCols(Math.floor(container.clientWidth / charWidth));
     setRows(Math.floor(container.clientHeight / lineHeight));
@@ -231,7 +236,7 @@ export function StoryPage() {
                       }
                     }}
             >
-              <span ref={rulerRef} className="char-ruler">M</span>
+              <span ref={rulerRef} className="char-ruler">{'M'.repeat(10)}</span>
               <div className="story-lines">
                 {currentPage.map((line, i) => (
                         <div key={i} className="story-line">{line || ' '}</div>
