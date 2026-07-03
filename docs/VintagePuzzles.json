@@ -1,0 +1,3536 @@
+{
+    "name": "VintagePuzzles",
+    "updated_at": "2026-06-25T00:00:00.000000Z",
+    "encodings": {
+        "SingleBit": {
+            "type": "fixed",
+            "encoding": {
+                "width": 1,
+                "encodingMap": {
+                    "0": 0,
+                    "1": 1
+                }
+            }
+        },
+        "DoubleBit": {
+            "type": "fixed",
+            "encoding": {
+                "width": 2,
+                "encodingMap": {
+                    "0": 0,
+                    "1": 1,
+                    "2": 2,
+                    "3": 3
+                }
+            }
+        },
+        "ThreeBitOctal": {
+            "type": "fixed",
+            "encoding": {
+                "width": 3,
+                "encodingMap": {
+                    "0": 0,
+                    "1": 1,
+                    "2": 2,
+                    "3": 3,
+                    "4": 4,
+                    "5": 5,
+                    "6": 6,
+                    "7": 7
+                }
+            }
+        },
+        "FourBitHex": {
+            "type": "fixed",
+            "encoding": {
+                "width": 4,
+                "encodingMap": {
+                    "0": 0,
+                    "1": 1,
+                    "2": 2,
+                    "3": 3,
+                    "4": 4,
+                    "5": 5,
+                    "6": 6,
+                    "7": 7,
+                    "8": 8,
+                    "9": 9,
+                    "A": 10,
+                    "B": 11,
+                    "C": 12,
+                    "D": 13,
+                    "E": 14,
+                    "F": 15
+                }
+            }
+        }
+    },
+    "categories": {
+        "Demo": {
+            "sort_order": 1,
+            "levels": [
+                {
+                    "levelName": [
+                        "DEMO"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Here is a Trailer",
+                            "slug": "demo-here-is-a-trailer",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "HERE IS",
+                                "A TRAILER FOR",
+                                "",
+                                "MAGIE",
+                                "",
+                                "A GAME",
+                                "ABOUT BITS"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "How it Looks",
+                            "slug": "demo-how-it-looks",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "THERE ARE",
+                                "DIFFERENT",
+                                "PUZZLE MODES",
+                                "THIS TRAILER",
+                                "ONLY SHOWS",
+                                "ONE MODE"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "And we sped it up",
+                            "slug": "demo-and-we-sped-it-up",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AND WE SPED",
+                                "UP THE VIDEO",
+                                "BECAUSE",
+                                "THE GAME",
+                                "INVOLVES",
+                                "A LOT",
+                                "OF THINKING"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "And that is boring",
+                            "slug": "demo-and-that-is-boring",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "BORING ENOUGH",
+                            "clue": [
+                                "WATCHING ME",
+                                "PLAY IS"
+                            ],
+                            "winMessage": [
+                                "PLAYING IS",
+                                "MUCH MORE FUN",
+                                ".",
+                                "TRY IT",
+                                "AND SEE!"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "VIDEO",
+                        "INTRO"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 2,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Here is a Trailer",
+                            "slug": "video-intro-here-is-a-trailer",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "HERE IS",
+                                "A TRAILER FOR",
+                                "",
+                                "MAGIE",
+                                "",
+                                "A GAME",
+                                "ABOUT BITS"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "How it Looks",
+                            "slug": "video-intro-how-it-looks",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "THERE ARE",
+                                "DIFFERENT",
+                                "PUZZLE MODES",
+                                "",
+                                "THIS TRAILER",
+                                "ONLY SHOWS",
+                                "ONE OR TWO",
+                                "MODES."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "And we sped it up",
+                            "slug": "video-intro-and-we-sped-it-up",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AND WE SPED",
+                                "UP THE VIDEO",
+                                "BECAUSE",
+                                "THE GAME",
+                                "INVOLVES",
+                                "A LOT",
+                                "OF THINKING"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "And that is boring",
+                            "slug": "video-intro-and-that-is-boring",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "BORING ENOUGH",
+                            "clue": [
+                                "WATCHING ME",
+                                "PLAY IS"
+                            ],
+                            "winMessage": [
+                                "PLAYING IS",
+                                "MUCH MORE FUN",
+                                ".",
+                                "TRY IT",
+                                "AND SEE!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Encoding": {
+            "sort_order": 2,
+            "levels": [
+                {
+                    "levelName": [
+                        "ENCODING",
+                        "MESSAGES"
+                    ],
+                    "slug": "",
+                    "levelVersion": 2,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Send a Message",
+                            "slug": "encoding-messages-send-a-message",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "ENC",
+                            "winText": "ENCODING THE MESSAGE",
+                            "clue": [
+                                "PREPARING",
+                                "TO SEND",
+                                "A MESSAGE",
+                                "IS CALLED"
+                            ],
+                            "winMessage": [
+                                "AFTER",
+                                "ENCODING",
+                                "A MESSAGE",
+                                "YOU CAN",
+                                "RECORD IT ON",
+                                "A CARD",
+                                ".............",
+                                "CARD READER",
+                                "ERROR",
+                                ".............",
+                                "CARD SWIPES",
+                                "WILL BE",
+                                "SIMULATED",
+                                "............."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Encoding Puzzles 1",
+                            "slug": "encoding-messages-encoding-puzzles-1",
+                            "type": "Decode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "LET US DO",
+                                "AN ENCODING",
+                                "PUZZLE.",
+                                "USE THE",
+                                "ON AND OFF",
+                                "BUTTONS",
+                                "TO ENCODE",
+                                "A MESSAGE."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Encoding Puzzles 2",
+                            "slug": "encoding-messages-encoding-puzzles-2",
+                            "type": "Encode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "ENCODING IS ",
+                            "winText": "ENCODING IS FUN!",
+                            "clue": [
+                                "BITS THAT",
+                                "DO NOT MATCH",
+                                "THE PUZZLE",
+                                "WILL LIGHT",
+                                "UP PURPLE.",
+                                "             ",
+                                "BITS CAN",
+                                "BE CHANGED BY",
+                                "TAPPING THEM",
+                                "ON THE SCREEN"
+                            ],
+                            "winMessage": [
+                                "IT SURE IS!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Homework Later",
+                            "slug": "encoding-messages-homework-later",
+                            "type": "Encode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "HOMEWORK",
+                            "clue": [
+                                "LATER",
+                                "YOU WILL",
+                                "ENCODE"
+                            ],
+                            "winMessage": [
+                                "BUT FOR NOW,",
+                                "JUST COMPLETE",
+                                "THE LESSONS",
+                                "IN THIS",
+                                "TUTORIAL."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Personal Messages",
+                            "slug": "encoding-messages-personal-messages",
+                            "type": "Encode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "PERSONAL M",
+                            "winText": "PERSONAL MESSAGES",
+                            "clue": [
+                                "IN THE FUTURE",
+                                "YOU WILL BE",
+                                "PERMITTED",
+                                "TO USE",
+                                "YOUR MAGIE",
+                                "TO ENCODE"
+                            ],
+                            "winMessage": [
+                                "BUT FOR NOW,",
+                                "JUST COMPLETE",
+                                "THE LESSONS",
+                                "IN THIS",
+                                "TUTORIAL."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Have Fun",
+                            "slug": "encoding-messages-have-fun",
+                            "type": "Encode",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "I PROMISE TO HAVE FUN",
+                            "clue": [
+                                "WE HOPE YOU",
+                                "WILL ENJOY",
+                                "USING YOUR",
+                                "MAGIE DEVICE."
+                            ],
+                            "winMessage": [
+                                "GREAT!",
+                                "LOOK FOR",
+                                "MORE MESSAGES",
+                                "SOON!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Bits Intro": {
+            "sort_order": 3,
+            "levels": [
+                {
+                    "levelName": [
+                        "THIS IS A BIT"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "This is A Bit",
+                            "slug": "this-is-a-bit-this-is-a-bit",
+                            "type": "Encode",
+                            "encoding_name": "SingleBit",
+                            "init": "1",
+                            "winText": "1",
+                            "clue": [
+                                "THIS IS A BIT"
+                            ],
+                            "winMessage": [
+                                "IT IS .ON."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "This is also A Bit",
+                            "slug": "this-is-a-bit-this-is-also-a-bit",
+                            "type": "Encode",
+                            "encoding_name": "SingleBit",
+                            "init": "0",
+                            "winText": "0",
+                            "clue": [
+                                "THIS IS ALSO",
+                                "A BIT"
+                            ],
+                            "winMessage": [
+                                "IT IS .OFF."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Other names",
+                            "slug": "this-is-a-bit-other-names",
+                            "type": "Encode",
+                            "encoding_name": "SingleBit",
+                            "init": "10",
+                            "winText": "10",
+                            "clue": [
+                                "OTHER NAMES",
+                                "FOR .ON. AND",
+                                ".OFF. ARE",
+                                ".ONE. AND",
+                                ".ZERO."
+                            ],
+                            "winMessage": [
+                                "SOME PEOPLE",
+                                "ALSO USE",
+                                "NAMES LIKE",
+                                ".HIGH. AND",
+                                ".LOW. OR",
+                                ".SET. AND",
+                                ".UNSET."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Here you can switch them",
+                            "slug": "this-is-a-bit-here-you-can-switch-them",
+                            "type": "Encode",
+                            "encoding_name": "SingleBit",
+                            "init": "0",
+                            "winText": "1",
+                            "clue": [
+                                "MAGIE LETS",
+                                "YOU FLIP YOUR",
+                                "BITS. YOU DO",
+                                "THAT BY",
+                                "TAPPING ON",
+                                "THEM."
+                            ],
+                            "winMessage": [
+                                "YOU JUST",
+                                "FLIPPED THAT",
+                                "BIT FROM",
+                                ".OFF. TO",
+                                ".ON.!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "MAGiE adds more",
+                            "slug": "this-is-a-bit-magie-adds-more",
+                            "type": "Encode",
+                            "encoding_name": "SingleBit",
+                            "init": "1",
+                            "winText": "0",
+                            "clue": [
+                                "A SINGLE BIT",
+                                "IS JUST .ON.",
+                                "OR .OFF., BUT",
+                                "MAGIE CAN ADD",
+                                "MORE",
+                                "INFORMATION"
+                            ],
+                            "winMessage": [
+                                "SEE HOW THE",
+                                "BIT WENT FROM",
+                                "PURPLE TO",
+                                "GREEN? WHEN",
+                                "MAGIE KNOWS",
+                                "THAT A BIT IS",
+                                "IN THE WRONG",
+                                "STATE, MAGIE",
+                                "PAINTS THE",
+                                "BIT PURPLE."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "THESE ARE TWO",
+                        "BITS"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 2,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Pairing Bits",
+                            "slug": "these-are-two-bits-pairing-bits",
+                            "type": "Encode",
+                            "encoding_name": "DoubleBit",
+                            "init": "3",
+                            "winText": "3",
+                            "clue": [
+                                "THESE ARE",
+                                "ALSO BITS"
+                            ],
+                            "winMessage": [
+                                "THEY ARE BOTH",
+                                ".ON."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "These bits are both .off.",
+                            "slug": "these-are-two-bits-these-bits-are-both-off",
+                            "type": "Encode",
+                            "encoding_name": "DoubleBit",
+                            "init": "0",
+                            "winText": "3",
+                            "clue": [
+                                "THESE BITS",
+                                "ARE BOTH",
+                                ".OFF. SWITCH",
+                                "THEM BOTH TO",
+                                ".ON."
+                            ],
+                            "winMessage": [
+                                "EASY, RIGHT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Combo",
+                            "slug": "these-are-two-bits-combo",
+                            "type": "Encode",
+                            "encoding_name": "DoubleBit",
+                            "init": "0003",
+                            "winText": "0123",
+                            "clue": [
+                                "SO FAR TWO",
+                                "BITS ARE LIKE",
+                                "ONE BIT. BUT",
+                                "THEY ARE NOT",
+                                "ONE BIT. TURN",
+                                "ON THE PURPLE",
+                                "BITS."
+                            ],
+                            "winMessage": [
+                                "SEE FOUR",
+                                "DIFFERENT",
+                                "COMBINATIONS?",
+                                "TWO BITS CAN",
+                                "BE IN FOUR",
+                                "STATES."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Flippy 1",
+                            "slug": "these-are-two-bits-flippy-1",
+                            "type": "Encode",
+                            "encoding_name": "DoubleBit",
+                            "init": "3",
+                            "winText": "0",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS."
+                            ],
+                            "winMessage": [
+                                "STILL EASY.",
+                                "LET US DO",
+                                "SOME MORE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Flippy 2",
+                            "slug": "these-are-two-bits-flippy-2",
+                            "type": "Encode",
+                            "encoding_name": "DoubleBit",
+                            "init": "0000",
+                            "winText": "3120",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS."
+                            ],
+                            "winMessage": [
+                                "WELL DONE. IN",
+                                "THE NEXT",
+                                "LEVEL WE WILL",
+                                "USE THREE",
+                                "BITS."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "THREE BITS"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 3,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Tripple Bits",
+                            "slug": "three-bits-tripple-bits",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "7",
+                            "winText": "7",
+                            "clue": [
+                                "MORE BITS."
+                            ],
+                            "winMessage": [
+                                "THEY ARE ALL",
+                                ".ON."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "These bits are both .off.",
+                            "slug": "three-bits-these-bits-are-both-off",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "0",
+                            "winText": "3",
+                            "clue": [
+                                "THESE BITS",
+                                "ARE .OFF.",
+                                "SWITCH THEM",
+                                "ALL .ON."
+                            ],
+                            "winMessage": [
+                                "STILL EASY,",
+                                "RIGHT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Combo",
+                            "slug": "three-bits-combo",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "01230123",
+                            "winText": "01234567",
+                            "clue": [
+                                "HOW MANY",
+                                "COMBINATIONS",
+                                "CAN WE GET",
+                                "FROM THREE",
+                                "BITS?"
+                            ],
+                            "winMessage": [
+                                "SEE HOW THOSE",
+                                "FOUR TWO.BIT",
+                                "STATES REPEAT",
+                                "WITH THE",
+                                "THIRD BIT",
+                                ".OFF. AND",
+                                "THEN .ON.?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Flippy 3-1",
+                            "slug": "three-bits-flippy-3-1",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "00000",
+                            "winText": "25257",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS."
+                            ],
+                            "winMessage": [
+                                "STILL EASY.",
+                                "LET US DO",
+                                "SOME MORE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Flippy 3-2",
+                            "slug": "three-bits-flippy-3-2",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "0000",
+                            "winText": "421367",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS."
+                            ],
+                            "winMessage": [
+                                "WELL DONE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Flippy 3-3",
+                            "slug": "three-bits-flippy-3-3",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "012",
+                            "winText": "01234567",
+                            "clue": [
+                                "CAN YOU",
+                                "FIGURE OUT",
+                                "HOW TO MAKE",
+                                "THE NUMBERS",
+                                "ON THE RIGHT",
+                                "GO FROM ZERO",
+                                "TO SEVEN? I",
+                                "WILL START",
+                                "YOU OUT."
+                            ],
+                            "winMessage": [
+                                "LET US MOVE",
+                                "ON TO FOUR",
+                                "BITS."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "FOUR BITS"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 4,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Quadruple Bits",
+                            "slug": "four-bits-quadruple-bits",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "7",
+                            "winText": "F",
+                            "clue": [
+                                "LET US ADD",
+                                "ONE MORE BIT!"
+                            ],
+                            "winMessage": [
+                                "TA DA!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "These bits are both .off.",
+                            "slug": "four-bits-these-bits-are-both-off",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0",
+                            "winText": "F",
+                            "clue": [
+                                "THESE BITS",
+                                "ARE .OFF.",
+                                "SWITCH THEM",
+                                "ALL .ON."
+                            ],
+                            "winMessage": [
+                                "STILL EASY,",
+                                "RIGHT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Combo",
+                            "slug": "four-bits-combo",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0123456701234567",
+                            "winText": "0123456789ABCDEF",
+                            "clue": [
+                                "HOW MANY",
+                                "COMBINATIONS",
+                                "CAN WE GET",
+                                "FROM FOUR",
+                                "BITS?"
+                            ],
+                            "winMessage": [
+                                "SEE HOW THOSE",
+                                "EIGHT",
+                                "THREE.BIT",
+                                "STATES REPEAT",
+                                "WITH THE",
+                                "FOURTH BIT",
+                                ".OFF. AND",
+                                "THEN .ON.?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Patterns 4-1",
+                            "slug": "four-bits-patterns-4-1",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "69F0",
+                            "clue": [
+                                "LET US MAKE",
+                                "SOME",
+                                "PATTERNS. ALL",
+                                "YOU HAVE TO",
+                                "DO IS FLIP",
+                                "THE PURPLE",
+                                "BITS."
+                            ],
+                            "winMessage": [
+                                "PAY NO",
+                                "ATTENTION TO",
+                                "THOSE",
+                                "NUMBERS. JUST",
+                                "FLIP THE",
+                                "BITS!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Patterns 4-2",
+                            "slug": "four-bits-patterns-4-2",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "8421",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS."
+                            ],
+                            "winMessage": [
+                                "WELL DONE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Patterns 4-3",
+                            "slug": "four-bits-patterns-4-3",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "C3C3",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS"
+                            ],
+                            "winMessage": [
+                                "GREAT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Patterns 4-4",
+                            "slug": "four-bits-patterns-4-4",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "1248",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS"
+                            ],
+                            "winMessage": [
+                                "OKAY!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Patterns 4-5",
+                            "slug": "four-bits-patterns-4-5",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "F99F",
+                            "clue": [
+                                "CORRECT THE",
+                                "PURPLE BITS"
+                            ],
+                            "winMessage": [
+                                "A SQUARE!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Octal": {
+            "sort_order": 4,
+            "levels": [
+                {
+                    "levelName": [
+                        "OCTAL INTRO"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Reference",
+                            "slug": "octal-intro-octal-reference",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "0123456789ABC",
+                                "DE"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Decode 00",
+                            "slug": "octal-intro-octal-decode-00",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "0",
+                            "clue": [
+                                "HOW TO",
+                                "REPRESENT",
+                                "ZERO"
+                            ],
+                            "winMessage": [
+                                "MAKES SENSE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Decode 01",
+                            "slug": "octal-intro-octal-decode-01",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "1",
+                            "clue": [
+                                "HOW ABOUT",
+                                "ONE?"
+                            ],
+                            "winMessage": [
+                                "WITH YOU SO",
+                                "FAR."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal ",
+                            "slug": "octal-intro-octal",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "2",
+                            "clue": [
+                                "TWO?"
+                            ],
+                            "winMessage": [
+                                "SINCE WE ONLY",
+                                "HAVE ON.BITS",
+                                "AND OFF.BITS,",
+                                "WE CARRY A",
+                                "BIT WHEN THE",
+                                "OTHERS GET",
+                                "FULL. JUST",
+                                "LIKE IN",
+                                "DECIMAL",
+                                "NUMBERS, WHEN",
+                                "WE GET TO 9",
+                                "WE CARRY A 1",
+                                "TO MAKE 10."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal ",
+                            "slug": "octal-intro-octal-1",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "3",
+                            "clue": [
+                                "THREE"
+                            ],
+                            "winMessage": [
+                                "JUST TWO PLUS",
+                                "ONE. 010 PLUS",
+                                "1 IS 011."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal ",
+                            "slug": "octal-intro-octal-2",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "4",
+                            "clue": [
+                                "NOW CARRY A 1",
+                                "TO MAKE FOUR"
+                            ],
+                            "winMessage": [
+                                "ADD ONE AND",
+                                "CARRY ONE TO",
+                                "GO FROM 011",
+                                "TO 100."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal ",
+                            "slug": "octal-intro-octal-3",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "567",
+                            "clue": [
+                                "LET US DO UP",
+                                "TO SEVEN!"
+                            ],
+                            "winMessage": [
+                                "OH! SEVEN IS",
+                                "AS HIGH AS WE",
+                                "CAN GO!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal ",
+                            "slug": "octal-intro-octal-4",
+                            "type": "Decode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "WHAT ABOUT",
+                                "EIGHT?"
+                            ],
+                            "winMessage": [
+                                "IF YOU STRING",
+                                "THEM",
+                                "TOGETHER,",
+                                "THEY MAKE",
+                                "001000. SEE",
+                                "HOW THAT IS",
+                                "JUST CARRYING",
+                                "THE ONE FROM",
+                                "111?"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "OCTAL INTRO"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 2,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 0",
+                            "slug": "octal-intro-octal-encode-0",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "0",
+                            "clue": [
+                                "HOW TO",
+                                "REPRESENT",
+                                "ZERO"
+                            ],
+                            "winMessage": [
+                                "MAKES SENSE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 1",
+                            "slug": "octal-intro-octal-encode-1",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "1",
+                            "clue": [
+                                "HOW ABOUT",
+                                "ONE?"
+                            ],
+                            "winMessage": [
+                                "WITH YOU SO",
+                                "FAR."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 2",
+                            "slug": "octal-intro-octal-encode-2",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "2",
+                            "clue": [
+                                "TWO?"
+                            ],
+                            "winMessage": [
+                                "SINCE WE ONLY",
+                                "HAVE ON.BITS",
+                                "AND OFF.BITS,",
+                                "WE CARRY A",
+                                "BIT WHEN THE",
+                                "OTHERS GET",
+                                "FULL. JUST",
+                                "LIKE IN",
+                                "DECIMAL",
+                                "NUMBERS, WHEN",
+                                "WE GET TO 9",
+                                "WE CARRY A 1",
+                                "TO MAKE 10."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 3",
+                            "slug": "octal-intro-octal-encode-3",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "3",
+                            "clue": [
+                                "THREE"
+                            ],
+                            "winMessage": [
+                                "JUST TWO PLUS",
+                                "ONE. 010 PLUS",
+                                "1 IS 011."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 4",
+                            "slug": "octal-intro-octal-encode-4",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "4",
+                            "clue": [
+                                "NOW CARRY A 1",
+                                "TO MAKE FOUR"
+                            ],
+                            "winMessage": [
+                                "CARRY ONE AND",
+                                "ROLL OVER THE",
+                                "OTHERS TO GO",
+                                "FROM 011 TO",
+                                "100."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 567",
+                            "slug": "octal-intro-octal-encode-567",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "567",
+                            "clue": [
+                                "LET US DO UP",
+                                "TO SEVEN!"
+                            ],
+                            "winMessage": [
+                                "OH! SEVEN IS",
+                                "AS HIGH AS WE",
+                                "CAN GO!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 8",
+                            "slug": "octal-intro-octal-encode-8",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "WHAT ABOUT",
+                                "EIGHT?"
+                            ],
+                            "winMessage": [
+                                "THAT IS",
+                                "RIGHT!",
+                                ".EIGHT. IN",
+                                "OCTAL LOOKS",
+                                "LIKE .10. IF",
+                                "YOU STRING",
+                                "THEM",
+                                "TOGETHER,",
+                                "THEY MAKE",
+                                "001000. SEE",
+                                "HOW THAT IS",
+                                "JUST CARRYING",
+                                "THE ONE FROM",
+                                "111?"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "OCTAL 2"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 3,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Review",
+                            "slug": "octal-2-octal-review",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "",
+                            "winText": "01234567",
+                            "clue": [
+                                "01234567"
+                            ],
+                            "winMessage": [
+                                "GREAT! LET US",
+                                "LEARN SOME",
+                                "MORE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 012",
+                            "slug": "octal-2-octal-encode-012",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "000",
+                            "winText": "012",
+                            "clue": [
+                                "ENCODE 012"
+                            ],
+                            "winMessage": [
+                                "JUST STRING",
+                                "THEM ALONG."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Encode 412",
+                            "slug": "octal-2-octal-encode-412",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "000",
+                            "winText": "412",
+                            "clue": [
+                                "SOME FAIRLY",
+                                "RANDOM",
+                                "NUMBERS"
+                            ],
+                            "winMessage": [
+                                "WITH YOU SO",
+                                "FAR."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Add 0",
+                            "slug": "octal-2-octal-add-0",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "000",
+                            "winText": "424",
+                            "clue": [
+                                "NOW, ADD",
+                                "TOGETHER 012",
+                                "AND 412"
+                            ],
+                            "winMessage": [
+                                "PIECE OF",
+                                "CAKE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Add 1",
+                            "slug": "octal-2-octal-add-1",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "00",
+                            "winText": "10",
+                            "clue": [
+                                "WHAT ABOUT 4",
+                                "PLUS 4?"
+                            ],
+                            "winMessage": [
+                                "RIGHT! OCTAL",
+                                "10. A.K.A.",
+                                "DECIMAL 8"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Add 2",
+                            "slug": "octal-2-octal-add-2",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "00",
+                            "winText": "20",
+                            "clue": [
+                                "WHAT ABOUT",
+                                "OCTAL 10 PLUS",
+                                "OCTAL 10?"
+                            ],
+                            "winMessage": [
+                                "YES!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Moving On",
+                            "slug": "octal-2-moving-on",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "0",
+                            "winText": "7",
+                            "clue": [
+                                "SHALL WE LOOK",
+                                "AT USING",
+                                "ANOTHER BIT?"
+                            ],
+                            "winMessage": [
+                                "LET US HAVE A",
+                                "LOOK!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Hex": {
+            "sort_order": 5,
+            "levels": [
+                {
+                    "levelName": [
+                        "HEX INTRO"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Octal Review",
+                            "slug": "hex-intro-octal-review",
+                            "type": "Encode",
+                            "encoding_name": "ThreeBitOctal",
+                            "init": "01234567",
+                            "winText": "01234567",
+                            "clue": [
+                                "A REMINDER OF",
+                                "OCTAL. THREE",
+                                "BITS FOR",
+                                "EIGHT STATES."
+                            ],
+                            "winMessage": [
+                                "REMEMBER, YOU",
+                                "CAN DOUBLE",
+                                "THE NUMBER OF",
+                                "STATES BY",
+                                "ADDING ONE",
+                                "BIT."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex 1",
+                            "slug": "hex-intro-hex-1",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "000000000000000",
+                            "winText": "0123456789ABCDE",
+                            "clue": [
+                                "SO FOUR BITS",
+                                "GIVES US ALL",
+                                "OF THOSE",
+                                "STATES WITH",
+                                "THE NEW BIT",
+                                "OFF AND THEN",
+                                "AGAIN WITH IT",
+                                "ON. SHALL WE",
+                                "COUNT TO",
+                                "1111?"
+                            ],
+                            "winMessage": [
+                                "DO YOU SEE",
+                                "THE 0 THROUGH",
+                                "7 REPEATING",
+                                "WITH THE",
+                                "FIRST BIT",
+                                "CHANGING?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "The secret to Hex",
+                            "slug": "hex-intro-the-secret-to-hex",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "89ABCDEF",
+                            "winText": "89ABCDEF",
+                            "clue": [
+                                "THE SECRET TO",
+                                "LEARNING",
+                                "HEXADECIMAL,",
+                                "IS TO NOT TRY",
+                                "TO CONVERT IT",
+                                "INTO DECIMAL."
+                            ],
+                            "winMessage": [
+                                "THINK NOT .A.",
+                                "EQUALS .10.",
+                                "THINK INSTEAD",
+                                ".A. COMES",
+                                "AFTER .9."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "A comes after 9",
+                            "slug": "hex-intro-a-comes-after-9",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "00000000",
+                            "winText": "FEDCAB98",
+                            "clue": [
+                                ".B. IS NOT",
+                                ".11. B IS .A.",
+                                "PLUS .1. OR",
+                                ".9. PLUS .2.",
+                                "AND .C. IS",
+                                ".9. PLUS .3."
+                            ],
+                            "winMessage": [
+                                "FED CAB",
+                                "NINETY EIGHT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Some Hex Math",
+                            "slug": "hex-intro-some-hex-math",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0",
+                            "winText": "E",
+                            "clue": [
+                                "9 PLUS 5"
+                            ],
+                            "winMessage": [
+                                "YES!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Math 2",
+                            "slug": "hex-intro-hex-math-2",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0",
+                            "winText": "E",
+                            "clue": [
+                                "7 PLUS 8"
+                            ],
+                            "winMessage": [
+                                "DID YOU SEE",
+                                "HOW THE BITS",
+                                "WENT",
+                                "TOGETHER?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Math 3",
+                            "slug": "hex-intro-hex-math-3",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "00",
+                            "winText": "C3",
+                            "clue": [
+                                "WHAT IS 1100",
+                                "0011 IN HEX?"
+                            ],
+                            "winMessage": [
+                                "LET US ADD",
+                                "THEM."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Math 4",
+                            "slug": "hex-intro-hex-math-4",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "ADD C PLUS 3"
+                            ],
+                            "winMessage": [
+                                "SEE?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Math 5",
+                            "slug": "hex-intro-hex-math-5",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "A5",
+                            "clue": [
+                                "WHAT ARE THE",
+                                "BIT PATTERNS",
+                                "FOR A AND 5?"
+                            ],
+                            "winMessage": [
+                                "GOOD! CAN YOU",
+                                "GUESS WHAT IS",
+                                "NEXT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Math 6",
+                            "slug": "hex-intro-hex-math-6",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "ADD A AND 5"
+                            ],
+                            "winMessage": [
+                                "YOU ARE GOING",
+                                "TO DO JUST",
+                                "FINE, KID."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "HEX ADDITION"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 2,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Reference",
+                            "slug": "hex-addition-hex-reference",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "0123456789ABCDEF",
+                            "clue": [
+                                "0123456789ABC",
+                                "DEF"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 01",
+                            "slug": "hex-addition-hex-add-01",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "2",
+                            "clue": [
+                                "ADD 1 AND 1"
+                            ],
+                            "winMessage": [
+                                "NOT TOO HARD,",
+                                "RIGHT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 02",
+                            "slug": "hex-addition-hex-add-02",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "4",
+                            "clue": [
+                                "ADD 2 AND 2.",
+                                "THAT IS 0010",
+                                "AND 0010"
+                            ],
+                            "winMessage": [
+                                "ONE MORE EASY",
+                                "ONE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 03",
+                            "slug": "hex-addition-hex-add-03",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "8",
+                            "clue": [
+                                "ADD 4 AND 4.",
+                                "THAT IS 0100",
+                                "AND 0100"
+                            ],
+                            "winMessage": [
+                                "OKAY, NOW FOR",
+                                "FUN!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 04",
+                            "slug": "hex-addition-hex-add-04",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "A",
+                            "clue": [
+                                "ADD 8 AND 2.",
+                                "THAT IS 1000",
+                                "AND 0010"
+                            ],
+                            "winMessage": [
+                                "GET IT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 05",
+                            "slug": "hex-addition-hex-add-05",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "8 PLUS 3.",
+                                "THAT IS 1000",
+                                "AND 0011"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 06",
+                            "slug": "hex-addition-hex-add-06",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "8 PLUS 8"
+                            ],
+                            "winMessage": [
+                                "CARRY THE",
+                                "ONE.",
+                                "OVERFLOW!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 07",
+                            "slug": "hex-addition-hex-add-07",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "20",
+                            "clue": [
+                                "10 PLUS 10"
+                            ],
+                            "winMessage": [
+                                "GREAT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 08",
+                            "slug": "hex-addition-hex-add-08",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "40",
+                            "clue": [
+                                "20 PLUS 20"
+                            ],
+                            "winMessage": [
+                                "SO FAR SO",
+                                "GOOD. CAN YOU",
+                                "GUESS WHAT IS",
+                                "NEXT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 09",
+                            "slug": "hex-addition-hex-add-09",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "80",
+                            "clue": [
+                                "40 PLUS 40"
+                            ],
+                            "winMessage": [
+                                "NICE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0A",
+                            "slug": "hex-addition-hex-add-0a",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "100",
+                            "clue": [
+                                "AAAAAND. 80",
+                                "PLUS 80"
+                            ],
+                            "winMessage": [
+                                "EIGHTY PLUS",
+                                "EIGHTY EQUALS",
+                                "A HUNDRED.",
+                                "SOUNDS WRONG.",
+                                "BUT IT IS",
+                                "RIGHT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0B",
+                            "slug": "hex-addition-hex-add-0b",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "A",
+                            "clue": [
+                                "9 PLUS 1"
+                            ],
+                            "winMessage": [
+                                "JUST FOLLOW",
+                                "THE RULES."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0C",
+                            "slug": "hex-addition-hex-add-0c",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "9 PLUS 2"
+                            ],
+                            "winMessage": [
+                                "GOOD!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0D",
+                            "slug": "hex-addition-hex-add-0d",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "A PLUS 1"
+                            ],
+                            "winMessage": [
+                                "INCREMENT."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0C",
+                            "slug": "hex-addition-hex-add-0c-1",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "C",
+                            "clue": [
+                                "A PLUS 2"
+                            ],
+                            "winMessage": [
+                                "GOOD. KEEP",
+                                "GOING."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0D",
+                            "slug": "hex-addition-hex-add-0d-1",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "D",
+                            "clue": [
+                                "A PLUS 3"
+                            ],
+                            "winMessage": [
+                                "A PLUS 3",
+                                "EQUALS D.",
+                                "PIECE OF",
+                                "CAKE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0E",
+                            "slug": "hex-addition-hex-add-0e",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "E",
+                            "clue": [
+                                "A PLUS 4"
+                            ],
+                            "winMessage": [
+                                "GETTING CLOSE",
+                                "TO OVERFLOW!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0F",
+                            "slug": "hex-addition-hex-add-0f",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "A PLUS 5"
+                            ],
+                            "winMessage": [
+                                "FULL BITS."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 10",
+                            "slug": "hex-addition-hex-add-10",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "B PLUS 4"
+                            ],
+                            "winMessage": [
+                                "SAME ANSWER."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 11",
+                            "slug": "hex-addition-hex-add-11",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "C PLUS 3"
+                            ],
+                            "winMessage": [
+                                "CAN YOU GUESS",
+                                "WHAT IS NEXT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "hex-addition-hex",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "D PLUS 2"
+                            ],
+                            "winMessage": [
+                                "GOOD."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "hex-addition-hex-1",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "E PLUS 1"
+                            ],
+                            "winMessage": [
+                                "NOW WHAT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "hex-addition-hex-2",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "F PLUS 1"
+                            ],
+                            "winMessage": [
+                                "OVERFLOW!",
+                                "CARRY THE",
+                                "ONE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "hex-addition-hex-3",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "11",
+                            "clue": [
+                                "F PLUS 2"
+                            ],
+                            "winMessage": [
+                                "LESS OBVIOUS,",
+                                "BUT STILL STR",
+                                "AIGHTFORWARD."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "BINARY",
+                        "ADDITION"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 3,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Reference",
+                            "slug": "binary-addition-hex-reference",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "",
+                            "clue": [],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Random Hex 1",
+                            "slug": "binary-addition-random-hex-1",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "",
+                            "clue": [],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 01",
+                            "slug": "binary-addition-hex-add-01",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "2",
+                            "clue": [
+                                "ADD 1 AND 1"
+                            ],
+                            "winMessage": [
+                                "NOT TOO HARD,",
+                                "RIGHT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 02",
+                            "slug": "binary-addition-hex-add-02",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "4",
+                            "clue": [
+                                "ADD 2 AND 2"
+                            ],
+                            "winMessage": [
+                                "ONE MORE EASY",
+                                "ONE."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 03",
+                            "slug": "binary-addition-hex-add-03",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "8",
+                            "clue": [
+                                "ADD 4 AND 4"
+                            ],
+                            "winMessage": [
+                                "OKAY, NOW FOR",
+                                "FUN!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 04",
+                            "slug": "binary-addition-hex-add-04",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "A",
+                            "clue": [
+                                "ADD 8 AND 2"
+                            ],
+                            "winMessage": [
+                                "GET IT?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 05",
+                            "slug": "binary-addition-hex-add-05",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "8 PLUS 3"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 06",
+                            "slug": "binary-addition-hex-add-06",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "8 PLUS 8"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 07",
+                            "slug": "binary-addition-hex-add-07",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "20",
+                            "clue": [
+                                "10 PLUS 10"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 08",
+                            "slug": "binary-addition-hex-add-08",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "40",
+                            "clue": [
+                                "20 PLUS 20"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 09",
+                            "slug": "binary-addition-hex-add-09",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "80",
+                            "clue": [
+                                "40 PLUS 40"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0A",
+                            "slug": "binary-addition-hex-add-0a",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "100",
+                            "clue": [
+                                "80 PLUS 80"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0B",
+                            "slug": "binary-addition-hex-add-0b",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "A",
+                            "clue": [
+                                "9 PLUS 1"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0C",
+                            "slug": "binary-addition-hex-add-0c",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "9 PLUS 2"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0D",
+                            "slug": "binary-addition-hex-add-0d",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "B",
+                            "clue": [
+                                "A PLUS 1"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0C",
+                            "slug": "binary-addition-hex-add-0c-1",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "C",
+                            "clue": [
+                                "A PLUS 2"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0D",
+                            "slug": "binary-addition-hex-add-0d-1",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "D",
+                            "clue": [
+                                "A PLUS 3"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0E",
+                            "slug": "binary-addition-hex-add-0e",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "E",
+                            "clue": [
+                                "A PLUS 4"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 0F",
+                            "slug": "binary-addition-hex-add-0f",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "A PLUS 5"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 10",
+                            "slug": "binary-addition-hex-add-10",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "B PLUS 4"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex Add 11",
+                            "slug": "binary-addition-hex-add-11",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "C PLUS 3"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "binary-addition-hex",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "D PLUS 2"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "binary-addition-hex-1",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "F",
+                            "clue": [
+                                "E PLUS 1"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "binary-addition-hex-2",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "10",
+                            "clue": [
+                                "F PLUS 1"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Hex",
+                            "slug": "binary-addition-hex-3",
+                            "type": "Decode",
+                            "encoding_name": "FourBitHex",
+                            "init": "",
+                            "winText": "11",
+                            "clue": [
+                                "F PLUS 2"
+                            ],
+                            "winMessage": []
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "LEARN HEX 1"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 4,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "It just translates four bits",
+                            "slug": "learn-hex-1-it-just-translates-four-bits",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0000",
+                            "winText": "AFD7",
+                            "clue": [
+                                "WHY IS MAGIE",
+                                "SHOWING YOU",
+                                "NUMBERS AND",
+                                "LETTERS NEXT",
+                                "TO YOUR BITS?"
+                            ],
+                            "winMessage": [
+                                "THOSE NUMBERS",
+                                "AND LETTERS",
+                                "ARE SIMPLY",
+                                "SHORTHAND FOR",
+                                "GROUPS OF",
+                                "FOUR BITS."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "All bits are off",
+                            "slug": "learn-hex-1-all-bits-are-off",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "F",
+                            "winText": "0",
+                            "clue": [
+                                "WHEN ALL BITS",
+                                "ARE .OFF., WE",
+                                "USUALLY CALL",
+                                "IT .ZERO. OR",
+                                "SOMETIMES",
+                                ".NULL."
+                            ],
+                            "winMessage": [
+                                "DID YOU",
+                                "NOTICE WHICH",
+                                "LETTER SHOWED",
+                                "WHEN THEY",
+                                "WERE ALL ON?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "All on",
+                            "slug": "learn-hex-1-all-on",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "0",
+                            "winText": "F",
+                            "clue": [
+                                "FOR THIS",
+                                "GROUP OF",
+                                "PUZZLES, YOUR",
+                                "MAGIE IS",
+                                "CONFIGURED",
+                                "WITH A SYSTEM",
+                                "CALLED",
+                                ".HEXADECIMAL."
+                            ],
+                            "winMessage": [
+                                "IN",
+                                "HEXADECIMAL,",
+                                "WE CALL FOUR",
+                                ".ON. BITS .F."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Positional Value",
+                            "slug": "learn-hex-1-positional-value",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "00000",
+                            "winText": "01248",
+                            "clue": [
+                                "BUT WHAT",
+                                "ABOUT WHEN",
+                                "SOME BITS ARE",
+                                ".ON. AND",
+                                "OTHERS ARE",
+                                ".OFF.? IN",
+                                "THESE CASES,",
+                                "WE USE",
+                                ".POSITIONAL.",
+                                "VALUES. JUST",
+                                "LIKE IN",
+                                "NORMAL",
+                                "NUMBERS. .10.",
+                                "IS MORE THAN",
+                                ".01. IN",
+                                "NORMAL",
+                                "NUMBERS, .10.",
+                                "IS EVEN MORE",
+                                "THAN .09.",
+                                "EVEN THOUGH",
+                                ".9. IS MUCH",
+                                "MORE THAN .1."
+                            ],
+                            "winMessage": [
+                                "SEE? AS THE",
+                                ".1. MOVES",
+                                "LEFT, THE",
+                                "NUMBERS GET",
+                                "BIGGER."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Add them up",
+                            "slug": "learn-hex-1-add-them-up",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "2",
+                            "winText": "3",
+                            "clue": [
+                                "THE COOL",
+                                "THING IS THAT",
+                                "WE CAN JUST",
+                                "ADD THOSE",
+                                "NUMBERS UP",
+                                "AND GET EVEN",
+                                "BIGGER",
+                                "NUMBERS. SO",
+                                ".10. IS",
+                                "BIGGER THAN",
+                                ".01. AND .11.",
+                                "IS EVEN",
+                                "BIGGER"
+                            ],
+                            "winMessage": [
+                                "BIGGER!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Keep Adding",
+                            "slug": "learn-hex-1-keep-adding",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "3",
+                            "winText": "4",
+                            "clue": [
+                                "AS THE RIGHT",
+                                "SIDE FILLS",
+                                "UP, WE JUST",
+                                "ROLL OVER",
+                                "INTO BITS",
+                                "THAT ARE",
+                                "FURTHER TO",
+                                "THE LEFT AND",
+                                "THEREFORE",
+                                "WORTH MORE."
+                            ],
+                            "winMessage": [
+                                "JUST LIKE",
+                                "NORMAL .99.",
+                                "PLUS .1. IS",
+                                ".100., BINARY",
+                                ".11. PLUS .1.",
+                                "IS .100."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 5",
+                            "slug": "learn-hex-1-count-5",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "4",
+                            "winText": "5",
+                            "clue": [
+                                "ADD .1. TO",
+                                ".4."
+                            ],
+                            "winMessage": [
+                                "OKAY!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 6",
+                            "slug": "learn-hex-1-count-6",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "5",
+                            "winText": "6",
+                            "clue": [
+                                "ADD .1. TO",
+                                ".5."
+                            ],
+                            "winMessage": [
+                                "TICK! I LIKE",
+                                "TO THINK OF",
+                                "AN ODOMETER",
+                                "TICKING OVER."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 7",
+                            "slug": "learn-hex-1-count-7",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "6",
+                            "winText": "7",
+                            "clue": [
+                                "ADD .1. TO",
+                                ".6."
+                            ],
+                            "winMessage": [
+                                "TICK!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 8",
+                            "slug": "learn-hex-1-count-8",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "7",
+                            "winText": "8",
+                            "clue": [
+                                "ADD .1. TO",
+                                ".7."
+                            ],
+                            "winMessage": [
+                                "ROLL OVER!"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "LEARN HEX 2"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 5,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Count 9",
+                            "slug": "learn-hex-2-count-9",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "8",
+                            "winText": "9",
+                            "clue": [
+                                "ADD .1. TO",
+                                ".8. TO GET",
+                                ".9."
+                            ],
+                            "winMessage": [
+                                "OKAY! SO FAR",
+                                "SO GOOD, BUT",
+                                "NOW WE ARE",
+                                "OUT OF",
+                                ".DECIMAL.",
+                                "DIGITS. THAT",
+                                "IS, WE ARE",
+                                "GOING PAST",
+                                "DECIMAL .9."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count A",
+                            "slug": "learn-hex-2-count-a",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "9",
+                            "winText": "A",
+                            "clue": [
+                                "IN DECIMAL",
+                                "NUMBERS, WE",
+                                "WOULD ROLL",
+                                "OVER TO .10.,",
+                                "BUT",
+                                "HEXADECIMAL",
+                                "GIVES US SIX",
+                                "ADDITIONAL",
+                                "NUMERALS."
+                            ],
+                            "winMessage": [
+                                "DO YOU SEE",
+                                "HOW WE",
+                                "HAVEN'T USED",
+                                "UP ALL FOUR",
+                                "BITS? THIS IS",
+                                "WHY BINARY",
+                                "LOVES",
+                                "HEXADECIMAL."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count B",
+                            "slug": "learn-hex-2-count-b",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "A",
+                            "winText": "B",
+                            "clue": [
+                                ".HEXADECIMAL.",
+                                "MEANS SIX",
+                                ".HEX. AND TEN",
+                                ".DEC...",
+                                "IMAL...?"
+                            ],
+                            "winMessage": [
+                                "DO YOU",
+                                "REMEMBER",
+                                "WHICH LETTER",
+                                "IS THE SIXTH",
+                                "IN THE",
+                                "ALPHABET?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count C",
+                            "slug": "learn-hex-2-count-c",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "B",
+                            "winText": "C",
+                            "clue": [
+                                "JUST KEEP",
+                                "ADDING .1."
+                            ],
+                            "winMessage": [
+                                "ROLL IT PART",
+                                "WAY OVER."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count D",
+                            "slug": "learn-hex-2-count-d",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "C",
+                            "winText": "D",
+                            "clue": [
+                                "JUST KEEP",
+                                "ADDING .1."
+                            ],
+                            "winMessage": [
+                                "THAT ONE WAS",
+                                "EASY."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count E",
+                            "slug": "learn-hex-2-count-e",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "D",
+                            "winText": "E",
+                            "clue": [
+                                "JUST KEEP",
+                                "ADDING .1."
+                            ],
+                            "winMessage": [
+                                "ALMOST THERE!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count F",
+                            "slug": "learn-hex-2-count-f",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "E",
+                            "winText": "F",
+                            "clue": [
+                                "WE ARE ABOUT",
+                                "TO MAX OUT",
+                                "OUR FIRST",
+                                "HEXADECIMAL",
+                                "DIGIT. READY?"
+                            ],
+                            "winMessage": [
+                                "THERE! YOU",
+                                "DID IT! YOU",
+                                "COUNTED TO",
+                                ".F.!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 10",
+                            "slug": "learn-hex-2-count-10",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "F",
+                            "winText": "10",
+                            "clue": [
+                                "NOW, WE JUST",
+                                "ROLL THE NEXT",
+                                ".1. OVER. IT",
+                                "SEEMS HARD",
+                                "UNTIL WE",
+                                "REALIZE WE",
+                                "CAN JUST ADD",
+                                "A SECOND",
+                                "DIGIT."
+                            ],
+                            "winMessage": [
+                                "YOU GOT IT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 11",
+                            "slug": "learn-hex-2-count-11",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "10",
+                            "winText": "11",
+                            "clue": [
+                                "NOW, WE JUST",
+                                "KEEP COUNTING",
+                                "ON THAT LAST",
+                                "DIGIT UNTIL",
+                                "IT IS TIME TO",
+                                "ROLL OVER",
+                                "ANOTHER BIT."
+                            ],
+                            "winMessage": [
+                                "YOU GOT IT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 12",
+                            "slug": "learn-hex-2-count-12",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "11",
+                            "winText": "12",
+                            "clue": [
+                                "JUST KEEP",
+                                "ADDING .1.",
+                                "LIKE BEFORE"
+                            ],
+                            "winMessage": [
+                                "WE CAN STOP",
+                                "HERE. IF YOU",
+                                "WANT TO COUNT",
+                                "FURTHR,",
+                                "CHOOSE THE",
+                                "LEVEL CALLED",
+                                ".COUNTING IN",
+                                "HEX."
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "levelName": [
+                        "COUNTING IN",
+                        "HEX"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 6,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "Count 13",
+                            "slug": "counting-in-hex-count-13",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "12",
+                            "winText": "13",
+                            "clue": [
+                                "ANOTHER WAY",
+                                "TO THINK OF",
+                                "IT IS AS IF",
+                                "YOU WERE",
+                                "PUSHING BITS",
+                                "ONTO ONE OF",
+                                "THOSE SPRING",
+                                "LOADED BUFFET",
+                                "PLATE",
+                                "STACKERS."
+                            ],
+                            "winMessage": [
+                                "MAYBE NOT",
+                                "PLATES. SOME",
+                                "KIND OF",
+                                "FLIPPER."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 14",
+                            "slug": "counting-in-hex-count-14",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "13",
+                            "winText": "14",
+                            "clue": [
+                                "YOU PUSH ONE",
+                                "MORE, AND IT",
+                                "FLIPS ALL THE",
+                                "BITS TO ITS",
+                                "LEFT UNTIL IT",
+                                "HITS ONE THAT",
+                                "IS GOING FROM",
+                                ".OFF. TO .ON."
+                            ],
+                            "winMessage": [
+                                "LIKE, ONE OF",
+                                "THOSE RUBBER",
+                                "TOYS THAT YOU",
+                                "TURN INSIDE",
+                                "OUT AND THEN",
+                                "IT POPS UP IN",
+                                "THE AIR."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 15",
+                            "slug": "counting-in-hex-count-15",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "14",
+                            "winText": "15",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "NO FLIPS"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 16",
+                            "slug": "counting-in-hex-count-16",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "15",
+                            "winText": "16",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "A LITTLE",
+                                "FLIP. JUST",
+                                "ONE BIT."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 17",
+                            "slug": "counting-in-hex-count-17",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "16",
+                            "winText": "17",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "NO FLIP."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 18",
+                            "slug": "counting-in-hex-count-18",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "17",
+                            "winText": "18",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "THREE FLIPS?"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 19",
+                            "slug": "counting-in-hex-count-19",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "18",
+                            "winText": "19",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "NO FLIPS."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1A",
+                            "slug": "counting-in-hex-count-1a",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "19",
+                            "winText": "1A",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "ONE LITTLE",
+                                "FLIP. AND WE",
+                                "ARE NOT OUT",
+                                "OF BITS YET,",
+                                "SO WE DO NOT",
+                                "FLIP TO .20.",
+                                "YET! THIS IS",
+                                ".HEXA.DECIMAL"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1B",
+                            "slug": "counting-in-hex-count-1b",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1A",
+                            "winText": "1B",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "NO FLIPS. BUT",
+                                "THERE WILL BE",
+                                "ONE NEXT",
+                                "TIME!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1C",
+                            "slug": "counting-in-hex-count-1c",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1B",
+                            "winText": "1C",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT AND GET",
+                                "READY FOR A",
+                                "FLIP!"
+                            ],
+                            "winMessage": [
+                                "NO FLIPS. NOT",
+                                "OUR BIGGEEST",
+                                "FLIP, BUT",
+                                "NOTHING TO",
+                                "SNEAZE AT!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1D",
+                            "slug": "counting-in-hex-count-1d",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1C",
+                            "winText": "1D",
+                            "clue": [
+                                ".C. IS PRETTY",
+                                "EASY TO",
+                                "REMEMBER, AND",
+                                ".D. IS JUST",
+                                "ONE MORE THAN",
+                                "THAT."
+                            ],
+                            "winMessage": [
+                                "NO FLIP."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1E",
+                            "slug": "counting-in-hex-count-1e",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1D",
+                            "winText": "1E",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "I LIKE .E."
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 1F",
+                            "slug": "counting-in-hex-count-1f",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1E",
+                            "winText": "1F",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "LOOK AT ALL",
+                                "THOSE .ON.",
+                                "BITS IN A",
+                                "ROW!"
+                            ]
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Count 0x20",
+                            "slug": "counting-in-hex-count-0x20",
+                            "type": "Encode",
+                            "encoding_name": "FourBitHex",
+                            "init": "1F",
+                            "winText": "20",
+                            "clue": [
+                                "PUSH AN .ON.",
+                                "BIT"
+                            ],
+                            "winMessage": [
+                                "FLIP, FLIP,",
+                                "FLIP, FLIP,",
+                                "FLIP, FLIP!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Story": {
+            "sort_order": 6,
+            "levels": [
+                {
+                    "levelName": [
+                        "IN CLASS",
+                        "TODAY"
+                    ],
+                    "slug": "",
+                    "levelVersion": 1,
+                    "sort_order": 1,
+                    "puzzles": [
+                        {
+                            "id": null,
+                            "puzzleName": "When",
+                            "slug": "in-class-today-when",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AT THE START",
+                                "OF CLASS",
+                                "TODAY"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Who",
+                            "slug": "in-class-today-who",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "MRS. BRIGGS",
+                                "ANNOUNCEOS,",
+                                ".OKAY KIDS.",
+                                "TODAY IS THE",
+                                "DAY!."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Day for What",
+                            "slug": "in-class-today-day-for-what",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                ".YOU FINALLY",
+                                "GET YOUR DATA",
+                                "EXPLORERS!."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Excited",
+                            "slug": "in-class-today-excited",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "ALL OF US",
+                                "WERE TOO",
+                                "NERVOUS FOR",
+                                "CHEEROS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "How",
+                            "slug": "in-class-today-how",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "MRS. BRIGGS",
+                                "ROLLED OUT",
+                                "THE CART FULL",
+                                "OF DEVICES."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Then What",
+                            "slug": "in-class-today-then-what",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "WITHOUT ANY",
+                                "CEREMONY SHE",
+                                "ROLLS THE",
+                                "CART TO EACH",
+                                "DESK AND",
+                                "SETTOS..."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Content 1",
+                            "slug": "in-class-today-content-1",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "A DEVICE,"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Content 2",
+                            "slug": "in-class-today-content-2",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "A BAG,"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Content 3",
+                            "slug": "in-class-today-content-3",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AA BATTERIES"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Content 4",
+                            "slug": "in-class-today-content-4",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "A SHRINK",
+                                "WRAPPED BRICK",
+                                "OF SEVENTY",
+                                "PRE PRINTED",
+                                "PAPER CARDS",
+                                "WITH MAGNETIC",
+                                "STRIPES ON",
+                                "THEM,"
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Content 5",
+                            "slug": "in-class-today-content-5",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AND LAST OF",
+                                "ALL, A FEW",
+                                "PLASTIC CARDS",
+                                "MEANT TO BE",
+                                "USED MULTIPLE",
+                                "TIMES."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Plastic Cards",
+                            "slug": "in-class-today-plastic-cards",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "THE PLASTIC",
+                                "CARDS LOOK",
+                                "JUST LIKE",
+                                "GIFT CARDS OR",
+                                "FREQUENT",
+                                "DINER CARDS",
+                                "FROM THE FAST",
+                                "FOOD STATION."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "In other words",
+                            "slug": "in-class-today-in-other-words",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "IN OTHER",
+                                "WORDS, THEY",
+                                "LOOK LIKE",
+                                "CREDIT CARDS",
+                                "WITHOUT",
+                                "NUMBERS",
+                                "STAMPOS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "What for?",
+                            "slug": "in-class-today-what-for",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "WE ARE",
+                                "SUPPOSED TO",
+                                "USEOS TO HAND",
+                                "IN HOMEWORK",
+                                "AND STUFF,",
+                                "BUT WE OFTEN",
+                                "USEOS TO",
+                                "TRADEOS AND",
+                                "PLAYOS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Playos 1",
+                            "slug": "in-class-today-playos-1",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "MY FAVORITE",
+                                "IS ",
+                                ".SECRET",
+                                "TOKEN.",
+                                "WHERE ONE ",
+                                "OF US",
+                                "ENCODES A",
+                                "SECRET NUMBER",
+                                "ON THEIR",
+                                "CARD."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Playos 2",
+                            "slug": "in-class-today-playos-2",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "THE OTHER",
+                                "PLAYERS PUT",
+                                "WHATEVER THEY",
+                                "THINK WILL",
+                                "TRICKOS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Playos 3",
+                            "slug": "in-class-today-playos-3",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "THEN WE SWAP",
+                                "CARDS AND TRY",
+                                "TO FIGURE OUT",
+                                "WHO HAS THE",
+                                "SECRET TOKEN."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Playos 4",
+                            "slug": "in-class-today-playos-4",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "IT IS REALLY",
+                                "FUN, YOU",
+                                "SHOULD TRYOS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Thin Bags",
+                            "slug": "in-class-today-thin-bags",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "ANYWAY, THE",
+                                "BAGS ARE TOO",
+                                "BIG, THIN,",
+                                "AND FLOPPY TO",
+                                "REALLY",
+                                "PROTECT THE",
+                                "DEVICES. I",
+                                "THINK THEY",
+                                "ARE MOSTLY",
+                                "THERE TO",
+                                "HOLDOS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Protectos 1",
+                            "slug": "in-class-today-protectos-1",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "MOST KIDS",
+                                "MAKE OR EVEN",
+                                "BUY CASES TO",
+                                "PROTECTOS AND",
+                                "GIVE A LITTLE",
+                                "BIT OF",
+                                "INDIVIDUAL",
+                                "FLAIR."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Protectos 2",
+                            "slug": "in-class-today-protectos-2",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "SOME KIDS",
+                                "WERE READY",
+                                "AND PUTTOS ON",
+                                "THEIR DEVICES",
+                                "RIGHT THERE",
+                                "IN CLASS."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "Contemplatos",
+                            "slug": "in-class-today-contemplatos",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "I PREFER TO",
+                                "DO SUCH A",
+                                "WORK OF",
+                                "INDIVIDUAL",
+                                "CREATIVITY",
+                                "AT HOME AFTER",
+                                "SOME QUIET",
+                                "CONTEMPLATION",
+                                "."
+                            ],
+                            "winMessage": []
+                        },
+                        {
+                            "id": null,
+                            "puzzleName": "The End",
+                            "slug": "in-class-today-the-end",
+                            "type": "",
+                            "encoding_name": "AlphaLengthA1",
+                            "init": "",
+                            "winText": "",
+                            "clue": [
+                                "AND LIKE THAT",
+                                "IT IS OVER.",
+                                "ALL THE",
+                                "KIDS IN CLASS",
+                                "HAVE THEIR",
+                                "OWN",
+                                "INTERACTIVE",
+                                "DATA",
+                                "EXPLORERS.",
+                                "OR,",
+                                "MAGNETIC",
+                                "INTERACTIVE",
+                                "EXPLORERS.",
+                                "OR,",
+                                "AS I PREFER",
+                                "TO CALLOS,",
+                                "...",
+                                "MAGIES!!"
+                            ],
+                            "winMessage": []
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
