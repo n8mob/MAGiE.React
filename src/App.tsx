@@ -70,7 +70,7 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
-const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
+  const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
   const activeScrollContainer = useRef<HTMLElement | null>(null);
@@ -291,6 +291,13 @@ const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
         } />
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="tutorial" />} />
+      </>)}
+      {features.includes('vintage') && (<>
+        <Route path="/vintage" element={<MenuBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex" element={<CategoryBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="vintage" />} />
+        <Route path="/vintage/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="vintage" />} />
       </>)}
       {features.includes('bigGameRoutes') && (<>
         <Route path="/bigGame" element={<MenuBrowser menuName="bigGame" />} />

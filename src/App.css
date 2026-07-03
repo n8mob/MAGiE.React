@@ -179,7 +179,7 @@ h3 {
   overflow-y: auto;
 }
 
-.decode-guess-display {
+.guess-text-display {
   width: min(100%, 34rem);
   margin: 0 auto 0.8rem;
   padding: 0.5rem 0.75rem;
@@ -192,19 +192,31 @@ h3 {
   overflow: hidden;
 }
 
-.decode-guess-text,
-.decode-guess-placeholder {
+.guess-text,
+.guess-placeholder {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.decode-guess-placeholder {
+.guess-placeholder {
   opacity: 0.55;
 }
 
-.decode-guess-cursor {
+/* scroll-tail: instead of truncating with an ellipsis, clip overflow on the
+   left so the newest input stays visible (scrolled to the end via JS). */
+.guess-text-display.scroll-tail {
+  overflow-x: hidden;
+}
+
+.guess-text-display.scroll-tail .guess-text {
+  overflow: visible;
+  text-overflow: clip;
+  flex-shrink: 0;
+}
+
+.guess-cursor {
   flex: 0 0 auto;
 }
 

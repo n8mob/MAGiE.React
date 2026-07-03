@@ -30,6 +30,15 @@ export const MENU_NAME_MAP: Record<string, MenuNameInfo> = {
       </div>
     )
   },
+  vintage: {
+    shortName: "vintage",
+    fullName: "VintagePuzzles",
+    titleNode: (
+      <div className={'menu-title'}>
+        <h3>-= RETRO MAGiE =-</h3>
+      </div>
+    )
+  },
   bigGame: {
     shortName: "bigGame",
     fullName: "BigGame_fromJSON",

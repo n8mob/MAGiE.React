@@ -14,6 +14,9 @@ function PageNotFound() {
       </div>
     </>;
     setHeaderContent(notFoundDiv);
+    // Clear the 404 heading when navigating away; not every destination
+    // sets its own header content (e.g. the story pages). See #175.
+    return () => setHeaderContent(null);
   }, [setHeaderContent]);
 
   return (<>

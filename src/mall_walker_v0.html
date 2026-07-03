@@ -1,0 +1,105 @@
+
+<style>
+.mw-tile { image-rendering: pixelated; }
+.mw-btn {
+  width:44px; height:44px; background:#1a1a08; border:1px solid #3a3a1a;
+  color:#ffcc00; font-size:18px; cursor:pointer; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  user-select:none; -webkit-tap-highlight-color:transparent;
+}
+.mw-btn:active { background:#2a2a10; }
+</style>
+<h2 class="sr-only">Mall Walker — a tile-based map sandbox. Walk around with arrow keys or the on-screen d-pad.</h2>
+
+<div id="root" style="display:flex;flex-direction:column;align-items:center;padding:16px 0;font-family:'Courier New',monospace;"></div>
+
+<script>
+const WALL=1,FLOOR=0,ARCADE=2,FOOD=3,NEWS=4,JAIL=5;
+const W=WALL,_=FLOOR,A=ARCADE,F=FOOD,N=NEWS,J=JAIL;
+
+const MAP=[
+  [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
+  [W,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,W],
+  [W,_,A,A,A,W,_,_,F,F,F,W,_,_,N,N,N,W,_,W],
+  [W,_,A,A,A,W,_,_,F,F,F,W,_,_,N,N,N,W,_,W],
+  [W,_,A,A,A,W,_,_,F,F,F,W,_,_,N,N,N,W,_,W],
+  [W,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,W],
+  [W,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,W],
+  [W,_,J,J,J,W,_,_,_,_,_,W,_,_,_,_,_,W,_,W],
+  [W,_,J,J,J,W,_,_,_,_,_,W,_,_,_,_,_,W,_,W],
+  [W,_,J,J,J,W,_,_,_,_,_,W,_,_,_,_,_,W,_,W],
+  [W,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,W],
+  [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
+];
+const ROWS=MAP.length, COLS=MAP[0].length, T=28;
+
+const ZONE_NAMES={[ARCADE]:'ARCADE',[FOOD]:'FOOD COURT',[NEWS]:'NEWSSTAND',[JAIL]:'MALL JAIL'};
+const TILE_BG={
+  [FLOOR]:'#d0d4d4',[WALL]:'#1e272a',
+  [ARCADE]:'#5c287a',[FOOD]:'#1ba8a8',
+  [NEWS]:'#d4b759',[JAIL]:'#008080',
+};
+
+let pos={row:6,col:10};
+
+function move(dr,dc){
+  const nr=pos.row+dr, nc=pos.col+dc;
+  if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return;
+  if(MAP[nr][nc]===WALL) return;
+  pos={row:nr,col:nc};
+  render();
+}
+
+function render(){
+  const root=document.getElementById('root');
+  const zone=ZONE_NAMES[MAP[pos.row][pos.col]]||'CORRIDOR';
+
+  let tilesHTML='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const isP=r===pos.row&&c===pos.col;
+      const bg=isP?'#ffcc00':TILE_BG[MAP[r][c]];
+      const content=isP?'◆':'';
+      const color=isP?'#000':'transparent';
+      tilesHTML+=`<div class="mw-tile" style="width:${T}px;height:${T}px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:12px;color:${color};font-weight:bold;">${content}</div>`;
+    }
+  }
+
+  root.innerHTML=`
+    <div style="font-size:10px;letter-spacing:3px;color:var(--color-text-secondary);margin-bottom:12px;">
+      MALL WALKER v0.1 &nbsp;▸&nbsp; ARROW KEYS / WASD
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(${COLS},${T}px);grid-template-rows:repeat(${ROWS},${T}px);outline:2px solid #333;gap:0;">
+      ${tilesHTML}
+    </div>
+    <div style="margin-top:12px;font-size:13px;letter-spacing:3px;color:#ffcc00;min-height:22px;">
+      [ ${zone} ]
+    </div>
+    <div style="margin-top:4px;font-size:10px;letter-spacing:2px;color:#444;">${pos.row},${pos.col}</div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:44px 44px 44px;gap:4px;" id="dpad">
+      <div></div>
+      <button class="mw-btn" data-dr="-1" data-dc="0" aria-label="up">▲</button>
+      <div></div>
+      <button class="mw-btn" data-dr="0" data-dc="-1" aria-label="left">◀</button>
+      <button class="mw-btn" data-dr="1" data-dc="0" aria-label="down">▼</button>
+      <button class="mw-btn" data-dr="0" data-dc="1" aria-label="right">▶</button>
+    </div>
+  `;
+
+  document.getElementById('dpad').addEventListener('click',e=>{
+    const btn=e.target.closest('button');
+    if(!btn) return;
+    move(parseInt(btn.dataset.dr),parseInt(btn.dataset.dc));
+  });
+}
+
+window.addEventListener('keydown',e=>{
+  const map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1],
+             w:[-1,0],s:[1,0],a:[0,-1],d:[0,1],
+             W:[-1,0],S:[1,0],A:[0,-1],D:[0,1]};
+  const dir=map[e.key];
+  if(dir){e.preventDefault();move(dir[0],dir[1]);}
+});
+
+render();
+</script>
