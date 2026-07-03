@@ -14,7 +14,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
     onShareWin = () => {},
     bitButtonWidthPx = 32
   }) => {
-  const [guessBits, setGuessBits] = useState(BitSequence.empty());
+  const [guessBits, setGuessBits] = useState(puzzle?.encoding?.encodeText(puzzle?.init) || BitSequence.empty());
   const guessText = useMemo(
     () => puzzle?.encoding?.decodeText(guessBits) || "",
     [puzzle, guessBits]
@@ -90,7 +90,9 @@ const EncodePuzzle: FC<PuzzleProps> = (
     <>
       <div id="game-content">
         <div id="main-display" className="display" ref={mainDisplayRef}>
-          {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+          <div id="clue-text">
+            {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+          </div>
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
@@ -106,20 +108,23 @@ const EncodePuzzle: FC<PuzzleProps> = (
             )}
           />
         </div>
-      </div>
-      <div id="puzzle-inputs" ref={puzzleInputsRef}>
-        {puzzle.winText != null && puzzle.winText.length > 0 &&
-          <GuessDisplay guessText={guessText} placeholder="YOUR GUESS HERE" showCursor={!hasWon} />
-        }
-        {!hasWon && (
-          <BitInputs
-            onBit={appendBit}
-            onDelete={deleteBit}
-            onSubmit={() => {}}
-            disabled={hasWon}
-          />)}
-        {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
-          <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+        <div id="puzzle-inputs" ref={puzzleInputsRef}>
+          {puzzle.winText != null && puzzle.winText.length > 0 &&
+            <GuessDisplay guessText={guessText} placeholder="YOUR GUESS HERE" showCursor={!hasWon} />
+          }
+          {hasWon ? (
+            <div id="win-message" className="display">
+              {[...puzzle.winMessage].map((winLine, winIndex) =>
+                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
+            </div>
+          ) : (
+            <BitInputs
+              onBit={appendBit}
+              onDelete={deleteBit}
+              onSubmit={() => {}}
+              disabled={hasWon}
+            />)}
+        </div>
       </div>
     </>
   )
