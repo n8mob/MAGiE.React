@@ -26,7 +26,8 @@ const EncodePuzzle: FC<PuzzleProps> = (
     puzzleInputsRef,
     displayRows,
     judgment,
-    hasWon
+    hasWon,
+    isAutoWin
   } = useBasePuzzle({
     puzzle,
     guessBits,
@@ -109,7 +110,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
           />
         </div>
         <div id="puzzle-inputs" ref={puzzleInputsRef}>
-          {puzzle.winText != null && puzzle.winText.length > 0 &&
+          {!isAutoWin && puzzle.winText != null && puzzle.winText.length > 0 &&
             <GuessDisplay guessText={guessText} placeholder="YOUR GUESS HERE" showCursor={!hasWon} />
           }
           {hasWon ? (
