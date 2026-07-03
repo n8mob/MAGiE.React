@@ -4,7 +4,9 @@
       "Bash(npm outdated *)",
       "Bash(npm show *)",
       "Bash(npm run lint *)",
-      "Bash(npx vitest *)"
+      "Bash(npx vitest *)",
+      "Bash(git checkout *)",
+      "Bash(npm audit *)"
     ]
   }
 }
