@@ -4,6 +4,7 @@ import { CorrectnessBitButton } from "./BitButton.tsx";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { BitSequence } from "../BitSequence";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
+import { GuessDisplay } from "./GuessDisplay.tsx";
 import { Correctness } from "../judgment/BitJudgment.ts";
 
 const LETTER_PATTERN = /^[a-z]$/i;
@@ -171,12 +172,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
         </div>
         {!hasWon && (
           <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
-            <div className="guess-text-display" aria-label="Current guess">
-              <span className={guessText.length > 0 ? "guess-text" : "guess-placeholder"}>
-                {guessText.length > 0 ? guessText : "DECODE TEXT HERE"}
-              </span>
-              <span className="decode-guess-cursor blink" aria-hidden="true">_</span>
-            </div>
+            <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
             <OnScreenKeyboard
               onCharacter={appendCharacter}
               onDelete={deleteCharacter}

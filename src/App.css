@@ -216,7 +216,7 @@ h3 {
   flex-shrink: 0;
 }
 
-.decode-guess-cursor {
+.guess-cursor {
   flex: 0 0 auto;
 }
 

@@ -1,6 +1,7 @@
-import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FC, useCallback, useEffect, useMemo, useState } from "react";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
+import { GuessDisplay } from "./GuessDisplay.tsx";
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
@@ -80,16 +81,6 @@ const EncodePuzzle: FC<PuzzleProps> = (
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Keep the newest input visible: the guess display clips on the left
-  // (see .scroll-tail in App.css), so scroll to the end on every change.
-  const guessDisplayRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const guessDisplay = guessDisplayRef.current;
-    if (guessDisplay) {
-      guessDisplay.scrollLeft = guessDisplay.scrollWidth;
-    }
-  }, [guessText]);
-
   if (!puzzle) {
     // No crashes!
     return <></>;
@@ -118,14 +109,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
       </div>
       <div id="puzzle-inputs" ref={puzzleInputsRef}>
         {puzzle.winText != null && puzzle.winText.length > 0 &&
-          <div className="guess-text-display scroll-tail" aria-label="Current guess" ref={guessDisplayRef}>
-            <span className={guessBits.length > 0 ? "guess-text" : "guess-placeholder"}>{guessText.length > 0
-              ? guessText
-              : "YOUR GUESS HERE"}</span>
-            {!hasWon && (
-              <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
-            )}
-          </div>
+          <GuessDisplay guessText={guessText} placeholder="YOUR GUESS HERE" showCursor={!hasWon} />
         }
         {!hasWon && (
           <BitInputs
