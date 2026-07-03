@@ -14,6 +14,10 @@ const EncodePuzzle: FC<PuzzleProps> = (
     bitButtonWidthPx = 32
   }) => {
   const [guessBits, setGuessBits] = useState(BitSequence.empty());
+  const guessText = useMemo(
+    () => puzzle?.encoding?.decodeText(guessBits) || "",
+    [puzzle, guessBits]
+  );
 
   const {
     displayMatrixRef,
@@ -79,34 +83,38 @@ const EncodePuzzle: FC<PuzzleProps> = (
   }, [handleKeyDown]);
 
   if (!puzzle) {
+    // No crashes!
     return <></>;
   }
 
   return (
     <>
-      <div id="main-display">
-        {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-        <DisplayMatrix
-          ref={displayMatrixRef}
-          displayRows={displayRows}
-          renderBit={(bit, rowIndex, indexWithinRow) => (
-            <CorrectnessBitButton
-              key={`bit-${bit.index}`}
-              bit={bit}
-              correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
-                ?? Correctness.unguessed}
-              onChange={handleBitClick}
-            />
-          )}
-        />
-        {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
-          <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+      <div id="game-content">
+        <div id="main-display" className="display">
+          {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+          <DisplayMatrix
+            ref={displayMatrixRef}
+            displayRows={displayRows}
+            renderBit={(bit, rowIndex, indexWithinRow) => (
+              <CorrectnessBitButton
+                key={`bit-${bit.index}`}
+                bit={bit}
+                correctness={
+                  judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
+                  ?? Correctness.unguessed}
+                onChange={handleBitClick}
+              />
+            )}
+          />
+          {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
+            <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+        </div>
       </div>
       {!hasWon && (
         <div id="puzzle-inputs" className="encode-puzzle-inputs">
-          <div className="encode-guess-display" aria-label="Current guess">
+          <div className="decode-guess-display" aria-label="Current guess">
           <span className={guessBits.length > 0 ? "encode-guess-text" : "encode-guess-placeholder"}>
-            {guessBits.length > 0 ? guessBits.toString() : "DECODE TEXT HERE"}
+            {guessText.length > 0 ? guessText : "YOUR GUESS HERE"}
           </span>
             <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
           </div>

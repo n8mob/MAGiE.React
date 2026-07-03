@@ -249,7 +249,9 @@ const DecodePuzzle: FC<PuzzleProps> = (
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
                 bit={bit}
-                correctness={judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness ?? Correctness.unguessed}
+                correctness={
+                judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
+                  ?? Correctness.unguessed}
               />
             )}
           />
