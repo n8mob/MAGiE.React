@@ -8,6 +8,9 @@
 
 :root {
   font-family: "HD44780", "Press Start 2P", Monaco, Consolas, monospace, sans-serif;
+  /* Scale all rem/em text down on narrow (mobile) viewports.
+     4vw hits 16px at a 400px-wide viewport; floor at 12px for readability. */
+  font-size: clamp(12px, 4vw, 16px);
   line-height: 1.5;
   background-color: #d0d4d4;
   font-synthesis: none;
