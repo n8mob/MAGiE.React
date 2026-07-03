@@ -3,6 +3,7 @@ import ReactGA4 from "react-ga4";
 import { BitSequence } from "../BitSequence.ts";
 import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
 import { BitButton } from "./BitButton.tsx";
+import { BitInputs } from "./BitInputs.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
 
@@ -17,22 +18,6 @@ const CLUES: Record<DoorLockState, string> = {
   accepted: "ACCESS GRANTED",
   rejected: "ACCESS DENIED",
 };
-
-const keyboardAssetModules = import.meta.glob("../assets/keyboard/*.png", {
-  eager: true,
-  import: "default",
-}) as Record<string, string>;
-
-const keyboardAssetMap: Record<string, string> = Object.entries(keyboardAssetModules).reduce<Record<string, string>>(
-  (assetMap, [modulePath, url]) => {
-    const fileName = modulePath.split("/").pop();
-    if (fileName) {
-      assetMap[fileName] = url;
-    }
-    return assetMap;
-  },
-  {}
-);
 
 interface DoorLockProps {
   encoder: BinaryEncoder;
@@ -187,38 +172,7 @@ const DoorLock = (props: DoorLockProps) => {
         }
       </div>
       <div id="puzzle-inputs">
-        <div className="keyboard">
-          <div className="keyboard-row" role="group" aria-label="Bit input">
-            <button type="button" className="keyboard-key" aria-label="1" onClick={() => appendBit("1")}>
-              <img src={keyboardAssetMap["keyboard_Bit_on_32x32.png"]}
-                   alt=""
-                   aria-hidden="true"
-                   draggable={false}
-                   className="keyboard-key-image" />
-            </button>
-            <button type="button" className="keyboard-key" aria-label="0" onClick={() => appendBit("0")}>
-              <img src={keyboardAssetMap["keyboard_Bit_off_32x32.png"]}
-                   alt=""
-                   aria-hidden="true"
-                   draggable={false}
-                   className="keyboard-key-image" />
-            </button>
-            <button type="button" className="keyboard-key" aria-label="delete" onClick={deleteBit}>
-              <img src={keyboardAssetMap["keyboard_delete_32x32.png"]}
-                   alt=""
-                   aria-hidden="true"
-                   draggable={false}
-                   className="keyboard-key-image" />
-            </button>
-            <button type="button" className="keyboard-key" aria-label="submit" onClick={submit}>
-              <img src={keyboardAssetMap["keyboard_return_32x32.png"]}
-                   alt=""
-                   aria-hidden="true"
-                   draggable={false}
-                   className="keyboard-key-image" />
-            </button>
-          </div>
-        </div>
+        <BitInputs onBit={appendBit} onDelete={deleteBit} onSubmit={submit} />
       </div>
     </div>
   );
