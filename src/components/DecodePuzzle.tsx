@@ -1,7 +1,7 @@
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { CorrectnessBitButton } from "./BitButton.tsx";
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { BitSequence } from "../BitSequence";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
 import { Correctness } from "../judgment/BitJudgment.ts";
@@ -51,9 +51,11 @@ const DecodePuzzle: FC<PuzzleProps> = (
 
   const {
     displayMatrixRef,
+    mainDisplayRef,
+    puzzleInputsRef,
+    displayRows,
     judgment,
-    hasWon,
-    displayWidth
+    hasWon
   } = useBasePuzzle({
     puzzle: puzzle,
     guessBits,
@@ -62,112 +64,18 @@ const DecodePuzzle: FC<PuzzleProps> = (
     bitButtonWidthPx,
   });
 
-  // Compute winBits and displayRows for decode-type puzzles
-  const displayRows = useMemo(
-    () => {
-      if (puzzle.encoding && puzzle.winText && guessBits && displayWidth) {
-        const winBits = puzzle.encoding?.encodeText(puzzle.winText);
-        const displayBits = winBits?.appendBits(guessBits.slice(winBits.length))
-        return Array.from(puzzle.encoding?.splitForDisplay(displayBits, displayWidth));
-      } else {
-        return [];
-      }
-    },
-    [puzzle.encoding, puzzle.winText, guessBits, displayWidth]);
-
-  const mainDisplayRef = useRef<HTMLDivElement>(null);
-  const puzzleInputsRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setGuessText(sanitizeGuessText(puzzle.init));
   }, [puzzle.init]);
 
-  const scrollChangedBitIntoView = useCallback((lastChangedIndex: number) => {
-    if (lastChangedIndex < 0) {
-      return;
-    }
-
-    // Find which row contains this bit.
-    let rowIndex = -1;
-    for (let i = 0; i < displayRows.length; ++i) {
-      const row = displayRows[i];
-      if (row.length < 1) {
-        continue;
-      }
-      const firstBitIndex = row.firstBit().index;
-      const lastBitIndex = row.lastBit().index;
-      if (lastChangedIndex >= firstBitIndex && lastChangedIndex <= lastBitIndex) {
-        rowIndex = i;
-        break;
-      }
-    }
-
-    // Scroll the row into view but keep #puzzle-inputs visible.
-    if (rowIndex < 0
-      || !displayMatrixRef.current
-      || typeof displayMatrixRef.current.getBitRowElement !== "function"
-    ) {
-      return;
-    }
-
-    const lastChangedRow = displayMatrixRef.current.getBitRowElement(rowIndex);
-    const mainDisplay = mainDisplayRef.current;
-    const puzzleInputs = puzzleInputsRef.current;
-    if (!lastChangedRow || !mainDisplay || !puzzleInputs) {
-      return;
-    }
-
-    const rowRect = lastChangedRow.getBoundingClientRect();
-    const mainRect = mainDisplay.getBoundingClientRect();
-    const inputsRect = puzzleInputs.getBoundingClientRect();
-    const contextFactor = 6;
-    const newScrollTop = rowRect.top - mainRect.top + mainDisplay.scrollTop - (mainRect.height / contextFactor);
-    mainDisplay.scrollTo({
-      top: newScrollTop,
-      behavior: "smooth"
-    });
-    if (rowRect.bottom > mainRect.bottom) {
-      const maxScroll = (inputsRect.top) - mainRect.top - lastChangedRow.offsetHeight;
-      mainDisplay.scrollTop += Math.min(rowRect.bottom - mainRect.bottom, maxScroll);
-    } else if (rowRect.top < mainRect.top) {
-      mainDisplay.scrollTop += rowRect.top - mainRect.top;
-    }
-  }, [displayRows, displayMatrixRef]);
-
+  // Judging and scrolling both react to guessBits changes in useBasePuzzle.
   const updateGuessText = useCallback((rawGuessText: string) => {
     if (hasWon) {
       return;
     }
-
-    const previousGuessBits = guessBits;
-    const nextGuessText = sanitizeGuessText(rawGuessText);
-    setGuessText(nextGuessText);
-
-    let nextGuessBits = BitSequence.empty();
-
-    if (!puzzle.encoding) {
-      console.log("No puzzle encoding available for decoding");
-    } else {
-      nextGuessBits = puzzle.encoding.encodeText(nextGuessText);
-    }
-
-    // Scroll logic: scroll the row containing the last changed bit into view.
-    let lastChangedIndex = -1;
-    const minLen = Math.min(previousGuessBits.length, nextGuessBits.length);
-    for (let i = 0; i < minLen; ++i) {
-      if (previousGuessBits.getBit(i) !== nextGuessBits.getBit(i)) {
-        lastChangedIndex = i;
-      }
-    }
-    if (nextGuessBits.length > previousGuessBits.length) {
-      lastChangedIndex = nextGuessBits.length - 1;
-    } else if (nextGuessBits.length < previousGuessBits.length) {
-      lastChangedIndex = Math.max(nextGuessBits.length - 1, 0);
-    }
-
-    scrollChangedBitIntoView(lastChangedIndex);
-  }, [guessBits, hasWon, puzzle.encoding, scrollChangedBitIntoView]);
+    setGuessText(sanitizeGuessText(rawGuessText));
+  }, [hasWon]);
 
   const appendCharacter = useCallback((character: string) => {
     if (hasWon) {

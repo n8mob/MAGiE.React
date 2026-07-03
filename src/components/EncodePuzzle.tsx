@@ -21,9 +21,11 @@ const EncodePuzzle: FC<PuzzleProps> = (
 
   const {
     displayMatrixRef,
+    mainDisplayRef,
+    puzzleInputsRef,
+    displayRows,
     judgment,
-    hasWon,
-    displayWidth
+    hasWon
   } = useBasePuzzle({
     puzzle,
     guessBits,
@@ -31,10 +33,6 @@ const EncodePuzzle: FC<PuzzleProps> = (
     onShareWin,
     bitButtonWidthPx
   });
-
-  const displayRows = useMemo(
-    () => Array.from(puzzle.encoding.splitForDisplay(guessBits, displayWidth)
-    ), [puzzle, guessBits, displayWidth]);
 
   const appendBit = useCallback((bit: "0" | "1") => {
     setGuessBits(prev => prev.appendBit(bit));
@@ -90,7 +88,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
   return (
     <>
       <div id="game-content">
-        <div id="main-display" className="display">
+        <div id="main-display" className="display" ref={mainDisplayRef}>
           {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           <DisplayMatrix
             ref={displayMatrixRef}
@@ -108,7 +106,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
           />
         </div>
       </div>
-      <div id="puzzle-inputs">
+      <div id="puzzle-inputs" ref={puzzleInputsRef}>
         {puzzle.winText != null && puzzle.winText.length > 0 &&
           <div className="guess-text-display" aria-label="Current guess">
             <span className={guessBits.length > 0 ? "guess-text" : "guess-placeholder"}>{guessText.length > 0
