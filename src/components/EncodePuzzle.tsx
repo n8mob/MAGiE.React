@@ -106,25 +106,29 @@ const EncodePuzzle: FC<PuzzleProps> = (
               />
             )}
           />
-          {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
-            <p key={`win-text-${winIndex}`}>{winLine}</p>)}
         </div>
       </div>
-      {!hasWon && (
-        <div id="puzzle-inputs" className="encode-puzzle-inputs">
-          <div className="decode-guess-display" aria-label="Current guess">
-          <span className={guessBits.length > 0 ? "encode-guess-text" : "encode-guess-placeholder"}>
-            {guessText.length > 0 ? guessText : "YOUR GUESS HERE"}
-          </span>
-            <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
+      <div id="puzzle-inputs">
+        {puzzle.winText != null && puzzle.winText.length > 0 &&
+          <div className="guess-text-display" aria-label="Current guess">
+            <span className={guessBits.length > 0 ? "guess-text" : "guess-placeholder"}>{guessText.length > 0
+              ? guessText
+              : "YOUR GUESS HERE"}</span>
+            {!hasWon && (
+              <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
+            )}
           </div>
+        }
+        {!hasWon && (
           <BitInputs
             onBit={appendBit}
             onDelete={deleteBit}
             onSubmit={() => {}}
             disabled={hasWon}
-          />
-        </div>)}
+          />)}
+        {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
+          <p key={`win-text-${winIndex}`}>{winLine}</p>)}
+      </div>
     </>
   )
     ;

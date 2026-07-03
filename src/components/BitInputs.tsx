@@ -1,5 +1,6 @@
 import { FC, useCallback } from "react";
 import "./OnScreenKeyboard.css";
+import "./BitInputs.css";
 
 type BitInputAction = "append" | "delete" | "submit";
 
@@ -101,7 +102,7 @@ const BitInputs: FC<BitInputsProps> = (
   }, [disabled, onBit, onDelete, onSubmit]);
 
   return (
-    <div className="keyboard">
+    <div className="bit-buttons">
       <div className="keyboard-row" role="group" aria-label="Bit input">
         {BIT_KEYS.map((key) => (
           <button

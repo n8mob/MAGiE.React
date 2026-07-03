@@ -148,7 +148,7 @@ const DoorLock = (props: DoorLockProps) => {
       <div id="main-display" className="display" ref={mainDisplayRef}>
         <p id="clue-text">{CLUES[gameState]}</p>
         {cardBits.isEmpty
-          ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
+          ? <span className="guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={cardRows}
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} />}
@@ -164,7 +164,7 @@ const DoorLock = (props: DoorLockProps) => {
       </div>
       <div id="magie-staging" className="display">
         {stagingBits.isEmpty
-          ? <span className="decode-guess-placeholder">_ _ _ _ _ _ _ _</span>
+          ? <span className="guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={stagingRows}
             renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} onChange={handleStagingBitClick} />}
