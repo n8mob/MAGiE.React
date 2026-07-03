@@ -1,5 +1,6 @@
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useState } from "react";
 import { CorrectnessBitButton } from "./BitButton.tsx";
+import { BitInputs } from "./BitInputs.tsx";
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
@@ -31,6 +32,14 @@ const EncodePuzzle: FC<PuzzleProps> = (
     () => Array.from(puzzle.encoding.splitForDisplay(guessBits, displayWidth)
     ), [puzzle, guessBits, displayWidth]);
 
+  const appendBit = useCallback((bit: "0" | "1") => {
+    setGuessBits(prev => prev.appendBit(bit));
+  }, []);
+
+  const deleteBit = useCallback(() => {
+    setGuessBits(prev => prev.slice(0, -1));
+  }, []);
+
   // Handle key down for entering bits from the 1 and 0 keys
   // (and backspace for deleting bits)
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -40,17 +49,17 @@ const EncodePuzzle: FC<PuzzleProps> = (
     switch (event.key) {
       case "0":
       case "1": {
-        setGuessBits(guessBits.appendBit(event.key));
+        appendBit(event.key);
         break;
       }
       case "Backspace": {
-        setGuessBits(guessBits.slice(0, -1));
+        deleteBit();
         break;
       }
       default:
         break;
     }
-  }, [puzzle, guessBits, setGuessBits]);
+  }, [puzzle, appendBit, deleteBit]);
 
   // Handle bit click for toggling bits
   // HTMLInputElement instead of a button type because the buttons are actually checkboxes
@@ -95,15 +104,18 @@ const EncodePuzzle: FC<PuzzleProps> = (
       </div>
       {!hasWon && (
         <div id="puzzle-inputs" className="encode-puzzle-inputs">
-          <div className="encode-guess-display" area-label="Current guess">
+          <div className="encode-guess-display" aria-label="Current guess">
           <span className={guessBits.length > 0 ? "encode-guess-text" : "encode-guess-placeholder"}>
             {guessBits.length > 0 ? guessBits.toString() : "DECODE TEXT HERE"}
           </span>
             <span className="encode-guess-cursor blink" aria-hidden="true">_</span>
           </div>
-          <div className="TEMP">
-            <h1>ENCODE INPUTS HERE</h1>
-          </div>
+          <BitInputs
+            onBit={appendBit}
+            onDelete={deleteBit}
+            onSubmit={() => {}}
+            disabled={hasWon}
+          />
         </div>)}
     </>
   )
