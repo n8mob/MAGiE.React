@@ -164,23 +164,23 @@ const DecodePuzzle: FC<PuzzleProps> = (
               />
             )}
           />
-          <div id="win-message">
-            {hasWon && puzzle.init !== puzzle.winText && <p>{guessText}</p>}
-            {judgment.isCorrect && [...puzzle.winMessage].map((winLine, winIndex) =>
-              <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-          </div>
         </div>
-        {!hasWon && (
-          <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
-            <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
+        <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
+          <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
+          {hasWon ? (
+            <div id="win-message" className="display">
+              {[...puzzle.winMessage].map((winLine, winIndex) =>
+                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
+            </div>
+          ) : (
             <OnScreenKeyboard
               onCharacter={appendCharacter}
               onDelete={deleteCharacter}
               onReturn={checkAnswer}
               disabled={hasWon}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
