@@ -56,7 +56,8 @@ const DecodePuzzle: FC<PuzzleProps> = (
     puzzleInputsRef,
     displayRows,
     judgment,
-    hasWon
+    hasWon,
+    isAutoWin
   } = useBasePuzzle({
     puzzle: puzzle,
     guessBits,
@@ -166,7 +167,9 @@ const DecodePuzzle: FC<PuzzleProps> = (
           />
         </div>
         <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
-          <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
+          {!isAutoWin &&
+            <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
+          }
           {hasWon ? (
             <div id="win-message" className="display">
               {[...puzzle.winMessage].map((winLine, winIndex) =>
