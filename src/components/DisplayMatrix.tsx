@@ -5,6 +5,8 @@ import { IndexedBit } from "../IndexedBit.ts";
 interface DisplayMatrixProps {
   displayRows: DisplayRow[];
   renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode;
+  /** Show each row's decoded-character annotation. Off for decode puzzles, where it would reveal the answer. */
+  showAnnotations?: boolean;
 }
 
 interface DisplayMatrixUpdate {
@@ -14,7 +16,7 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({ displayRows, renderBit }, ref) => {
+  ({ displayRows, renderBit, showAnnotations = true }, ref) => {
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
@@ -44,7 +46,7 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
                   indexWithinRow
                 )
               ))}
-              {displayRow.annotation && (
+              {showAnnotations && displayRow.annotation && (
                 <span className="annotation">{' '}{displayRow.annotation}</span>
               )}
             </p>

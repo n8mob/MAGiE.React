@@ -155,6 +155,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
+            showAnnotations={false}
             renderBit={(bit, rowIndex, indexWithinRow) => (
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
