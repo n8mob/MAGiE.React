@@ -32,6 +32,7 @@ type DayPuzzleProps = {
 export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const { setHeaderContent } = useHeader();
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
+  const [puzzleStatus, setPuzzleStatus] = useState<"loading" | "ready" | "missing">("loading");
   const { year, month, day } = useParams<{ year?: string, month?: string, day?: string }>();
   const [solveTimeDisplay, setSolveTimeDisplay] = useState("");
   const [hasWon, setHasWon] = useState(false);
@@ -61,20 +62,33 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
   useEffect(() => {
     if (!puzzleDate) { return; }
-    console.log("About to fetch puzzle for date:", puzzleDate);
+    let stale = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentPuzzle(null);
+    setPuzzleStatus("loading");
     fetchPuzzle(() => getDailyPuzzleForDate(puzzleDate))
       .then(puzzle => {
+        if (stale) { return; }
         if (!puzzle) {
           console.warn("No puzzle found for date:", puzzleDate);
+          setPuzzleStatus("missing");
           return;
         }
-        console.log("Fetched puzzle for date:", puzzleDate, "Puzzle:", puzzle.slug);
         setCurrentPuzzle(puzzle);
-      }).catch(error => console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error));
+        setPuzzleStatus("ready");
+      }).catch(error => {
+        console.error(`Failed to fetch daily puzzle for ${puzzleDate}:`, error);
+        if (!stale) {
+          setPuzzleStatus("missing");
+        }
+      });
+    return () => { stale = true; };
   }, [puzzleDate]);
 
+  // Date navigation stays in the header even when the date has no puzzle,
+  // so the player can keep paging to other days.
   useEffect(() => {
-    if (currentPuzzle && formattedDate && puzzleDate) {
+    if (formattedDate && puzzleDate) {
 
       const prevDate = dateLinkFormat(addDays(puzzleDate, -1));
       const nextDate = dateLinkFormat(addDays(puzzleDate, 1));
@@ -97,7 +111,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     }
     return () => setHeaderContent(null); // Clear header when component unmounts
 
-  }, [currentPuzzle, formattedDate, puzzleDate, setHeaderContent]);
+  }, [formattedDate, puzzleDate, setHeaderContent]);
 
   if (!puzzleDate) {
     return <>
@@ -116,7 +130,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     </>
   }
 
-  if (!currentPuzzle) {
+  if (puzzleStatus === "loading") {
+    return <p>Rewinding the tape...</p>;
+  }
+
+  if (puzzleStatus === "missing" || !currentPuzzle) {
     return (
       <>
         <p>Tape missing.</p>

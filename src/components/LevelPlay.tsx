@@ -21,17 +21,27 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   const { categoryIndex, levelNumber, puzzleIndex: puzzleIndexParam } = useParams();
   const { category } = useCategory(menu, categoryIndex);
   const { level } = useLevel(category, levelNumber);
-  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [hasWon, setHasWon] = useState(false);
   const { setHeaderContent } = useHeader();
-  const puzzle = useMemo(() => {
-    return currentPuzzle?.encoding ? currentPuzzle : {
-      ...currentPuzzle,
-      encoding: menu?.encodingProviders[currentPuzzle?.encoding_name || ""]
-    } as Puzzle;
-  }, [currentPuzzle, menu?.encodingProviders]);
-
   const puzzleIndex = parseInt(puzzleIndexParam || "0", 10);
+
+  // The puzzle is derived from the route, not stored: navigating to a
+  // puzzle that doesn't exist yields null instead of a stale puzzle.
+  const currentPuzzle = useMemo<Puzzle | null>(() => {
+    const rawPuzzle = level?.puzzles[puzzleIndex];
+    if (!rawPuzzle) {
+      return null;
+    }
+    if (rawPuzzle.encoding) {
+      return rawPuzzle;
+    }
+    const encoding = menu?.encodingProviders[rawPuzzle.encoding_name || ""];
+    if (!encoding) {
+      console.error(`The "${menuName}" menu does not define the encoding "${rawPuzzle.encoding_name}" needed by puzzle "${rawPuzzle.slug}".`);
+    }
+    return { ...rawPuzzle, encoding } as Puzzle;
+  }, [level, puzzleIndex, menu?.encodingProviders, menuName]);
+
   const nextPuzzleIndex = puzzleIndex + 1;
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
 
@@ -82,8 +92,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
             <Link to={`/${menuName}/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
         </div>
       );
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentPuzzle(level.puzzles[puzzleIndex]);
     }
     return () => setHeaderContent(null);
   }, [category, categoryIndex, level, levelNumber, menu, menuName, puzzleIndex, setHeaderContent]);
@@ -106,14 +114,14 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
 
     // Generate a share string for this puzzle context
     const shareString = `I solved the ${level.levelName.join(" ")} puzzle in the ${category?.name || ""} category!`;
-    debug(`${puzzle.slug}: has won?: ${hasWon}`);
+    debug(`${currentPuzzle.slug}: has won?: ${hasWon}`);
 
     return (
       <>
-        {puzzle && (
+        {currentPuzzle && (
           <PlayPuzzle
-            key={puzzle.slug}
-            puzzle={puzzle}
+            key={currentPuzzle.slug}
+            puzzle={currentPuzzle}
             onWin={handleWin}
             puzzleShareString={shareString}
           />
@@ -124,7 +132,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
                     onClick={() => {
                       ReactGA4.event('story_start_clicked', {
                         source: 'post-win-link',
-                        puzzle_slug: puzzle?.slug,
+                        puzzle_slug: currentPuzzle?.slug,
                       });
                       navigate(linkAfterWin.to);
                     }}>{linkAfterWin.text}</button>
