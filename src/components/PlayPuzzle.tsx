@@ -18,7 +18,6 @@ interface PlayPuzzleProps {
 
 const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
-  const [currentPuzzle, setCurrentPuzzle] = useState(puzzle);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
@@ -54,19 +53,13 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentPuzzle(puzzle);
-    setSolveTimeString("");
-  }, [puzzle]);
-
-  useEffect(() => {
     setStopwatchDisplay("00:00");
     return () => setStopwatchDisplay("");
   }, [setStopwatchDisplay]);
 
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
-    const isAutoWin = currentPuzzle.init === currentPuzzle.winText;
+    const isAutoWin = puzzle.init === puzzle.winText;
     let solveTimeSeconds = -1;
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();
@@ -80,10 +73,10 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         });
       }
       ReactGA4.event("win", {
-        puzzle_slug: currentPuzzle.slug,
-        winText: currentPuzzle.winText,
-        encoding: currentPuzzle.encoding_name,
-        encoding_type: currentPuzzle.encoding.getType(),
+        puzzle_slug: puzzle.slug,
+        winText: puzzle.winText,
+        encoding: puzzle.encoding_name,
+        encoding_type: puzzle.encoding.getType(),
         pagePath: window.location.pathname + window.location.search,
         solve_time_seconds: solveTimeSeconds,
       });
@@ -96,7 +89,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
   const handleShareWin = () => {
     const shareText = `${puzzleShareString}\n${solveTimeString}`;
     ReactGA4.event('share_win_clicked', {
-      puzzle_slug: currentPuzzle.slug,
+      puzzle_slug: puzzle.slug,
     });
     if (onShareWin) {
       onShareWin();
@@ -108,7 +101,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         url: window.location.href,
       }).then(() => {
         ReactGA4.event('share_win_completed', {
-          puzzle_slug: currentPuzzle.slug,
+          puzzle_slug: puzzle.slug,
           share_method: 'native',
         });
       }).catch(console.error);
@@ -120,7 +113,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
           .then(() => {
             ReactGA4.event('share_win_completed', {
-              puzzle_slug: currentPuzzle.slug,
+              puzzle_slug: puzzle.slug,
               share_method: 'clipboard',
             });
             alert("The share message has been copied to your clipboard.");
@@ -140,7 +133,7 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
     }
   };
 
-  if (!currentPuzzle) {
+  if (!puzzle) {
     return <div>Loading...</div>;
   }
 
@@ -151,17 +144,17 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
         onDisplayChange={setStopwatchDisplay}
         visible={false}
       />
-      {currentPuzzle.type === "Encode" &&
+      {puzzle.type === "Encode" &&
         <EncodePuzzle
-          puzzle={currentPuzzle}
+          puzzle={puzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
           bitButtonWidthPx={32}
         />
       }
-      {currentPuzzle.type === "Decode" &&
+      {puzzle.type === "Decode" &&
         <DecodePuzzle
-          puzzle={currentPuzzle}
+          puzzle={puzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
           bitButtonWidthPx={32}
