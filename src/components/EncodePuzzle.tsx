@@ -97,7 +97,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
-            showAnnotations={false}
+            showAnnotations={true}
             renderBit={(bit, rowIndex, indexWithinRow) => (
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
