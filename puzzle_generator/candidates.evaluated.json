@@ -1,0 +1,697 @@
+[
+  {
+    "winText": "TAPE",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:06:32+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Everything Runs On",
+        "clue": [
+          "ALL INFORMATION IN",
+          "THE MALL IS STORED",
+          "ON MAGNETIC"
+        ],
+        "winMessage": [
+          "yes, .tape..",
+          "every price, every",
+          "name, every door",
+          "code. all of it."
+        ]
+      },
+      {
+        "puzzleName": "The Administrator Explains",
+        "clue": [
+          "THE ADMINISTRATOR",
+          "REMINDS YOU: PLEASE",
+          "DO NOT BEND,",
+          "FOLD, OR CREASE",
+          "YOUR MAGNETIC"
+        ],
+        "winMessage": [
+          "your .tape. thanks",
+          "you for your",
+          "cooperation."
+        ]
+      },
+      {
+        "puzzleName": "Proti's Supply Run",
+        "clue": [
+          "PROTI NEEDS A FRESH",
+          "REEL OF BLANK",
+          "MAGNETIC",
+          "RECORDING"
+        ],
+        "winMessage": [
+          "one roll of .tape.",
+          "coming right up.",
+          "aisle seven,",
+          "next to the",
+          "card punchers."
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "TAPEWORK",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:06:40+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Filler Material",
+        "clue": [
+          "THE LEAST IMPORTANT",
+          "BUT MOST ENJOYABLE",
+          "TASK IS READING THE",
+          "NEWS, ARTICLES",
+          "AND OTHER",
+          "FILLER MATERIAL THAT",
+          "GETS INCLUDED IN",
+          "THE..."
+        ],
+        "winMessage": [
+          ".tapework.",
+          "being the name of",
+          "the long loop of",
+          "magnetic tape that",
+          "runs all through",
+          "the school"
+        ]
+      },
+      {
+        "puzzleName": "The Busy Loop",
+        "clue": [
+          "HEPI CALLS IT",
+          "\"THE FUN PART\".",
+          "PROTI CALLS IT",
+          "\"THE BORING PART\".",
+          "THE ADMINISTRATOR",
+          "CALLS IT THE..."
+        ],
+        "winMessage": [
+          "the .tapework. is",
+          "the decorative filler",
+          "encoded between",
+          "important messages",
+          "on the mall loop.",
+          "hepi reads all of it."
+        ]
+      },
+      {
+        "puzzleName": "Between the Messages",
+        "clue": [
+          "THE CONTENT THAT",
+          "FILLS THE GAP",
+          "BETWEEN OFFICIAL",
+          "ANNOUNCEMENTS ON",
+          "THE MALL LOOP",
+          "IS CALLED THE..."
+        ],
+        "winMessage": [
+          "yes, the .tapework.",
+          "today it contains:",
+          "a poem about socks,",
+          "three lost-card",
+          "notices, and a",
+          "recipe for fudge."
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "LOOP",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:06:47+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Back to the Beginning",
+        "clue": [
+          "THE TAPE RUNS FORWARD,",
+          "THEN RETURNS TO START.",
+          "ENGINEERS CALL THIS",
+          "ARRANGEMENT A"
+        ],
+        "winMessage": [
+          "a .loop.,",
+          "specifically the kind",
+          "that keeps the mall's",
+          "background music",
+          "playing all day",
+          "without anyone",
+          "lifting a finger"
+        ],
+        "evaluation": {
+          "difficulty": 3,
+          "tone": 3,
+          "world": 2,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:23:07.176Z"
+        }
+      },
+      {
+        "puzzleName": "Infinite Replay",
+        "clue": [
+          "PROTI NOTICED THE",
+          "SAME JINGLE PLAYING",
+          "EVERY FEW MINUTES.",
+          "THE TAPE IS WOUND",
+          "INTO A CONTINUOUS"
+        ],
+        "winMessage": [
+          "yes, a .loop.,",
+          "the Administrator",
+          "chose that jingle",
+          "herself and has",
+          "no regrets"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 4,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:23:41.495Z"
+        }
+      },
+      {
+        "puzzleName": "The Tape That Feeds Itself",
+        "clue": [
+          "A STRIP OF MAGNETIC",
+          "TAPE JOINED AT BOTH",
+          "ENDS TO FORM A",
+          "SHAPE WITH NO",
+          "BEGINNING OR END IS",
+          "CALLED A"
+        ],
+        "winMessage": [
+          "a .loop.,",
+          "the backbone of",
+          "every kiosk and",
+          "public terminal",
+          "in the mall"
+        ],
+        "evaluation": {
+          "difficulty": 3,
+          "tone": 2,
+          "world": 2,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": false,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:24:06.022Z"
+        }
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "BITS",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:06:55+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Smallest Units",
+        "clue": [
+          "EACH STRIPE ON YOUR",
+          "MALL CARD HOLDS",
+          "INFORMATION AS TINY",
+          "MAGNETIC ONES AND",
+          "ZEROS, CALLED"
+        ],
+        "winMessage": [
+          "yes, .bits.!",
+          "the smallest units",
+          "of information",
+          "the Administrator",
+          "ever works with"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:24:39.957Z"
+        }
+      },
+      {
+        "puzzleName": "The Tiny Ones",
+        "clue": [
+          "THE ADMINISTRATOR",
+          "PROCESSES EVERY",
+          "MESSAGE ONE AT A",
+          "TIME, READING EACH",
+          "OF THE MAGNETIC"
+        ],
+        "winMessage": [
+          "one by one,",
+          "each tiny .bit.",
+          "tells the tape",
+          "reader: on or off,",
+          "yes or no"
+        ]
+      },
+      {
+        "puzzleName": "Proti Counts",
+        "clue": [
+          "PROTI COUNTS THE",
+          "MARKS ON HER CARD:",
+          "EIGHT ONES AND",
+          "ZEROS PER LETTER.",
+          "EIGHT WHAT, EXACTLY?",
+          "EIGHT"
+        ],
+        "winMessage": [
+          "eight .bits.!",
+          "hepi already knew.",
+          "proti is catching up"
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "CARD",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:02+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Slide It Through",
+        "clue": [
+          "TO ACCESS THE FOOD",
+          "COURT, INSERT YOUR",
+          "MAGNETIC STRIPE"
+        ],
+        "winMessage": [
+          "the reader will",
+          "confirm your balance",
+          "and wave you in,",
+          "assuming your .card.",
+          "is not demagnetized"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:25:31.876Z"
+        }
+      },
+      {
+        "puzzleName": "Proti's Wallet",
+        "clue": [
+          "HEPI BORROWED PROTI'S",
+          "TRANSIT PASS.",
+          "IT IS A SMALL,",
+          "FLAT, RECTANGULAR"
+        ],
+        "winMessage": [
+          "a .card., yes,",
+          "laminated and stamped",
+          "with the mall seal",
+          "and proti's photo,",
+          "which is a bad photo"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 4,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:25:53.795Z"
+        }
+      },
+      {
+        "puzzleName": "Information on File",
+        "clue": [
+          "ALL YOUR PERSONAL",
+          "RECORDS ARE STORED",
+          "ON A MAGNETIC",
+          "STRIPE"
+        ],
+        "winMessage": [
+          "the administrator",
+          "keeps one .card.",
+          "per resident,",
+          "filed alphabetically,",
+          "in a very long drawer"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 2,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:26:17.059Z"
+        }
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "STRIPE",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:10+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "One Track Mind",
+        "clue": [
+          "EVERY CARD IN THE",
+          "MALL CARRIES ITS",
+          "DATA ON A SINGLE",
+          "MAGNETIC"
+        ],
+        "winMessage": [
+          "just one thin",
+          ".stripe.",
+          "of iron particles,",
+          "holding everything",
+          "you need to know"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:26:46.114Z"
+        }
+      },
+      {
+        "puzzleName": "The Administrator's Marking",
+        "clue": [
+          "THE ADMINISTRATOR",
+          "IDENTIFIES ALL",
+          "AUTHORIZED VISITORS",
+          "BY THE DARK",
+          "HORIZONTAL",
+          "BAND ON THEIR",
+          "ENTRY CARD,",
+          "CALLED A"
+        ],
+        "winMessage": [
+          "no .stripe.,",
+          "no entry.",
+          "the kiosk is",
+          "very firm about this"
+        ]
+      },
+      {
+        "puzzleName": "Proti's New Card",
+        "clue": [
+          "PROTI NOTICED HER",
+          "NEW LIBRARY CARD",
+          "HAD A SHINY BLACK",
+          "BAND ACROSS THE",
+          "BACK. HEPI SAID,",
+          ".THAT IS CALLED",
+          "A MAGNETIC."
+        ],
+        "winMessage": [
+          "proti ran her thumb",
+          "across the .stripe.",
+          "it felt like",
+          "nothing at all,",
+          "which seemed wrong",
+          "for something that",
+          "knew her name"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": false,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:27:27.969Z"
+        }
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "SWIPE",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:16+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Card Readers 101",
+        "clue": [
+          "TO USE YOUR CARD",
+          "AT ANY KIOSK,",
+          "SIMPLY FACE THE",
+          "STRIPE DOWN AND"
+        ],
+        "winMessage": [
+          "one clean .swipe.",
+          "is all it takes.",
+          "the reader does",
+          "the rest!"
+        ],
+        "evaluation": {
+          "difficulty": 2,
+          "tone": 3,
+          "world": 3,
+          "note": "",
+          "puzzleType": "Encode",
+          "encoding": "5bA1",
+          "solved": true,
+          "revealed": false,
+          "evaluated_at": "2026-07-16T01:27:58.232Z"
+        }
+      },
+      {
+        "puzzleName": "The Checkout Motion",
+        "clue": [
+          "CASHIERS ARE",
+          "TRAINED TO",
+          "COMPLETE A",
+          "TRANSACTION WITH",
+          "ONE SMOOTH"
+        ],
+        "winMessage": [
+          "a good .swipe.",
+          "leaves a clean",
+          "read every time.",
+          "sloppy ones get",
+          "sent to retraining."
+        ]
+      },
+      {
+        "puzzleName": "How to Pay",
+        "clue": [
+          "PROTO HOLDS HER",
+          "CARD UP TO THE",
+          "SLOT. THE SIGN",
+          "READS: PLEASE"
+        ],
+        "winMessage": [
+          ".swipe.",
+          "says the sign.",
+          "proti swipes.",
+          "the machine",
+          "beeps happily."
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "MALLOWANCE",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:22+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Tuesday Funds",
+        "clue": [
+          "TUESDAY IS THE DAY",
+          "THAT MALL RESIDENTS",
+          "RECEIVE THEIR"
+        ],
+        "winMessage": [
+          "this helps children",
+          "build early habits",
+          "of shopping!"
+        ]
+      },
+      {
+        "puzzleName": "Weekly Spending Card",
+        "clue": [
+          "EVERY WEEK, PROTI'S",
+          "PARENTS LOAD CREDITS",
+          "ONTO HER CARD.",
+          "THIS WEEKLY BUDGET",
+          "IS CALLED HER"
+        ],
+        "winMessage": [
+          "the .mallowance.",
+          "card is punched",
+          "with the amount",
+          "and dated by the",
+          "kiosk clerk"
+        ]
+      },
+      {
+        "puzzleName": "The Administrator Explains",
+        "clue": [
+          "THE ADMINISTRATOR",
+          "REMINDS CHILDREN:",
+          "YOUR WEEKLY SHOPPING",
+          "BUDGET IS YOUR"
+        ],
+        "winMessage": [
+          "spend it wisely!",
+          "the .mallowance.",
+          "resets every",
+          "tuesday at noon"
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "SCHOOL",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:28+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "Where Proti Goes",
+        "clue": [
+          "HEPI WAITS BY THE",
+          "EAST KIOSK UNTIL",
+          "PROTI GETS OUT OF"
+        ],
+        "winMessage": [
+          "the bell sounds",
+          "at three o'clock,",
+          "right on the dot.",
+          "the tape never lies."
+        ]
+      },
+      {
+        "puzzleName": "Morning Routine",
+        "clue": [
+          "BEFORE THE MALL,",
+          "THERE IS ALWAYS",
+          "SOMETHING CALLED"
+        ],
+        "winMessage": [
+          "yes, unfortunately.",
+          "the Administrator",
+          "sends a reminder",
+          "card each morning."
+        ]
+      },
+      {
+        "puzzleName": "The Other Building",
+        "clue": [
+          "THE BUILDING ACROSS",
+          "FROM THE MALL,",
+          "WHERE CHILDREN SPEND",
+          "THEIR MORNINGS, IS",
+          "SIMPLY CALLED"
+        ],
+        "winMessage": [
+          "it has its own",
+          "tape system, but",
+          "the Administrator",
+          "does not run it.",
+          "a different machine",
+          "entirely."
+        ]
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "winText": "MALL",
+    "type": "Encode",
+    "generated_at": "2026-07-16T00:07:34+00:00",
+    "model": "claude-sonnet-4-6",
+    "candidates": [
+      {
+        "puzzleName": "You Are Here",
+        "clue": [
+          "THE ADMINISTRATOR",
+          "WELCOMES YOU TO",
+          "HEXAGON RIDGE"
+        ],
+        "winMessage": [
+          "hexagon ridge is,",
+          "of course, the name",
+          "of our beloved",
+          ".mall."
+        ]
+      },
+      {
+        "puzzleName": "Directory Assistance",
+        "clue": [
+          "FOOD COURT, KIOSKS,",
+          "ANCHOR STORES, AND",
+          "FORTY-TWO SHOPS:",
+          "WELCOME TO THE"
+        ],
+        "winMessage": [
+          "the directory",
+          "kiosk prints you",
+          "a fresh map of",
+          "the .mall. on",
+          "request"
+        ]
+      },
+      {
+        "puzzleName": "Proti's Favorite Place",
+        "clue": [
+          "PROTI WOULD RATHER",
+          "BE ANYWHERE THAN",
+          "SCHOOL — SPECIFICALLY,",
+          "SHE WOULD RATHER",
+          "BE AT THE"
+        ],
+        "winMessage": [
+          "hepi agrees.",
+          "the .mall. has",
+          "better vending",
+          "than school does"
+        ]
+      }
+    ],
+    "rejected": []
+  }
+]
