@@ -1,0 +1,155 @@
+/* Admin candidate-evaluation page. Minimal presentation; admin accent is orange
+   to stand apart from the game palette (see COLORS.md). */
+
+.eval-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.eval-settings {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  padding: 0.5em 1em;
+  border-bottom: 2px solid #c25400;
+}
+
+.eval-settings input[type="radio"] {
+  accent-color: #c25400;
+}
+
+.eval-type-toggle,
+.eval-encoding-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  cursor: pointer;
+}
+
+.eval-encoding-options {
+  display: inline-flex;
+  gap: 0.75em;
+}
+
+.eval-meta {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.35em 1em;
+  font-size: 0.8em;
+  opacity: 0.65;
+}
+
+.eval-error {
+  margin: 0;
+  padding: 0.35em 1em;
+  color: #962c2c;
+}
+
+.eval-play-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.eval-reveal {
+  flex: 0 0 auto;
+  margin: 0.25em 1em;
+  padding: 0.5em 0.75em;
+  border: 2px dashed #c25400;
+}
+
+.eval-controls {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  padding: 0.5em 1em 1em;
+  border-top: 2px solid #c25400;
+}
+
+.eval-rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75em;
+}
+
+.eval-rating-label {
+  min-width: 7em;
+}
+
+.eval-rating-buttons {
+  display: inline-flex;
+  gap: 0.35em;
+}
+
+.eval-rating-buttons button {
+  min-width: 2.25em;
+  padding: 0.25em 0;
+  margin: 0;
+  font-family: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.eval-rating-buttons button.selected {
+  background: #c25400;
+  color: #fff;
+  border-color: #c25400;
+}
+
+.eval-note {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 0.35em 0.5em;
+  background: rgba(20, 33, 36, 0.12);
+  border: 2px solid rgba(0, 0, 0, 0.32);
+}
+
+.eval-nav,
+.eval-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.2em;
+}
+
+.eval-nav button,
+.eval-progress button {
+  flex: 1 1 auto;
+  padding: 0.4em;
+  font-family: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.eval-nav button:disabled,
+.eval-progress button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.eval-progress {
+  font-size: 0.8em;
+}
+
+.eval-progress button {
+  flex: 0 0 auto;
+}

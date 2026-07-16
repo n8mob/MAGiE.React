@@ -19,6 +19,7 @@ import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
+import { EvaluatePage } from "./components/EvaluatePage.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
@@ -313,6 +314,8 @@ function App() {
         <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="mall" />} />
       </>)}
+      {/* Admin-only candidate review; unlisted route, no auth beyond obscurity. */}
+      <Route path="/admin/evaluate" element={<EvaluatePage />} />
       <Route path={"*"} element={<PageNotFound />} />
     </Routes>), [features]);
 
