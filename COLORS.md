@@ -17,6 +17,7 @@ All colors used in the project, with their semantic roles and source files.
 | `focus-ring`     | `#dfed84` | Keyboard focus outlines (yellow-green)          | `App.css`, `OnScreenKeyboard.css` |
 | `panel-bg`       | `#d1d8d8` | Dialog / card background (slightly darker grey) | `Dialog.css`                      |
 | `title`          | `silver`  | MAGiE title text (`h1#magie-title`)             | `App.css`                         |
+| `admin`          | `#c25400` | Accents on Eval page, for now                   | `EvaluatePage.css`                |
 
 ---
 

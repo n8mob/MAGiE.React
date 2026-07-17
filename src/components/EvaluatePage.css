@@ -22,10 +22,6 @@
   border-bottom: 2px solid #c25400;
 }
 
-.eval-settings input[type="radio"] {
-  accent-color: #c25400;
-}
-
 .eval-type-toggle,
 .eval-encoding-options label {
   display: inline-flex;

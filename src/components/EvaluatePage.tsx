@@ -270,6 +270,7 @@ const EvaluatePage = () => {
             <label key={option}>
               <input
                 type="radio"
+                className="bit-checkbox"
                 name="eval-encoding"
                 value={option}
                 checked={encodingName === option}

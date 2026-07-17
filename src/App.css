@@ -12,6 +12,7 @@ html, body {
 }
 
 h1#magie-title {
+  font-family: sans-serif;
   position: absolute;
   bottom: 18%;
   left: 0;
