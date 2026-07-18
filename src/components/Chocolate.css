@@ -1,0 +1,30 @@
+.chocolate-hud {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+}
+
+/* Focused row: the same inset-panel tint documented in COLORS.md */
+.bit-field p.focused-row {
+  background: rgba(20, 33, 36, 0.12);
+}
+
+/* Letter annotations light up with their bits, per whole-letter judgment.
+   Colors approximate the teal/purple bit sprites. */
+.bit-field p.letter-correct .annotation {
+  color: #008080;
+}
+
+.bit-field p.letter-incorrect .annotation {
+  color: #6a4fa0;
+}
+
+.chocolate-game-over {
+  text-align: center;
+}
+
+.chocolate-game-over button {
+  margin-top: 0.5em;
+}

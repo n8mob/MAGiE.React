@@ -12,11 +12,11 @@ A new puzzle type. Codename: Chocolate. The name comes from the episode of _I Lo
 
 ## Data model
 
-New puzzle type: `chocolate` (A similar layout to the `encode` puzzle component — but do **not** branch inside EncodePuzzle).
+New puzzle type: `chocolate` (A similar layout to the `EncodePuzzle` component — but do **not** branch inside EncodePuzzle.tsx).
 
 ```
 {
-  type: "chocolate",
+  type: "Chocolate",
   encoding: <existing encoding ref>,
   text: "MEET ME AT THE FOUNTAIN",
   clock: "none" | "advance" | "scroll",

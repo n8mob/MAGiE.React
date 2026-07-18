@@ -1,8 +1,10 @@
 // noinspection DuplicatedCode
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
+import { ChocolateMode } from "./ChocolateMode.tsx";
 import { Puzzle } from "../model.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
@@ -14,10 +16,32 @@ interface PlayPuzzleProps {
   puzzleShareString: string;
   onWin?: (stopwatch: StopwatchHandle) => void;
   onShareWin?: () => void;
+  /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
+  asChocolate?: boolean;
 }
 
-const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzleProps) => {
+const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, asChocolate = false }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
+  const [searchParams] = useSearchParams();
+
+  // Existing Encode/Decode puzzles double as Chocolate content, forced either by
+  // the asChocolate prop (the /chocolate area) or by the ?asChocolate query param
+  // (ad-hoc testing on any route). The query param's optional value picks the
+  // clock (?asChocolate=none|advance|scroll); otherwise the ChocolateMode
+  // default applies.
+  const puzzle = useMemo<Puzzle>(() => {
+    if (rawPuzzle
+      && (asChocolate || searchParams.has("asChocolate"))
+      && rawPuzzle.type !== "Chocolate"
+    ) {
+      const clockParam = searchParams.get("asChocolate");
+      const clock = clockParam === "none" || clockParam === "advance" || clockParam === "scroll"
+        ? clockParam
+        : undefined;
+      return { ...rawPuzzle, type: "Chocolate", clock };
+    }
+    return rawPuzzle;
+  }, [rawPuzzle, asChocolate, searchParams]);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
   const winAudio = useRef<HTMLAudioElement | null>(null);
@@ -154,6 +178,14 @@ const PlayPuzzle = ({ puzzle, puzzleShareString, onWin, onShareWin }: PlayPuzzle
       }
       {puzzle.type === "Decode" &&
         <DecodePuzzle
+          puzzle={puzzle}
+          onWin={handleWin}
+          onShareWin={handleShareWin}
+          bitButtonWidthPx={32}
+        />
+      }
+      {puzzle.type === "Chocolate" &&
+        <ChocolateMode
           puzzle={puzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}

@@ -49,5 +49,16 @@ export const MENU_NAME_MAP: Record<string, MenuNameInfo> = {
         <h3>Big Game</h3>
       </div>
     )
-  }
+  },
+  chocolate: {
+    shortName: "chocolate",
+    fullName: "AbandonedMall-March2025",
+    titleNode: (
+      <div className={'menu-title'}>
+        <p>-= Proti and Hepi =-</p>
+        <p>in</p>
+        <h3>The Abandoned Mall</h3>
+      </div>
+    )
+  },
 };

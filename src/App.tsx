@@ -306,6 +306,15 @@ function App() {
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="bigGame" />} />
       </>)}
+      {features.includes('chocolate') && (<>
+        {/* MENU_NAME_MAP aliases "chocolate" to the mall's API menu, so these
+            routes browse mall content while links stay under /chocolate. */}
+        <Route path="/chocolate" element={<MenuBrowser menuName="chocolate" />} />
+        <Route path="/chocolate/:categoryIndex" element={<CategoryBrowser menuName="chocolate" />} />
+        <Route path="/chocolate/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate" />} />
+        <Route path="/chocolate/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+               element={<LevelPlay menuName="chocolate" asChocolate={true} />} />
+      </>)}
       {features.includes('mall') && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
         <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />

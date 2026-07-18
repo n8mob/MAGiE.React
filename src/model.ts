@@ -22,15 +22,24 @@ export interface VariableWidthEncodingData extends EncodingData{
   encoding: Record<string, Record<string, string>>;
 }
 
+export type ChocolateClock = "none" | "advance" | "scroll";
+export type ChocolateScoring = "time" | "strikes";
+
 export interface Puzzle {
   slug: string;
   init: string;
   clue: string[];
   winText: string;
   winMessage: string[];
-  type: "Encode" | "Decode";
+  type: "Encode" | "Decode" | "Chocolate";
   encoding_name: string;
   encoding: BinaryEncoder;
+  // Chocolate-mode fields; absent on Encode/Decode puzzles, defaulted in ChocolateMode.
+  clock?: ChocolateClock;
+  scoring?: ChocolateScoring[];
+  scrollSpeed?: number;
+  scrollAccel?: number;
+  maxStrikes?: number;
 }
 
 export interface Level {
