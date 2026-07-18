@@ -6,6 +6,7 @@ import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { ChocolateMode } from "./ChocolateMode.tsx";
 import { Puzzle } from "../model.ts";
+import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { debug  } from "../Logger.ts";
@@ -30,17 +31,26 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
   // clock (?asChocolate=none|advance|scroll); otherwise the ChocolateMode
   // default applies.
   const puzzle = useMemo<Puzzle>(() => {
-    if (rawPuzzle
+    let p = rawPuzzle;
+    if (p
       && (asChocolate || searchParams.has("asChocolate"))
-      && rawPuzzle.type !== "Chocolate"
+      && p.type !== "Chocolate"
     ) {
       const clockParam = searchParams.get("asChocolate");
       const clock = clockParam === "none" || clockParam === "advance" || clockParam === "scroll"
         ? clockParam
         : undefined;
-      return { ...rawPuzzle, type: "Chocolate", clock };
+      p = { ...p, type: "Chocolate", clock };
     }
-    return rawPuzzle;
+    // Chocolate requires a fixed-width encoding; variable-width (alpha-length)
+    // and missing encodings fall back to the built-in 5bA1.
+    if (p && p.type === "Chocolate") {
+      const encoding = chocolateEncoding(p.encoding);
+      if (encoding !== p.encoding) {
+        p = { ...p, encoding, encoding_name: FIVE_BIT_A1_NAME };
+      }
+    }
+    return p;
   }, [rawPuzzle, asChocolate, searchParams]);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);

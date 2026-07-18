@@ -8,6 +8,7 @@ import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { PerLetterJudge } from "../judgment/PerLetterJudge.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
+import { chocolateEncoding } from "../encoding/FiveBitA1.ts";
 import "./Chocolate.css";
 
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
@@ -27,9 +28,13 @@ type RunState = "running" | "won" | "lost";
  */
 const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const clock = puzzle.clock ?? "scroll";
-  const scrollSpeed = puzzle.scrollSpeed ?? 0.8;
-  const scrollAccel = puzzle.scrollAccel ?? 0.1;
+  const scrollSpeed = puzzle.scrollSpeed ?? 0.15;
+  const scrollAccel = puzzle.scrollAccel ?? 0.05;
   const maxStrikes = puzzle.maxStrikes ?? 10;
+
+  // PlayPuzzle already substitutes 5bA1 for non-fixed-width encodings; resolving
+  // again here keeps the mode safe no matter how it's reached.
+  const encoding = useMemo(() => chocolateEncoding(puzzle.encoding), [puzzle]);
 
   // Existing Encode/Decode puzzles double as chocolate content: clue + winText.
   const chocolateText = useMemo(() => {
@@ -41,7 +46,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   }, [puzzle]);
 
   const targetChars = useMemo(() => [...chocolateText], [chocolateText]);
-  const winBits = useMemo(() => puzzle.encoding.encodeText(chocolateText), [puzzle, chocolateText]);
+  const winBits = useMemo(() => encoding.encodeText(chocolateText), [encoding, chocolateText]);
   const allOffBits = useCallback(
     () => BitSequence.fromString("0".repeat(winBits.length)),
     [winBits.length]
@@ -59,10 +64,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
 
-  const judge = useMemo(() => new PerLetterJudge(puzzle.encoding), [puzzle]);
+  const judge = useMemo(() => new PerLetterJudge(encoding), [encoding]);
   const judgment = useMemo(
-    () => judge.judgeBits(guessBits, winBits, (bits) => puzzle.encoding.splitByChar(bits)),
-    [judge, guessBits, winBits, puzzle]
+    () => judge.judgeBits(guessBits, winBits, (bits) => encoding.splitByChar(bits)),
+    [judge, guessBits, winBits, encoding]
   );
   // The conveyor timer reads judgment through a ref so bit toggles don't reset the tick.
   const judgmentRef = useRef(judgment);
@@ -74,12 +79,12 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const displayRows = useMemo(() => {
     const rows: DisplayRow[] = [];
     let letterIndex = 0;
-    for (const letterBits of puzzle.encoding.splitByChar(guessBits)) {
+    for (const letterBits of encoding.splitByChar(guessBits)) {
       rows.push(new DisplayRow(letterBits, targetChars[letterIndex] ?? ""));
       letterIndex++;
     }
     return rows;
-  }, [puzzle, guessBits, targetChars]);
+  }, [encoding, guessBits, targetChars]);
 
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;

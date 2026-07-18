@@ -23,6 +23,7 @@ teal/purple; the `chocolate` entry in `MENU_NAME_MAP` still shows the mall's tit
 - **Fixed-width encodings only** (5bA1, hex/4-bit, 3-bit color, 2-bit suits). One row of the bit display = one letter.
 - **Pre-set puzzle text only.** Any "random" content will be authored as puzzle data (e.g., random bytes rendered as hex), not generated at runtime.
 - Variable-width encodings (alpha-length): explicitly out of scope for v1.
+  - **Decision:** a puzzle whose encoding is variable-width (or missing) is played with a built-in client-side **5bA1** encoding instead (`' '` = 0, A = 1 … Z = 26; `src/encoding/FiveBitA1.ts`). The substitution happens in `PlayPuzzle` (so `encoding_name` and analytics report `5bA1`), and `ChocolateMode` re-resolves defensively via the same `chocolateEncoding()` helper.
 
 ## Data model
 
@@ -39,8 +40,8 @@ New puzzle type: `"Chocolate"` (a similar layout to the `EncodePuzzle` component
   winMessage: [...],  // optional; shown as text (no bits) after the win, with the ta-da
   clock: "none" | "advance" | "scroll",   // default: "scroll"
   scoring: ("time" | "strikes")[],        // default: ["time", "strikes"]
-  scrollSpeed: <rows per second>,         // default: 0.8
-  scrollAccel: <rows/sec added every 10 scrolled rows>,  // default: 0.1
+  scrollSpeed: <rows per second>,         // default: 0.15 (playtested down from 0.8)
+  scrollAccel: <rows/sec added every 10 scrolled rows>,  // default: 0.05
   maxStrikes: <n>                         // default: 3? 5? 10?
 }
 ```
