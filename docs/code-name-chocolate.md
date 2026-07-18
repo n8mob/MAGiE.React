@@ -79,6 +79,12 @@ step. `scrollAccel` is added to the speed every 10 scrolled rows.
 
 ## Modes (same component, different clocks)
 
+**Starting position (decision):** the first letter starts at the **bottom** of the
+display in Dessert (a measured screenful of empty conveyor belt leads in and
+scrolls off unjudged, so the player has the full belt-travel time on letter one),
+**half-way up** in Treat, and at the **top** in Taste. Implemented as spacer rows
+sized from the display height at run start.
+
 ### 1. Taste (`clock: none`)
 - Player-paced. Navigate freely, no scoring, no failure. The cursor just flows; nothing auto-advances, and completed letters can be broken and re-fixed.
 - Doubles as the low-stress option for younger players.

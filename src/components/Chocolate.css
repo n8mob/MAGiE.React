@@ -11,6 +11,11 @@
   background: rgba(20, 33, 36, 0.12);
 }
 
+/* Empty conveyor-belt rows ahead of the message; match the 32px bit rows. */
+.bit-field p.conveyor-spacer {
+  min-height: 32px;
+}
+
 /* Letter annotations light up with their bits, per whole-letter judgment.
    Colors approximate the teal/purple bit sprites. */
 .bit-field p.letter-correct .annotation {

@@ -61,8 +61,13 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // One entry per scrolled-off (or completed) letter. Kept whole for the
   // future "gleaned message" narrative hook — do not collapse to a count.
   const [letterResults, setLetterResults] = useState<boolean[]>([]);
+  // Empty conveyor-belt rows above the message, so the first letter starts at
+  // the bottom of the display (Dessert), half-way up (Treat), or at the top
+  // (Taste). null until the display has been measured.
+  const [leadIn, setLeadIn] = useState<number | null>(null);
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
+  const mainDisplayRef = useRef<HTMLDivElement>(null);
 
   const judge = useMemo(() => new PerLetterJudge(encoding), [encoding]);
   const judgment = useMemo(
@@ -88,6 +93,34 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
 
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;
+
+  // Measure how many rows fit the display, then set the lead-in per clock:
+  // Dessert starts the first letter at the bottom edge, Treat half-way, Taste
+  // at the top. Runs once per run (leadIn resets to null on retry).
+  useEffect(() => {
+    if (leadIn !== null || rowCount === 0) {
+      return;
+    }
+    const container = mainDisplayRef.current;
+    const firstRow = displayMatrixRef.current?.getBitRowElement?.(0);
+    if (!container || !firstRow) {
+       
+      setLeadIn(0);
+      return;
+    }
+    const secondRow = displayMatrixRef.current?.getBitRowElement?.(1);
+    const rowPitch = secondRow
+      ? secondRow.getBoundingClientRect().top - firstRow.getBoundingClientRect().top
+      : firstRow.offsetHeight;
+    const rowsThatFit = Math.max(1, Math.floor(container.clientHeight / Math.max(rowPitch, 1)));
+    const startRow = clock === "scroll" ? rowsThatFit - 1
+      : clock === "advance" ? Math.floor(rowsThatFit / 2)
+      : 0;
+     
+    setLeadIn(Math.max(0, startRow));
+  }, [leadIn, rowCount, clock]);
+
+  const spacerCount = leadIn ?? 0;
 
   const rowOf = useCallback((bitIndex: number) => Math.floor(bitIndex / rowWidth), [rowWidth]);
   const isRowCorrect = useCallback(
@@ -211,7 +244,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // The Dessert conveyor: one whole-row step per tick — discrete, like the
   // original hardware would. The row leaving the top edge is judged as it goes.
   useEffect(() => {
-    if (clock !== "scroll" || runState !== "running" || rowCount === 0 || scrolledRows >= rowCount) {
+    if (clock !== "scroll" || runState !== "running" || rowCount === 0 || scrolledRows >= rowCount
+      || leadIn === null) {
       return;
     }
     const speed = Math.max(
@@ -219,6 +253,11 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       MIN_SCROLL_SPEED
     );
     const timeout = window.setTimeout(() => {
+      // The empty lead-in belt scrolls off first; nothing to judge yet.
+      if (leadIn > 0) {
+        setLeadIn(l => (l ?? 1) - 1);
+        return;
+      }
       const correct = judgmentRef.current.sequenceJudgments[scrolledRows]?.isSequenceCorrect ?? false;
       setLetterResults(prev => [...prev, correct]);
       if (correct) {
@@ -229,7 +268,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       setScrolledRows(r => r + 1);
     }, 1000 / speed);
     return () => window.clearTimeout(timeout);
-  }, [clock, runState, scrolledRows, rowCount, scrollSpeed, scrollAccel]);
+  }, [clock, runState, scrolledRows, rowCount, scrollSpeed, scrollAccel, leadIn]);
 
   // Run outcomes, in priority order: strike-out, full completion, survival.
   useEffect(() => {
@@ -277,6 +316,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setStrikes(0);
     setPoints(0);
     setLetterResults([]);
+    setLeadIn(null);
     setRunState("running");
   }, [allOffBits]);
 
@@ -284,20 +324,27 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
 
   // Step the focused row into view (discrete, no smooth scrolling).
   useEffect(() => {
-    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow - scrolledRows);
+    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow - scrolledRows + spacerCount);
     rowElement?.scrollIntoView({ block: "nearest" });
-  }, [focusedRow, scrolledRows]);
+  }, [focusedRow, scrolledRows, spacerCount]);
 
-  const visibleRows = useMemo(() => displayRows.slice(scrolledRows), [displayRows, scrolledRows]);
+  // Rendered rows: the empty lead-in belt, then the not-yet-scrolled letters.
+  const visibleRows = useMemo(() => {
+    const spacers = Array.from({ length: spacerCount }, () => new DisplayRow(BitSequence.empty(), ""));
+    return [...spacers, ...displayRows.slice(scrolledRows)];
+  }, [spacerCount, displayRows, scrolledRows]);
 
   const rowClassName = useCallback((visibleRowIndex: number) => {
-    const absoluteRow = visibleRowIndex + scrolledRows;
+    if (visibleRowIndex < spacerCount) {
+      return "conveyor-spacer";
+    }
+    const absoluteRow = visibleRowIndex - spacerCount + scrolledRows;
     const classes = [isRowCorrect(absoluteRow) ? "letter-correct" : "letter-incorrect"];
     if (runState === "running" && absoluteRow === focusedRow) {
       classes.push("focused-row");
     }
     return classes.join(" ");
-  }, [scrolledRows, isRowCorrect, runState, focusedRow]);
+  }, [spacerCount, scrolledRows, isRowCorrect, runState, focusedRow]);
 
   if (!puzzle) {
     // No crashes!
@@ -306,7 +353,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
 
   return (
     <div id="game-content">
-      <div id="main-display" className="display chocolate-display">
+      <div id="main-display" className="display chocolate-display" ref={mainDisplayRef}>
         {clock === "scroll" && (
           <div className="chocolate-hud">
             <span>SCORE {points}</span>
@@ -330,7 +377,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
                 bit={bit}
-                correctness={isRowCorrect(rowIndex + scrolledRows)
+                correctness={isRowCorrect(rowIndex - spacerCount + scrolledRows)
                   ? Correctness.correct
                   : Correctness.incorrect}
                 onChange={handleBitClick}
