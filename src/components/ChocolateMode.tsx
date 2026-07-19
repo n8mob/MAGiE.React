@@ -14,6 +14,9 @@ import "./Chocolate.css";
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
 const ACCEL_EVERY_ROWS = 10;
 const MIN_SCROLL_SPEED = 0.05;
+// How long after the last edit a wrong row keeps showing the target letter
+// before revealing what the player's bits actually encode.
+const GUESS_REVEAL_MS = 2000;
 
 type RunState = "running" | "won" | "lost";
 
@@ -70,6 +73,11 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // Topmost rendered row currently in the viewport, tracked from scroll events,
   // for placing the judged-edge marker.
   const [topVisibleRow, setTopVisibleRow] = useState(0);
+  // Wrong rows whose reveal delay has passed: their annotation shows the
+  // character the player's bits actually encode instead of the target.
+  const [revealedRows, setRevealedRows] = useState<ReadonlySet<number>>(new Set());
+  const lastEditAtRef = useRef<Record<number, number>>({});
+  const revealTimeoutsRef = useRef<number[]>([]);
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
@@ -94,16 +102,27 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     judgmentRef.current = judgment;
   }, [judgment]);
 
-  // One row per letter, annotated with the letter to be encoded.
+  // One row per letter. The annotation shows the target ("win") character by
+  // default; a wrong row that has sat unedited past the reveal delay — or that
+  // the judged edge has already passed — shows the character the player's bits
+  // actually encode (the "guess" character) instead. Correct rows show the
+  // letter either way, since guess == target. Row coloring is unchanged: the
+  // annotation and bits always color together, per whole-letter judgment.
   const displayRows = useMemo(() => {
     const rows: DisplayRow[] = [];
     let letterIndex = 0;
     for (const letterBits of encoding.splitByChar(guessBits)) {
-      rows.push(new DisplayRow(letterBits, targetChars[letterIndex] ?? ""));
+      const isCorrect = judgment.sequenceJudgments[letterIndex]?.isSequenceCorrect ?? false;
+      const judged = clock === "scroll" && letterIndex < scrolledRows;
+      const revealGuess = !isCorrect && (judged || revealedRows.has(letterIndex));
+      const annotation = revealGuess
+        ? encoding.decodeChar(letterBits)
+        : (targetChars[letterIndex] ?? "");
+      rows.push(new DisplayRow(letterBits, annotation));
       letterIndex++;
     }
     return rows;
-  }, [encoding, guessBits, targetChars]);
+  }, [encoding, guessBits, targetChars, judgment, clock, scrolledRows, revealedRows]);
 
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;
@@ -204,6 +223,41 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   );
   const minEditableBit = clock === "scroll" ? scrolledRows * rowWidth : 0;
 
+  // Record an edit to a row: the target letter comes back while the player is
+  // working, and the guess character is revealed only after the delay passes
+  // with no further edits to that row.
+  const noteEdit = useCallback((bitIndex: number) => {
+    const row = rowOf(bitIndex);
+    const editedAt = Date.now();
+    lastEditAtRef.current[row] = editedAt;
+    setRevealedRows(prev => {
+      if (!prev.has(row)) {
+        return prev;
+      }
+      const next = new Set(prev);
+      next.delete(row);
+      return next;
+    });
+    const timeoutId = window.setTimeout(() => {
+      if (lastEditAtRef.current[row] !== editedAt) {
+        return; // A later edit restarted this row's reveal delay.
+      }
+      setRevealedRows(prev => {
+        if (prev.has(row)) {
+          return prev;
+        }
+        const next = new Set(prev);
+        next.add(row);
+        return next;
+      });
+    }, GUESS_REVEAL_MS);
+    revealTimeoutsRef.current.push(timeoutId);
+  }, [rowOf]);
+
+  useEffect(() => () => {
+    revealTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+  }, []);
+
   const nextEditableBit = useCallback((fromBit: number) => {
     let index = Math.max(fromBit, minEditableBit);
     while (index < winBits.length && isRowLocked(rowOf(index))) {
@@ -221,9 +275,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(target).bit === bit ? prev : prev.toggleBit(target));
+    noteEdit(target);
     shouldFollowCursor.current = true;
     setCursor(nextEditableBit(target + 1));
-  }, [runState, cursor, nextEditableBit, winBits.length]);
+  }, [runState, cursor, nextEditableBit, winBits.length, noteEdit]);
 
   const deleteBit = useCallback(() => {
     if (runState !== "running") {
@@ -237,9 +292,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(index).bit === "0" ? prev : prev.toggleBit(index));
+    noteEdit(index);
     shouldFollowCursor.current = true;
     setCursor(index);
-  }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth]);
+  }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth, noteEdit]);
 
   const handleBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (runState !== "running") {
@@ -254,9 +310,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.toggleBit(index));
+    noteEdit(index);
     shouldFollowCursor.current = true;
     setCursor(index + 1);
-  }, [runState, minEditableBit, isRowLocked, rowOf]);
+  }, [runState, minEditableBit, isRowLocked, rowOf, noteEdit]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -398,6 +455,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setPoints(0);
     setLetterResults([]);
     setLeadIn(null);
+    setRevealedRows(new Set());
+    lastEditAtRef.current = {};
     setRunState("running");
     if (mainDisplayRef.current) {
       mainDisplayRef.current.scrollTop = 0;

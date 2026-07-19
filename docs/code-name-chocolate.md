@@ -69,6 +69,7 @@ step. `scrollAccel` is added to the speed every 10 scrolled rows.
 ## UI: `ChocolateMode` component
 
 - One `DisplayRow` per letter (built from `encoding.splitByChar`), annotated with the **target** letter to be encoded. Bits initialize to all off.
+- **Live-decode annotation (decision):** a wrong row shows the target ("win") character while the player works on it and for 2 s after their last edit to that row; then the annotation flips to the character their bits **actually encode** (the "guess" character). Every edit brings the target back and restarts the delay. The annotation and bits always color together per whole-letter judgment — wrong guess character stays purple, and a correct row shows the letter teal (guess == target). Rows the judged edge has passed show their guess character permanently: the on-screen "gleaned" message, blank where letters were never attempted.
 - Letter annotations color teal/purple together with their bits, per `isSequenceCorrect`, via a new optional `rowClassName` prop on `DisplayMatrix` (CSS in `Chocolate.css`; the bits themselves still use the sprite swaps).
 - **Input model (decision): type + tap.**
   - `0`/`1` keys and the on-screen `BitInputs` buttons fill from the cursor; typing `0` just steps past an off bit.
