@@ -14,13 +14,21 @@ describe('fiveBitA1', () => {
     expect(fiveBitA1.encodeText("Z").toPlainString()).to.equal("11010");
   });
 
-  it('round-trips a message with spaces', () => {
-    const message = "MEET ME AT THE FOUNTAIN";
+  it('encodes the punctuation from docs/5bA1.json', () => {
+    expect(fiveBitA1.encodeText(".").toPlainString()).to.equal("11011");
+    expect(fiveBitA1.encodeText(",").toPlainString()).to.equal("11100");
+    expect(fiveBitA1.encodeText("!").toPlainString()).to.equal("11101");
+    expect(fiveBitA1.encodeText("?").toPlainString()).to.equal("11110");
+    expect(fiveBitA1.encodeText("@").toPlainString()).to.equal("11111");
+  });
+
+  it('round-trips a message with spaces and punctuation', () => {
+    const message = "MEET ME AT THE FOUNTAIN, OK?";
     expect(fiveBitA1.decodeText(fiveBitA1.encodeText(message))).to.equal(message);
   });
 
   it('encodes unknown characters as all bits off', () => {
-    expect(fiveBitA1.encodeText("?").toPlainString()).to.equal("00000");
+    expect(fiveBitA1.encodeText("#").toPlainString()).to.equal("00000");
   });
 
   it('splits by char into five-bit letters', () => {
