@@ -156,7 +156,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     rowsThatFitRef.current = rowsThatFit;
     // The scroll edge trails the judged edge by ~70% of a screenful, capped at 7.
     bufferRowsRef.current = Math.max(1, Math.min(7, Math.round(rowsThatFit * 0.7)));
-    const startRow = clock === "scroll" ? rowsThatFit - 1
+    const startRow = clock === "scroll" ? rowsThatFit - 5
       : clock === "advance" ? Math.floor(rowsThatFit / 2)
       : 0;
 
