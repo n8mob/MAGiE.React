@@ -23,8 +23,8 @@ type RunState = "running" | "won" | "lost";
  * whole row is right (PerLetterJudge — no bit-level feedback).
  *
  * Clocks: "none" (Taste, player-paced), "advance" (Treat, focus auto-advances,
- * timed), "scroll" (Dessert, the conveyor removes the top row on a timer;
- * correct rows score a point, incorrect rows a strike).
+ * timed), "scroll" (Dessert, a judged edge sweeps down the message on a timer,
+ * locking rows as it passes; correct rows score a point, incorrect a strike).
  */
 const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const clock = puzzle.clock ?? "scroll";
@@ -63,12 +63,22 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const [letterResults, setLetterResults] = useState<boolean[]>([]);
   // Empty conveyor-belt rows above the message, so the first letter starts at
   // the bottom of the display (Dessert), half-way up (Treat), or at the top
-  // (Taste). null until the display has been measured.
+  // (Taste). leadInSize is the static spacer count; leadIn counts down as the
+  // judged edge descends through the empty belt. null until measured.
   const [leadIn, setLeadIn] = useState<number | null>(null);
+  const [leadInSize, setLeadInSize] = useState<number | null>(null);
+  // Topmost rendered row currently in the viewport, tracked from scroll events,
+  // for placing the judged-edge marker.
+  const [topVisibleRow, setTopVisibleRow] = useState(0);
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const rowPitchRef = useRef(32);
+  const rowsThatFitRef = useRef(1);
+  const bufferRowsRef = useRef(1);
+  // Offset from the container's content top to the first rendered row (the HUD
+  // sits above the rows), captured at measurement time.
+  const rowsTopOffsetRef = useRef(0);
   // Set by input handlers so the view follows the cursor only when the player
   // moved it — never when the belt did.
   const shouldFollowCursor = useRef(false);
@@ -117,31 +127,70 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       ? secondRow.getBoundingClientRect().top - firstRow.getBoundingClientRect().top
       : firstRow.offsetHeight;
     rowPitchRef.current = Math.max(rowPitch, 1);
+    rowsTopOffsetRef.current = firstRow.getBoundingClientRect().top
+      - container.getBoundingClientRect().top + container.scrollTop;
     const rowsThatFit = Math.max(1, Math.floor(container.clientHeight / Math.max(rowPitch, 1)));
+    rowsThatFitRef.current = rowsThatFit;
+    // The scroll edge trails the judged edge by ~70% of a screenful, capped at 7.
+    bufferRowsRef.current = Math.max(1, Math.min(7, Math.round(rowsThatFit * 0.7)));
     const startRow = clock === "scroll" ? rowsThatFit - 1
       : clock === "advance" ? Math.floor(rowsThatFit / 2)
       : 0;
-     
+
     setLeadIn(Math.max(0, startRow));
+    setLeadInSize(Math.max(0, startRow));
   }, [leadIn, rowCount, clock]);
 
-  const spacerCount = leadIn ?? 0;
+  const spacerCount = leadInSize ?? 0;
 
-  // Decouple the belt (logical scroll point) from the player's view (actual
-  // scroll point). When a row leaves the top while the player has scrolled
-  // ahead, pull scrollTop back by one row so their working area holds still —
-  // the peace lasts until the judged edge catches up with their viewport.
-  const previousTopRows = useRef({ scrolledRows, spacerCount });
+  // The judged edge as a rendered-row index: it descends through the empty
+  // lead-in belt, then points at the next letter to be judged.
+  const pointerIndex = useMemo(() => {
+    if (clock !== "scroll" || leadIn === null || leadInSize === null) {
+      return null;
+    }
+    return (leadInSize - leadIn) + scrolledRows;
+  }, [clock, leadIn, leadInSize, scrolledRows]);
+
+  // Auto-scroll: the scroll edge trails the judged edge by bufferRows. When it
+  // would pass the bottom of the viewport, the view moves down — at most one
+  // row per tick, so a player who scrolled back over judged rows is tugged
+  // gently toward the action, while a player who scrolled ahead is left in
+  // peace until the judged edge catches up.
   useLayoutEffect(() => {
-    const previous = previousTopRows.current;
-    const rowsRemoved = (previous.spacerCount - spacerCount) + (scrolledRows - previous.scrolledRows);
-    previousTopRows.current = { scrolledRows, spacerCount };
-    const container = mainDisplayRef.current;
-    if (rowsRemoved <= 0 || runState !== "running" || !container || container.scrollTop <= 0) {
+    if (clock !== "scroll" || runState !== "running" || pointerIndex === null) {
       return;
     }
-    container.scrollTop = Math.max(0, container.scrollTop - rowsRemoved * rowPitchRef.current);
-  }, [scrolledRows, spacerCount, runState]);
+    const container = mainDisplayRef.current;
+    if (!container) {
+      return;
+    }
+    const pitch = rowPitchRef.current;
+    const scrollEdge = pointerIndex + bufferRowsRef.current;
+    const targetTop = rowsTopOffsetRef.current + (scrollEdge - rowsThatFitRef.current + 1) * pitch;
+    if (targetTop > container.scrollTop) {
+      container.scrollTop = Math.min(targetTop, container.scrollTop + pitch);
+    }
+  }, [clock, runState, pointerIndex]);
+
+  // Track which rendered row is at the top of the viewport (for the marker).
+  useEffect(() => {
+    if (clock !== "scroll") {
+      return;
+    }
+    const container = mainDisplayRef.current;
+    if (!container) {
+      return;
+    }
+    const updateTopVisibleRow = () => {
+      const pitch = Math.max(rowPitchRef.current, 1);
+      setTopVisibleRow(Math.max(0, Math.round((container.scrollTop - rowsTopOffsetRef.current) / pitch)));
+    };
+     
+    updateTopVisibleRow();
+    container.addEventListener("scroll", updateTopVisibleRow, { passive: true });
+    return () => container.removeEventListener("scroll", updateTopVisibleRow);
+  }, [clock, runState]);
 
   const rowOf = useCallback((bitIndex: number) => Math.floor(bitIndex / rowWidth), [rowWidth]);
   const isRowCorrect = useCallback(
@@ -273,7 +322,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   }, [minEditableBit]);
 
   // The Dessert conveyor: one whole-row step per tick — discrete, like the
-  // original hardware would. The row leaving the top edge is judged as it goes.
+  // original hardware would. Rows are never removed; the judged edge sweeps
+  // down the tape, locking each row as it passes.
   useEffect(() => {
     if (clock !== "scroll" || runState !== "running" || rowCount === 0 || scrolledRows >= rowCount
       || leadIn === null) {
@@ -349,6 +399,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setLetterResults([]);
     setLeadIn(null);
     setRunState("running");
+    if (mainDisplayRef.current) {
+      mainDisplayRef.current.scrollTop = 0;
+    }
   }, [allOffBits]);
 
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
@@ -363,27 +416,40 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     if (!follow) {
       return;
     }
-    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow - scrolledRows + spacerCount);
+    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow + spacerCount);
     rowElement?.scrollIntoView({ block: "nearest" });
   });
 
-  // Rendered rows: the empty lead-in belt, then the not-yet-scrolled letters.
-  const visibleRows = useMemo(() => {
+  // Rendered rows: the empty lead-in belt, then the whole message. Judged rows
+  // stay on screen (locked) so the player can scroll back for reference.
+  const renderedRows = useMemo(() => {
     const spacers = Array.from({ length: spacerCount }, () => new DisplayRow(BitSequence.empty(), ""));
-    return [...spacers, ...displayRows.slice(scrolledRows)];
-  }, [spacerCount, displayRows, scrolledRows]);
+    return [...spacers, ...displayRows];
+  }, [spacerCount, displayRows]);
 
-  const rowClassName = useCallback((visibleRowIndex: number) => {
-    if (visibleRowIndex < spacerCount) {
+  const rowClassName = useCallback((renderedRowIndex: number) => {
+    if (renderedRowIndex < spacerCount) {
       return "conveyor-spacer";
     }
-    const absoluteRow = visibleRowIndex - spacerCount + scrolledRows;
-    const classes = [isRowCorrect(absoluteRow) ? "letter-correct" : "letter-incorrect"];
-    if (runState === "running" && absoluteRow === focusedRow) {
+    const letterRow = renderedRowIndex - spacerCount;
+    const classes = [isRowCorrect(letterRow) ? "letter-correct" : "letter-incorrect"];
+    if (runState === "running" && letterRow === focusedRow) {
       classes.push("focused-row");
     }
     return classes.join(" ");
-  }, [spacerCount, scrolledRows, isRowCorrect, runState, focusedRow]);
+  }, [spacerCount, isRowCorrect, runState, focusedRow]);
+
+  // Judged-edge marker in the status gutter: 🞂 on the next row to be judged,
+  // or 🞁 on the top visible row when the edge is above the viewport.
+  const renderGutter = useCallback((renderedRowIndex: number) => {
+    if (runState !== "running" || pointerIndex === null) {
+      return "";
+    }
+    if (pointerIndex < topVisibleRow) {
+      return renderedRowIndex === topVisibleRow ? "🞁" : "";
+    }
+    return renderedRowIndex === pointerIndex ? "🞂" : "";
+  }, [runState, pointerIndex, topVisibleRow]);
 
   if (!puzzle) {
     // No crashes!
@@ -409,14 +475,15 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
         ) : (
           <DisplayMatrix
             ref={displayMatrixRef}
-            displayRows={visibleRows}
+            displayRows={renderedRows}
             showAnnotations={true}
             rowClassName={rowClassName}
+            renderGutter={clock === "scroll" ? renderGutter : undefined}
             renderBit={(bit, rowIndex) => (
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
                 bit={bit}
-                correctness={isRowCorrect(rowIndex - spacerCount + scrolledRows)
+                correctness={isRowCorrect(rowIndex - spacerCount)
                   ? Correctness.correct
                   : Correctness.incorrect}
                 onChange={handleBitClick}

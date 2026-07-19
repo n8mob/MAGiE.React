@@ -21,6 +21,16 @@
   min-height: 32px;
 }
 
+/* Status gutter left of the bits: holds the judged-edge marker (🞂 / 🞁)
+   and keeps the bit columns even across rows. */
+.row-gutter {
+  flex: 0 0 24px;
+  align-self: center;
+  text-align: center;
+  line-height: 1;
+  font-size: 14px;
+}
+
 /* Letter annotations light up with their bits, per whole-letter judgment.
    Colors approximate the teal/purple bit sprites. */
 .bit-field p.letter-correct .annotation {
