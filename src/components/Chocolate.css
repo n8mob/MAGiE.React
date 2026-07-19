@@ -21,7 +21,7 @@
   min-height: 32px;
 }
 
-/* Status gutter left of the bits: holds the judged-edge marker (🞂 / 🞁)
+/* Status gutter left of the bits: holds the judged-edge marker (▶ / ▲)
    and keeps the bit columns even across rows. */
 .row-gutter {
   flex: 0 0 24px;

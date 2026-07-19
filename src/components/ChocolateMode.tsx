@@ -87,6 +87,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // Offset from the container's content top to the first rendered row (the HUD
   // sits above the rows), captured at measurement time.
   const rowsTopOffsetRef = useRef(0);
+  // The sticky HUD overlays the top rows once scrolled; the marker must sit on
+  // the first row fully visible below it, not merely inside the viewport.
+  const hudHeightRef = useRef(0);
   // Set by input handlers so the view follows the cursor only when the player
   // moved it — never when the belt did.
   const shouldFollowCursor = useRef(false);
@@ -148,6 +151,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     rowPitchRef.current = Math.max(rowPitch, 1);
     rowsTopOffsetRef.current = firstRow.getBoundingClientRect().top
       - container.getBoundingClientRect().top + container.scrollTop;
+    hudHeightRef.current = container.querySelector<HTMLElement>(".chocolate-hud")?.offsetHeight ?? 0;
     const rowsThatFit = Math.max(1, Math.floor(container.clientHeight / Math.max(rowPitch, 1)));
     rowsThatFitRef.current = rowsThatFit;
     // The scroll edge trails the judged edge by ~70% of a screenful, capped at 7.
@@ -203,7 +207,12 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     }
     const updateTopVisibleRow = () => {
       const pitch = Math.max(rowPitchRef.current, 1);
-      setTopVisibleRow(Math.max(0, Math.round((container.scrollTop - rowsTopOffsetRef.current) / pitch)));
+      // First row fully visible below the sticky HUD (ceil: a row partially
+      // scrolled out, or covered by the HUD, doesn't count as the top row).
+      const firstFullyVisible = Math.ceil(
+        (container.scrollTop + hudHeightRef.current - rowsTopOffsetRef.current) / pitch
+      );
+      setTopVisibleRow(Math.max(0, firstFullyVisible));
     };
      
     updateTopVisibleRow();
@@ -498,16 +507,16 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     return classes.join(" ");
   }, [spacerCount, isRowCorrect, runState, focusedRow]);
 
-  // Judged-edge marker in the status gutter: 🞂 on the next row to be judged,
-  // or 🞁 on the top visible row when the edge is above the viewport.
+  // Judged-edge marker in the status gutter: ▶ on the next row to be judged,
+  // or ▲ on the top visible row when the edge is above the viewport.
   const renderGutter = useCallback((renderedRowIndex: number) => {
     if (runState !== "running" || pointerIndex === null) {
       return "";
     }
     if (pointerIndex < topVisibleRow) {
-      return renderedRowIndex === topVisibleRow ? "🞁" : "";
+      return renderedRowIndex === topVisibleRow ? "▲" : "";
     }
-    return renderedRowIndex === pointerIndex ? "🞂" : "";
+    return renderedRowIndex === pointerIndex ? "▶" : "";
   }, [runState, pointerIndex, topVisibleRow]);
 
   if (!puzzle) {
