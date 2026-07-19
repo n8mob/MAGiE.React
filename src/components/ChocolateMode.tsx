@@ -31,7 +31,7 @@ type RunState = "running" | "won" | "lost";
  */
 const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const clock = puzzle.clock ?? "scroll";
-  const scrollSpeed = puzzle.scrollSpeed ?? 0.15;
+  const scrollSpeed = puzzle.scrollSpeed ?? 0.35;
   const scrollAccel = puzzle.scrollAccel ?? 0.05;
   const maxStrikes = puzzle.maxStrikes ?? 10;
 
