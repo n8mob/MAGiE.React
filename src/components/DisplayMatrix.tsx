@@ -7,6 +7,10 @@ interface DisplayMatrixProps {
   renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode;
   /** Show each row's decoded-character annotation. Off for decode puzzles, where it would reveal the answer. */
   showAnnotations?: boolean;
+  /** Optional class for a row's <p>, e.g. per-letter correctness or focus styling in Chocolate mode. */
+  rowClassName?: (rowIndex: number) => string | undefined;
+  /** Optional status-gutter content rendered left of each row's bits (e.g. Chocolate's judged-edge marker). */
+  renderGutter?: (rowIndex: number) => ReactNode;
 }
 
 interface DisplayMatrixUpdate {
@@ -16,7 +20,7 @@ interface DisplayMatrixUpdate {
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
-  ({ displayRows, renderBit, showAnnotations = true }, ref) => {
+  ({ displayRows, renderBit, showAnnotations = true, rowClassName, renderGutter }, ref) => {
     const bitFieldRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
@@ -38,7 +42,12 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
       <>
         <div ref={bitFieldRef} className="bit-field">
           {displayRows.map((displayRow, rowIndex) => (
-            <p key={`row-${rowIndex}`} ref={el => { rowRefs.current[rowIndex] = el; }}>
+            <p key={`row-${rowIndex}`}
+               className={rowClassName?.(rowIndex) || undefined}
+               ref={el => { rowRefs.current[rowIndex] = el; }}>
+              {renderGutter && (
+                <span className="row-gutter">{renderGutter(rowIndex)}</span>
+              )}
               {[...displayRow].map((bit, indexWithinRow) => (
                 renderBit(
                   bit,

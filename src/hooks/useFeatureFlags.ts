@@ -27,7 +27,7 @@ function getOrCreateSessionChallenge(): string {
 }
 
 export function useFeatureFlags() {
-  const NORMAL_FEATURES = ['tutorial', 'story', 'doorLock', 'date', 'vintage'];
+  const NORMAL_FEATURES = ['tutorial', 'story', 'doorLock', 'date', 'vintage', 'chocolate'];
   const [features, setFeatures] = useState<string[]>(NORMAL_FEATURES);
 
   useEffect(() => {

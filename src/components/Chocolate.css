@@ -1,0 +1,50 @@
+.chocolate-hud {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+  /* Stay visible while the player scrolls ahead of the conveyor edge. */
+  position: sticky;
+  top: 0;
+  background: #d0d4d4;
+  z-index: 1;
+}
+
+/* Focused row: the same inset-panel tint documented in COLORS.md */
+.bit-field p.focused-row {
+  background: rgba(20, 33, 36, 0.12);
+}
+
+/* Empty conveyor-belt rows ahead of the message; match the 32px bit rows. */
+.bit-field p.conveyor-spacer {
+  min-height: 32px;
+}
+
+/* Status gutter left of the bits: holds the judged-edge marker (▶ / ▲)
+   and keeps the bit columns even across rows. */
+.row-gutter {
+  flex: 0 0 24px;
+  align-self: center;
+  text-align: center;
+  line-height: 1;
+  font-size: 14px;
+}
+
+/* Letter annotations light up with their bits, per whole-letter judgment.
+   Colors approximate the teal/purple bit sprites. */
+.bit-field p.letter-correct .annotation {
+  color: #008080;
+}
+
+.bit-field p.letter-incorrect .annotation {
+  color: #6a4fa0;
+}
+
+.chocolate-game-over {
+  text-align: center;
+}
+
+.chocolate-game-over button {
+  margin-top: 0.5em;
+}

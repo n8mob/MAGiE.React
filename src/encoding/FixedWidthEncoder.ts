@@ -103,6 +103,8 @@ class FixedWidthEncoder implements BinaryEncoder {
    * @param displayWidth The width of each row.
    * @param bits The string of bits to be split.
    * @returns A generator yielding `DisplayRow` objects.
+   * If displayWidth is shorter than the fixed width of this encoding,
+   * then the display rows will simply show as many bits as they can.
    */
   * splitForDisplay(bits: BitSequence, displayWidth: number): Generator<DisplayRow, void> {
     let start = 0;
@@ -120,6 +122,7 @@ class FixedWidthEncoder implements BinaryEncoder {
     while (start < bits.length) {
       const end = start + splitWidth;
       const bitsForRow = bits.slice(start, end);
+      // TODO if displayWidth is narrower than this.width, this will barf.
       yield new DisplayRow(bitsForRow, this.decodeText(bitsForRow));
       start = end;
     }
