@@ -100,6 +100,7 @@ sized from the display height at run start.
 - When a letter scrolls off: correct → 1 point; incorrect → 1 strike. HUD shows `SCORE` and `STRIKES n/max`.
 - `maxStrikes` ends the run: score screen (points, letters gleaned) with a TRY AGAIN button that resets the run. A `chocolate_strike_out` GA event fires.
 - **Run endings (decision):** surviving the whole message — or completing every letter early ("outrunning the conveyor", which banks the untouched remainder as points) — triggers the standard win flow (ta-da, win message, share) plus the point total.
+- **Scroll-ahead peace (decision):** the belt's judged edge (logical scroll point) is decoupled from the player's view (actual scroll point). Scrolling ahead holds the working area still — each row the belt removes above is compensated in `scrollTop` — and the view only auto-follows the cursor on player input (typing, tapping, arrows), never on belt ticks. The peace lasts until the judged edge reaches the top of the view; the HUD is sticky so strikes accrued above remain visible.
 - Per-letter results are recorded as a full boolean array per run (see Deferred), not collapsed to a count.
 - Future scoring enhancements (not in v1, but the structure allows them):
   - bonuses for fully correct words

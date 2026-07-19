@@ -4,6 +4,11 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0.25em 0.5em;
+  /* Stay visible while the player scrolls ahead of the conveyor edge. */
+  position: sticky;
+  top: 0;
+  background: #d0d4d4;
+  z-index: 1;
 }
 
 /* Focused row: the same inset-panel tint documented in COLORS.md */

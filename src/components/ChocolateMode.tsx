@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
@@ -68,6 +68,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
+  const rowPitchRef = useRef(32);
+  // Set by input handlers so the view follows the cursor only when the player
+  // moved it — never when the belt did.
+  const shouldFollowCursor = useRef(false);
 
   const judge = useMemo(() => new PerLetterJudge(encoding), [encoding]);
   const judgment = useMemo(
@@ -112,6 +116,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     const rowPitch = secondRow
       ? secondRow.getBoundingClientRect().top - firstRow.getBoundingClientRect().top
       : firstRow.offsetHeight;
+    rowPitchRef.current = Math.max(rowPitch, 1);
     const rowsThatFit = Math.max(1, Math.floor(container.clientHeight / Math.max(rowPitch, 1)));
     const startRow = clock === "scroll" ? rowsThatFit - 1
       : clock === "advance" ? Math.floor(rowsThatFit / 2)
@@ -121,6 +126,22 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   }, [leadIn, rowCount, clock]);
 
   const spacerCount = leadIn ?? 0;
+
+  // Decouple the belt (logical scroll point) from the player's view (actual
+  // scroll point). When a row leaves the top while the player has scrolled
+  // ahead, pull scrollTop back by one row so their working area holds still —
+  // the peace lasts until the judged edge catches up with their viewport.
+  const previousTopRows = useRef({ scrolledRows, spacerCount });
+  useLayoutEffect(() => {
+    const previous = previousTopRows.current;
+    const rowsRemoved = (previous.spacerCount - spacerCount) + (scrolledRows - previous.scrolledRows);
+    previousTopRows.current = { scrolledRows, spacerCount };
+    const container = mainDisplayRef.current;
+    if (rowsRemoved <= 0 || runState !== "running" || !container || container.scrollTop <= 0) {
+      return;
+    }
+    container.scrollTop = Math.max(0, container.scrollTop - rowsRemoved * rowPitchRef.current);
+  }, [scrolledRows, spacerCount, runState]);
 
   const rowOf = useCallback((bitIndex: number) => Math.floor(bitIndex / rowWidth), [rowWidth]);
   const isRowCorrect = useCallback(
@@ -151,6 +172,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(target).bit === bit ? prev : prev.toggleBit(target));
+    shouldFollowCursor.current = true;
     setCursor(nextEditableBit(target + 1));
   }, [runState, cursor, nextEditableBit, winBits.length]);
 
@@ -166,6 +188,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(index).bit === "0" ? prev : prev.toggleBit(index));
+    shouldFollowCursor.current = true;
     setCursor(index);
   }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth]);
 
@@ -182,6 +205,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.toggleBit(index));
+    shouldFollowCursor.current = true;
     setCursor(index + 1);
   }, [runState, minEditableBit, isRowLocked, rowOf]);
 
@@ -199,15 +223,19 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
           deleteBit();
           break;
         case "ArrowLeft":
+          shouldFollowCursor.current = true;
           setCursor(c => Math.max(c - 1, minEditableBit));
           break;
         case "ArrowRight":
+          shouldFollowCursor.current = true;
           setCursor(c => Math.min(c + 1, winBits.length));
           break;
         case "ArrowUp":
+          shouldFollowCursor.current = true;
           setCursor(c => Math.max(c - rowWidth, minEditableBit));
           break;
         case "ArrowDown":
+          shouldFollowCursor.current = true;
           setCursor(c => Math.min(c + rowWidth, winBits.length));
           break;
         default:
@@ -230,6 +258,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       while (next < rowCount && isRowCorrect(next)) {
         next++;
       }
+      // The hop is a consequence of the player completing a letter, so the
+      // view is allowed to follow it.
+      shouldFollowCursor.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCursor(Math.max(next * rowWidth, minEditableBit));
     }
@@ -322,11 +353,19 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
 
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
 
-  // Step the focused row into view (discrete, no smooth scrolling).
+  // Step the focused row into view (discrete, no smooth scrolling) — but only
+  // when the player moved the cursor. Belt ticks never steal the view; the
+  // no-deps effect clears any leftover flag every render so a stale flag can't
+  // fire on a later tick.
   useEffect(() => {
+    const follow = shouldFollowCursor.current;
+    shouldFollowCursor.current = false;
+    if (!follow) {
+      return;
+    }
     const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow - scrolledRows + spacerCount);
     rowElement?.scrollIntoView({ block: "nearest" });
-  }, [focusedRow, scrolledRows, spacerCount]);
+  });
 
   // Rendered rows: the empty lead-in belt, then the not-yet-scrolled letters.
   const visibleRows = useMemo(() => {
