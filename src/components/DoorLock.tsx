@@ -6,6 +6,7 @@ import { BitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
+import { useBitSounds } from "../hooks/useBitSounds.ts";
 
 const randomSequence = (bits: number = 8) =>
   BitSequence.fromString(Math.floor(Math.random() * (2 ** bits)).toString(2).padStart(bits, "0"));
@@ -29,6 +30,8 @@ const DoorLock = (props: DoorLockProps) => {
   const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());
   const [cardBits, setCardBits] = useState(() => BitSequence.empty());
+  // Staging is the live input; the card only changes on a swipe, so it stays silent.
+  useBitSounds(stagingBits);
   const bitsPerRow = 8;
   const [presetIndex, setPresetIndex] = useState(0);
   const [winSequence, setWinSequence] = useState(() =>

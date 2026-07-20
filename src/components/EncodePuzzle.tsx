@@ -6,6 +6,7 @@ import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
+import { useBitSounds } from "../hooks/useBitSounds.ts";
 
 const EncodePuzzle: FC<PuzzleProps> = (
   {
@@ -19,6 +20,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
     () => puzzle?.encoding?.decodeText(guessBits) || "",
     [puzzle, guessBits]
   );
+  useBitSounds(guessBits);
 
   const {
     displayMatrixRef,

@@ -9,6 +9,7 @@ import { Correctness } from "../judgment/BitJudgment.ts";
 import { PerLetterJudge } from "../judgment/PerLetterJudge.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { chocolateEncoding } from "../encoding/FiveBitA1.ts";
+import { useBitSounds } from "../hooks/useBitSounds.ts";
 import "./Chocolate.css";
 
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
@@ -56,6 +57,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   );
 
   const [guessBits, setGuessBits] = useState<BitSequence>(allOffBits);
+  useBitSounds(guessBits);
   const [runState, setRunState] = useState<RunState>("running");
   const [cursor, setCursor] = useState(0);
   const [scrolledRows, setScrolledRows] = useState(0);
