@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { BitSequence } from "../BitSequence.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { diffBitSounds } from "../audio/bitSoundDiff.ts";
 
 const DEFAULT_ON_SOUND = SOUNDS.bitOn;
 const DEFAULT_OFF_SOUND = SOUNDS.bitOff;
@@ -47,26 +48,11 @@ function useBitSounds(bits: BitSequence, options: BitSoundOptions = {}): void {
     const before = previous.current;
     previous.current = current;
 
-    if (before === null || before === current) {return;}
+    if (before === null) {return;}
 
-    // A change is "on" if any bit went 0 -> 1, or if the sequence grew with a
-    // 1 on the end. Everything else reads as an "off" tap.
-    let turnedOn = false;
-    let turnedOff = false;
-    const shared = Math.min(before.length, current.length);
-    for (let i = 0; i < shared; i++) {
-      if (before[i] === current[i]) {continue;}
-      if (current[i] === "1") {turnedOn = true;}
-      else {turnedOff = true;}
-    }
-    for (let i = shared; i < current.length; i++) {
-      if (current[i] === "1") {turnedOn = true;}
-      else {turnedOff = true;}
-    }
-    if (current.length < before.length) {turnedOff = true;}
-
-    if (turnedOn) {playSound(onSound, volume);}
-    else if (turnedOff) {playSound(offSound, volume);}
+    const direction = diffBitSounds(before, current);
+    if (direction === "on") {playSound(onSound, volume);}
+    else if (direction === "off") {playSound(offSound, volume);}
   }, [bits, enabled, onSound, offSound, volume]);
 }
 
