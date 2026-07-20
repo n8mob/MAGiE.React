@@ -11,6 +11,8 @@ import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { debug  } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
+import { loadSound, playSound } from "../audio/SoundPlayer.ts";
+import { SOUNDS } from "../audio/sounds.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -54,17 +56,9 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
   }, [rawPuzzle, asChocolate, searchParams]);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
-  const winAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    winAudio.current = new Audio('/sounds/big-ta-da.wav');
-    winAudio.current.load();
-    winAudio.current.volume = 0.25;
-    return () => {
-      // TODO test if this quits playing if the user hits "next" very quickly.
-      // that may be fine. I dunno.
-      winAudio.current?.pause();
-    };
+    void loadSound(SOUNDS.win);
   }, []);
 
   const updateSolveTimeString = () => {
@@ -101,11 +95,7 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
       updateSolveTimeString();
     }
     if (!isAutoWin) {
-      if (winAudio.current) {
-        winAudio.current.play().catch((error) => {
-          console.warn("Audio playback failed:", error);
-        });
-      }
+      playSound(SOUNDS.win);
       ReactGA4.event("win", {
         puzzle_slug: puzzle.slug,
         winText: puzzle.winText,

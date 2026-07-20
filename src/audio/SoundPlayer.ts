@@ -67,6 +67,21 @@ function primeAudio(): void {
 }
 
 /**
+ * Watch for the first user gesture of the session and resume the context then.
+ * Installed at module load rather than per-component so that any sound works
+ * even on screens that never render a bit button.
+ */
+if (typeof window !== "undefined") {
+  const prime = () => {
+    primeAudio();
+    window.removeEventListener("pointerdown", prime);
+    window.removeEventListener("keydown", prime);
+  };
+  window.addEventListener("pointerdown", prime);
+  window.addEventListener("keydown", prime);
+}
+
+/**
  * Play a preloaded sound. If it hasn't finished decoding yet this is a no-op
  * rather than a delayed play, since a late tap sound is worse than none.
  */

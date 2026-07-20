@@ -7,6 +7,8 @@ import { BitInputs } from "./BitInputs.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
+import { loadSound, playSound } from "../audio/SoundPlayer.ts";
+import { SOUNDS } from "../audio/sounds.ts";
 
 const randomSequence = (bits: number = 8) =>
   BitSequence.fromString(Math.floor(Math.random() * (2 ** bits)).toString(2).padStart(bits, "0"));
@@ -39,14 +41,10 @@ const DoorLock = (props: DoorLockProps) => {
   );
 
   const mainDisplayRef = useRef<HTMLDivElement>(null);
-  const winAudio = useRef<HTMLAudioElement | null>(null);
   const [hint, setHint] = useState("Guess the bit sequence!");
 
   useEffect(() => {
-    winAudio.current = new Audio('/sounds/big-ta-da.wav');
-    winAudio.current.preload = "auto";
-    winAudio.current.volume = 0.25;
-    return () => { winAudio.current?.pause(); };
+    void loadSound(SOUNDS.win);
   }, []);
 
   useEffect(() => {
@@ -106,10 +104,7 @@ const DoorLock = (props: DoorLockProps) => {
       if (isCorrect) {
         ReactGA4.event("door_lock_win", { preset_index: presetIndex, pagePath });
         setHint("You got it!");
-        if (winAudio.current) {
-          winAudio.current.currentTime = 0;
-          winAudio.current.play().catch((error) => { console.warn("Audio playback failed:", error); });
-        }
+        playSound(SOUNDS.win);
       } else {
         setHint(`BAD KEY ${diff > 0 ? "+" : ""}${diff}`);
       }

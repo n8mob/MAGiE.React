@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import { BitSequence } from "../BitSequence.ts";
-import { loadSound, playSound, primeAudio } from "../audio/SoundPlayer.ts";
+import { loadSound, playSound } from "../audio/SoundPlayer.ts";
+import { SOUNDS } from "../audio/sounds.ts";
 
-const DEFAULT_ON_SOUND = "/sounds/Tap01.3.wav";
-const DEFAULT_OFF_SOUND = "/sounds/Tap01.1.wav";
+const DEFAULT_ON_SOUND = SOUNDS.bitOn;
+const DEFAULT_OFF_SOUND = SOUNDS.bitOff;
 
 interface BitSoundOptions {
   onSound?: string;
@@ -67,18 +68,6 @@ function useBitSounds(bits: BitSequence, options: BitSoundOptions = {}): void {
     if (turnedOn) {playSound(onSound, volume);}
     else if (turnedOff) {playSound(offSound, volume);}
   }, [bits, enabled, onSound, offSound, volume]);
-
-  // The AudioContext stays suspended until the player interacts with the page.
-  useEffect(() => {
-    if (!enabled) {return;}
-    const prime = () => { primeAudio(); };
-    window.addEventListener("pointerdown", prime);
-    window.addEventListener("keydown", prime);
-    return () => {
-      window.removeEventListener("pointerdown", prime);
-      window.removeEventListener("keydown", prime);
-    };
-  }, [enabled]);
 }
 
 export { useBitSounds, DEFAULT_ON_SOUND, DEFAULT_OFF_SOUND };
