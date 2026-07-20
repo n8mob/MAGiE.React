@@ -309,6 +309,7 @@ function App() {
       {features.includes('chocolate') && (<>
         {/* MENU_NAME_MAP aliases "chocolate" to the mall's API menu, so these
             routes browse mall content while links stay under /chocolate. */}
+        <Route path="/letErRoll" element={<Navigate to={"/chocolate/0/levels/4/puzzles/0"}/>} />
         <Route path="/chocolate" element={<MenuBrowser menuName="chocolate" />} />
         <Route path="/chocolate/:categoryIndex" element={<CategoryBrowser menuName="chocolate" />} />
         <Route path="/chocolate/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate" />} />
