@@ -17,7 +17,7 @@ const ACCEL_EVERY_ROWS = 10;
 const MIN_SCROLL_SPEED = 0.05;
 // How long after the last edit a wrong row keeps showing the target letter
 // before revealing what the player's bits actually encode.
-const GUESS_REVEAL_MS = 2000;
+const GUESS_REVEAL_MS = 800;
 
 type RunState = "running" | "won" | "lost";
 
