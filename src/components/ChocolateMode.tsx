@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
@@ -308,15 +308,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setCursor(index);
   }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth, noteEdit]);
 
-  const handleBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+  const handleBitToggle = useCallback((index: number) => {
     if (runState !== "running") {
       return;
     }
-    const bitIndex = event.target.dataset.bitIndex;
-    if (bitIndex === undefined) {
-      return;
-    }
-    const index = parseInt(bitIndex);
     if (index < minEditableBit || isRowLocked(rowOf(index))) {
       return;
     }
@@ -556,7 +551,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
                 correctness={isRowCorrect(rowIndex - spacerCount)
                   ? Correctness.correct
                   : Correctness.incorrect}
-                onChange={handleBitClick}
+                onBitToggle={handleBitToggle}
               />
             )}
           />

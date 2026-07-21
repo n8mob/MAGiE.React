@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { BitSequence } from "../BitSequence.ts";
 import { BinaryEncoder } from "../encoding/BinaryEncoder.ts";
@@ -82,10 +82,8 @@ const DoorLock = (props: DoorLockProps) => {
     setStagingBits(prev => prev.slice(0, -1));
   }, []);
 
-  const handleStagingBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const bitIndex = event.target.dataset.bitIndex;
-    if (bitIndex === undefined) { return; }
-    setStagingBits(prev => prev.toggleBit(parseInt(bitIndex)));
+  const handleStagingBitToggle = useCallback((index: number) => {
+    setStagingBits(prev => prev.toggleBit(index));
   }, []);
 
   const submit = useCallback(() => {
@@ -165,7 +163,7 @@ const DoorLock = (props: DoorLockProps) => {
           ? <span className="guess-placeholder">_ _ _ _ _ _ _ _</span>
           : <DisplayMatrix
             displayRows={stagingRows}
-            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} onChange={handleStagingBitClick} />}
+            renderBit={(bit) => <BitButton key={`bit-${bit.index}`} bit={bit} onBitToggle={handleStagingBitToggle} />}
           />
         }
       </div>
