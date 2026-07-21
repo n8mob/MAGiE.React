@@ -19,6 +19,7 @@ import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
+import { TouchDiagnostics } from "./components/TouchDiagnostics.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
@@ -65,6 +66,8 @@ function App() {
   usePageTracking();
   const location = useLocation();
   const { headerContent, stopwatchDisplay } = useHeader();
+  // Temporary, for issue #186. Read straight off the URL so it survives routing.
+  const showTouchDiagnostics = new URLSearchParams(window.location.search).get("diag") === "touch";
 
   const [showWelcome, setShowWelcome] = useState(() => localStorage.getItem('isFirstVisit') === null);
   const [showHowTo, setShowHowTo] = useState(false);
@@ -328,6 +331,7 @@ function App() {
 
   return (
     <div id="device">
+      {showTouchDiagnostics && <TouchDiagnostics />}
       <div id="bezel-header">
         <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
         <h1 id="magie-title">MAGiE</h1>
