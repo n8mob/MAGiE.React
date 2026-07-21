@@ -31,6 +31,15 @@
   font-size: 14px;
 }
 
+input.bit-checkbox {
+  width: 40px;
+  height: 40px;
+}
+
+.bit-field .annotation {
+  font-size: large;
+}
+
 /* Letter annotations light up with their bits, per whole-letter judgment.
    Colors approximate the teal/purple bit sprites. */
 .bit-field p.letter-correct .annotation {
