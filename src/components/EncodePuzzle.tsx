@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
 import { GuessDisplay } from "./GuessDisplay.tsx";
@@ -67,16 +67,12 @@ const EncodePuzzle: FC<PuzzleProps> = (
     }
   }, [puzzle, appendBit, deleteBit]);
 
-  // Handle bit click for toggling bits
-  // HTMLInputElement instead of a button type because the buttons are actually checkboxes
-  const handleBitClick = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const bitIndex = event.target.dataset.bitIndex;
-    if (bitIndex === undefined) {
-      return;
-    }
-    const index = parseInt(bitIndex);
-    setGuessBits(guessBits.toggleBit(index));
-  }, [guessBits, setGuessBits]);
+  // Functional update, not guessBits.toggleBit: two taps landing before a
+  // re-render would otherwise both read the same stale sequence, so the second
+  // one silently discards the first.
+  const handleBitToggle = useCallback((index: number) => {
+    setGuessBits(prev => prev.toggleBit(index));
+  }, [setGuessBits]);
 
   // Attach keydown listener
   useEffect(() => {
@@ -107,7 +103,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
                 correctness={
                   judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
                   ?? Correctness.unguessed}
-                onChange={handleBitClick}
+                onBitToggle={handleBitToggle}
               />
             )}
           />

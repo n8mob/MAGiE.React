@@ -307,6 +307,14 @@ input.bit-checkbox {
   opacity: 0.85;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   margin: 0;
+  /* Without this, two quick taps on neighbouring bits fall inside the browser's
+     double-tap slop radius and get coalesced into one double-tap gesture, so the
+     second bit never toggles and the first appears to toggle twice. Same fix the
+     on-screen keyboard already carries. */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input.bit-checkbox:checked {
