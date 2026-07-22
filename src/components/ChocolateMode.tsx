@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
-import { BitInputs } from "./BitInputs.tsx";
 import { PuzzleProps } from "./useBasePuzzle";
 import { DisplayMatrix, DisplayMatrixUpdate } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
@@ -370,9 +369,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       while (next < rowCount && isRowCorrect(next)) {
         next++;
       }
-      // The hop is a consequence of the player completing a letter, so the
-      // view is allowed to follow it.
-      shouldFollowCursor.current = true;
+      // The hop is a consequence of the player completing a letter. In Dessert
+      // the belt owns the view, so let it follow only in the timed Treat mode —
+      // otherwise a correct letter jumps the conveyor.
+      shouldFollowCursor.current = clock === "advance";
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCursor(Math.max(next * rowWidth, minEditableBit));
     }
@@ -523,7 +523,11 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
 
   return (
     <div id="game-content">
-      <div id="main-display" className="display chocolate-display" ref={mainDisplayRef}>
+      <div
+        id="main-display"
+        className={`display chocolate-display${clock === "scroll" ? " conveyor-locked" : ""}`}
+        ref={mainDisplayRef}
+      >
         {clock === "scroll" && (
           <div className="chocolate-hud">
             <span>SCORE {points}</span>
@@ -557,22 +561,15 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
           />
         )}
       </div>
-      <div id="puzzle-inputs">
-        {runState === "won" ? (
+      {runState === "won" && (
+        <div id="puzzle-inputs">
           <div id="win-message" className="display">
             {clock === "scroll" && <p>SCORE {points}</p>}
             {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
               <p key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
-        ) : (
-          <BitInputs
-            onBit={typeBit}
-            onDelete={deleteBit}
-            onSubmit={() => {}}
-            disabled={runState !== "running"}
-          />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

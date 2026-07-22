@@ -11,6 +11,16 @@
   z-index: 1;
 }
 
+/* Dessert conveyor: the belt drives the view, so lock out user scrolling.
+   overflow: hidden still allows programmatic scrollTop, and touch panning of a
+   hidden-overflow element doesn't scroll it. Overrides #game-content
+   #main-display { overflow-y: auto } via the extra class specificity. */
+#game-content #main-display.conveyor-locked {
+  overflow-y: hidden;
+  touch-action: pan-x;
+  overscroll-behavior: contain;
+}
+
 /* Focused row: the same inset-panel tint documented in COLORS.md */
 .bit-field p.focused-row {
   background: rgba(20, 33, 36, 0.12);
