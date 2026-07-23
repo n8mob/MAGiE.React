@@ -1,6 +1,7 @@
 .chocolate-hud {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   box-sizing: border-box;
   padding: 0.25em 0.5em;
@@ -9,6 +10,29 @@
   top: 0;
   background: #d0d4d4;
   z-index: 1;
+}
+
+/* Fast-forward ("cue") — hold to zoom the belt ahead. touch-action/user-select
+   off so a press-and-hold doesn't select text or fire the long-press menu. */
+.chocolate-cue {
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.45em 0.6em;
+  cursor: pointer;
+  background: transparent;
+  border: 2px solid;
+  border-radius: 4px;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Suppress the iOS long-press callout; the contextmenu event (Android/desktop)
+     is prevented on the button itself. */
+  -webkit-touch-callout: none;
+}
+
+.chocolate-cue.active {
+  background: rgba(20, 33, 36, 0.18);
 }
 
 /* Dessert conveyor: the belt drives the view, so lock out user scrolling.
@@ -39,6 +63,7 @@
   height: 2px;
   background: #6a4fa0;
   box-shadow: 0 0 4px rgba(106, 79, 160, 0.6);
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   pointer-events: none;
   z-index: 1;
 }
