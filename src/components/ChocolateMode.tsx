@@ -21,6 +21,8 @@ const GUESS_REVEAL_MS = 600;
 // HUD. A row is judged only once its BOTTOM edge rises past this line, so a row
 // still touching it is fair game. Tune by eye.
 const LINE_POSITION = 0.2;
+// How much the "cue" (fast-forward) button multiplies belt speed while held.
+const CUE_SPEED_MULTIPLIER = 12;
 
 type RunState = "running" | "won" | "lost";
 
@@ -97,6 +99,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   const judgeOffsetRef = useRef(0);
   // The continuous scroll offset, in rows. The one true position of the belt.
   const sRef = useRef(0);
+  // "Cue" fast-forward: held state read by the animation loop (ref, instant) and
+  // mirrored to state for button styling / the future VHS overlay.
+  const cueHeldRef = useRef(false);
+  const [cueActive, setCueActive] = useState(false);
   // Mirror of scrolledRows for the animation loop to read without re-subscribing.
   const scrolledRowsRef = useRef(0);
   // Set by input handlers so the view follows the cursor only when the player
@@ -243,7 +249,10 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       last = now;
       const tier = Math.floor(scrolledRowsRef.current / ACCEL_EVERY_ROWS);
       const speed = Math.max(scrollSpeed + scrollAccel * tier, MIN_SCROLL_SPEED);
-      sRef.current += dt * speed;
+      // "Cue": a momentary boost while the fast-forward button is held. Read from
+      // a ref so the loop needn't re-subscribe when it toggles.
+      const cueBoost = cueHeldRef.current ? CUE_SPEED_MULTIPLIER : 1;
+      sRef.current += dt * speed * cueBoost;
       belt.style.transform = `translate3d(0, ${-sRef.current * rowPitchRef.current}px, 0)`;
       const judged = Math.max(0, Math.min(rowCount, Math.floor(sRef.current + judgeOffsetRef.current)));
       if (judged > scrolledRowsRef.current) {
@@ -462,6 +471,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     revealTimeoutsRef.current.forEach(id => window.clearTimeout(id));
     revealTimeoutsRef.current = [];
     winReported.current = false;
+    // Release the cue in case a hold was interrupted by the run ending.
+    cueHeldRef.current = false;
+    setCueActive(false);
     // Rewind the belt to the start; the animation loop restarts when runState
     // returns to "running".
     sRef.current = 0;
@@ -471,6 +483,19 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     }
     setRunState("running");
   }, [allOffBits]);
+
+  // Cue (fast-forward) held only while the button is down and the run is live.
+  const startCue = useCallback(() => {
+    if (runState !== "running") {
+      return;
+    }
+    cueHeldRef.current = true;
+    setCueActive(true);
+  }, [runState]);
+  const stopCue = useCallback(() => {
+    cueHeldRef.current = false;
+    setCueActive(false);
+  }, []);
 
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
 
@@ -517,10 +542,34 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
         id="main-display"
         className={`display chocolate-display${clock === "scroll" ? " conveyor-locked" : ""}`}
         ref={mainDisplayRef}
+        // Covers the HUD too, which sits outside the bit grid's own handler.
+        onContextMenu={event => event.preventDefault()}
       >
         {clock === "scroll" && (
           <div className="chocolate-hud">
             <span>SCORE {points}</span>
+            {runState === "running" && (
+              <button
+                type="button"
+                className={`chocolate-cue${cueActive ? " active" : ""}`}
+                aria-label="Fast forward"
+                // Pointer capture keeps the hold alive if the finger drifts off
+                // the button; release/cancel/lost-capture all end it.
+                onPointerDown={event => {
+                  event.preventDefault();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  startCue();
+                }}
+                onPointerUp={stopCue}
+                onPointerCancel={stopCue}
+                onLostPointerCapture={stopCue}
+                // Long-press fires contextmenu on Android/desktop; suppress it so
+                // the hold isn't interrupted by a menu.
+                onContextMenu={event => event.preventDefault()}
+              >
+                ▶▶
+              </button>
+            )}
             <span>STRIKES {strikes}/{maxStrikes}</span>
           </div>
         )}
