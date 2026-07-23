@@ -27,6 +27,16 @@ const CUE_SPEED_MULTIPLIER = 12;
 type RunState = "running" | "won" | "lost";
 
 /**
+ * Keys that hold the conveyor in fast-forward. F and Space are the real
+ * controls; the Media* names are spec'd KeyboardEvent.key values for keyboards
+ * with transport controls — most OSes swallow those before the browser sees
+ * them, so they're a free bonus, never something to rely on.
+ */
+const isCueKey = (key: string) =>
+  key === "f" || key === "F" || key === " "
+  || key === "MediaFastForward" || key === "MediaTrackNext";
+
+/**
  * Chocolate mode: the full target text is shown, one letter per row, and every
  * bit starts off. The player toggles bits; a letter lights teal only when its
  * whole row is right (PerLetterJudge — no bit-level feedback).
@@ -354,9 +364,29 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setCursor(index + 1);
   }, [runState, minEditableBit, isRowLocked, rowOf, noteEdit]);
 
+  // Cue (fast-forward) held only while the button/key is down and the run is live.
+  const startCue = useCallback(() => {
+    if (runState !== "running") {
+      return;
+    }
+    cueHeldRef.current = true;
+    setCueActive(true);
+  }, [runState]);
+  const stopCue = useCallback(() => {
+    cueHeldRef.current = false;
+    setCueActive(false);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (runState !== "running") {
+        return;
+      }
+      if (isCueKey(event.key)) {
+        // Space would scroll (and re-trigger a focused button); keydown repeats
+        // while held, and startCue is idempotent, so repeats are harmless.
+        event.preventDefault();
+        startCue();
         return;
       }
       switch (event.key) {
@@ -387,9 +417,23 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
           break;
       }
     };
+    // Releasing is deliberately not gated on runState: a run ending mid-hold
+    // must still let go of the cue. Blur covers alt-tabbing away while held,
+    // where the keyup never arrives.
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (isCueKey(event.key)) {
+        stopCue();
+      }
+    };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [runState, typeBit, deleteBit, minEditableBit, winBits.length, rowWidth]);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", stopCue);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", stopCue);
+    };
+  }, [runState, typeBit, deleteBit, minEditableBit, winBits.length, rowWidth, startCue, stopCue]);
 
   // Treat/Dessert: once the focused letter is correct, hop to the next
   // not-yet-correct row (this also skips the free space rows).
@@ -484,19 +528,6 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setRunState("running");
   }, [allOffBits]);
 
-  // Cue (fast-forward) held only while the button is down and the run is live.
-  const startCue = useCallback(() => {
-    if (runState !== "running") {
-      return;
-    }
-    cueHeldRef.current = true;
-    setCueActive(true);
-  }, [runState]);
-  const stopCue = useCallback(() => {
-    cueHeldRef.current = false;
-    setCueActive(false);
-  }, []);
-
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
 
   // Step the focused row into view when the player moved the cursor — but never
@@ -552,7 +583,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
               <button
                 type="button"
                 className={`chocolate-cue${cueActive ? " active" : ""}`}
-                aria-label="Fast forward"
+                aria-label="Fast forward — hold F or Space"
+                title="Hold to fast forward (F or Space)"
                 // Pointer capture keeps the hold alive if the finger drifts off
                 // the button; release/cancel/lost-capture all end it.
                 onPointerDown={event => {
