@@ -43,7 +43,14 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
 
     return (
       <>
-        <div ref={bitFieldRef} className="bit-field">
+        <div
+          ref={bitFieldRef}
+          className="bit-field"
+          // Chrome/Android ignores -webkit-touch-callout, so a long press on the
+          // grid raises the context menu even with user-select: none. This is the
+          // cross-browser half of that suppression.
+          onContextMenu={event => event.preventDefault()}
+        >
           {displayRows.map((displayRow, rowIndex) => (
             <p key={`row-${rowIndex}`}
                className={rowClassName?.(rowIndex) || undefined}

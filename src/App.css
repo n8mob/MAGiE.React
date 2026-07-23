@@ -283,6 +283,13 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* The bit grid is a control surface, not prose: a long press here should never
+     select the annotation letters or raise the copy/share callout mid-play.
+     Deliberately scoped to .bit-field, so clues, win messages and story text
+     stay selectable and shareable. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .bit-field p {

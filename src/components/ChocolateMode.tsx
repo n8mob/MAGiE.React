@@ -542,6 +542,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
         id="main-display"
         className={`display chocolate-display${clock === "scroll" ? " conveyor-locked" : ""}`}
         ref={mainDisplayRef}
+        // Covers the HUD too, which sits outside the bit grid's own handler.
+        onContextMenu={event => event.preventDefault()}
       >
         {clock === "scroll" && (
           <div className="chocolate-hud">
