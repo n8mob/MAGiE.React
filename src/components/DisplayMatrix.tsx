@@ -17,6 +17,8 @@ interface DisplayMatrixUpdate {
   getWidth: () => number;
   scrollToBottom?: () => void;
   getBitRowElement?: (rowIndex: number) => HTMLElement | null;
+  /** The scrolling row container, so Chocolate's conveyor can translate it directly. */
+  getBitFieldElement?: () => HTMLElement | null;
 }
 
 const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
@@ -35,7 +37,8 @@ const DisplayMatrix = forwardRef<DisplayMatrixUpdate, DisplayMatrixProps>(
       },
       getBitRowElement: (rowIndex: number) => {
         return rowRefs.current[rowIndex] || null;
-      }
+      },
+      getBitFieldElement: () => bitFieldRef.current
     }));
 
     return (
