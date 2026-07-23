@@ -94,14 +94,14 @@
   min-height: var(--chocolate-row-pitch, 40px);
 }
 
-/* Status gutter left of the bits: holds the judged-edge marker (▶ / ▲)
+/* Status gutter left of the bits: holds the target ("win") letter for the row,
    and keeps the bit columns even across rows. */
 .row-gutter {
   flex: 0 0 24px;
   align-self: center;
   text-align: center;
   line-height: 1;
-  font-size: 14px;
+  font-size: var(--chocolate-letter-size, 14px);
 }
 
 /* Bigger bits for Chocolate — only 5 per row in 5bA1, so there's room. Scoped
@@ -109,6 +109,10 @@
    modes (an unscoped rule here leaks to the whole app; CSS isn't file-scoped). */
 .chocolate-display {
   --chocolate-bit-size: 40px;
+  /* One size for both letters — the target in the gutter and the decoded guess
+     in the annotation — so they read as a matched pair rather than a headline
+     and a footnote. Tune this alone to resize both. */
+  --chocolate-letter-size: calc(var(--chocolate-bit-size) * 0.35);
 }
 
 .chocolate-display input.bit-checkbox {
@@ -116,9 +120,9 @@
   height: var(--chocolate-bit-size);
 }
 
-/* Annotation tracks the bit size so the letter reads at a matching scale. */
+/* Matches the gutter's target letter exactly (see --chocolate-letter-size). */
 .chocolate-display .annotation {
-  font-size: calc(var(--chocolate-bit-size) * 0.5);
+  font-size: var(--chocolate-letter-size);
 }
 
 /* Letter annotations light up with their bits, per whole-letter judgment.
