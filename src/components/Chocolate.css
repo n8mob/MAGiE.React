@@ -19,6 +19,34 @@
   overflow-y: hidden;
   touch-action: pan-x;
   overscroll-behavior: contain;
+  /* Anchor the absolutely-positioned judgment line to the display box. */
+  position: relative;
+}
+
+/* The belt itself: translated every frame by the conveyor loop. Hint the
+   compositor so the transform stays smooth (no per-frame repaint). */
+#main-display.conveyor-locked .bit-field {
+  will-change: transform;
+}
+
+/* The rock-solid judgment line, painted across the belt at a fixed height like
+   the printed art on a Game & Watch lens. Rows are judged as they cross it.
+   Sits above the belt but below the sticky HUD (z-index 1). */
+.chocolate-judgment-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #6a4fa0;
+  box-shadow: 0 0 4px rgba(106, 79, 160, 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Vertically center each row's contents so the smaller annotation sits centered
+   against the taller bits, rather than top-aligned by the flex default. */
+.chocolate-display .bit-field p {
+  align-items: center;
 }
 
 /* Focused row: the same inset-panel tint documented in COLORS.md */
@@ -26,9 +54,11 @@
   background: rgba(20, 33, 36, 0.12);
 }
 
-/* Empty conveyor-belt rows ahead of the message; match the 32px bit rows. */
+/* Empty conveyor-belt rows ahead of the message. Must be exactly one row pitch
+   tall (set by the conveyor at measure time) so the belt's uniform-pitch scroll
+   math matches the real DOM; falls back to the bit height before measurement. */
 .bit-field p.conveyor-spacer {
-  min-height: 32px;
+  min-height: var(--chocolate-row-pitch, 40px);
 }
 
 /* Status gutter left of the bits: holds the judged-edge marker (▶ / ▲)
@@ -41,13 +71,21 @@
   font-size: 14px;
 }
 
-input.bit-checkbox {
-  width: 40px;
-  height: 40px;
+/* Bigger bits for Chocolate — only 5 per row in 5bA1, so there's room. Scoped
+   to .chocolate-display so the default 32px in App.css still governs the other
+   modes (an unscoped rule here leaks to the whole app; CSS isn't file-scoped). */
+.chocolate-display {
+  --chocolate-bit-size: 40px;
 }
 
-.bit-field .annotation {
-  font-size: large;
+.chocolate-display input.bit-checkbox {
+  width: var(--chocolate-bit-size);
+  height: var(--chocolate-bit-size);
+}
+
+/* Annotation tracks the bit size so the letter reads at a matching scale. */
+.chocolate-display .annotation {
+  font-size: calc(var(--chocolate-bit-size) * 0.5);
 }
 
 /* Letter annotations light up with their bits, per whole-letter judgment.
