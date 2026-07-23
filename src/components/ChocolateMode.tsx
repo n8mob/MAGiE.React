@@ -14,15 +14,31 @@ import "./Chocolate.css";
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
 const ACCEL_EVERY_ROWS = 10;
 const MIN_SCROLL_SPEED = 0.05;
-// How long after the last edit a wrong row keeps showing the target letter
-// before revealing what the player's bits actually encode.
-const GUESS_REVEAL_MS = 600;
 // Where the fixed judgment line sits, as a fraction of the belt height below the
 // HUD. A row is judged only once its BOTTOM edge rises past this line, so a row
 // still touching it is fair game. Tune by eye.
 const LINE_POSITION = 0.2;
 // How much the "cue" (fast-forward) button multiplies belt speed while held.
 const CUE_SPEED_MULTIPLIER = 12;
+// Space is 0 (all bits off) in 5bA1, so both the target and the decoded guess
+// can legitimately be a space — invisible in either slot. Stand one in so an
+// untouched row reads as "nothing here yet" rather than as a rendering bug.
+const SPACE_GLYPH = "_";
+
+/** Render a character that would otherwise be invisible. */
+const visibleChar = (char: string) => (char === " " || char === "" ? SPACE_GLYPH : char);
+
+/**
+ * Clocks that hide the target letter in the left gutter.
+ *
+ * Empty for alpha: every mode shows what the player is aiming for. For beta,
+ * add "scroll" here to hide it in Dessert — a visible target beside a live
+ * decode lets a player match glyphs without doing the encoding mentally, which
+ * is fine while teaching and not fine while testing.
+ */
+const HIDE_TARGET_GUTTER_FOR: string[] = [];
+
+const showsTargetGutter = (clock: string) => !HIDE_TARGET_GUTTER_FOR.includes(clock);
 
 type RunState = "running" | "won" | "lost";
 
@@ -95,11 +111,6 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // Gate: true once the belt has been measured. Wakes the animation loop (state,
   // not a ref, precisely so it can) and reveals the line.
   const [measured, setMeasured] = useState(false);
-  // Wrong rows whose reveal delay has passed: their annotation shows the
-  // character the player's bits actually encode instead of the target.
-  const [revealedRows, setRevealedRows] = useState<ReadonlySet<number>>(new Set());
-  const lastEditAtRef = useRef<Record<number, number>>({});
-  const revealTimeoutsRef = useRef<number[]>([]);
   const winReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
@@ -134,26 +145,27 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     scrolledRowsRef.current = scrolledRows;
   }, [scrolledRows]);
 
-  // One row per letter. The annotation shows the target ("win") character by
-  // default; a wrong row that has sat unedited past the reveal delay — or that
-  // the line has already passed — shows the character the player's bits actually
-  // encode (the "guess" character) instead. Correct rows show the letter either
-  // way, since guess == target.
+  // One row per letter. The annotation is simply what the player's bits decode
+  // to right now — the target letter lives in the left gutter, so the two never
+  // occupy the same slot and neither needs marking up to say which it is.
   const displayRows = useMemo(() => {
     const rows: DisplayRow[] = [];
     let letterIndex = 0;
     for (const letterBits of encoding.splitByChar(guessBits)) {
-      const isCorrect = judgment.sequenceJudgments[letterIndex]?.isSequenceCorrect ?? false;
-      const judged = clock === "scroll" && letterIndex < scrolledRows;
-      const revealGuess = !isCorrect && (judged || revealedRows.has(letterIndex));
-      const annotation = revealGuess
-        ? encoding.decodeChar(letterBits)
-        : (targetChars[letterIndex] ?? "");
+      const decoded = encoding.decodeChar(letterBits);
+      // A decoded space only needs standing in for when it's wrong. Space is the
+      // sole character encoding to 0, so a decoded space matching a target space
+      // is necessarily correct — show it as the real (invisible) space. Where the
+      // target is a letter, the underscore says "you've left this blank", and
+      // .letter-incorrect colours it purple.
+      const annotation = decoded === " " && targetChars[letterIndex] !== " "
+        ? SPACE_GLYPH
+        : decoded;
       rows.push(new DisplayRow(letterBits, annotation));
       letterIndex++;
     }
     return rows;
-  }, [encoding, guessBits, targetChars, judgment, clock, scrolledRows, revealedRows]);
+  }, [encoding, guessBits, targetChars]);
 
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;
@@ -277,41 +289,6 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     return () => cancelAnimationFrame(raf);
   }, [clock, runState, measured, rowCount, scrollSpeed, scrollAccel, commitCrossings]);
 
-  // Record an edit to a row: the target letter comes back while the player is
-  // working, and the guess character is revealed only after the delay passes
-  // with no further edits to that row.
-  const noteEdit = useCallback((bitIndex: number) => {
-    const row = rowOf(bitIndex);
-    const editedAt = Date.now();
-    lastEditAtRef.current[row] = editedAt;
-    setRevealedRows(prev => {
-      if (!prev.has(row)) {
-        return prev;
-      }
-      const next = new Set(prev);
-      next.delete(row);
-      return next;
-    });
-    const timeoutId = window.setTimeout(() => {
-      if (lastEditAtRef.current[row] !== editedAt) {
-        return; // A later edit restarted this row's reveal delay.
-      }
-      setRevealedRows(prev => {
-        if (prev.has(row)) {
-          return prev;
-        }
-        const next = new Set(prev);
-        next.add(row);
-        return next;
-      });
-    }, GUESS_REVEAL_MS);
-    revealTimeoutsRef.current.push(timeoutId);
-  }, [rowOf]);
-
-  useEffect(() => () => {
-    revealTimeoutsRef.current.forEach(id => window.clearTimeout(id));
-  }, []);
-
   const nextEditableBit = useCallback((fromBit: number) => {
     let index = Math.max(fromBit, minEditableBit);
     while (index < winBits.length && isRowLocked(rowOf(index))) {
@@ -329,10 +306,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(target).bit === bit ? prev : prev.toggleBit(target));
-    noteEdit(target);
     shouldFollowCursor.current = true;
     setCursor(nextEditableBit(target + 1));
-  }, [runState, cursor, nextEditableBit, winBits.length, noteEdit]);
+  }, [runState, cursor, nextEditableBit, winBits.length]);
 
   const deleteBit = useCallback(() => {
     if (runState !== "running") {
@@ -346,10 +322,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.getBit(index).bit === "0" ? prev : prev.toggleBit(index));
-    noteEdit(index);
     shouldFollowCursor.current = true;
     setCursor(index);
-  }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth, noteEdit]);
+  }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth]);
 
   const handleBitToggle = useCallback((index: number) => {
     if (runState !== "running") {
@@ -359,10 +334,9 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       return;
     }
     setGuessBits(prev => prev.toggleBit(index));
-    noteEdit(index);
     shouldFollowCursor.current = true;
     setCursor(index + 1);
-  }, [runState, minEditableBit, isRowLocked, rowOf, noteEdit]);
+  }, [runState, minEditableBit, isRowLocked, rowOf]);
 
   // Cue (fast-forward) held only while the button/key is down and the run is live.
   const startCue = useCallback(() => {
@@ -510,10 +484,6 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setStrikes(0);
     setPoints(0);
     setLetterResults([]);
-    setRevealedRows(new Set());
-    lastEditAtRef.current = {};
-    revealTimeoutsRef.current.forEach(id => window.clearTimeout(id));
-    revealTimeoutsRef.current = [];
     winReported.current = false;
     // Release the cue in case a hold was interrupted by the run ending.
     cueHeldRef.current = false;
@@ -561,6 +531,14 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     }
     return classes.join(" ");
   }, [spacerCount, isRowCorrect, runState, focusedRow]);
+
+  // Left gutter: the target letter for this row. Runway rows have no target.
+  const renderTarget = useCallback((renderedRowIndex: number) => {
+    if (renderedRowIndex < spacerCount) {
+      return "";
+    }
+    return visibleChar(targetChars[renderedRowIndex - spacerCount] ?? "");
+  }, [spacerCount, targetChars]);
 
   if (!puzzle) {
     // No crashes!
@@ -621,6 +599,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
             displayRows={renderedRows}
             showAnnotations={true}
             rowClassName={rowClassName}
+            renderGutter={showsTargetGutter(clock) ? renderTarget : undefined}
             renderBit={(bit, rowIndex) => (
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
