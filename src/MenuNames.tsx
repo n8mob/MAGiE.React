@@ -9,6 +9,19 @@ export interface MenuNameInfo {
 }
 
 export const MENU_NAME_MAP: Record<string, MenuNameInfo> = {
+  chocolate2: {
+    shortName: "chocolate2",
+    fullName: "Chocolate_Testing_2026_July",
+    titleNode: (
+      <div className={'menu-title'}>
+        <p>
+          //// CAUTION ////<br />
+          /// CHOCOLATE ///
+        </p>
+      </div>
+    )
+  },
+
   mall: {
     shortName: "mall",
     fullName: "AbandonedMall-March2025",
