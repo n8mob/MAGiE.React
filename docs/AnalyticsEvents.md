@@ -1,3 +1,5 @@
+[//]: # (TODO: is this a dead document? I think magie-analytics-spec is more correct and up to date.)
+
 # Analytics Events
 
 MAGiE uses [react-ga4](https://www.npmjs.com/package/react-ga4) (GA4 measurement ID: `G-ZL5RKDBBF6`).
