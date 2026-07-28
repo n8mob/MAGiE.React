@@ -172,22 +172,22 @@ belongs to neither attempt, which is the intended reading.
 
 Register in GA4 Admin **before shipping**. No backfill.
 
-- [ ] `menu`
-- [ ] `category`
-- [ ] `level`
-- [ ] `puzzle_slug`
-- [ ] `puzzle_number`
-- [ ] `puzzle_type`
-- [ ] `encoding`
-- [ ] `menu_position`
-- [ ] `content_version`
-- [ ] `puzzle_date`
-- [ ] `attempt_number`
-- [ ] `outcome`
+- [x] menu
+- [x] category
+- [x] level
+- [x] puzzle_slug
+- [x] puzzle_number
+- [x] puzzle_type
+- [x] encoding
+- [x] menu_position
+- [x] content_version
+- [x] puzzle_date
+- [x] attempt_number
+- [x] outcome
 
 Plus one custom **metric** (separate 25-slot budget):
 
-- [ ] `solve_time_seconds`
+- [x] solve_time_seconds
 
 ### What "no backfill" actually means
 
