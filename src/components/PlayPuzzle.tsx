@@ -81,12 +81,15 @@ const PlayPuzzle = ({
   // reports its duration as a delta from wherever the previous one ended.
   const attemptStartSeconds = useRef(0);
   const startedSlug = useRef<string | null>(null);
+  const attemptOpen = useRef(false);
 
   const startAttempt = useCallback(() => {
     if (!analytics) {
       return;
     }
+    startedSlug.current = analytics.puzzle_slug;
     attemptStartSeconds.current = stopwatchRef.current?.getTotalSeconds() ?? 0;
+    attemptOpen.current = true;
     trackPuzzleStart(analytics);
   }, [analytics]);
 
@@ -94,17 +97,27 @@ const PlayPuzzle = ({
     if (!analytics) {
       return;
     }
+    // Open the attempt if nothing has yet. An auto-win puzzle arrives already
+    // solved, and the judgment that spots it lives in a child component — React
+    // flushes child effects before parent ones, so the win lands here before this
+    // component's own mount effect has run. Without this, those puzzles emit an
+    // end with no start, which is precisely the shape the abandonment inference
+    // treats as a phantom.
+    if (!attemptOpen.current) {
+      startAttempt();
+    }
+    attemptOpen.current = false;
     const total = stopwatchRef.current?.getTotalSeconds() ?? 0;
     trackPuzzleEnd(analytics, outcome, Math.max(0, total - attemptStartSeconds.current));
-  }, [analytics]);
+  }, [analytics, startAttempt]);
 
-  // Mount only. Retries fire their own start from handleRetry, and the ref guard
-  // keeps StrictMode's double-invoke from counting as a second attempt.
+  // Mount only. Retries fire their own start from handleRetry, and the slug guard
+  // covers both StrictMode's double-invoke and an auto-win that already opened
+  // the attempt from endAttempt above.
   useEffect(() => {
     if (!analytics || startedSlug.current === analytics.puzzle_slug) {
       return;
     }
-    startedSlug.current = analytics.puzzle_slug;
     startAttempt();
   }, [analytics, startAttempt]);
 
