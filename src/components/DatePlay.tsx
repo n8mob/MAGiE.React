@@ -9,6 +9,7 @@ import { shortDate } from "./DateFormatter.tsx";
 import ReactGA4 from "react-ga4";
 import { dailyPlacement } from "../analytics/puzzleAnalytics.ts";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { dailyPuzzleTitle } from "../pageTitles.ts";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import { debug } from "../Logger.ts";
@@ -140,6 +141,21 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     [currentPuzzle, puzzleDate]
   );
 
+  /*
+   * Both of these appear the moment the puzzle is solved, so the tap that solved
+   * it must not carry through into them. handleShareWin is a hoisted function
+   * declaration rather than a const arrow precisely so it can be referenced here,
+   * above the early returns that hooks have to stay clear of.
+   */
+  const shareControl = useActivationGuard(handleShareWin);
+  const yesterdayControl = useActivationGuard(() => {
+    ReactGA4.event('story_start_clicked', {
+      source: 'post-win-link',
+      puzzle_slug: currentPuzzle?.slug,
+      is_first_visit: isFirstVisit,
+    });
+  });
+
   if (!puzzleDate) {
     return <>
       <p>What day is it???</p>
@@ -203,7 +219,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     updateSolveTime(stopwatch);
   }
 
-  const handleShareWin = () => {
+  function handleShareWin() {
     const shareText = `${dateShareString}\n${solveTimeDescription}`;
     ReactGA4.event('share_win_clicked', {
       puzzle_slug: currentPuzzle?.slug,
@@ -247,7 +263,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
         shareText;
       alert(message);
     }
-  };
+  }
 
   return (
     <>
@@ -264,17 +280,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
       )}
       {hasWon && (<>
           <div className="after-win-controls">
-            <button type={"button"} onClick={handleShareWin}>Share Your Win</button>
+            <button type={"button"} {...shareControl}>Share Your Win</button>
             <p className={"split-content"}>
               <Link
                 to={`/date/${dateLinkFormat(addDays(puzzleDate, -1))}`}
-                onClick={() => {
-                  ReactGA4.event('story_start_clicked', {
-                    source: 'post-win-link',
-                    puzzle_slug: currentPuzzle?.slug,
-                    is_first_visit: isFirstVisit,
-                  });
-                }}>
+                {...yesterdayControl}>
                 ◀◀ Yesterday's puzzle
               </Link>
             </p>
