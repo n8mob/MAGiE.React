@@ -8,6 +8,8 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { shortDate } from "./DateFormatter.tsx";
 import ReactGA4 from "react-ga4";
 import { dailyPlacement } from "../analytics/puzzleAnalytics.ts";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { dailyPuzzleTitle } from "../pageTitles.ts";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import { debug } from "../Logger.ts";
 
@@ -68,6 +70,10 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
    * It also drops the commit where the previous puzzle's win controls are still
    * on screen, because neither effect has run yet.
    */
+  // The date comes straight off the route, so unlike the menu areas this never
+  // has to wait on a fetch.
+  usePageTitle(puzzleDate ? dailyPuzzleTitle(puzzleDate) : null);
+
   const dateKey = puzzleDate ? dateLinkFormat(puzzleDate) : "";
   const [renderedDateKey, setRenderedDateKey] = useState(dateKey);
   if (dateKey !== renderedDateKey) {

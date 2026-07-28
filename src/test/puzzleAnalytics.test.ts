@@ -9,7 +9,7 @@ import {
 } from "../analytics/puzzleAnalytics";
 import ReactGA4 from "react-ga4";
 
-vi.mock("react-ga4", () => ({ default: { event: vi.fn() } }));
+vi.mock("react-ga4", () => ({ default: { event: vi.fn(), send: vi.fn() } }));
 
 const sessionStore = new Map<string, string>();
 vi.stubGlobal("sessionStorage", {

@@ -10,6 +10,8 @@ import { useLevel } from "../hooks/useLevel.tsx";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { menuPlacement } from "../analytics/puzzleAnalytics.ts";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { puzzleTitle } from "../pageTitles.ts";
 import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
@@ -68,6 +70,14 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
       ? menuPlacement(menu, category, level, currentPuzzle, puzzleIndex)
       : undefined,
     [menu, category, level, currentPuzzle, puzzleIndex]
+  );
+
+  // null until the menu resolves, which holds the page_view rather than letting
+  // it go out under the previous page's title.
+  usePageTitle(
+    level
+      ? puzzleTitle(menuName, level.levelName.join(" "), puzzleIndex + 1, level.puzzles.length)
+      : null
   );
 
   const nextPuzzleIndex = puzzleIndex + 1;

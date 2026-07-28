@@ -9,6 +9,8 @@ import { debug } from "../Logger.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { doorLockTitle } from "../pageTitles.ts";
 
 const randomSequence = (bits: number = 8) =>
   BitSequence.fromString(Math.floor(Math.random() * (2 ** bits)).toString(2).padStart(bits, "0"));
@@ -28,6 +30,7 @@ interface DoorLockProps {
 }
 
 const DoorLock = (props: DoorLockProps) => {
+  usePageTitle(doorLockTitle());
   const { encoder, presets } = props;
   const [gameState, setGameState] = useState<DoorLockState>("idle");
   const [stagingBits, setStagingBits] = useState(() => BitSequence.empty());

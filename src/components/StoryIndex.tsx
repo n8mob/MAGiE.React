@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { stories } from "../stories.ts";
 import './StoryPage.css';
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { storyTitle } from "../pageTitles.ts";
 
 export function StoryIndex() {
+  usePageTitle(storyTitle());
   return (
     <div className="story-page">
       <div id="main-display">

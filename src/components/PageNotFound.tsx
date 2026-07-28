@@ -2,9 +2,12 @@ import './PageNotFound.css';
 import { useHeader } from '../hooks/useHeader.ts';
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { usePageTitle } from '../hooks/usePageTitle.ts';
+import { notFoundTitle } from '../pageTitles.ts';
 
 function PageNotFound() {
   const { setHeaderContent } = useHeader();
+  usePageTitle(notFoundTitle());
 
   useEffect(() => {
     const notFoundDiv = <>

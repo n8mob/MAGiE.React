@@ -21,7 +21,7 @@ vi.mock("../audio/SoundPlayer.ts", () => ({
   loadSound: vi.fn(() => Promise.resolve()),
   playSound: vi.fn(),
 }));
-vi.mock("react-ga4", () => ({ default: { event: vi.fn() } }));
+vi.mock("react-ga4", () => ({ default: { event: vi.fn(), send: vi.fn() } }));
 vi.mock("../PuzzleApi", () => ({ getDailyPuzzleForDate: vi.fn() }));
 
 const dailyPuzzle = (init: string): PuzzleForDate => ({

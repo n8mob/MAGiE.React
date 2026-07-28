@@ -24,7 +24,7 @@ import { PuzzlePlacement } from "../analytics/puzzleAnalytics";
  * regression from a refactor here or from a change in React itself.
  */
 
-vi.mock("react-ga4", () => ({ default: { event: vi.fn() } }));
+vi.mock("react-ga4", () => ({ default: { event: vi.fn(), send: vi.fn() } }));
 vi.mock("../audio/SoundPlayer.ts", () => ({
   loadSound: vi.fn(() => Promise.resolve()),
   playSound: vi.fn(),

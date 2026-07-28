@@ -2,8 +2,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { ReactNode } from "react";
 import LevelPlay from "../components/LevelPlay";
 import { HeaderProvider } from "../components/HeaderContext";
+import { PageTitleProvider } from "../components/PageTitleContext";
+import { usePageTracking } from "../hooks/usePageTracking";
 
 /*
  * Issue #223 — the [Next ▶▶] button doesn't appear on auto-win tutorial levels.
@@ -21,7 +24,7 @@ vi.mock("../audio/SoundPlayer.ts", () => ({
   loadSound: vi.fn(() => Promise.resolve()),
   playSound: vi.fn(),
 }));
-vi.mock("react-ga4", () => ({ default: { event: vi.fn() } }));
+vi.mock("react-ga4", () => ({ default: { event: vi.fn(), send: vi.fn() } }));
 
 /*
  * The menu is built once inside the factory and handed back by reference. The
@@ -64,16 +67,26 @@ vi.mock("../hooks/useMenu.tsx", async () => {
   return { useMenu: () => ({ menu, loading: false, error: null }) };
 });
 
+/** Stands in for App, which is where usePageTracking actually lives. */
+const TrackerHost = ({ children }: { children: ReactNode }) => {
+  usePageTracking();
+  return <>{children}</>;
+};
+
 const renderAt = (puzzleIndex: number) => render(
   <MemoryRouter initialEntries={[`/tutorial/0/levels/28/puzzles/${puzzleIndex}`]}>
-    <HeaderProvider>
-      <Routes>
-        <Route
-          path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-          element={<LevelPlay menuName="tutorial" />}
-        />
-      </Routes>
-    </HeaderProvider>
+    <PageTitleProvider>
+      <HeaderProvider>
+        <TrackerHost>
+          <Routes>
+            <Route
+              path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+              element={<LevelPlay menuName="tutorial" />}
+            />
+          </Routes>
+        </TrackerHost>
+      </HeaderProvider>
+    </PageTitleProvider>
   </MemoryRouter>
 );
 
@@ -100,5 +113,17 @@ describe("LevelPlay auto-win (#223)", () => {
   it("does not show it on a puzzle that arrives unsolved", () => {
     renderAt(2);
     expect(screen.queryByRole("button", { name: /next/i })).to.equal(null);
+  });
+});
+
+describe("LevelPlay page title", () => {
+  it("titles the page with area, level name and position in level", () => {
+    renderAt(0);
+    expect(document.title).to.equal("MAGiE Tutorial: First Time 1/3");
+  });
+
+  it("counts puzzles from 1, matching what a player would say", () => {
+    renderAt(1);
+    expect(document.title).to.equal("MAGiE Tutorial: First Time 2/3");
   });
 });
