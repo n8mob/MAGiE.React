@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StrictMode } from "react";
-import { render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ReactGA4 from "react-ga4";
 import { PlayPuzzle } from "../components/PlayPuzzle";
@@ -73,6 +73,11 @@ beforeEach(() => {
   sessionStorage.clear();
   vi.mocked(ReactGA4.event).mockClear();
 });
+
+// Explicit: testing-library only auto-registers cleanup when Vitest runs with
+// `globals: true`, which this project doesn't. Without it, each test leaves a
+// live tree (and a ticking Stopwatch) mounted behind it.
+afterEach(cleanup);
 
 describe("PlayPuzzle funnel events", () => {
   it("emits puzzle_start before puzzle_end on an auto-win puzzle", () => {

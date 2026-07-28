@@ -54,12 +54,27 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     : '';
   const solveTimeDescription = solveTimeDisplay ? `It took me ${solveTimeDisplay}.` : '';
 
-  // Reset gameplay state when navigating to a different date
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  /*
+   * Clear gameplay state during render rather than in an effect, matching
+   * LevelPlay (#223).
+   *
+   * An effect happens to be safe here today: the async puzzle fetch nulls
+   * currentPuzzle and unmounts PlayPuzzle, so the remount always lands after
+   * this reset rather than before it. But that is an accident of timing, not a
+   * guarantee — serving a cached puzzle synchronously would be enough to
+   * reintroduce the bug, and it would look unrelated to whatever change caused
+   * it. Resetting during render removes the dependency on that ordering.
+   *
+   * It also drops the commit where the previous puzzle's win controls are still
+   * on screen, because neither effect has run yet.
+   */
+  const dateKey = puzzleDate ? dateLinkFormat(puzzleDate) : "";
+  const [renderedDateKey, setRenderedDateKey] = useState(dateKey);
+  if (dateKey !== renderedDateKey) {
+    setRenderedDateKey(dateKey);
     setHasWon(false);
     setSolveTimeDisplay("");
-  }, [puzzleDate]);
+  }
 
   useEffect(() => {
     if (!puzzleDate) { return; }
