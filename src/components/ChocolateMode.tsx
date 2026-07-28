@@ -66,7 +66,19 @@ const isCueKey = (key: string) =>
  * judged rows is derived as floor(s + judgeOffset) — when that integer ticks up,
  * the rows that just finished crossing the line are scored and locked.
  */
-const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
+interface ChocolateModeProps extends PuzzleProps {
+  /** Chocolate is the only mode that can end in a loss. */
+  onLose?: () => void;
+  /** TRY AGAIN resets in place, so a new attempt has to announce itself. */
+  onRetry?: () => void;
+}
+
+const ChocolateMode: FC<ChocolateModeProps> = ({
+  puzzle,
+  onWin = () => {},
+  onLose = () => {},
+  onRetry = () => {},
+}) => {
   const clock = puzzle.clock ?? "scroll";
   const scrollSpeed = puzzle.scrollSpeed ?? 0.20;
   const scrollAccel = puzzle.scrollAccel ?? 0.04;
@@ -112,6 +124,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
   // not a ref, precisely so it can) and reveals the line.
   const [measured, setMeasured] = useState(false);
   const winReported = useRef(false);
+  const lossReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const rowPitchRef = useRef(32);
@@ -474,7 +487,11 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       winReported.current = true;
       onWin();
     }
-  }, [runState, onWin]);
+    if (runState === "lost" && !lossReported.current) {
+      lossReported.current = true;
+      onLose();
+    }
+  }, [runState, onWin, onLose]);
 
   const handleRetry = useCallback(() => {
     setGuessBits(allOffBits());
@@ -485,6 +502,8 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
     setPoints(0);
     setLetterResults([]);
     winReported.current = false;
+    lossReported.current = false;
+    onRetry();
     // Release the cue in case a hold was interrupted by the run ending.
     cueHeldRef.current = false;
     setCueActive(false);
@@ -496,7 +515,7 @@ const ChocolateMode: FC<PuzzleProps> = ({ puzzle, onWin = () => {} }) => {
       belt.style.transform = "translate3d(0, 0, 0)";
     }
     setRunState("running");
-  }, [allOffBits]);
+  }, [allOffBits, onRetry]);
 
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
 

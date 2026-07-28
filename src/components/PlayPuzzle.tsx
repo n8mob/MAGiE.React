@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
@@ -9,6 +9,7 @@ import { Puzzle } from "../model.ts";
 import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { PuzzlePlacement, resolvePuzzleContext, trackPuzzleEnd, trackPuzzleStart, } from "../analytics/puzzleAnalytics.ts";
 import { debug  } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
@@ -21,9 +22,21 @@ interface PlayPuzzleProps {
   onShareWin?: () => void;
   /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
   asChocolate?: boolean;
+  /**
+   * Where this puzzle sits in the content, from whichever route loaded it.
+   * Omit to play without emitting funnel events.
+   */
+  placement?: PuzzlePlacement;
 }
 
-const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, asChocolate = false }: PlayPuzzleProps) => {
+const PlayPuzzle = ({
+  puzzle: rawPuzzle,
+  puzzleShareString,
+  onWin,
+  onShareWin,
+  asChocolate = false,
+  placement,
+}: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
   const [searchParams] = useSearchParams();
 
@@ -57,6 +70,44 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
 
+  // puzzle_type and encoding come from the puzzle as *played*, after any
+  // Chocolate coercion above — the route can't know either one.
+  const analytics = useMemo(
+    () => (placement ? resolvePuzzleContext(placement, puzzle) : null),
+    [placement, puzzle]
+  );
+
+  // The stopwatch runs for the whole screen and has no reset, so each attempt
+  // reports its duration as a delta from wherever the previous one ended.
+  const attemptStartSeconds = useRef(0);
+  const startedSlug = useRef<string | null>(null);
+
+  const startAttempt = useCallback(() => {
+    if (!analytics) {
+      return;
+    }
+    attemptStartSeconds.current = stopwatchRef.current?.getTotalSeconds() ?? 0;
+    trackPuzzleStart(analytics);
+  }, [analytics]);
+
+  const endAttempt = useCallback((outcome: "won" | "lost") => {
+    if (!analytics) {
+      return;
+    }
+    const total = stopwatchRef.current?.getTotalSeconds() ?? 0;
+    trackPuzzleEnd(analytics, outcome, Math.max(0, total - attemptStartSeconds.current));
+  }, [analytics]);
+
+  // Mount only. Retries fire their own start from handleRetry, and the ref guard
+  // keeps StrictMode's double-invoke from counting as a second attempt.
+  useEffect(() => {
+    if (!analytics || startedSlug.current === analytics.puzzle_slug) {
+      return;
+    }
+    startedSlug.current = analytics.puzzle_slug;
+    startAttempt();
+  }, [analytics, startAttempt]);
+
   useEffect(() => {
     void loadSound(SOUNDS.win);
   }, []);
@@ -88,26 +139,37 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
     const isAutoWin = puzzle.init === puzzle.winText;
-    let solveTimeSeconds = -1;
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();
-      solveTimeSeconds = stopwatchRef.current.getTotalSeconds();
       updateSolveTimeString();
     }
+    // The sound stays suppressed on auto-win puzzles — they open already solved,
+    // so a fanfare on arrival is just noise. The event is *not* suppressed: those
+    // are the tutorial's demo screens, and dropping them punched a hole in
+    // exactly the onboarding funnel this is meant to measure.
     if (!isAutoWin) {
       playSound(SOUNDS.win);
-      ReactGA4.event("win", {
-        puzzle_slug: puzzle.slug,
-        winText: puzzle.winText,
-        encoding: puzzle.encoding_name,
-        encoding_type: puzzle.encoding.getType(),
-        pagePath: window.location.pathname + window.location.search,
-        solve_time_seconds: solveTimeSeconds,
-      });
     }
+    endAttempt("won");
     if (onWin) {
       onWin(stopwatchRef.current!);
     }
+  };
+
+  // Chocolate is the only mode that can end in a loss, and its TRY AGAIN resets
+  // in place, so the retry has to announce itself — a mount-only start would
+  // leave the next puzzle_end with no matching start.
+  // Deliberately does not stop the stopwatch: the next startAttempt() rebases off
+  // its running total, so time spent reading the game-over screen falls between
+  // the two attempts and is counted in neither.
+  const handleLose = () => {
+    debug("PlayPuzzle detected loss");
+    endAttempt("lost");
+  };
+
+  const handleRetry = () => {
+    debug("PlayPuzzle detected retry");
+    startAttempt();
   };
 
   const handleShareWin = () => {
@@ -188,6 +250,8 @@ const PlayPuzzle = ({ puzzle: rawPuzzle, puzzleShareString, onWin, onShareWin, a
         <ChocolateMode
           puzzle={puzzle}
           onWin={handleWin}
+          onLose={handleLose}
+          onRetry={handleRetry}
           onShareWin={handleShareWin}
           bitButtonWidthPx={32}
         />

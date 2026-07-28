@@ -7,6 +7,7 @@ import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
 import { shortDate } from "./DateFormatter.tsx";
 import ReactGA4 from "react-ga4";
+import { dailyPlacement } from "../analytics/puzzleAnalytics.ts";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import { debug } from "../Logger.ts";
 
@@ -113,6 +114,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
 
   }, [formattedDate, puzzleDate, setHeaderContent]);
 
+  const placement = useMemo(
+    () => (currentPuzzle && puzzleDate) ? dailyPlacement(currentPuzzle, puzzleDate) : undefined,
+    [currentPuzzle, puzzleDate]
+  );
+
   if (!puzzleDate) {
     return <>
       <p>What day is it???</p>
@@ -169,22 +175,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     }
   };
 
+  // PlayPuzzle emits puzzle_end for the win; this only handles the local UI.
   function handleWin(stopwatch: StopwatchHandle) {
     debug(`DatePlay handles win at ${ stopwatch.displayTime() }`);
     setHasWon(true);
     updateSolveTime(stopwatch);
-
-    console.log(`Puzzle solved in ${solveTimeDisplay} s`);
-    const eventParams = {
-      puzzle_slug: currentPuzzle?.slug,
-      winText: currentPuzzle?.winText,
-      encoding: currentPuzzle?.encoding_name,
-      encoding_type: currentPuzzle?.encoding.getType(),
-      pagePath: window.location.pathname + window.location.search,
-      solve_time_seconds: stopwatch.getTotalSeconds(),
-    };
-
-    ReactGA4.event("win", { ...eventParams });
   }
 
   const handleShareWin = () => {
@@ -243,6 +238,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
           puzzleShareString={`I decoded the MAGiE puzzle for ${puzzleDate.getDate() === new Date().getDate()
             ? "today, "
             : ""}${formattedDate}!`}
+          placement={placement}
         />
       )}
       {hasWon && (<>

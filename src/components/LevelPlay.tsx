@@ -9,6 +9,7 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { menuPlacement } from "../analytics/puzzleAnalytics.ts";
 import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
@@ -43,6 +44,15 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     }
     return { ...rawPuzzle, encoding } as Puzzle;
   }, [level, puzzleIndex, menu?.encodingProviders, menuName]);
+
+  // Memoized rather than built inline at the call site: a fresh object every
+  // render would churn PlayPuzzle's analytics context for no reason.
+  const placement = useMemo(
+    () => (menu && level && currentPuzzle)
+      ? menuPlacement(menu, category, level, currentPuzzle, puzzleIndex)
+      : undefined,
+    [menu, category, level, currentPuzzle, puzzleIndex]
+  );
 
   const nextPuzzleIndex = puzzleIndex + 1;
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
@@ -127,6 +137,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
             onWin={handleWin}
             puzzleShareString={shareString}
             asChocolate={asChocolate}
+            placement={placement}
           />
         )}
         {hasWon && (

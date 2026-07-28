@@ -7,6 +7,7 @@
     </scripts>
     <node-interpreter value="project" />
     <envs>
+      <env name="VITE_GA_DEBUG" value="true" />
       <env name="VITE_MAGIE_PUZZLE_API" value="https://puzzles.magiegame.com" />
     </envs>
     <EXTENSION ID="com.intellij.lang.javascript.buildTools.npm.rc.StartBrowserRunConfigurationExtension">
