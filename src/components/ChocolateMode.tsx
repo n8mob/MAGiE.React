@@ -88,14 +88,28 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   // again here keeps the mode safe no matter how it's reached.
   const encoding = useMemo(() => chocolateEncoding(puzzle.encoding), [puzzle]);
 
-  // Existing Encode/Decode puzzles double as chocolate content: clue + winText.
-  const chocolateText = useMemo(() => {
-    return [...(puzzle.clue ?? []), puzzle.winText ?? ""]
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .toUpperCase();
-  }, [puzzle]);
+  /*
+   * The target text is the winText alone (#231).
+   *
+   * The clue used to be concatenated onto the front of it, which quietly assumed
+   * every clue character had a code in the puzzle's encoding. 5bA1 covers A-Z, so
+   * that held; hex covers only 0-9 and A-F, so every other letter in the clue
+   * encodes to the default and becomes a row the player cannot possibly solve.
+   * The clue is prose, not ciphertext — it rides the belt as text instead.
+   */
+  const chocolateText = useMemo(
+    () => (puzzle.winText ?? "").replace(/\s+/g, " ").trim().toUpperCase(),
+    [puzzle]
+  );
+
+  /**
+   * Clue lines, one belt row each — the same one-line-per-array-entry contract
+   * Encode and Decode already use, so authors control the line breaks.
+   */
+  const clueLines = useMemo(
+    () => (puzzle.clue ?? []).map(line => line.trim()).filter(line => line.length > 0),
+    [puzzle]
+  );
 
   const targetChars = useMemo(() => [...chocolateText], [chocolateText]);
   const winBits = useMemo(() => encoding.encodeText(chocolateText), [encoding, chocolateText]);
@@ -183,6 +197,19 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;
 
+  /**
+   * Rendered rows sitting above the first letter: the empty runway, then the
+   * clue. Every conversion between a rendered row index and a letter index goes
+   * through this, including the conveyor's judging offset.
+   *
+   * Clue rows are pinned to exactly one row pitch in CSS. The belt is translated
+   * as a single element on the assumption that every row is the same height, so
+   * a clue line tall enough to wrap would drift the letters out from under the
+   * judgment line.
+   */
+  const clueRowCount = clueLines.length;
+  const beltOffset = spacerCount + clueRowCount;
+
   // Measure the belt once, then place the runway and the line. Runs before paint
   // (and setState here re-renders before paint) so no unspaced frame is shown.
   useLayoutEffect(() => {
@@ -190,11 +217,23 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       return;
     }
     const container = mainDisplayRef.current;
-    const firstRow = displayMatrixRef.current?.getBitRowElement?.(0);
-    if (!container || !firstRow) {
+    /*
+     * Two different rows, for two different jobs.
+     *
+     * beltTop is rendered row 0 — the belt's content origin. It has to be row 0
+     * rather than the first letter, because clue rows are still at their CSS
+     * fallback height right now and get resized to the measured pitch a moment
+     * later; anchoring below them would bake in a height that is about to change.
+     *
+     * firstRow is the first *letter* row, which is where pitch has to come from:
+     * a clue row is pinned to the pitch, so measuring one would be circular.
+     */
+    const beltTop = displayMatrixRef.current?.getBitRowElement?.(0);
+    const firstRow = displayMatrixRef.current?.getBitRowElement?.(beltOffset);
+    if (!container || !beltTop || !firstRow) {
       return;
     }
-    const secondRow = displayMatrixRef.current?.getBitRowElement?.(1);
+    const secondRow = displayMatrixRef.current?.getBitRowElement?.(beltOffset + 1);
     const pitch = Math.max(
       secondRow
         ? secondRow.getBoundingClientRect().top - firstRow.getBoundingClientRect().top
@@ -204,7 +243,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     const containerTop = container.getBoundingClientRect().top;
     // The belt's content origin, measured — not assumed to equal hudHeight, since
     // padding/margins above the first row shift it.
-    const beltTopPx = firstRow.getBoundingClientRect().top - containerTop;
+    const beltTopPx = beltTop.getBoundingClientRect().top - containerTop;
     const hudHeight = container.querySelector<HTMLElement>(".chocolate-hud")?.offsetHeight ?? 0;
     const conveyorVisibleHeight = Math.max(container.clientHeight - hudHeight, pitch);
     const beltRows = conveyorVisibleHeight / pitch;
@@ -212,19 +251,21 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     const runway = Math.max(1, Math.ceil(beltRows * 0.74));
     const lineTopPx = hudHeight + LINE_POSITION * conveyorVisibleHeight;
     rowPitchRef.current = pitch;
-    // Runway rows must be exactly one pitch tall, or the uniform-pitch transform
-    // model drifts by runway * (pitch - spacerHeight). Feed the measured pitch to
-    // the spacer CSS so message rows land where the formula expects.
+    // Runway and clue rows must both be exactly one pitch tall, or the
+    // uniform-pitch transform model drifts by their combined error. Feed the
+    // measured pitch to their CSS so message rows land where the formula expects.
     container.style.setProperty("--chocolate-row-pitch", `${pitch}px`);
     // Scoring threshold and painted line share the same measured pixels, so a
     // letter locks exactly as its bottom edge clears the line.
-    // judgedCount = floor(s + judgeOffset); row m judged when its bottom (at
-    // rendered row m+runway) reaches lineTopPx.
-    judgeOffsetRef.current = (lineTopPx - beltTopPx) / pitch - runway;
+    // judgedCount = floor(s + judgeOffset); letter m is judged when its bottom
+    // (at rendered row m + runway + clueRowCount) reaches lineTopPx. The clue is
+    // counted in rows of the final pitch, which is why it belongs here and not
+    // folded into beltTopPx.
+    judgeOffsetRef.current = (lineTopPx - beltTopPx) / pitch - runway - clueRowCount;
     setSpacerCount(runway);
     setLineTopPx(lineTopPx);
     setMeasured(true);
-  }, [clock, measured, rowCount]);
+  }, [clock, measured, rowCount, beltOffset, clueRowCount]);
 
   const rowOf = useCallback((bitIndex: number) => Math.floor(bitIndex / rowWidth), [rowWidth]);
   const isRowCorrect = useCallback(
@@ -528,36 +569,46 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     if (!follow || clock === "scroll") {
       return;
     }
-    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow + spacerCount);
+    const rowElement = displayMatrixRef.current?.getBitRowElement?.(focusedRow + beltOffset);
     rowElement?.scrollIntoView({ block: "nearest" });
   });
 
-  // Rendered rows: the empty runway, then the whole message. Judged rows stay on
-  // screen (locked) and ride up behind the HUD.
+  /*
+   * Rendered rows: the empty runway, then the clue, then the whole message.
+   * Judged rows stay on screen (locked) and ride up behind the HUD.
+   *
+   * A clue row carries its text as a DisplayRow annotation over an empty bit
+   * sequence, so it renders as text on the belt with no bits to toggle and no
+   * gutter letter — and rides up and off ahead of the message, as intended.
+   */
   const renderedRows = useMemo(() => {
     const spacers = Array.from({ length: spacerCount }, () => new DisplayRow(BitSequence.empty(), ""));
-    return [...spacers, ...displayRows];
-  }, [spacerCount, displayRows]);
+    const clues = clueLines.map(line => new DisplayRow(BitSequence.empty(), line));
+    return [...spacers, ...clues, ...displayRows];
+  }, [spacerCount, clueLines, displayRows]);
 
   const rowClassName = useCallback((renderedRowIndex: number) => {
     if (renderedRowIndex < spacerCount) {
       return "conveyor-spacer";
     }
-    const letterRow = renderedRowIndex - spacerCount;
+    if (renderedRowIndex < beltOffset) {
+      return "conveyor-clue";
+    }
+    const letterRow = renderedRowIndex - beltOffset;
     const classes = [isRowCorrect(letterRow) ? "letter-correct" : "letter-incorrect"];
     if (runState === "running" && letterRow === focusedRow) {
       classes.push("focused-row");
     }
     return classes.join(" ");
-  }, [spacerCount, isRowCorrect, runState, focusedRow]);
+  }, [spacerCount, beltOffset, isRowCorrect, runState, focusedRow]);
 
-  // Left gutter: the target letter for this row. Runway rows have no target.
+  // Left gutter: the target letter for this row. Runway and clue rows have none.
   const renderTarget = useCallback((renderedRowIndex: number) => {
-    if (renderedRowIndex < spacerCount) {
+    if (renderedRowIndex < beltOffset) {
       return "";
     }
-    return visibleChar(targetChars[renderedRowIndex - spacerCount] ?? "");
-  }, [spacerCount, targetChars]);
+    return visibleChar(targetChars[renderedRowIndex - beltOffset] ?? "");
+  }, [beltOffset, targetChars]);
 
   if (!puzzle) {
     // No crashes!
@@ -623,7 +674,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
               <CorrectnessBitButton
                 key={`bit-${bit.index}`}
                 bit={bit}
-                correctness={isRowCorrect(rowIndex - spacerCount)
+                correctness={isRowCorrect(rowIndex - beltOffset)
                   ? Correctness.correct
                   : Correctness.incorrect}
                 onBitToggle={handleBitToggle}

@@ -94,6 +94,33 @@
   min-height: var(--chocolate-row-pitch, 40px);
 }
 
+/* Clue lines, riding the belt as prose ahead of the message (#231).
+
+   Pinned to exactly one row pitch, top and bottom. The belt is translated as a
+   single element assuming uniform rows, so a clue line long enough to wrap would
+   push every letter below it out from under the judgment line. nowrap + hidden
+   makes over-long lines clip rather than silently break the scroll maths —
+   authors control the breaks, one array entry per line, as in the other modes. */
+.bit-field p.conveyor-clue {
+  min-height: var(--chocolate-row-pitch, 40px);
+  max-height: var(--chocolate-row-pitch, 40px);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Clue text reads as prose, not as a decoded letter: full row width, left
+   aligned, and larger than the per-letter annotation it borrows its markup from. */
+.chocolate-display .conveyor-clue .annotation {
+  font-size: calc(var(--chocolate-bit-size, 40px) * 0.45);
+  color: #142124;
+  text-align: left;
+}
+
+/* No target letter belongs beside a clue, so reclaim the gutter's width. */
+.chocolate-display .conveyor-clue .row-gutter {
+  display: none;
+}
+
 /* Status gutter left of the bits: holds the target ("win") letter for the row,
    and keeps the bit columns even across rows. */
 .row-gutter {
