@@ -9,6 +9,8 @@ import { useCategory } from "../hooks/useCategory.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
 import ReactGA4 from "react-ga4";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { categoryTitle } from "../pageTitles.ts";
 
 function LevelBrowser({ menuName }: { menuName: string }) {
   const { categoryIndex, levelNumber } = useParams();
@@ -17,6 +19,8 @@ function LevelBrowser({ menuName }: { menuName: string }) {
   const { setHeaderContent } = useHeader();
   const { level } = useLevel(category, levelNumber);
   const navigate = useNavigate();
+  // A level list, so it titles like its category rather than a single puzzle.
+  usePageTitle(category?.name ? categoryTitle(menuName, category.name) : null);
 
   useEffect(() => {
     if (!category) {

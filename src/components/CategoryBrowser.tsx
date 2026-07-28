@@ -6,6 +6,8 @@ import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
 import { MENU_NAME_MAP } from "../MenuNames.tsx";
 import ReactGA4 from "react-ga4";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { categoryTitle } from "../pageTitles.ts";
 
 function CategoryBrowser({ menuName }: { menuName: string }) {
   const { setHeaderContent } = useHeader();
@@ -13,6 +15,8 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
   const categoryIndex = parseInt(categoryIndexParam ?? '0', 10);
   const { menu, loading, error } = useMenu(menuName, setHeaderContent);
   const { category } = useCategory(menu, categoryIndex);
+  // null until the menu resolves and the category name is known.
+  usePageTitle(category?.name ? categoryTitle(menuName, category.name) : null);
 
 
   useEffect(() => {

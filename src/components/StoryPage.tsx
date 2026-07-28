@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { stories } from "../stories.ts";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from 'react-ga4';
+import { usePageTitle } from '../hooks/usePageTitle.ts';
+import { storyTitle } from '../pageTitles.ts';
 
 function importStory(fileName: string) {
   return import.meta.glob(
@@ -123,6 +125,7 @@ export function StoryPage() {
   const index = stories.findIndex(s => s.slug === slug);
   const story = index !== -1 ? stories[index] : null;
   const storyMarkdown = story ? importStory(story.fileName) : null;
+  usePageTitle(story ? storyTitle(story.title) : null);
 
   const [pageIndex, setPageIndex] = useState(0);
   const [cols, setCols] = useState(40);

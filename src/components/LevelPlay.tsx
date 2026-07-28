@@ -9,6 +9,9 @@ import { useHeader } from "../hooks/useHeader.ts";
 import { useLevel } from "../hooks/useLevel.tsx";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
+import { menuPlacement } from "../analytics/puzzleAnalytics.ts";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { puzzleTitle } from "../pageTitles.ts";
 import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
@@ -27,6 +30,22 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
   const { setHeaderContent } = useHeader();
   const puzzleIndex = parseInt(puzzleIndexParam || "0", 10);
 
+  /*
+   * Clear the win state during render rather than in an effect (#223).
+   *
+   * The win is detected inside PlayPuzzle's subtree, and React flushes child
+   * effects before parent ones. An auto-win puzzle (init === winText) therefore
+   * reports its win before an effect here would run, and the reset would then
+   * wipe it — no [Next ▶▶] button. Resetting during render happens before the
+   * children commit at all, so there is nothing to clobber.
+   */
+  const routeKey = `${menuName}/${categoryIndex}/${levelNumber}/${puzzleIndex}`;
+  const [renderedRouteKey, setRenderedRouteKey] = useState(routeKey);
+  if (routeKey !== renderedRouteKey) {
+    setRenderedRouteKey(routeKey);
+    setHasWon(false);
+  }
+
   // The puzzle is derived from the route, not stored: navigating to a
   // puzzle that doesn't exist yields null instead of a stale puzzle.
   const currentPuzzle = useMemo<Puzzle | null>(() => {
@@ -44,6 +63,23 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     return { ...rawPuzzle, encoding } as Puzzle;
   }, [level, puzzleIndex, menu?.encodingProviders, menuName]);
 
+  // Memoized rather than built inline at the call site: a fresh object every
+  // render would churn PlayPuzzle's analytics context for no reason.
+  const placement = useMemo(
+    () => (menu && level && currentPuzzle)
+      ? menuPlacement(menu, category, level, currentPuzzle, puzzleIndex)
+      : undefined,
+    [menu, category, level, currentPuzzle, puzzleIndex]
+  );
+
+  // null until the menu resolves, which holds the page_view rather than letting
+  // it go out under the previous page's title.
+  usePageTitle(
+    level
+      ? puzzleTitle(menuName, level.levelName.join(" "), puzzleIndex + 1, level.puzzles.length)
+      : null
+  );
+
   const nextPuzzleIndex = puzzleIndex + 1;
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
 
@@ -60,11 +96,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next ▶▶";
   }
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasWon(false);
-  }, [menuName, categoryIndex, levelNumber, puzzleIndex]);
 
   useEffect(() => {
     if (!menu) {
@@ -127,6 +158,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
             onWin={handleWin}
             puzzleShareString={shareString}
             asChocolate={asChocolate}
+            placement={placement}
           />
         )}
         {hasWon && (

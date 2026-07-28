@@ -4,14 +4,17 @@ import './index.css'
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { HeaderProvider } from "./components/HeaderContext.tsx";
+import { PageTitleProvider } from "./components/PageTitleContext.tsx";
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <HeaderProvider>
-        <App/>
-      </HeaderProvider>
+      <PageTitleProvider>
+        <HeaderProvider>
+          <App/>
+        </HeaderProvider>
+      </PageTitleProvider>
     </BrowserRouter>
   </StrictMode>
 );

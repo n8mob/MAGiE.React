@@ -3,7 +3,6 @@ import { Puzzle } from "../model.ts";
 import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
-import ReactGA4 from "react-ga4";
 import { VariableWidthEncoder } from "../encoding/VariableWidthEncoder.ts";
 import { VariableWidthDecodingJudge } from "../judgment/VariableWidthDecodingJudge.ts";
 import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
@@ -136,8 +135,6 @@ export function useBasePuzzle(
       return;
     }
 
-    const guessText = puzzle.encoding?.decodeText(guessBits) ?? "missing encoding";
-
     const splitter = (bits: BitSequence) => puzzle.encoding.splitForDisplay(bits, displayWidthInBitCount);
 
     const newJudgment = judge.judgeBits(guessBits, winBits, splitter);
@@ -149,22 +146,14 @@ export function useBasePuzzle(
     previousJudgment.current = newJudgment;
     setJudgment(newJudgment);
 
-    const eventParams = {
-      puzzle_slug: puzzle.slug,
-      guess_text: guessText,
-      winText: puzzle.winText,
-      encoding: puzzle.encoding_name,
-      encoding_type: puzzle.encoding.getType(),
-      judgment_is_correct: newJudgment.isCorrect,
-      pagePath: window.location.pathname + window.location.search,
-    };
+    // No analytics here. This runs on every bit toggle, so the old `guess` event
+    // fired 50-150 times per puzzle and its guess_text was unbounded cardinality;
+    // `winning_judgment` just duplicated the win that onWin() already reports.
+    // Both fold into puzzle_end — see docs/magie-analytics-spec.md.
     if (newJudgment.isCorrect) {
-      ReactGA4.event("winning_judgment", eventParams);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasWon(true);
       onWin();
-    } else {
-      ReactGA4.event("guess", eventParams);
     }
   }, [puzzle, judge, guessBits, winBits, displayWidthInBitCount, onWin]);
 

@@ -68,12 +68,38 @@ export class Menu {
   categories: Record<string, Category>;
   encodings: Record<string, EncodingData>;
   encodingProviders: Record<string, BinaryEncoder>;
+  /**
+   * Puzzle slug -> 1-based ordinal across the whole menu, in the order a player
+   * walking straight through would meet them: categories in key order, levels in
+   * array order, puzzles in array order.
+   *
+   * `sort_order` is deliberately not consulted — if it's ever missing that's a
+   * data bug, and array order is what the player actually experiences. See
+   * docs/magie-analytics-spec.md.
+   */
+  menuPositions: Record<string, number>;
+
   constructor(data: MenuData) {
     this.name = data.name || "Unknown Menu";
     this.updated_at = data.updated_at;
     this.categories = {};
     Object.entries(data.categories).forEach(([key, category]) => {
       this.categories[key] = { ...category, name: key };
+    });
+
+    this.menuPositions = {};
+    let position = 0;
+    Object.values(this.categories).forEach(category => {
+      (category.levels ?? []).forEach(level => {
+        (level.puzzles ?? []).forEach(puzzle => {
+          position += 1;
+          // First occurrence wins, so a slug repeated by mistake keeps a stable
+          // position instead of drifting to wherever it last appeared.
+          if (puzzle.slug && !(puzzle.slug in this.menuPositions)) {
+            this.menuPositions[puzzle.slug] = position;
+          }
+        });
+      });
     });
     this.encodings = data.encodings;
     this.encodingProviders = {};

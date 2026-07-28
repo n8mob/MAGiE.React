@@ -7,6 +7,9 @@ import { fetchPuzzle } from "../FetchPuzzle.tsx";
 import { useHeader } from "../hooks/useHeader.ts";
 import { shortDate } from "./DateFormatter.tsx";
 import ReactGA4 from "react-ga4";
+import { dailyPlacement } from "../analytics/puzzleAnalytics.ts";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { dailyPuzzleTitle } from "../pageTitles.ts";
 import { StopwatchHandle } from "./Stopwatch.tsx";
 import { debug } from "../Logger.ts";
 
@@ -53,12 +56,31 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     : '';
   const solveTimeDescription = solveTimeDisplay ? `It took me ${solveTimeDisplay}.` : '';
 
-  // Reset gameplay state when navigating to a different date
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  /*
+   * Clear gameplay state during render rather than in an effect, matching
+   * LevelPlay (#223).
+   *
+   * An effect happens to be safe here today: the async puzzle fetch nulls
+   * currentPuzzle and unmounts PlayPuzzle, so the remount always lands after
+   * this reset rather than before it. But that is an accident of timing, not a
+   * guarantee — serving a cached puzzle synchronously would be enough to
+   * reintroduce the bug, and it would look unrelated to whatever change caused
+   * it. Resetting during render removes the dependency on that ordering.
+   *
+   * It also drops the commit where the previous puzzle's win controls are still
+   * on screen, because neither effect has run yet.
+   */
+  // The date comes straight off the route, so unlike the menu areas this never
+  // has to wait on a fetch.
+  usePageTitle(puzzleDate ? dailyPuzzleTitle(puzzleDate) : null);
+
+  const dateKey = puzzleDate ? dateLinkFormat(puzzleDate) : "";
+  const [renderedDateKey, setRenderedDateKey] = useState(dateKey);
+  if (dateKey !== renderedDateKey) {
+    setRenderedDateKey(dateKey);
     setHasWon(false);
     setSolveTimeDisplay("");
-  }, [puzzleDate]);
+  }
 
   useEffect(() => {
     if (!puzzleDate) { return; }
@@ -112,6 +134,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     return () => setHeaderContent(null); // Clear header when component unmounts
 
   }, [formattedDate, puzzleDate, setHeaderContent]);
+
+  const placement = useMemo(
+    () => (currentPuzzle && puzzleDate) ? dailyPlacement(currentPuzzle, puzzleDate) : undefined,
+    [currentPuzzle, puzzleDate]
+  );
 
   if (!puzzleDate) {
     return <>
@@ -169,22 +196,11 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
     }
   };
 
+  // PlayPuzzle emits puzzle_end for the win; this only handles the local UI.
   function handleWin(stopwatch: StopwatchHandle) {
     debug(`DatePlay handles win at ${ stopwatch.displayTime() }`);
     setHasWon(true);
     updateSolveTime(stopwatch);
-
-    console.log(`Puzzle solved in ${solveTimeDisplay} s`);
-    const eventParams = {
-      puzzle_slug: currentPuzzle?.slug,
-      winText: currentPuzzle?.winText,
-      encoding: currentPuzzle?.encoding_name,
-      encoding_type: currentPuzzle?.encoding.getType(),
-      pagePath: window.location.pathname + window.location.search,
-      solve_time_seconds: stopwatch.getTotalSeconds(),
-    };
-
-    ReactGA4.event("win", { ...eventParams });
   }
 
   const handleShareWin = () => {
@@ -243,6 +259,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
           puzzleShareString={`I decoded the MAGiE puzzle for ${puzzleDate.getDate() === new Date().getDate()
             ? "today, "
             : ""}${formattedDate}!`}
+          placement={placement}
         />
       )}
       {hasWon && (<>

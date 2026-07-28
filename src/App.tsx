@@ -28,33 +28,28 @@ const ga4id = 'G-ZL5RKDBBF6';
 const HEADER_COLLAPSE_THRESHOLD = 72;
 const HEADER_EXPAND_GESTURE_DELTA = 44;
 
-ReactGA4.initialize(ga4id);
-
 const urlParams = new URLSearchParams(window.location.search);
 const debugMode = import.meta.env.VITE_GA_DEBUG === 'true' || urlParams.has('_dbg');
 
-/**
- * Global declaration for gtag function
- * Not sure why 'Window' is marked as unused
- * other than the fact that 'window' uses a lowercase 'w' down below.
- * If I use a lowercase 'w' here, it will complain about 'gtag' not being defined.
- * And if I use an uppercase 'W' down there, I get the same complaint.
+/*
+ * send_page_view is off because usePageTracking sends a page_view on every route
+ * change — including the first one. Left on, gtag's own config-time page_view
+ * would double-count every landing.
+ *
+ * debug_mode rides along on the same config call. Setting it via a second
+ * gtag('config', ...) would fire yet another page_view, and would leave any
+ * event sent before that second call untagged.
  */
-declare global {
-  // noinspection JSUnusedGlobalSymbols
-  interface Window {
-    gtag: (...args: unknown[]) => void;
-  }
-}
+ReactGA4.initialize(ga4id, {
+  gtagOptions: {
+    send_page_view: false,
+    ...(debugMode ? { debug_mode: true } : {}),
+  },
+});
 
-if (window.gtag) {
-  if (debugMode) {
-    window.gtag('config', ga4id, { 'debug_mode': debugMode });
-    console.log('Google Analytics 4 initialized with debug mode enabled.');
-    ReactGA4.event("debug_mode_enabled", { debug_mode: debugMode });
-  }
-} else {
-  console.warn('Google Analytics 4 is not available. Make sure you have included the GA4 script in your HTML.');
+if (debugMode) {
+  console.log('Google Analytics 4 initialized with debug mode enabled.');
+  ReactGA4.event("debug_mode_enabled", { debug_mode: debugMode });
 }
 
 function RedirectLevelRootToPuzzle0() {
@@ -309,6 +304,11 @@ function App() {
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="bigGame" />} />
       </>)}
+      <Route path="/chocolate2" element={<MenuBrowser menuName="chocolate2" />} />
+      <Route path="/chocolate2/:categoryIndex" element={<CategoryBrowser menuName="chocolate2" />} />
+      <Route path="/chocolate2/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate2" />} />
+      <Route path="/chocolate2/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
+             element={<LevelPlay menuName="chocolate2" />} />
       {features.includes('chocolate') && (<>
         {/* MENU_NAME_MAP aliases "chocolate" to the mall's API menu, so these
             routes browse mall content while links stay under /chocolate. */}

@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
 import ReactGA4 from "react-ga4";
+import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { areaTitle } from "../pageTitles.ts";
 
 function MenuBrowser({ menuName }: { menuName: string }) {
   const { setHeaderContent } = useHeader();
   const { menu } = useMenu(menuName, setHeaderContent);
+  usePageTitle(areaTitle(menuName));
 
   if (!menu) {
     return <div>Loading {menuName}...</div>;
