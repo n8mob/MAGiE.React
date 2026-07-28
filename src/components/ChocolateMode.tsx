@@ -9,6 +9,7 @@ import { PerLetterJudge } from "../judgment/PerLetterJudge.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { chocolateEncoding } from "../encoding/FiveBitA1.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
+import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import "./Chocolate.css";
 
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
@@ -517,6 +518,10 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     setRunState("running");
   }, [allOffBits, onRetry]);
 
+  // The game-over panel replaces the belt, so TRY AGAIN can land exactly where
+  // the player's last bit tap was.
+  const retryControl = useActivationGuard(handleRetry);
+
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
 
   // Step the focused row into view when the player moved the cursor — but never
@@ -610,7 +615,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
             <p>The conveyor got ahead of you!</p>
             <p>SCORE {points}</p>
             <p>LETTERS GLEANED {letterResults.filter(Boolean).length}/{rowCount}</p>
-            <button type="button" onClick={handleRetry}>TRY AGAIN</button>
+            <button type="button" {...retryControl}>TRY AGAIN</button>
           </div>
         ) : (
           <DisplayMatrix

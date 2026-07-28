@@ -11,6 +11,7 @@ import { StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { menuPlacement } from "../analytics/puzzleAnalytics.ts";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
+import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { puzzleTitle } from "../pageTitles.ts";
 import { debug } from "../Logger.ts";
 
@@ -97,6 +98,16 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     linkAfterWin.text = "Next ▶▶";
   }
 
+  // This button appears the instant the winning bit goes down, often right under
+  // the finger that toggled it — so it must ignore that gesture's stray click.
+  const afterWinControl = useActivationGuard(() => {
+    ReactGA4.event('story_start_clicked', {
+      source: 'post-win-link',
+      puzzle_slug: currentPuzzle?.slug,
+    });
+    navigate(linkAfterWin.to);
+  });
+
   useEffect(() => {
     if (!menu) {
       debug(`Waiting for the ${menuName} menu data.`);
@@ -163,14 +174,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
         )}
         {hasWon && (
           <div className="after-win-controls">
-            <button type={"button"}
-                    onClick={() => {
-                      ReactGA4.event('story_start_clicked', {
-                        source: 'post-win-link',
-                        puzzle_slug: currentPuzzle?.slug,
-                      });
-                      navigate(linkAfterWin.to);
-                    }}>{linkAfterWin.text}</button>
+            <button type={"button"} {...afterWinControl}>{linkAfterWin.text}</button>
           </div>
         )}
       </>

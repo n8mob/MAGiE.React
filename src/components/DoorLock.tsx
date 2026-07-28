@@ -9,6 +9,7 @@ import { debug } from "../Logger.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { doorLockTitle } from "../pageTitles.ts";
 
@@ -123,6 +124,9 @@ const DoorLock = (props: DoorLockProps) => {
     }
   }, [gameState, stagingBits, winSequence, presetIndex, presets]);
 
+  // Appears the instant the winning bit lands, under the finger that landed it.
+  const nextControl = useActivationGuard(submit);
+
   /**
    * keyboard handler
    */
@@ -157,7 +161,7 @@ const DoorLock = (props: DoorLockProps) => {
         {gameState === "accepted" && <p>{parseInt(winSequence.toPlainString(), 2)}</p>}
         {gameState === "accepted" && (
           <div className="after-win-controls">
-            <button type="button" onClick={submit}>Next ▶▶</button>
+            <button type="button" {...nextControl}>Next ▶▶</button>
           </div>
         )}
       </div>

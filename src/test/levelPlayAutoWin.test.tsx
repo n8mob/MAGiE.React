@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ReactNode } from "react";
 import LevelPlay from "../components/LevelPlay";
 import { HeaderProvider } from "../components/HeaderContext";
 import { PageTitleProvider } from "../components/PageTitleContext";
 import { usePageTracking } from "../hooks/usePageTracking";
+import ReactGA4 from "react-ga4";
 
 /*
  * Issue #223 — the [Next ▶▶] button doesn't appear on auto-win tutorial levels.
@@ -125,5 +126,40 @@ describe("LevelPlay page title", () => {
   it("counts puzzles from 1, matching what a player would say", () => {
     renderAt(1);
     expect(document.title).to.equal("MAGiE Tutorial: First Time 2/3");
+  });
+});
+
+describe("LevelPlay Next button, ghost clicks", () => {
+  const nextButton = () => screen.getByRole("button", { name: /next/i });
+  const navigations = () =>
+    vi.mocked(ReactGA4.event).mock.calls.filter(call => call[0] === "story_start_clicked");
+
+  beforeEach(() => vi.mocked(ReactGA4.event).mockClear());
+
+  it("ignores the tail of the gesture that won the puzzle", () => {
+    renderAt(0);
+
+    // The winning tap went down on a bit; this button did not exist yet. All the
+    // browser delivers here is the click at the end of that same gesture.
+    fireEvent.click(nextButton(), { detail: 1 });
+
+    expect(navigations()).to.have.lengthOf(0);
+  });
+
+  it("still advances on a press that actually starts on it", () => {
+    renderAt(0);
+
+    fireEvent.pointerDown(nextButton());
+    fireEvent.click(nextButton(), { detail: 1 });
+
+    expect(navigations()).to.have.lengthOf(1);
+  });
+
+  it("still advances from the keyboard", () => {
+    renderAt(0);
+
+    fireEvent.click(nextButton(), { detail: 0 });
+
+    expect(navigations()).to.have.lengthOf(1);
   });
 });
