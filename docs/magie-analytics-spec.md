@@ -189,6 +189,44 @@ Plus one custom **metric** (separate 25-slot budget):
 
 - [ ] `solve_time_seconds`
 
+### What "no backfill" actually means
+
+Registration is not retroactive. A dimension associates its parameter from the moment it is created,
+forward. Events collected before that show `(not set)` under it in reports — permanently, no amount of
+waiting fixes it.
+
+But **the parameter data is collected and stored either way**. GA4 records every param sent, registered
+or not; registration only controls whether it is *sliceable in the reporting UI*. Those are two separate
+things, and the gap between them is what makes the workflow below possible.
+
+So the cost of getting it wrong is not a burned slot — a dimension can be archived to reclaim one. The
+cost is a permanent hole in the UI covering the window between first traffic and correct registration.
+BigQuery export would rescue exactly that (raw `event_params` are all there regardless), which is worth
+remembering while it stays under Deferred: until then, the GA4 UI is the only view and the hole is real.
+
+### Verifying costs nothing
+
+DebugView shows the full raw event payload, registered or not — that is its whole purpose. Load a puzzle
+with `?_dbg`, confirm every param name and value, and no slot has been touched.
+
+A dimension can also be created for a parameter GA4 has never seen; the form suggests recently-seen names
+but doesn't restrict you to them. So registration isn't blocked on getting traffic first.
+
+DebugView and Realtime are immediate, but standard reports lag registration by up to 24 hours — an empty
+report on day one is not a bug. Sequencing is in [Before alpha testing](#before-alpha-testing).
+
+### Debug mode is not a reporting filter
+
+`debug_mode` routes events to DebugView. It does **not** keep them out of standard reports — debug
+traffic lands in the same funnel as everything else. `VITE_GA_DEBUG=true` sitting in a dev run
+configuration therefore pollutes alpha data on every local session, as does `?asChocolate` testing. The
+"dev-day spikes" in the dashboard are this, not real players.
+
+`debug_mode` and `traffic_type` are independent, and they act at different stages: `debug_mode` routes an
+event into DebugView's live stream, while the Internal Traffic data filter acts at report processing. So
+sending both keeps full DebugView verification *and* keeps the events out of the funnel. They are not in
+tension.
+
 ## Retired
 
 Removed when `puzzle_start`/`puzzle_end` land. Restoring any of these is a small code change, but GA4
@@ -203,6 +241,27 @@ never backfills — you'd get data from that day forward and a permanent gap beh
 If the fiddling signal is ever wanted back, prefer a `guess_count` on `puzzle_end` over restoring `guess`:
 same question answered, ~1% of the volume, and it spends custom-*metric* budget (25, separate pool)
 instead of a dimension slot.
+
+## Before alpha testing
+
+Pre-flight checklist. The order matters: steps 1–2 can't be applied retroactively, and step 4 can't be
+undone.
+
+- [ ] **1. Verify in DebugView.** Load a tutorial puzzle with `?_dbg` and read the `puzzle_start` /
+      `puzzle_end` pair. Check every param name and value, and confirm an auto-win demo screen emits the
+      pair in that order. Free, reversible, touches no slots — see
+      [Verifying costs nothing](#verifying-costs-nothing).
+- [ ] **2. Register the dimensions and the metric.** Nothing collected before this is ever sliceable.
+- [ ] **3. Send `traffic_type: 'internal'` alongside `debug_mode`.** Two lines beside the existing
+      `ReactGA4.initialize` call in `App.tsx`.
+- [ ] **4. Switch on the Internal Traffic data filter** — Admin → Data Settings → Data Filters. Leave it
+      in **Testing** mode first: testing mode excludes nothing, it just exposes a "Test data filter name"
+      dimension so the match can be confirmed against real dev sessions. Only then set it Active. Active
+      filtering is permanent and the excluded data is unrecoverable.
+- [ ] **5. Confirm the dev-day spikes stop.** That's the signal steps 3–4 worked.
+- [ ] **6. Wait 24 hours** before judging whether the standard reports look right.
+
+Then open it up.
 
 ## Questions this should answer
 
