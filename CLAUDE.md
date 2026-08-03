@@ -87,5 +87,4 @@ The `text-transform: uppercase` global on `#root` is suppressed for the whole st
 See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-based bit-state color system.
 
 ### Feature flags
-
-Routes beyond `/today`/`/date/...`/`/tutorial/...` are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source. The default feature set is `['tutorial']`.
+Routes not listed in `useFeatureFlags.NORMAL_FEATURES` are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source. The default feature set is `['tutorial']`.
