@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { PuzzleProps } from "./useBasePuzzle";
@@ -10,6 +10,7 @@ import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { chocolateEncoding } from "../encoding/FiveBitA1.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { useActivationGuard } from "../hooks/useActivationGuard.ts";
+import { WinScreen } from "./WinScreen.tsx";
 import "./Chocolate.css";
 
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
@@ -91,6 +92,12 @@ interface ChocolateModeProps extends PuzzleProps {
   onLose?: () => void;
   /** TRY AGAIN resets in place, so a new attempt has to announce itself. */
   onRetry?: () => void;
+  /**
+   * Where the player can go once they've won, from whichever route loaded the
+   * puzzle. Rendered on the win screen, so the route needn't know this mode
+   * exists — see PlayPuzzle, which decides who gets it.
+   */
+  winActions?: ReactNode;
 }
 
 const ChocolateMode: FC<ChocolateModeProps> = ({
@@ -98,6 +105,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   onWin = () => {},
   onLose = () => {},
   onRetry = () => {},
+  winActions,
 }) => {
   const clock = puzzle.clock ?? "scroll";
   const scrollSpeed = puzzle.scrollSpeed ?? 0.20;
@@ -160,6 +168,10 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   // Set when the rewind has finished and the view belongs to the player. Until
   // then the belt still owns it, even though the run is over.
   const [viewHandedOver, setViewHandedOver] = useState(false);
+  // Stepping the win screen aside leaves the finished puzzle on display. Kept
+  // apart from runState because "won" and "win screen showing" stop meaning the
+  // same thing the moment the screen can be dismissed.
+  const [winScreenDismissed, setWinScreenDismissed] = useState(false);
   const winReported = useRef(false);
   const lossReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
@@ -705,6 +717,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     // it steers with the transform, which cannot see a leftover scroll offset.
     conveyorStoppedRef.current = false;
     setViewHandedOver(false);
+    setWinScreenDismissed(false);
     if (mainDisplayRef.current) {
       mainDisplayRef.current.scrollTop = 0;
     }
@@ -716,6 +729,14 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const retryControl = useActivationGuard(handleRetry);
 
   const focusedRow = rowOf(Math.min(cursor, Math.max(winBits.length - 1, 0)));
+
+  /*
+   * The win screen waits for the rewind (#227). Dessert ends with the belt
+   * running back to the clue, and dropping a dialog over that the instant the
+   * last bit lands would throw the beat away. The player-paced clocks have no
+   * rewind to wait on, so for them the run being won is the whole cue.
+   */
+  const winScreenReady = runState === "won" && (clock !== "scroll" || viewHandedOver);
 
   // Step the focused row into view when the player moved the cursor — but never
   // in Dessert, where the belt owns the view. The no-deps effect clears any
@@ -843,15 +864,18 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
           />
         )}
       </div>
-      {runState === "won" && (
-        <div id="puzzle-inputs">
-          <div id="win-message" className="display">
-            {/*{clock === "scroll" && <p>SCORE {points}</p>}*/}
-            {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
-              <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-          </div>
-        </div>
-      )}
+      <WinScreen
+        open={winScreenReady && !winScreenDismissed}
+        winMessage={puzzle.winMessage ?? []}
+        onDismiss={() => setWinScreenDismissed(true)}
+        actions={winActions}
+        stats={clock === "scroll" ? (
+          <>
+            <span>SCORE {points}</span>
+            <span>GLEANED {letterResults.filter(Boolean).length}/{rowCount}</span>
+          </>
+        ) : undefined}
+      />
     </div>
   );
 };
