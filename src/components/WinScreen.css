@@ -56,3 +56,10 @@
   border: 2px solid;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
 }
+
+/* The way back, sitting under the puzzle while it is being admired. Fixed size
+   in the game-content column so the display keeps every pixel it can. */
+.win-screen-recall {
+  flex: 0 0 auto;
+  padding: 0.5em 1em;
+}
