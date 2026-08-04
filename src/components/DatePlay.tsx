@@ -39,7 +39,6 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const [puzzleStatus, setPuzzleStatus] = useState<"loading" | "ready" | "missing">("loading");
   const { year, month, day } = useParams<{ year?: string, month?: string, day?: string }>();
   const [solveTimeDisplay, setSolveTimeDisplay] = useState("");
-  const [hasWon, setHasWon] = useState(false);
   const linkToToday = <Link to={"/today"}>Rewind to today</Link>;
   const isFirstVisit = !localStorage.getItem('isFirstVisit');
 
@@ -79,7 +78,6 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   const [renderedDateKey, setRenderedDateKey] = useState(dateKey);
   if (dateKey !== renderedDateKey) {
     setRenderedDateKey(dateKey);
-    setHasWon(false);
     setSolveTimeDisplay("");
   }
 
@@ -215,7 +213,6 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
   // PlayPuzzle emits puzzle_end for the win; this only handles the local UI.
   function handleWin(stopwatch: StopwatchHandle) {
     debug(`DatePlay handles win at ${ stopwatch.displayTime() }`);
-    setHasWon(true);
     updateSolveTime(stopwatch);
   }
 
@@ -275,11 +272,7 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
           puzzleShareString={`I decoded the MAGiE puzzle for ${puzzleDate.getDate() === new Date().getDate()
             ? "today, "
             : ""}${formattedDate}!`}
-          placement={placement}
-        />
-      )}
-      {hasWon && (<>
-          <div className="after-win-controls">
+          winActions={<>
             <button type={"button"} {...shareControl}>Share Your Win</button>
             <p className={"split-content"}>
               <Link
@@ -288,8 +281,9 @@ export const DatePlay: FC<DayPuzzleProps> = ({ initialDate }) => {
                 ◀◀ Yesterday's puzzle
               </Link>
             </p>
-          </div>
-        </>
+          </>}
+          placement={placement}
+        />
       )}
     </>
   );

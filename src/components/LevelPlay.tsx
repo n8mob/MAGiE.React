@@ -1,5 +1,5 @@
 import { Puzzle } from "../model.ts";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { PlayPuzzle } from "./PlayPuzzle";
@@ -27,25 +27,8 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
   const { categoryIndex, levelNumber, puzzleIndex: puzzleIndexParam } = useParams();
   const { category } = useCategory(menu, categoryIndex);
   const { level } = useLevel(category, levelNumber);
-  const [hasWon, setHasWon] = useState(false);
   const { setHeaderContent } = useHeader();
   const puzzleIndex = parseInt(puzzleIndexParam || "0", 10);
-
-  /*
-   * Clear the win state during render rather than in an effect (#223).
-   *
-   * The win is detected inside PlayPuzzle's subtree, and React flushes child
-   * effects before parent ones. An auto-win puzzle (init === winText) therefore
-   * reports its win before an effect here would run, and the reset would then
-   * wipe it — no [Next ▶▶] button. Resetting during render happens before the
-   * children commit at all, so there is nothing to clobber.
-   */
-  const routeKey = `${menuName}/${categoryIndex}/${levelNumber}/${puzzleIndex}`;
-  const [renderedRouteKey, setRenderedRouteKey] = useState(routeKey);
-  if (routeKey !== renderedRouteKey) {
-    setRenderedRouteKey(routeKey);
-    setHasWon(false);
-  }
 
   // The puzzle is derived from the route, not stored: navigating to a
   // puzzle that doesn't exist yields null instead of a stale puzzle.
@@ -149,7 +132,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
 
   function handleWin(stopwatch: StopwatchHandle) {
     debug(`LevelPlay.handleWin: ${stopwatch.displayTime()}`);
-    setHasWon(true);
   }
 
   if (!menu || !currentPuzzle || !level) {
@@ -158,7 +140,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
 
     // Generate a share string for this puzzle context
     const shareString = `I solved the ${level.levelName.join(" ")} puzzle in the ${category?.name || ""} category!`;
-    debug(`${currentPuzzle.slug}: has won?: ${hasWon}`);
 
     return (
       <>
@@ -168,14 +149,12 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
             puzzle={currentPuzzle}
             onWin={handleWin}
             puzzleShareString={shareString}
+            winActions={
+              <button type={"button"} {...afterWinControl}>{linkAfterWin.text}</button>
+            }
             asChocolate={asChocolate}
             placement={placement}
           />
-        )}
-        {hasWon && (
-          <div className="after-win-controls">
-            <button type={"button"} {...afterWinControl}>{linkAfterWin.text}</button>
-          </div>
         )}
       </>
     );

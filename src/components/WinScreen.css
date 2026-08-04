@@ -1,0 +1,58 @@
+/* The win screen. Sized to the device frame rather than centred as a card, so
+   it reads as the MAGiE screen showing a different page instead of a dialog
+   floating over the app. See Dialog.css for the card treatment, which is what
+   the settings/help surfaces want and this one deliberately does not. */
+.win-screen {
+  max-width: 480px;
+  width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+
+.win-screen::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* .display-frame is written for a flex parent it can grow into. In the top
+   layer there is no such parent, so it sizes to its content and stops at the
+   viewport instead. */
+.win-screen-frame {
+  flex: 0 1 auto;
+  max-height: 100%;
+}
+
+/* The message itself scrolls if it outgrows the frame; the controls below must
+   not be pushed off the bottom with it. */
+.win-screen-panel {
+  overflow-y: auto;
+  min-height: 0;
+  text-align: left;
+}
+
+/* Mode-specific scoring, laid out as a row of readings across the top. */
+.win-screen-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 0.75em;
+}
+
+.win-screen-controls {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: 0.5em;
+  padding-top: 1em;
+}
+
+/* Secondary to whatever the route offers: leaving is the primary action, and
+   staying to look at the puzzle is the quieter one. */
+.win-screen-dismiss {
+  background: transparent;
+  border: 2px solid;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+}
