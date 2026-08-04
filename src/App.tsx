@@ -280,9 +280,10 @@ function App() {
         <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
       </>)}
       {features.includes('tutorial') && (<>
-        <Route path="/tutorial" element={
-          <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />
-        } />
+        {/*<Route path="/tutorial" element={*/}
+        {/*  <Navigate to={"/tutorial/0/levels/28/puzzles/0"} replace />*/}
+        {/*} />*/}
+        <Route path="/tutorial" element={<MenuBrowser menuName="tutorial" />} />
         <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial" />} />
         <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={
           <RedirectLevelRootToPuzzle0 />

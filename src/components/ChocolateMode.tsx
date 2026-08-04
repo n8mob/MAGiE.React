@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { PuzzleProps } from "./useBasePuzzle";
@@ -92,12 +92,6 @@ interface ChocolateModeProps extends PuzzleProps {
   onLose?: () => void;
   /** TRY AGAIN resets in place, so a new attempt has to announce itself. */
   onRetry?: () => void;
-  /**
-   * Where the player can go once they've won, from whichever route loaded the
-   * puzzle. Rendered on the win screen, so the route needn't know this mode
-   * exists — see PlayPuzzle, which decides who gets it.
-   */
-  winActions?: ReactNode;
 }
 
 const ChocolateMode: FC<ChocolateModeProps> = ({

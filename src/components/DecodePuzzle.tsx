@@ -6,6 +6,7 @@ import { BitSequence } from "../BitSequence";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
 import { GuessDisplay } from "./GuessDisplay.tsx";
 import { Correctness } from "../judgment/BitJudgment.ts";
+import { WinScreen } from "./WinScreen.tsx";
 
 const LETTER_PATTERN = /^[a-z]$/i;
 const ALLOWED_PUNCTUATION = new Set<string>([",", ".", "!", "?", " "]);
@@ -42,6 +43,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
     puzzle,
     onWin = () => {},
     onShareWin = () => {},
+    winActions,
     bitButtonWidthPx = 32
   }) => {
   const [guessText, setGuessText] = useState<string>(() => sanitizeGuessText(puzzle.init));
@@ -169,23 +171,38 @@ const DecodePuzzle: FC<PuzzleProps> = (
         </div>
         <div id="puzzle-inputs" className="decode-puzzle-inputs" ref={puzzleInputsRef}>
           {!isAutoWin &&
-            <GuessDisplay guessText={guessText} placeholder="DECODE TEXT HERE" />
+            <GuessDisplay
+              guessText={guessText}
+              placeholder="DECODE TEXT HERE"
+              showCursor={!hasWon}
+            />
           }
-          {hasWon ? (
-            <div id="win-message" className="display">
-              {[...puzzle.winMessage].map((winLine, winIndex) =>
-                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-            </div>
-          ) : (
+          {!hasWon && (
             <OnScreenKeyboard
               onCharacter={appendCharacter}
               onDelete={deleteCharacter}
               onReturn={checkAnswer}
-              disabled={hasWon}
             />
           )}
+          {/* Same as Encode: on the tutorial's already-solved demo screens this
+              text captions the bits above it rather than rewarding anything, so
+              it stays inline instead of covering its own subject. */}
+          {hasWon && isAutoWin && (
+            <div id="win-message" className="display">
+              {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
+                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
+            </div>
+          )}
         </div>
+        {!isAutoWin && (
+          <WinScreen won={hasWon} winMessage={puzzle.winMessage ?? []} actions={winActions} />
+        )}
       </div>
+      {/* See EncodePuzzle: the demo screens keep the controls they had, and the
+          flag must be useBasePuzzle's so a parent reset can't wipe it (#223). */}
+      {hasWon && isAutoWin && winActions && (
+        <div className="after-win-controls">{winActions}</div>
+      )}
     </>
   );
 }

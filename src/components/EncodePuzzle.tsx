@@ -7,12 +7,14 @@ import { DisplayMatrix } from "./DisplayMatrix";
 import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
+import { WinScreen } from "./WinScreen.tsx";
 
 const EncodePuzzle: FC<PuzzleProps> = (
   {
     puzzle,
     onWin = () => {},
     onShareWin = () => {},
+    winActions,
     bitButtonWidthPx = 32
   }) => {
   const [guessBits, setGuessBits] = useState(puzzle?.encoding?.encodeText(puzzle?.init) || BitSequence.empty());
@@ -112,20 +114,36 @@ const EncodePuzzle: FC<PuzzleProps> = (
           {!isAutoWin && puzzle.winText != null && puzzle.winText.length > 0 &&
             <GuessDisplay guessText={guessText} placeholder="YOUR GUESS HERE" showCursor={!hasWon} />
           }
-          {hasWon ? (
-            <div id="win-message" className="display">
-              {[...puzzle.winMessage].map((winLine, winIndex) =>
-                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-            </div>
-          ) : (
+          {!hasWon && (
             <BitInputs
               onBit={appendBit}
               onDelete={deleteBit}
               onSubmit={() => {}}
-              disabled={hasWon}
             />)}
+          {/* The tutorial's demo screens arrive already solved. Nothing was
+              accomplished, and this text is a caption for the bits above it —
+              "THIS IS A BIT" / "IT IS .ON." — not a reward. It stays inline,
+              because a screen that covers its own subject teaches nothing. A win
+              the player earned gets the WinScreen instead. */}
+          {hasWon && isAutoWin && (
+            <div id="win-message" className="display">
+              {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
+                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
+            </div>
+          )}
         </div>
+        {!isAutoWin && (
+          <WinScreen won={hasWon} winMessage={puzzle.winMessage ?? []} actions={winActions} />
+        )}
       </div>
+      {/* Where the after-win controls sat when PlayPuzzle rendered them, so the
+          demo screens are untouched. The flag has to be this one: a parent's own
+          copy gets cleared by its reset before the button ever renders (#223),
+          which is why useBasePuzzle owns it and the component remounts per
+          puzzle. Covered by levelPlayAutoWin.test.tsx. */}
+      {hasWon && isAutoWin && winActions && (
+        <div className="after-win-controls">{winActions}</div>
+      )}
     </>
   )
     ;

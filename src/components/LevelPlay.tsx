@@ -1,7 +1,6 @@
 import { Puzzle } from "../model.ts";
 import { FC, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { PlayPuzzle } from "./PlayPuzzle";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
@@ -50,7 +49,9 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
   // Memoized rather than built inline at the call site: a fresh object every
   // render would churn PlayPuzzle's analytics context for no reason.
   const placement = useMemo(
-    () => (menu && level && currentPuzzle)
+    () => (
+      menu && level && currentPuzzle
+    )
       ? menuPlacement(menu, category, level, currentPuzzle, puzzleIndex)
       : undefined,
     [menu, category, level, currentPuzzle, puzzleIndex]
@@ -69,13 +70,8 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
 
   const linkAfterWin = { to: "", text: "" };
   if (isLastInLevel) {
-    if (menuName === "tutorial") {
-      linkAfterWin.to = "/story";
-      linkAfterWin.text = "READ THE STORY";
-    } else {
-      linkAfterWin.to = `/${menuName}/${categoryIndex}`;
-      linkAfterWin.text = `Back to ${category?.name || "Category"}`;
-    }
+    linkAfterWin.to = `/${menuName}/${categoryIndex}`;
+    linkAfterWin.text = `Back to ${category?.name || "Category"}`;
   } else {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next ▶▶";

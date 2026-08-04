@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Puzzle } from "../model.ts";
 import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
@@ -16,6 +16,12 @@ export interface PuzzleProps {
   puzzle: Puzzle;
   onWin?: () => void;
   onShareWin?: () => void;
+  /**
+   * Where the player can go once they've won, from whichever route loaded the
+   * puzzle. Each mode decides where it belongs: on the win screen for a win the
+   * player earned, under the puzzle on the tutorial's auto-win demo screens.
+   */
+  winActions?: ReactNode;
   bitButtonWidthPx: number;
 }
 
