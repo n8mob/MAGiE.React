@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
@@ -20,6 +20,14 @@ interface PlayPuzzleProps {
   puzzleShareString: string;
   onWin?: (stopwatch: StopwatchHandle) => void;
   onShareWin?: () => void;
+  /**
+   * Where the player can go once they've won — Next, Share, back to the
+   * category. The route knows the answer; only this component knows which mode
+   * ended up rendering, and therefore whether the answer belongs on a win screen
+   * or under the puzzle. Passed here rather than rendered by the route so that
+   * one decision lives in one place.
+   */
+  winActions?: ReactNode;
   /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
   asChocolate?: boolean;
   /**
@@ -34,11 +42,23 @@ const PlayPuzzle = ({
   puzzleShareString,
   onWin,
   onShareWin,
+  winActions,
   asChocolate = false,
   placement,
 }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
   const [searchParams] = useSearchParams();
+  /*
+   * Whether this puzzle has been won, for deciding when the after-win controls
+   * appear.
+   *
+   * It belongs here rather than in the routes: both of them key this component
+   * by puzzle slug, so it remounts per puzzle and the flag resets by itself.
+   * LevelPlay had to clear its own copy during render instead (#223), because
+   * LevelPlay is *not* remounted and a child's win arrives before a parent
+   * effect could run. Nothing to clear, nothing to race.
+   */
+  const [hasWon, setHasWon] = useState(false);
 
   // Existing Encode/Decode puzzles double as Chocolate content, forced either by
   // the asChocolate prop (the /chocolate area) or by the ?asChocolate query param
@@ -151,6 +171,7 @@ const PlayPuzzle = ({
 
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
+    setHasWon(true);
     const isAutoWin = puzzle.init === puzzle.winText;
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();
@@ -182,6 +203,7 @@ const PlayPuzzle = ({
 
   const handleRetry = () => {
     debug("PlayPuzzle detected retry");
+    setHasWon(false);
     startAttempt();
   };
 
@@ -266,9 +288,16 @@ const PlayPuzzle = ({
           onLose={handleLose}
           onRetry={handleRetry}
           onShareWin={handleShareWin}
+          winActions={winActions}
           bitButtonWidthPx={32}
         />
       }
+      {/* Chocolate puts these on its win screen. The other modes have no such
+          screen yet, so they keep the panel under the puzzle they've always
+          had — the same markup the routes used to render themselves. */}
+      {hasWon && puzzle.type !== "Chocolate" && winActions && (
+        <div className="after-win-controls">{winActions}</div>
+      )}
     </>
   );
 };
