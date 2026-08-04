@@ -56,7 +56,8 @@
 }
 
 /* The belt itself: translated every frame by the conveyor loop. Hint the
-   compositor so the transform stays smooth (no per-frame repaint). */
+   compositor so the transform stays smooth (no per-frame repaint). Scoped to
+   the locked state so the layer is released once the belt stops. */
 #main-display.conveyor-locked .bit-field {
   will-change: transform;
 }
