@@ -168,10 +168,6 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   // Set when the rewind has finished and the view belongs to the player. Until
   // then the belt still owns it, even though the run is over.
   const [viewHandedOver, setViewHandedOver] = useState(false);
-  // Stepping the win screen aside leaves the finished puzzle on display. Kept
-  // apart from runState because "won" and "win screen showing" stop meaning the
-  // same thing the moment the screen can be dismissed.
-  const [winScreenDismissed, setWinScreenDismissed] = useState(false);
   const winReported = useRef(false);
   const lossReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
@@ -717,7 +713,6 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     // it steers with the transform, which cannot see a leftover scroll offset.
     conveyorStoppedRef.current = false;
     setViewHandedOver(false);
-    setWinScreenDismissed(false);
     if (mainDisplayRef.current) {
       mainDisplayRef.current.scrollTop = 0;
     }
@@ -865,9 +860,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
         )}
       </div>
       <WinScreen
-        open={winScreenReady && !winScreenDismissed}
+        won={winScreenReady}
         winMessage={puzzle.winMessage ?? []}
-        onDismiss={() => setWinScreenDismissed(true)}
         actions={winActions}
         stats={clock === "scroll" ? (
           <>

@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { ChocolateMode } from "../components/ChocolateMode";
+import { WinScreen } from "../components/WinScreen";
 import { fiveBitA1 } from "../encoding/FiveBitA1";
 import { Puzzle } from "../model";
 
@@ -41,6 +42,8 @@ const winScreen = (container: HTMLElement) =>
   container.querySelector<HTMLDialogElement>("dialog.win-screen");
 const isShowing = (container: HTMLElement) => !!winScreen(container)?.hasAttribute("open");
 const bitField = (container: HTMLElement) => container.querySelector(".bit-field");
+const recall = (container: HTMLElement) =>
+  container.querySelector<HTMLButtonElement>(".win-screen-recall button");
 
 const setReducedMotion = (matches: boolean) => {
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -141,6 +144,21 @@ describe("the win screen (#227)", () => {
     expect(bitField(container)).to.not.equal(null);
   });
 
+  it("offers a way back once it has been dismissed", () => {
+    const { container } = renderChocolate(puzzle({ clock: "none" }));
+    solve("A");
+    expect(recall(container)).to.equal(null);
+
+    press(winScreen(container)!.querySelector(".win-screen-dismiss")!);
+
+    // Everything that moves the player on lives on the screen, so admiring the
+    // puzzle has to be a round trip rather than a one-way door.
+    expect(recall(container)).to.not.equal(null);
+    press(recall(container)!);
+    expect(isShowing(container)).to.equal(true);
+    expect(recall(container)).to.equal(null);
+  });
+
   it("ignores a click that began somewhere else", () => {
     const { container } = renderChocolate(puzzle({ clock: "none" }));
     solve("A");
@@ -151,5 +169,21 @@ describe("the win screen (#227)", () => {
     fireEvent.click(dismiss!, { detail: 1 });
 
     expect(isShowing(container)).to.equal(true);
+  });
+});
+
+describe("WinScreen on its own", () => {
+  it("puts the screen back on offer when a new run starts", () => {
+    const { container, rerender } = render(<WinScreen won={true} winMessage={["WELL DONE"]} />);
+    press(container.querySelector(".win-screen-dismiss")!);
+    expect(recall(container)).to.not.equal(null);
+
+    // Chocolate's TRY AGAIN resets the run in place rather than remounting, so
+    // a stale dismissal would otherwise follow the player into the next one.
+    rerender(<WinScreen won={false} winMessage={["WELL DONE"]} />);
+    rerender(<WinScreen won={true} winMessage={["WELL DONE"]} />);
+
+    expect(isShowing(container)).to.equal(true);
+    expect(recall(container)).to.equal(null);
   });
 });
