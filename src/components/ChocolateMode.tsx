@@ -21,6 +21,12 @@ const MIN_SCROLL_SPEED = 0.05;
 const LINE_POSITION = 0.2;
 // How much the "cue" (fast-forward) button multiplies belt speed while held.
 const CUE_SPEED_MULTIPLIER = 12;
+// Rewind: after the run, the belt runs backwards to bring the clue into view.
+// Paced per row so short messages don't crawl and long ones don't drag, then
+// bounded at both ends so it always reads as one deliberate movement.
+const REWIND_MS_PER_ROW = 35;
+const REWIND_MIN_MS = 320;
+const REWIND_MAX_MS = 1100;
 // Space is 0 (all bits off) in 5bA1, so both the target and the decoded guess
 // can legitimately be a space — invisible in either slot. Stand one in so an
 // untouched row reads as "nothing here yet" rather than as a rendering bug.
@@ -28,6 +34,19 @@ const SPACE_GLYPH = "_";
 
 /** Render a character that would otherwise be invisible. */
 const visibleChar = (char: string) => (char === " " || char === "" ? SPACE_GLYPH : char);
+
+/**
+ * Honour the OS "reduce motion" setting. The rewind is presentation, not
+ * information — a player who has asked for less movement should simply arrive
+ * at the clue. Guarded for environments without matchMedia (jsdom).
+ */
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === "function"
+  && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Ease in and out, so the belt starts and stops like a belt rather than a cut. */
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /**
  * Clocks that hide the target letter in the left gutter.
@@ -138,6 +157,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   // Gate: true once the belt has been measured. Wakes the animation loop (state,
   // not a ref, precisely so it can) and reveals the line.
   const [measured, setMeasured] = useState(false);
+  // Set when the rewind has finished and the view belongs to the player. Until
+  // then the belt still owns it, even though the run is over.
+  const [viewHandedOver, setViewHandedOver] = useState(false);
   const winReported = useRef(false);
   const lossReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
@@ -148,6 +170,18 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const judgeOffsetRef = useRef(0);
   // The continuous scroll offset, in rows. The one true position of the belt.
   const sRef = useRef(0);
+  /*
+   * Latched when the run ends (#227): the conveyor's licence to write a
+   * transform at all, revoked the moment the rewind takes over the belt.
+   *
+   * The conveyor loop is a passive effect, so React cancels it asynchronously —
+   * after the layout effects that end the run have already run. A frame queued
+   * before the win can still fire in between, and it would drive the belt
+   * forward against a rewind pulling it back, or resurrect a transform the
+   * handover had just cleared. Checked inside the loop rather than fixed by
+   * effect ordering, so an already-queued frame is caught whenever it lands.
+   */
+  const conveyorStoppedRef = useRef(false);
   // "Cue" fast-forward: held state read by the animation loop (ref, instant) and
   // mirrored to state for button styling / the future VHS overlay.
   const cueHeldRef = useRef(false);
@@ -198,10 +232,21 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const rowCount = displayRows.length;
   const rowWidth = rowCount > 0 ? displayRows[0].length : 1;
 
+  // Who owns the view. The belt keeps it past the end of the run — it still has
+  // the rewind to perform — and gives it up only at the handover. Drives the
+  // scroll lock and whether the runway is on the belt at all.
+  const conveyorDrivesView = clock === "scroll" && !viewHandedOver;
+
   /**
    * Rendered rows sitting above the first letter: the empty runway, then the
    * clue. Every conversion between a rendered row index and a letter index goes
    * through this, including the conveyor's judging offset.
+   *
+   * The runway is scaffolding — it exists so the first letter has somewhere to
+   * ride up from — so it is only on the belt while the belt is moving (#227).
+   * Once the run ends it is just a screenful of blank above the clue with
+   * nothing to explain it, and every rendered-row mapping below follows
+   * beltOffset down when it goes.
    *
    * Clue rows are pinned to exactly one row pitch in CSS. The belt is translated
    * as a single element on the assumption that every row is the same height, so
@@ -209,7 +254,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
    * judgment line.
    */
   const clueRowCount = clueLines.length;
-  const beltOffset = spacerCount + clueRowCount;
+  const runwayRows = conveyorDrivesView ? spacerCount : 0;
+  const beltOffset = runwayRows + clueRowCount;
 
   // Measure the belt once, then place the runway and the line. Runs before paint
   // (and setState here re-renders before paint) so no unspaced frame is shown.
@@ -248,8 +294,22 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     const hudHeight = container.querySelector<HTMLElement>(".chocolate-hud")?.offsetHeight ?? 0;
     const conveyorVisibleHeight = Math.max(container.clientHeight - hudHeight, pitch);
     const beltRows = conveyorVisibleHeight / pitch;
-    // Enough empty rows that the first letter starts at the bottom of the belt.
-    const runway = Math.max(1, Math.ceil(beltRows * 0.74));
+    /*
+     * Where the message starts, counted in rows below the top of the belt.
+     *
+     * The clue rides the belt now, so it is lead-in too (#227): every clue line
+     * is a row of think time before the first letter reaches the judgment line,
+     * and the runway only has to make up the difference. Aim to put that first
+     * letter on the bottom row of the belt.
+     *
+     * A clue longer than the belt would ask for a negative runway. Floor it so
+     * the clue's own first line starts no higher than the judgment line —
+     * flush to the top would read as though the belt had already run past some
+     * of it before the player looked.
+     */
+    const targetDepth = Math.max(Math.floor(beltRows) - 1, 1);
+    const minRunway = Math.max(Math.round(LINE_POSITION * beltRows), 1);
+    const runway = Math.max(targetDepth - clueRowCount, minRunway);
     const lineTopPx = hudHeight + LINE_POSITION * conveyorVisibleHeight;
     rowPitchRef.current = pitch;
     // Runway and clue rows must both be exactly one pitch tall, or the
@@ -321,6 +381,11 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
+      // The run ended after this frame was queued. Drop it: the belt belongs to
+      // the rewind now, and then to the player.
+      if (conveyorStoppedRef.current) {
+        return;
+      }
       // Clamp dt so a backgrounded tab doesn't leap the belt forward on return.
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
@@ -343,6 +408,86 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [clock, runState, measured, rowCount, scrollSpeed, scrollAccel, commitCrossings]);
+
+  /*
+   * Rewind (#227). The run is over, so run the belt backwards to bring the clue
+   * back under the player's eye.
+   *
+   * Done on the belt's own terms — still transform-driven, still locked —
+   * rather than by scrolling, because a transform has no layout to answer to. It
+   * can hold the position the belt stopped in, which a scrollTop cannot once the
+   * runway is gone and there is nothing rendered past the last letter.
+   *
+   * The target is s = the runway, which parks the clue's first line exactly at
+   * the top of the belt — precisely where scrollTop 0 puts it once the runway is
+   * dropped. That is what makes the handover invisible: both are the same
+   * pixels, so the only movement the player sees is the rewind itself.
+   *
+   * A layout effect, so the conveyor is barred from writing before any frame it
+   * already queued can land and fight the rewind.
+   */
+  useLayoutEffect(() => {
+    if (clock !== "scroll" || runState !== "won" || viewHandedOver || !measured) {
+      return;
+    }
+    conveyorStoppedRef.current = true;
+    const belt = displayMatrixRef.current?.getBitFieldElement?.();
+    const from = sRef.current;
+    const to = spacerCount;
+    const rows = Math.abs(from - to);
+    // Nothing worth animating, or a player who has asked not to be moved around.
+    if (!belt || rows < 0.01 || prefersReducedMotion()) {
+      sRef.current = to;
+      setViewHandedOver(true);
+      return;
+    }
+    const duration = Math.min(Math.max(rows * REWIND_MS_PER_ROW, REWIND_MIN_MS), REWIND_MAX_MS);
+    let raf = 0;
+    let start = 0;
+    const tick = (now: number) => {
+      start = start || now;
+      const progress = Math.min((now - start) / duration, 1);
+      sRef.current = from + (to - from) * easeInOutCubic(progress);
+      belt.style.transform = `translate3d(0, ${-sRef.current * rowPitchRef.current}px, 0)`;
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      setViewHandedOver(true);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [clock, runState, viewHandedOver, measured, spacerCount]);
+
+  /*
+   * The handover (#227).
+   *
+   * While the belt was running it was a compositor transform inside an
+   * overflow-hidden box, so there was nothing for the browser to scroll: the
+   * runway and the clue were translated out of view, not scrolled out of it.
+   * Unlocking overflow alone would have left them unreachable.
+   *
+   * The rewind has already parked the belt with the clue at the top, and this
+   * same commit takes the runway off it, so the equivalent scroll position is
+   * zero — the discount below is what converts between the two.
+   *
+   * useLayoutEffect because the swap has to land in the same paint as the
+   * unlock; in a passive effect the belt would snap for one frame.
+   */
+  useLayoutEffect(() => {
+    if (clock !== "scroll" || !viewHandedOver) {
+      return;
+    }
+    const container = mainDisplayRef.current;
+    if (!container) {
+      return;
+    }
+    const belt = displayMatrixRef.current?.getBitFieldElement?.();
+    if (belt) {
+      belt.style.transform = "";
+    }
+    container.scrollTop = Math.max((sRef.current - spacerCount) * rowPitchRef.current, 0);
+  }, [clock, viewHandedOver, spacerCount]);
 
   const nextEditableBit = useCallback((fromBit: number) => {
     let index = Math.max(fromBit, minEditableBit);
@@ -556,6 +701,13 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     if (belt) {
       belt.style.transform = "translate3d(0, 0, 0)";
     }
+    // Undo the win handover (#227): the belt is about to own the view again, and
+    // it steers with the transform, which cannot see a leftover scroll offset.
+    conveyorStoppedRef.current = false;
+    setViewHandedOver(false);
+    if (mainDisplayRef.current) {
+      mainDisplayRef.current.scrollTop = 0;
+    }
     setRunState("running");
   }, [allOffBits, onRetry]);
 
@@ -579,21 +731,23 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   });
 
   /*
-   * Rendered rows: the empty runway, then the clue, then the whole message.
-   * Judged rows stay on screen (locked) and ride up behind the HUD.
+   * Rendered rows: the runway while the belt is moving, then the clue, then the
+   * whole message. Judged rows stay on screen (locked) and ride up behind the
+   * HUD. Nothing is rendered past the last letter — the message is the end of
+   * the belt, so that is where the scroll ends too.
    *
    * A clue row carries its text as a DisplayRow annotation over an empty bit
    * sequence, so it renders as text on the belt with no bits to toggle and no
    * gutter letter — and rides up and off ahead of the message, as intended.
    */
   const renderedRows = useMemo(() => {
-    const spacers = Array.from({ length: spacerCount }, () => new DisplayRow(BitSequence.empty(), ""));
+    const spacers = Array.from({ length: runwayRows }, () => new DisplayRow(BitSequence.empty(), ""));
     const clues = clueLines.map(line => new DisplayRow(BitSequence.empty(), line));
     return [...spacers, ...clues, ...displayRows];
-  }, [spacerCount, clueLines, displayRows]);
+  }, [runwayRows, clueLines, displayRows]);
 
   const rowClassName = useCallback((renderedRowIndex: number) => {
-    if (renderedRowIndex < spacerCount) {
+    if (renderedRowIndex < runwayRows) {
       return "conveyor-spacer";
     }
     if (renderedRowIndex < beltOffset) {
@@ -605,7 +759,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       classes.push("focused-row");
     }
     return classes.join(" ");
-  }, [spacerCount, beltOffset, isRowCorrect, runState, focusedRow]);
+  }, [runwayRows, beltOffset, isRowCorrect, runState, focusedRow]);
 
   // Left gutter: the target letter for this row. Runway and clue rows have none.
   const renderTarget = useCallback((renderedRowIndex: number) => {
@@ -624,7 +778,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     <div id="game-content">
       <div
         id="main-display"
-        className={`display chocolate-display${clock === "scroll" ? " conveyor-locked" : ""}`}
+        className={`display chocolate-display${conveyorDrivesView ? " conveyor-locked" : ""}`}
         ref={mainDisplayRef}
         // Covers the HUD too, which sits outside the bit grid's own handler.
         onContextMenu={event => event.preventDefault()}
@@ -658,7 +812,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
             <span>STRIKES {strikes}/{maxStrikes}</span>
           </div>
         )}
-        {clock === "scroll" && measured && (
+        {/* Goes with the run, not with the belt: the rewind judges nothing. */}
+        {clock === "scroll" && runState === "running" && measured && (
           <div className="chocolate-judgment-line" style={{ top: lineTopPx }} aria-hidden="true" />
         )}
         {runState === "lost" ? (
@@ -691,7 +846,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       {runState === "won" && (
         <div id="puzzle-inputs">
           <div id="win-message" className="display">
-            {clock === "scroll" && <p>SCORE {points}</p>}
+            {/*{clock === "scroll" && <p>SCORE {points}</p>}*/}
             {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
               <p key={`win-message-${winIndex}`}>{winLine}</p>)}
           </div>
