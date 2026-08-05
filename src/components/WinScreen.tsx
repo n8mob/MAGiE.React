@@ -19,6 +19,22 @@ import "./WinScreen.css";
 interface WinScreenProps {
   /** The run is over and won, so the screen is on offer. */
   won: boolean;
+  /**
+   * The puzzle's clue, one line per array entry — the opening of the transcript.
+   *
+   * Most win messages were written as the second half of a sentence the clue
+   * begins and the answer completes ("LATER YOU WILL ENCODE" / "HOMEWORK" /
+   * "BUT FOR NOW, JUST COMPLETE THE LESSONS"), or as a reply to the answer
+   * ("ENCODING IS FUN!" / "IT SURE IS!"). Showing the message alone strands it.
+   */
+  clue: string[];
+  /**
+   * The answer, between the clue and the message.
+   *
+   * A ReactNode rather than a string because Chocolate shows what the player
+   * actually gleaned, letter by letter, rather than what was on the card.
+   */
+  answer: ReactNode;
   /** The puzzle's own win text, one line per array entry. */
   winMessage: string[];
   /** Mode-specific scoring — Chocolate's SCORE and LETTERS GLEANED. */
@@ -27,7 +43,7 @@ interface WinScreenProps {
   actions?: ReactNode;
 }
 
-const WinScreen: FC<WinScreenProps> = ({ won, winMessage, stats, actions }) => {
+const WinScreen: FC<WinScreenProps> = ({ won, clue, answer, winMessage, stats, actions }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   /*
    * Showing and hiding is this component's own business, not the caller's. A
@@ -100,8 +116,16 @@ const WinScreen: FC<WinScreenProps> = ({ won, winMessage, stats, actions }) => {
     <>
       <dialog ref={dialogRef} className="win-screen" onCancel={handleCancel}>
         <div className="win-screen-frame display-frame">
+          {/* One transcript, in the order it was spoken: what the puzzle asked,
+              what the player answered, what it said back. The panel scrolls,
+              which only actually matters for the dozen or so puzzles whose three
+              parts run past a screenful. */}
           <div className="win-screen-panel display">
             {stats && <div className="win-screen-stats">{stats}</div>}
+            {clue.map((clueLine, clueIndex) => (
+              <p key={`win-clue-${clueIndex}`}>{clueLine}</p>
+            ))}
+            <p className="win-screen-answer">{answer}</p>
             {winMessage.map((winLine, winIndex) => (
               <p key={`win-message-${winIndex}`}>{winLine}</p>
             ))}

@@ -51,13 +51,13 @@
 
 /* Decode-specific sizing and width constraint */
 .decode-keyboard {
-  --keyboard-key-height: clamp(23px, 7.6vw, 32px);
+  --keyboard-key-height: clamp(26px, 7.4vw, 32px);
   width: min(100%, 34rem);
   margin: 0 auto;
 }
 
 @media (max-width: 360px) {
   .decode-keyboard {
-    --keyboard-key-height: clamp(20px, 6.4vw, 26px);
+    --keyboard-key-height: clamp(20px, 7vw, 26px);
   }
 }

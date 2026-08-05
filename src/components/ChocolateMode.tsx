@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { PuzzleProps } from "./useBasePuzzle";
@@ -92,12 +92,6 @@ interface ChocolateModeProps extends PuzzleProps {
   onLose?: () => void;
   /** TRY AGAIN resets in place, so a new attempt has to announce itself. */
   onRetry?: () => void;
-  /**
-   * Where the player can go once they've won, from whichever route loaded the
-   * puzzle. Rendered on the win screen, so the route needn't know this mode
-   * exists — see PlayPuzzle, which decides who gets it.
-   */
-  winActions?: ReactNode;
 }
 
 const ChocolateMode: FC<ChocolateModeProps> = ({
@@ -395,7 +389,11 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
         return;
       }
       // Clamp dt so a backgrounded tab doesn't leap the belt forward on return.
-      const dt = Math.min((now - last) / 1000, 0.1);
+      // Floored at zero as well: a frame timestamp can predate the `last` this
+      // effect recorded when it ran mid-frame, and a negative dt would drive the
+      // belt backwards. Small in a browser, total in jsdom, where the animation
+      // clock and performance.now() do not share an origin at all.
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.1);
       last = now;
       const tier = Math.floor(scrolledRowsRef.current / ACCEL_EVERY_ROWS);
       const speed = Math.max(scrollSpeed + scrollAccel * tier, MIN_SCROLL_SPEED);
@@ -733,6 +731,28 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
    */
   const winScreenReady = runState === "won" && (clock !== "scroll" || viewHandedOver);
 
+  /*
+   * The message as the player actually received it, letter by letter (#227).
+   *
+   * A Dessert run is won by surviving the conveyor, not by being right, so what
+   * was gleaned can be partial: every letter the belt carried past the line
+   * unsolved stays purple on the transcript. This is what letterResults has been
+   * kept whole for rather than collapsed to a count.
+   *
+   * The player-paced clocks can only be won outright, so there letterResults is
+   * empty and the live judgment answers for every row — all of them correct.
+   */
+  const gleanedAnswer = useMemo(() => displayRows.map((row, letterIndex) => (
+    <span
+      key={`gleaned-${letterIndex}`}
+      className={(letterResults[letterIndex] ?? isRowCorrect(letterIndex))
+        ? "answer-correct"
+        : "answer-incorrect"}
+    >
+      {row.annotation}
+    </span>
+  )), [displayRows, letterResults, isRowCorrect]);
+
   // Step the focused row into view when the player moved the cursor — but never
   // in Dessert, where the belt owns the view. The no-deps effect clears any
   // leftover flag every render so a stale flag can't fire on a later tick.
@@ -861,6 +881,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       </div>
       <WinScreen
         won={winScreenReady}
+        clue={clueLines}
+        answer={gleanedAnswer}
         winMessage={puzzle.winMessage ?? []}
         actions={winActions}
         stats={clock === "scroll" ? (

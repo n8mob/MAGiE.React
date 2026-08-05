@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { ChocolateMode } from "../components/ChocolateMode";
 import { WinScreen } from "../components/WinScreen";
 import { fiveBitA1 } from "../encoding/FiveBitA1";
@@ -159,6 +159,48 @@ describe("the win screen (#227)", () => {
     expect(recall(container)).to.equal(null);
   });
 
+  it("shows every letter in the clear when the run was won outright", () => {
+    const { container } = renderChocolate(puzzle({ clock: "none" }));
+    solve("A");
+
+    const letters = [...container.querySelectorAll(".win-screen-answer span")];
+    expect(letters.map(letter => letter.className)).to.deep.equal(["answer-correct"]);
+  });
+
+  it("shows the message as it was actually gleaned, wrong letters and all", async () => {
+    /*
+     * The belt has to be driven by hand. jsdom's animation clock does not share
+     * a time origin with performance.now(), so a real frame arrives with a
+     * timestamp behind the one the conveyor recorded when it started, and the
+     * whole run elapses as zero. Feeding the clock explicitly is the only way to
+     * make the conveyor move here at all.
+     */
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+
+    const { container } = renderChocolate(puzzle({
+      winText: "HI",
+      // Outrun on every letter, but never struck out — which in Dessert is still
+      // a win. What was received is a message full of holes.
+      scrollSpeed: 400,
+      maxStrikes: 99,
+    }));
+
+    await act(async () => {
+      frames[frames.length - 1](performance.now() + 1000);
+    });
+
+    expect(isShowing(container)).to.equal(true);
+    const letters = [...container.querySelectorAll(".win-screen-answer span")];
+    expect(letters).to.have.lengthOf(2);
+    expect(letters.map(letter => letter.className))
+      .to.deep.equal(["answer-incorrect", "answer-incorrect"]);
+  });
+
   it("ignores a click that began somewhere else", () => {
     const { container } = renderChocolate(puzzle({ clock: "none" }));
     solve("A");
@@ -173,17 +215,31 @@ describe("the win screen (#227)", () => {
 });
 
 describe("WinScreen on its own", () => {
+  const screen = (won: boolean) => (
+    <WinScreen won={won} clue={["A GREETING"]} answer="HI" winMessage={["WELL DONE"]} />
+  );
+
   it("puts the screen back on offer when a new run starts", () => {
-    const { container, rerender } = render(<WinScreen won={true} winMessage={["WELL DONE"]} />);
+    const { container, rerender } = render(screen(true));
     press(container.querySelector(".win-screen-dismiss")!);
     expect(recall(container)).to.not.equal(null);
 
     // Chocolate's TRY AGAIN resets the run in place rather than remounting, so
     // a stale dismissal would otherwise follow the player into the next one.
-    rerender(<WinScreen won={false} winMessage={["WELL DONE"]} />);
-    rerender(<WinScreen won={true} winMessage={["WELL DONE"]} />);
+    rerender(screen(false));
+    rerender(screen(true));
 
     expect(isShowing(container)).to.equal(true);
     expect(recall(container)).to.equal(null);
+  });
+
+  it("reads as one transcript: what was asked, answered, and said back", () => {
+    const { container } = render(screen(true));
+
+    // Most win messages were written as the second half of a sentence the clue
+    // begins, or as a reply to the answer. Order is the whole point.
+    const lines = [...container.querySelectorAll(".win-screen-panel p")]
+      .map(line => line.textContent);
+    expect(lines).to.deep.equal(["A GREETING", "HI", "WELL DONE"]);
   });
 });

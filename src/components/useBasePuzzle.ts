@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Puzzle } from "../model.ts";
 import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
@@ -16,6 +16,21 @@ export interface PuzzleProps {
   puzzle: Puzzle;
   onWin?: () => void;
   onShareWin?: () => void;
+  /**
+   * Where the player can go once they've won, from whichever route loaded the
+   * puzzle. Each mode decides where it belongs: on the win screen for a win the
+   * player earned, under the puzzle on the tutorial's auto-win demo screens.
+   */
+  winActions?: ReactNode;
+  /**
+   * Present the win inline, under the puzzle, instead of on the win screen.
+   *
+   * The mechanism, not the policy: whoever loads the puzzle decides. Today the
+   * only caller that sets it is the tutorial (see `isTutorialContent`), whose
+   * win messages point at the bit grid that a modal would cover. Auto-win
+   * puzzles take this path regardless, for the same reason.
+   */
+  winInline?: boolean;
   bitButtonWidthPx: number;
 }
 

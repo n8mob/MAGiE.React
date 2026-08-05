@@ -70,6 +70,22 @@ Two components share the same `<input type="checkbox" className="bit-checkbox">`
 
 Renders a grid of bit buttons from `DisplayRow[]`. Accepts a `renderBit: (bit: IndexedBit, rowIndex: number, indexWithinRow: number) => ReactNode` render prop — callers supply the button component and close over any click/change handlers. The inner grid div uses `className="bit-field"` (not an `id`) so multiple `DisplayMatrix` instances can coexist on the same page (e.g. DoorLock's card + staging displays). Exposes an imperative ref handle (`DisplayMatrixUpdate`) with `getWidth()`, `scrollToBottom()`, and `getBitRowElement(rowIndex)`.
 
+### Win screen (`src/components/WinScreen.tsx`)
+
+The post-win surface for all three puzzle modes: a native `<dialog>` opened with `showModal()`, so it sits in the browser's top layer and is not subject to `#main-display`'s overflow or the Chocolate HUD's stacking context. It takes `won` and owns its own dismissed state — showing, stepping aside ("admire puzzle"), and the recall control that brings it back are one behaviour, not the caller's business. Two slots keep mode-specific content out: `stats` (Chocolate's SCORE/GLEANED) and `actions`.
+
+The panel renders **one transcript — `clue`, then `answer`, then `winMessage`** — because that is how the content was written. Of the 115 earned-win puzzles carrying a `winMessage`, 104 are conversational: the clue opens a sentence the answer completes and the message continues (`LATER YOU WILL ENCODE` / `HOMEWORK` / `BUT FOR NOW…`), or the message replies to the answer (`ENCODING IS FUN!` / `IT SURE IS!`). Showing the message alone strands it. The panel scrolls, which only matters for the dozen puzzles whose three parts exceed a screenful.
+
+`answer` is a `ReactNode`, not a string. Encode and Decode pass `puzzle.winText`; **Chocolate passes what the player actually gleaned**, one `<span>` per letter, teal for correct and purple for not — a Dessert run is won by surviving the conveyor, not by being right, so the received message can be full of holes. This is what `letterResults` is kept whole for. `.win-screen-answer` sets `white-space: pre-wrap` so the per-letter spans don't collapse the spaces between words.
+
+`actions` is the route's after-win navigation (Next, Share, back to category). Routes pass it to `PlayPuzzle` as `winActions`; `PlayPuzzle` hands it to whichever mode renders, and the mode decides where it goes. Routes therefore hold no `hasWon` state of their own.
+
+**Two kinds of puzzle skip the screen and keep an inline `#win-message` panel plus plain `.after-win-controls`.** Both are decided by `winsInline = isAutoWin || winInline` in the mode, where `winInline` is the mechanism and the route sets the policy. `LevelPlay` sets it via `isTutorialContent()` (`src/tutorialContent.ts`), which matches the string "tutorial" in the route name, menu name, category, level name, or puzzle slug — a deliberately blunt rule, because ~15 tutorial puzzles teach by pointing at the bit grid (`SEE HOW THE BIT WENT FROM PURPLE TO GREEN?`, and one whose whole message is `SEE?`) and no field marks them. Note the word appears nowhere in `docs/VintagePuzzles.json` — there it is purely the route segment `App.tsx` passes as `menuName`. Chocolate has no inline win to fall back to and always uses the screen.
+
+The other kind is auto-win puzzles (`init === winText`). They are the tutorial's demo screens: most carry no `winMessage` at all (their content is the `clue`), and the ones that do use it to caption the bits above — `clue: ["THIS IS A BIT"]`, `winMessage: ["IT IS .ON."]`. A modal there covers the very thing the screen exists to show. `useBasePuzzle`'s `hasWon` is the flag that drives this, and it must stay there: a parent's own copy gets cleared by its reset before the button renders (#223).
+
+Note: jsdom implements `<dialog>` without `showModal()`, so the component falls back to the `open` attribute in tests. Visibility still works (jsdom applies `dialog:not([open]) { display: none }`, so `queryByRole` correctly excludes a closed screen) but the top layer and focus trap only exist in a real browser.
+
 ### Story mode (`src/components/StoryPage.tsx`, `StoryIndex.tsx`)
 
 A paginated text reader for narrative content stored as Markdown files in `src/assets/story/`. The story list is defined in `src/stories.ts`. Routes: `/story` (index) and `/story/:slug` (individual chapter).
