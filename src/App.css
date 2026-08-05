@@ -153,7 +153,7 @@ h3 {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 30px;
+  padding: 10px 30px;
   max-width: 480px;
   width: 100%;
   margin: 0 auto;
@@ -225,7 +225,7 @@ h3 {
   display: flex;
   justify-self: end;
   justify-content: center;
-  padding: 1em;
+  padding: 1em 0;
   flex-direction: column;
 }
 

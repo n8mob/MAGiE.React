@@ -22,6 +22,15 @@ export interface PuzzleProps {
    * player earned, under the puzzle on the tutorial's auto-win demo screens.
    */
   winActions?: ReactNode;
+  /**
+   * Present the win inline, under the puzzle, instead of on the win screen.
+   *
+   * The mechanism, not the policy: whoever loads the puzzle decides. Today the
+   * only caller that sets it is the tutorial (see `isTutorialContent`), whose
+   * win messages point at the bit grid that a modal would cover. Auto-win
+   * puzzles take this path regardless, for the same reason.
+   */
+  winInline?: boolean;
   bitButtonWidthPx: number;
 }
 

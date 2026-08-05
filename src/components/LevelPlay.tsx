@@ -12,6 +12,7 @@ import { menuPlacement } from "../analytics/puzzleAnalytics.ts";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { puzzleTitle } from "../pageTitles.ts";
+import { isTutorialContent } from "../tutorialContent.ts";
 import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
@@ -148,6 +149,13 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
             winActions={
               <button type={"button"} {...afterWinControl}>{linkAfterWin.text}</button>
             }
+            winInline={isTutorialContent(
+              menuName,
+              menu?.name,
+              category?.name,
+              level?.levelName?.join(" "),
+              currentPuzzle?.slug,
+            )}
             asChocolate={asChocolate}
             placement={placement}
           />

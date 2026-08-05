@@ -27,6 +27,12 @@ interface PlayPuzzleProps {
    * whether they belong on its win screen or in a panel under the puzzle.
    */
   winActions?: ReactNode;
+  /**
+   * Keep the win inline rather than on the win screen. Set by the tutorial,
+   * whose lessons point at the bit grid a modal would cover. Chocolate has no
+   * inline win to fall back to and always uses the screen.
+   */
+  winInline?: boolean;
   /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
   asChocolate?: boolean;
   /**
@@ -42,6 +48,7 @@ const PlayPuzzle = ({
   onWin,
   onShareWin,
   winActions,
+  winInline = false,
   asChocolate = false,
   placement,
 }: PlayPuzzleProps) => {
@@ -257,6 +264,7 @@ const PlayPuzzle = ({
           onWin={handleWin}
           onShareWin={handleShareWin}
           winActions={winActions}
+          winInline={winInline}
           bitButtonWidthPx={32}
         />
       }
@@ -266,6 +274,7 @@ const PlayPuzzle = ({
           onWin={handleWin}
           onShareWin={handleShareWin}
           winActions={winActions}
+          winInline={winInline}
           bitButtonWidthPx={32}
         />
       }

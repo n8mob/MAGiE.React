@@ -39,7 +39,7 @@ export const MENU_NAME_MAP: Record<string, MenuNameInfo> = {
   },
   tutorial: {
     shortName: "tutorial",
-    fullName: "Tutorial-June2025",
+    fullName: "tute-2026-08",
     displayName: "Tutorial",
     titleNode: (
       <div className={'menu-title'}>

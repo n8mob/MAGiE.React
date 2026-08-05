@@ -33,6 +33,29 @@
   text-align: left;
 }
 
+/* The answer, sitting between the clue that asked for it and the message that
+   replies. Set apart from the prose either side so the transcript reads as a
+   conversation rather than one block of narration. */
+.win-screen-answer {
+  margin: 0.6em 0;
+  color: #008080;
+  /* Chocolate hands in one span per letter, so a space between words is a span
+     of its own. Normal white-space handling would collapse it against its
+     neighbours and run the words together. */
+  white-space: pre-wrap;
+}
+
+/* Chocolate hands in the message the player actually gleaned rather than the one
+   on the card — in Dessert a run is won by surviving, not by being right. Same
+   teal and purple the bit sprites and letter annotations use. */
+.win-screen-answer .answer-correct {
+  color: #008080;
+}
+
+.win-screen-answer .answer-incorrect {
+  color: #6a4fa0;
+}
+
 /* Mode-specific scoring, laid out as a row of readings across the top. */
 .win-screen-stats {
   display: flex;

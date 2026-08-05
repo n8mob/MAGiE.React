@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import { EncodePuzzle } from "../components/EncodePuzzle";
 import { DecodePuzzle } from "../components/DecodePuzzle";
 import { fiveBitA1 } from "../encoding/FiveBitA1";
+import { isTutorialContent } from "../tutorialContent";
 import { Puzzle } from "../model";
 
 /*
@@ -101,6 +102,49 @@ describe("a win the player earned (#227)", () => {
     typeText("HI");
 
     expect(container.querySelector(".keyboard")).to.equal(null);
+  });
+});
+
+describe("tutorial content keeps its win inline", () => {
+  it("gives a tutorial puzzle no dialog even on a win it earned", () => {
+    const { container } = render(
+      <DecodePuzzle puzzle={puzzle()} bitButtonWidthPx={32} winActions={nextButton} winInline={true} />
+    );
+
+    typeText("HI");
+
+    // Its lessons point at the bit grid — "SEE HOW THE BIT WENT FROM PURPLE TO
+    // GREEN?" — so a modal would cover the thing being taught.
+    expect(dialog(container)).to.equal(null);
+    expect(winMessagePanel(container)?.textContent).to.contain("WELL DONE");
+    expect(nextButtons(container)[0].closest("dialog")).to.equal(null);
+  });
+
+  it("still gives the same puzzle a win screen outside the tutorial", () => {
+    const { container } = render(
+      <DecodePuzzle puzzle={puzzle()} bitButtonWidthPx={32} winActions={nextButton} />
+    );
+
+    typeText("HI");
+
+    expect(isShowing(container)).to.equal(true);
+  });
+});
+
+describe("isTutorialContent", () => {
+  it("matches wherever the word turns up", () => {
+    expect(isTutorialContent("tutorial")).to.equal(true);
+    expect(isTutorialContent(undefined, "Tutorial-June2025")).to.equal(true);
+    expect(isTutorialContent(null, undefined, "How To Play", "", "tutorial-demo-1")).to.equal(true);
+  });
+
+  it("does not match the checked-in vintage content, which never says it", () => {
+    // Worth pinning: in docs/VintagePuzzles.json the word appears in no menu
+    // name, category, level slug or puzzle slug. Only the route says "tutorial",
+    // which is why menuName is passed in as the first candidate.
+    expect(isTutorialContent(
+      "bigGame", "VintagePuzzles", "Bits Intro", "THIS IS A BIT", "this-is-a-bit-combo",
+    )).to.equal(false);
   });
 });
 
