@@ -60,7 +60,20 @@ describe("DatePlay auto-win", () => {
     vi.mocked(getDailyPuzzleForDate).mockResolvedValue(dailyPuzzle("HI"));
     renderDate();
 
-    expect(await screen.findByRole("button", { name: /share your win/i })).to.not.equal(null);
+    /*
+     * Three seconds rather than the default one.
+     *
+     * The puzzle mounts unsolved for a render before useBasePuzzle's judging
+     * effect flips hasWon, so the 30-key on-screen keyboard is on screen for
+     * part of this wait — and a byRole query with a name recomputes accessible
+     * names across every one of those buttons on each 50ms poll. It comfortably
+     * fits a second on an idle machine and misses it under a loaded suite: this
+     * passed alone and failed in a full run, repeatedly. Nothing about what is
+     * being asserted changes, only how long it is given to arrive.
+     */
+    expect(
+      await screen.findByRole("button", { name: /share your win/i }, { timeout: 3000 })
+    ).to.not.equal(null);
   });
 
   it("does not show them on a daily puzzle that arrives unsolved", async () => {
