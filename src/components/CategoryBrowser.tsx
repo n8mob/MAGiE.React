@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
-import { MENU_NAME_MAP } from "../MenuNames.tsx";
 import ReactGA4 from "react-ga4";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { categoryTitle } from "../pageTitles.ts";
@@ -55,8 +54,7 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
 
     setHeaderContent(
       <div className={'menu-title'}>
-        <Link to={`/${menuName}/`}><h3>{MENU_NAME_MAP[menuName]?.shortName ?? menuName}</h3></Link>
-        <p>{category?.name}</p>
+        <h3><Link to={`/${menuName}/`}>⏏&nbsp;</Link>{category?.name}</h3>
       </div>
     );
   }, [menuName, menu, categoryIndex, setHeaderContent, error, loading, categoryIndexParam, category?.name, category]);

@@ -173,7 +173,6 @@ h3 {
   min-height: 0;    /* Important for flex children! */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   text-align: left;
-  padding: 1em 0;
 }
 
 #game-content #main-display {

@@ -111,9 +111,7 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     if (category?.name && level) {
       setHeaderContent(
         <div className={'menu-title'}>
-          <h3><Link to={`/${menuName}/${categoryIndex}`}>{category.name}</Link></h3>
-          <h3 className="level-item">
-            <Link to={`/${menuName}/${categoryIndex}/levels/${levelNumber}`}>{level.levelName.join(" ")}</Link></h3>
+          <h3><Link to={`/${menuName}/${categoryIndex}`}>⏏&nbsp;</Link>{level.levelName.join(" ")}</h3>
         </div>
       );
     }

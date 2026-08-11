@@ -8,11 +8,11 @@
 
 .chocolate-hud {
   display: flex;
+  font-size: smaller;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  padding: 0.25em 0.5em;
   /* Stay visible while the player scrolls ahead of the conveyor edge. */
   position: sticky;
   top: 0;
@@ -23,7 +23,7 @@
 /* Fast-forward ("cue") — hold to zoom the belt ahead. touch-action/user-select
    off so a press-and-hold doesn't select text or fire the long-press menu. */
 .chocolate-cue {
-  font-size: 1.25rem;
+  font-size: small;
   line-height: 1;
   padding: 0.45em 0.6em;
   cursor: pointer;
