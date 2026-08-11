@@ -1,7 +1,8 @@
 @font-face {
   font-family: "HD44780";
   /*noinspection CssUnknownTarget*/
-  src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");
+  /*src: url("/fonts/hd44780a00-5x8.otf.woff2") format("woff2");*/
+  src: url("/fonts/hd44780a00-5x8-20260811.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
