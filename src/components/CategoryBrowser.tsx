@@ -65,9 +65,8 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
     <div id={'category'}>
       <div className={'menu-list'}>
         <ol>
-          {category?.levels.map((level, i) => {
-            const hasNumbers = /^[\d\W]/.test(level.levelName[0]); // starts with digit or symbol
-            return <li key={level.levelNumber} className={hasNumbers ? 'numbered-item' : undefined}>
+          {category?.levels.map((level) => {
+            return <li key={level.levelNumber}>
               <Link
                 to={`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}
                 onClick={() => ReactGA4.event('level_selected', {
@@ -76,7 +75,7 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
                   level_number: level.levelNumber,
                   level_name: level.levelName.join(' '),
                 })}
-              >{!hasNumbers ? `${i+1}. ` : ''}{level.levelName.join("\n")}</Link>
+              >{level.levelName.join("\n")}</Link>
             </li>
           })
           }
