@@ -51,17 +51,23 @@ const EncodePuzzle: FC<PuzzleProps> = (
   const winsInline = isAutoWin || winInline;
 
   const appendBit = useCallback((bit: "0" | "1") => {
+    if (hasWon) {
+      return;
+    }
     setGuessBits(prev => prev.appendBit(bit));
-  }, []);
+  }, [hasWon]);
 
   const deleteBit = useCallback(() => {
+    if (hasWon) {
+      return;
+    }
     setGuessBits(prev => prev.slice(0, -1));
-  }, []);
+  }, [hasWon]);
 
   // Handle key down for entering bits from the 1 and 0 keys
   // (and backspace for deleting bits)
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!puzzle) {
+    if (!puzzle || hasWon) {
       return;
     }
     switch (event.key) {
@@ -77,14 +83,17 @@ const EncodePuzzle: FC<PuzzleProps> = (
       default:
         break;
     }
-  }, [puzzle, appendBit, deleteBit]);
+  }, [puzzle, hasWon, appendBit, deleteBit]);
 
   // Functional update, not guessBits.toggleBit: two taps landing before a
   // re-render would otherwise both read the same stale sequence, so the second
   // one silently discards the first.
   const handleBitToggle = useCallback((index: number) => {
+    if (hasWon) {
+      return;
+    }
     setGuessBits(prev => prev.toggleBit(index));
-  }, [setGuessBits]);
+  }, [hasWon]);
 
   // Attach keydown listener
   useEffect(() => {
@@ -116,6 +125,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
                   judgment.sequenceJudgments[rowIndex]?.bitJudgments?.[indexWithinRow]?.correctness
                   ?? Correctness.unguessed}
                 onBitToggle={handleBitToggle}
+                disabled={hasWon}
               />
             )}
           />

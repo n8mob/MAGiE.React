@@ -335,11 +335,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     (row: number) => judgment.sequenceJudgments[row]?.isSequenceCorrect ?? false,
     [judgment]
   );
-  // Dessert locks correct letters so the conveyor can't shake them loose.
-  const isRowLocked = useCallback(
-    (row: number) => clock === "scroll" && isRowCorrect(row),
-    [clock, isRowCorrect]
-  );
+  // In Dessert, only rows that have crossed the judgment line are locked.
+  // Correct rows ahead of it remain editable until their scoring moment.
   const minEditableBit = clock === "scroll" ? scrolledRows * rowWidth : 0;
 
   // Score and lock the rows that just finished crossing the line, [from, judged).
@@ -496,12 +493,8 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   }, [clock, viewHandedOver, spacerCount]);
 
   const nextEditableBit = useCallback((fromBit: number) => {
-    let index = Math.max(fromBit, minEditableBit);
-    while (index < winBits.length && isRowLocked(rowOf(index))) {
-      index = (rowOf(index) + 1) * rowWidth;
-    }
-    return index;
-  }, [minEditableBit, winBits.length, isRowLocked, rowOf, rowWidth]);
+    return Math.max(fromBit, minEditableBit);
+  }, [minEditableBit]);
 
   const typeBit = useCallback((bit: "0" | "1") => {
     if (runState !== "running") {
@@ -520,29 +513,26 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     if (runState !== "running") {
       return;
     }
-    let index = Math.min(cursor, winBits.length) - 1;
-    while (index >= minEditableBit && isRowLocked(rowOf(index))) {
-      index = rowOf(index) * rowWidth - 1;
-    }
+    const index = Math.min(cursor, winBits.length) - 1;
     if (index < minEditableBit) {
       return;
     }
     setGuessBits(prev => prev.getBit(index).bit === "0" ? prev : prev.toggleBit(index));
     shouldFollowCursor.current = true;
     setCursor(index);
-  }, [runState, cursor, winBits.length, minEditableBit, isRowLocked, rowOf, rowWidth]);
+  }, [runState, cursor, winBits.length, minEditableBit]);
 
   const handleBitToggle = useCallback((index: number) => {
     if (runState !== "running") {
       return;
     }
-    if (index < minEditableBit || isRowLocked(rowOf(index))) {
+    if (index < minEditableBit) {
       return;
     }
     setGuessBits(prev => prev.toggleBit(index));
     shouldFollowCursor.current = true;
     setCursor(index + 1);
-  }, [runState, minEditableBit, isRowLocked, rowOf]);
+  }, [runState, minEditableBit]);
 
   // Cue (fast-forward) held only while the button/key is down and the run is live.
   const startCue = useCallback(() => {
@@ -874,6 +864,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
                   ? Correctness.correct
                   : Correctness.incorrect}
                 onBitToggle={handleBitToggle}
+                disabled={runState !== "running" || bit.index < minEditableBit}
               />
             )}
           />

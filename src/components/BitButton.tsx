@@ -12,6 +12,8 @@ const SYNTHETIC_CLICK_WINDOW_MS = 700;
 
 interface BitButtonProps {
   bit: IndexedBit;
+  /** Prevent every input path from changing this bit. */
+  disabled?: boolean;
   /**
    * Called with the bit's global index when the player toggles it.
    *
@@ -45,6 +47,7 @@ interface BitButtonHandlers {
 function useBitButtonHandlers(
   {
     onBitToggle = () => {},
+    disabled = false,
     playSounds = false,
     onSound = DEFAULT_ON_SOUND,
     offSound = DEFAULT_OFF_SOUND,
@@ -72,6 +75,7 @@ function useBitButtonHandlers(
 
   return {
     onPointerDown: (event: PointerEvent<HTMLInputElement>) => {
+      if (disabled) {return;}
       const input = event.currentTarget;
       // Stop the browser toggling `checked` itself and emitting a compat click.
       // These are controlled checkboxes, so React re-renders the new state.
@@ -80,6 +84,7 @@ function useBitButtonHandlers(
       toggle(input, !input.checked);
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      if (disabled) {return;}
       // Keyboard activation lands here. A change right after our own pointerdown
       // is the synthetic click (possibly retargeted from a neighbour) — drop it.
       if (performance.now() - lastPointerToggle.current < SYNTHETIC_CLICK_WINDOW_MS) {
@@ -91,7 +96,7 @@ function useBitButtonHandlers(
 }
 
 const BitButton: FC<BitButtonProps> = (props) => {
-  const { bit, onClick = () => {} } = props;
+  const { bit, disabled = false, onClick = () => {} } = props;
   const { onPointerDown, onChange } = useBitButtonHandlers(props);
   return (
     <input
@@ -101,6 +106,7 @@ const BitButton: FC<BitButtonProps> = (props) => {
       onChange={onChange}
       onClick={onClick}
       checked={bit.bit === "1"}
+      disabled={disabled}
       data-bit-index={bit.index}
     />
   );
@@ -111,7 +117,7 @@ interface CorrectnessBitButtonProps extends BitButtonProps {
 }
 
 const CorrectnessBitButton: FC<CorrectnessBitButtonProps> = (props) => {
-  const { bit, correctness, onClick = () => {} } = props;
+  const { bit, correctness, disabled = false, onClick = () => {} } = props;
   const { onPointerDown, onChange } = useBitButtonHandlers(props);
   return (
     <input
@@ -121,6 +127,7 @@ const CorrectnessBitButton: FC<CorrectnessBitButtonProps> = (props) => {
       onChange={onChange}
       onClick={onClick}
       checked={bit.bit === "1"}
+      disabled={disabled}
       data-correctness={correctness}
       data-bit-index={bit.index}
     />
