@@ -181,7 +181,7 @@ h3 {
 
 .guess-text-display {
   width: min(100%, 34rem);
-  margin: 0 auto 0.8rem;
+  margin: 0 auto 0.5rem;
   padding: 0.5rem 0.75rem;
   min-height: 2.25rem;
   display: flex;
@@ -225,7 +225,7 @@ h3 {
   display: flex;
   justify-self: end;
   justify-content: center;
-  padding: 1em 0;
+  padding: 0.5em 0 1em;
   flex-direction: column;
 }
 

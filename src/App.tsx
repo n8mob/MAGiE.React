@@ -1,6 +1,6 @@
 import './App.css'
 import scrollCover from './assets/ScrollCover.png'
-import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -25,7 +25,6 @@ import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
 
 const ga4id = 'G-ZL5RKDBBF6';
-const HEADER_COLLAPSE_THRESHOLD = 72;
 const HEADER_EXPAND_GESTURE_DELTA = 44;
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -59,7 +58,6 @@ function RedirectLevelRootToPuzzle0() {
 
 function App() {
   usePageTracking();
-  const location = useLocation();
   const { headerContent, stopwatchDisplay } = useHeader();
   // Temporary, for issue #186. Read straight off the URL so it survives routing.
   const showTouchDiagnostics = new URLSearchParams(window.location.search).get("diag") === "touch";
@@ -68,7 +66,6 @@ function App() {
   const [showHowTo, setShowHowTo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [useLcdFont, setUseLcdFont] = useState(() => (localStorage.getItem('useLcdFont') || 'true') === 'true');
-  const [headerScrollOffset, setHeaderScrollOffset] = useState(0);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const routeContentRef = useRef<HTMLDivElement | null>(null);
   const activeScrollContainer = useRef<HTMLElement | null>(null);
@@ -107,7 +104,6 @@ function App() {
       }
 
       activeScrollContainer.current = scrollTarget;
-      setHeaderScrollOffset(scrollTarget.scrollTop);
     };
 
     routeContent.addEventListener('scroll', handleNestedScroll, true);
@@ -227,16 +223,6 @@ function App() {
     };
   }, [getScrollContainerFromEventTarget, isHeaderCollapsed]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHeaderScrollOffset(0);
-    setIsHeaderCollapsed(false);
-    wheelExpandAccumulator.current = 0;
-    touchStartY.current = null;
-    activeScrollContainer.current = null;
-    routeContentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
-  }, [location.pathname, location.search]);
-
   const expandHeader = useCallback(() => {
     setIsHeaderCollapsed(false);
     wheelExpandAccumulator.current = 0;
@@ -247,23 +233,6 @@ function App() {
     }
     scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
-
-  const canCollapseHeader = Boolean(headerContent && stopwatchDisplay);
-
-  useEffect(() => {
-    if (!canCollapseHeader) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsHeaderCollapsed(false);
-      return;
-    }
-
-    setIsHeaderCollapsed((previousState) => {
-      if (!previousState && headerScrollOffset >= HEADER_COLLAPSE_THRESHOLD) {
-        return true;
-      }
-      return previousState;
-    });
-  }, [canCollapseHeader, headerScrollOffset]);
 
   const routes = useMemo(() => (
     <Routes>

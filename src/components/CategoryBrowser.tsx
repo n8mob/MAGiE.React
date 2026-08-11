@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useHeader } from "../hooks/useHeader.ts";
 import { useMenu } from "../hooks/useMenu.tsx";
 import { useCategory } from "../hooks/useCategory.tsx";
-import { MENU_NAME_MAP } from "../MenuNames.tsx";
 import ReactGA4 from "react-ga4";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { categoryTitle } from "../pageTitles.ts";
@@ -55,8 +54,7 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
 
     setHeaderContent(
       <div className={'menu-title'}>
-        <Link to={`/${menuName}/`}><h3>{MENU_NAME_MAP[menuName]?.shortName ?? menuName}</h3></Link>
-        <p>{category?.name}</p>
+        <h3><Link to={`/${menuName}/`}>⏏&nbsp;</Link>{category?.name}</h3>
       </div>
     );
   }, [menuName, menu, categoryIndex, setHeaderContent, error, loading, categoryIndexParam, category?.name, category]);
@@ -65,9 +63,8 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
     <div id={'category'}>
       <div className={'menu-list'}>
         <ol>
-          {category?.levels.map((level, i) => {
-            const hasNumbers = /^[\d\W]/.test(level.levelName[0]); // starts with digit or symbol
-            return <li key={level.levelNumber} className={hasNumbers ? 'numbered-item' : undefined}>
+          {category?.levels.map((level) => {
+            return <li key={level.levelNumber}>
               <Link
                 to={`/${menuName}/${categoryIndex}/levels/${level.levelNumber}/puzzles/0`}
                 onClick={() => ReactGA4.event('level_selected', {
@@ -76,7 +73,7 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
                   level_number: level.levelNumber,
                   level_name: level.levelName.join(' '),
                 })}
-              >{!hasNumbers ? `${i+1}. ` : ''}{level.levelName.join("\n")}</Link>
+              >{level.levelName.join("\n")}</Link>
             </li>
           })
           }
