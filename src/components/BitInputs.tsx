@@ -1,4 +1,5 @@
 import { FC, useCallback } from "react";
+import { KeyboardKey } from "./KeyboardKey.tsx";
 import "./OnScreenKeyboard.css";
 import "./BitInputs.css";
 
@@ -105,22 +106,13 @@ const BitInputs: FC<BitInputsProps> = (
     <div className="bit-buttons">
       <div className="keyboard-row" role="group" aria-label="Bit input">
         {BIT_KEYS.map((key) => (
-          <button
-            type="button"
+          <KeyboardKey
             key={key.id}
-            className="keyboard-key"
-            onClick={() => handlePress(key)}
+            ariaLabel={key.ariaLabel}
+            assetUrl={key.assetUrl}
             disabled={disabled}
-            aria-label={key.ariaLabel}
-          >
-            <img
-              src={key.assetUrl}
-              alt=""
-              aria-hidden="true"
-              draggable={false}
-              className="keyboard-key-image"
-            />
-          </button>
+            onPress={() => handlePress(key)}
+          />
         ))}
       </div>
     </div>

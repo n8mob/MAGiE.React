@@ -13,7 +13,17 @@
   gap: clamp(0.15rem, 0.9vw, 0.3rem);
 }
 
+/* On the key rather than on .keyboard, because the bit inputs are a keyboard too
+   and do not use that class — which is exactly how they ended up without it.
+   touch-action: manipulation is the load-bearing one: left to its defaults, the
+   browser keeps double-tap-zoom detection alive and evaluates fast repeat taps
+   as candidate double-taps, delivering them bunched. Entering a long run of one
+   bit then sounds in pairs rather than evenly. */
 .keyboard-key {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   margin: 0;
   padding: 0;
   border: none;

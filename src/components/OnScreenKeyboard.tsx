@@ -1,4 +1,5 @@
 import { FC, useCallback } from "react";
+import { KeyboardKey } from "./KeyboardKey.tsx";
 import "./OnScreenKeyboard.css";
 
 type KeyboardAction = "append" | "delete" | "return";
@@ -124,22 +125,13 @@ const OnScreenKeyboard: FC<OnScreenKeyboardProps> = (
       {KEY_ROWS.map((keyRow, rowIndex) => (
         <div className="keyboard-row" key={`keyboard-row-${rowIndex}`}>
           {keyRow.map((key) => (
-            <button
-              type="button"
+            <KeyboardKey
               key={key.id}
-              className="keyboard-key"
-              onClick={() => handlePress(key)}
+              ariaLabel={key.ariaLabel}
+              assetUrl={key.assetUrl}
               disabled={disabled}
-              aria-label={key.ariaLabel}
-            >
-              <img
-                src={key.assetUrl}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                className="keyboard-key-image"
-              />
-            </button>
+              onPress={() => handlePress(key)}
+            />
           ))}
         </div>
       ))}
