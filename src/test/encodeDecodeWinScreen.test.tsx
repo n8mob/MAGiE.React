@@ -95,6 +95,23 @@ describe("a win the player earned (#227)", () => {
     expect(nextButtons(dialog(container)!)).to.have.lengthOf(1);
   });
 
+  it("locks every Encode bit once the puzzle is won", () => {
+    const { container } = render(
+      <EncodePuzzle puzzle={puzzle({ type: "Encode" })} bitButtonWidthPx={32} />
+    );
+
+    typeBits("HI");
+
+    const bits = [...container.querySelectorAll<HTMLInputElement>(".bit-checkbox")];
+    expect(bits).to.have.lengthOf(fiveBitA1.encodeText("HI").length);
+    expect(bits.every(bit => bit.disabled)).to.equal(true);
+
+    const solvedBits = bits.map(bit => bit.checked);
+    fireEvent.keyDown(window, { key: "Backspace" });
+    fireEvent.pointerDown(bits[0]);
+    expect(bits.map(bit => bit.checked)).to.deep.equal(solvedBits);
+  });
+
   it("takes the on-screen keyboard away once there is nothing left to type", () => {
     const { container } = render(<DecodePuzzle puzzle={puzzle()} bitButtonWidthPx={32} />);
     expect(container.querySelector(".keyboard")).to.not.equal(null);

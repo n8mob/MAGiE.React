@@ -100,6 +100,30 @@ describe("the win screen (#227)", () => {
     expect(isShowing(container)).to.equal(true);
   });
 
+  it("locks every Taste bit once the puzzle is won", () => {
+    const { container } = renderChocolate(puzzle({ clock: "none" }));
+    solve("A");
+
+    const bits = [...container.querySelectorAll<HTMLInputElement>(".bit-checkbox")];
+    expect(bits).to.have.lengthOf(fiveBitA1.encodeText("A").length);
+    expect(bits.every(bit => bit.disabled)).to.equal(true);
+  });
+
+  it("keeps a correct Dessert row editable until it crosses the judgment line", () => {
+    const { container } = renderChocolate(puzzle({ winText: "AB" }));
+    solve("A");
+
+    const firstRow = container.querySelector(".bit-field p.letter-correct");
+    const firstBit = firstRow?.querySelector<HTMLInputElement>(".bit-checkbox");
+    expect(firstBit).to.not.equal(null);
+    expect(firstBit?.disabled).to.equal(false);
+
+    fireEvent.pointerDown(firstBit!, { pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(firstBit!, { pointerId: 1, clientX: 10, clientY: 10 });
+
+    expect(firstRow?.classList.contains("letter-incorrect")).to.equal(true);
+  });
+
   it("is not showing before the puzzle is solved", () => {
     const { container } = renderChocolate(puzzle());
 

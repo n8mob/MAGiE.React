@@ -328,6 +328,23 @@ input.bit-checkbox:checked {
   background-image: url('assets/Bit_on.png');
 }
 
+/* A disabled bit is frozen, not visually de-emphasized. Mobile Safari can
+   reintroduce native disabled-control paint (most visibly on checked inputs)
+   even though the checkbox has a custom image and appearance: none. Restate
+   the complete visual reset for this state while retaining the real disabled
+   attribute for semantics and input blocking. */
+input.bit-checkbox:disabled {
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 0.85;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  -webkit-text-fill-color: currentColor;
+  cursor: default;
+}
+
 input[data-correctness="unguessed"] {
   background-image: url("assets/Bit_off_Yellow.png");
 }
