@@ -9,6 +9,9 @@ import { DEFAULT_OFF_SOUND, DEFAULT_ON_SOUND } from "../hooks/useBitSounds.ts";
  * Only has to outlast the browser's synthetic-click delay, not a real gesture.
  */
 const SYNTHETIC_CLICK_WINDOW_MS = 700;
+// Deliberately generous: finger wobble and tiny attempted scroll adjustments
+// should still count as a tap. A real vertical pan quickly exceeds this.
+const TAP_MOVE_TOLERANCE_PX = 18;
 
 interface BitButtonProps {
   bit: IndexedBit;
@@ -17,12 +20,12 @@ interface BitButtonProps {
   /**
    * Called with the bit's global index when the player toggles it.
    *
-   * Fires on pointerdown rather than the checkbox's change event. Tapping two
+   * Uses the pointer gesture rather than the checkbox's change event. Tapping two
    * neighbouring bits quickly makes mobile Safari retarget the second tap's
    * synthetic click onto the first bit, which toggles that bit back off and
    * leaves the second one untouched — the whole gesture reads as unresponsive.
-   * pointerdown/touchstart always carry the true target, so we act on those and
-   * swallow the synthetic click that follows. See issue #186.
+   * We remember the true pointer target, commit on pointerup only if it did not
+   * become a scroll, and swallow the synthetic click that follows. See #186.
    */
   onBitToggle?: (bitIndex: number) => void;
   onClick?: MouseEventHandler<HTMLInputElement>;
@@ -40,6 +43,9 @@ interface BitButtonProps {
 
 interface BitButtonHandlers {
   onPointerDown: (event: PointerEvent<HTMLInputElement>) => void;
+  onPointerMove: (event: PointerEvent<HTMLInputElement>) => void;
+  onPointerUp: (event: PointerEvent<HTMLInputElement>) => void;
+  onPointerCancel: (event: PointerEvent<HTMLInputElement>) => void;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -54,6 +60,12 @@ function useBitButtonHandlers(
     soundVolume = 0.25,
   }: BitButtonProps): BitButtonHandlers {
   const lastPointerToggle = useRef(0);
+  const activePointer = useRef<{
+    id: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+  } | null>(null);
 
   useEffect(() => {
     if (!playSounds) {return;}
@@ -76,12 +88,38 @@ function useBitButtonHandlers(
   return {
     onPointerDown: (event: PointerEvent<HTMLInputElement>) => {
       if (disabled) {return;}
-      const input = event.currentTarget;
-      // Stop the browser toggling `checked` itself and emitting a compat click.
-      // These are controlled checkboxes, so React re-renders the new state.
+      activePointer.current = {
+        id: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        moved: false,
+      };
+      // Suppress the compatibility change even when this gesture becomes a pan.
+      lastPointerToggle.current = performance.now();
+    },
+    onPointerMove: (event: PointerEvent<HTMLInputElement>) => {
+      const active = activePointer.current;
+      if (!active || active.id !== event.pointerId || active.moved) {return;}
+      const dx = event.clientX - active.startX;
+      const dy = event.clientY - active.startY;
+      if (dx * dx + dy * dy > TAP_MOVE_TOLERANCE_PX * TAP_MOVE_TOLERANCE_PX) {
+        active.moved = true;
+      }
+    },
+    onPointerUp: (event: PointerEvent<HTMLInputElement>) => {
+      const active = activePointer.current;
+      activePointer.current = null;
+      if (disabled || !active || active.id !== event.pointerId || active.moved) {return;}
+      // This was a tap. Prevent the checkbox's compatibility click/change from
+      // applying the same gesture a second time; React owns `checked`.
       event.preventDefault();
       lastPointerToggle.current = performance.now();
-      toggle(input, !input.checked);
+      toggle(event.currentTarget, !event.currentTarget.checked);
+    },
+    onPointerCancel: (event: PointerEvent<HTMLInputElement>) => {
+      if (activePointer.current?.id === event.pointerId) {
+        activePointer.current = null;
+      }
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
       if (disabled) {return;}
@@ -97,13 +135,12 @@ function useBitButtonHandlers(
 
 const BitButton: FC<BitButtonProps> = (props) => {
   const { bit, disabled = false, onClick = () => {} } = props;
-  const { onPointerDown, onChange } = useBitButtonHandlers(props);
+  const handlers = useBitButtonHandlers(props);
   return (
     <input
       type="checkbox"
       className="bit-checkbox"
-      onPointerDown={onPointerDown}
-      onChange={onChange}
+      {...handlers}
       onClick={onClick}
       checked={bit.bit === "1"}
       disabled={disabled}
@@ -118,13 +155,12 @@ interface CorrectnessBitButtonProps extends BitButtonProps {
 
 const CorrectnessBitButton: FC<CorrectnessBitButtonProps> = (props) => {
   const { bit, correctness, disabled = false, onClick = () => {} } = props;
-  const { onPointerDown, onChange } = useBitButtonHandlers(props);
+  const handlers = useBitButtonHandlers(props);
   return (
     <input
       type="checkbox"
       className="bit-checkbox"
-      onPointerDown={onPointerDown}
-      onChange={onChange}
+      {...handlers}
       onClick={onClick}
       checked={bit.bit === "1"}
       disabled={disabled}

@@ -118,7 +118,8 @@ describe("the win screen (#227)", () => {
     expect(firstBit).to.not.equal(null);
     expect(firstBit?.disabled).to.equal(false);
 
-    fireEvent.pointerDown(firstBit!);
+    fireEvent.pointerDown(firstBit!, { pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(firstBit!, { pointerId: 1, clientX: 10, clientY: 10 });
 
     expect(firstRow?.classList.contains("letter-incorrect")).to.equal(true);
   });

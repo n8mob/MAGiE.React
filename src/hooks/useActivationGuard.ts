@@ -4,7 +4,8 @@ import { MouseEvent, useRef } from "react";
  * Guards a control that appears in response to a pointer event which landed
  * somewhere else.
  *
- * Bits toggle on pointerdown rather than click (see BitButton, issue #186), so
+ * Bits resolve their own pointer gesture rather than using click (see BitButton,
+ * issue #186), so
  * the winning tap re-renders the DOM while the player's finger is still down.
  * The click that follows is hit-tested against the *new* layout — and on touch
  * the browser synthesises that click at the touch point after touchend — so it
