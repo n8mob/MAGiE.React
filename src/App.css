@@ -328,6 +328,18 @@ input.bit-checkbox:checked {
   background-image: url('assets/Bit_on.png');
 }
 
+/* Fixed-width Encode uses this same value for both rendering and row splitting. */
+.puzzle-fitted-display input.bit-checkbox {
+  width: var(--puzzle-bit-size, 32px);
+  height: var(--puzzle-bit-size, 32px);
+}
+
+.puzzle-fitted-game #clue-text,
+.puzzle-fitted-game #win-message {
+  font-size: var(--puzzle-prose-size, 1rem);
+  white-space: nowrap;
+}
+
 /* A disabled bit is frozen, not visually de-emphasized. Mobile Safari can
    reintroduce native disabled-control paint (most visibly on checked inputs)
    even though the checkbox has a custom image and appearance: none. Restate

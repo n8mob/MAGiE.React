@@ -112,7 +112,7 @@
 /* Clue text reads as prose, not as a decoded letter: full row width, left
    aligned, and larger than the per-letter annotation it borrows its markup from. */
 .chocolate-display .conveyor-clue .annotation {
-  font-size: calc(var(--chocolate-bit-size, 40px) * 0.45);
+  font-size: var(--puzzle-prose-size, calc(var(--chocolate-bit-size, 40px) * 0.45));
   color: #142124;
   text-align: left;
 }

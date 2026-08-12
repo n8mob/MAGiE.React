@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, useCallback, useEffect, useMemo, useState } from "react";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { BitInputs } from "./BitInputs.tsx";
 import { GuessDisplay } from "./GuessDisplay.tsx";
@@ -8,6 +8,8 @@ import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { WinScreen } from "./WinScreen.tsx";
+import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
+import { usePuzzleProseSizing } from "../hooks/usePuzzleDisplaySizing.ts";
 
 const EncodePuzzle: FC<PuzzleProps> = (
   {
@@ -32,14 +34,20 @@ const EncodePuzzle: FC<PuzzleProps> = (
     displayRows,
     judgment,
     hasWon,
-    isAutoWin
+    isAutoWin,
+    effectiveBitButtonWidthPx
   } = useBasePuzzle({
     puzzle,
     guessBits,
     onWin,
     onShareWin,
-    bitButtonWidthPx
+    bitButtonWidthPx,
+    maximizeFixedWidthBits: puzzle.encoding instanceof FixedWidthEncoder
   });
+  const proseStyle = usePuzzleProseSizing(
+    mainDisplayRef,
+    [...(puzzle.clue ?? []), ...(puzzle.winMessage ?? [])]
+  );
 
   /*
    * Two roads to the same place. An auto-win screen arrives already solved, so
@@ -108,8 +116,19 @@ const EncodePuzzle: FC<PuzzleProps> = (
 
   return (
     <>
-      <div id="game-content">
-        <div id="main-display" className="display" ref={mainDisplayRef}>
+      <div
+        id="game-content"
+        className="puzzle-fitted-game"
+        style={{
+          ...proseStyle,
+          "--puzzle-bit-size": `${effectiveBitButtonWidthPx}px`
+        } as CSSProperties}
+      >
+        <div
+          id="main-display"
+          className="display puzzle-fitted-display"
+          ref={mainDisplayRef}
+        >
           <div id="clue-text">
             {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
           </div>

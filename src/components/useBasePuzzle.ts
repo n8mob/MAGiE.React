@@ -40,6 +40,7 @@ export interface UseBasePuzzleProps {
   onWin: () => void;
   onShareWin: () => void;
   bitButtonWidthPx: number;
+  maximizeFixedWidthBits?: boolean;
 }
 
 export function useBasePuzzle(
@@ -47,13 +48,22 @@ export function useBasePuzzle(
     puzzle,
     guessBits,
     onWin,
-    bitButtonWidthPx
+    bitButtonWidthPx,
+    maximizeFixedWidthBits = false
   }: UseBasePuzzleProps
 ) {
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const puzzleInputsRef = useRef<HTMLDivElement>(null);
   const [displayWidthInPx, setDisplayWidthInPx] = useState<number>(window.innerWidth);
+  const effectiveBitButtonWidthPx = useMemo(() => {
+    if (!maximizeFixedWidthBits || !(puzzle?.encoding instanceof FixedWidthEncoder)) {
+      return bitButtonWidthPx;
+    }
+    const characterWidth = puzzle.encoding.encodeChar(" ").length;
+    const fitted = Math.floor(displayWidthInPx / (characterWidth + 0.75));
+    return Math.min(56, Math.max(bitButtonWidthPx, fitted));
+  }, [bitButtonWidthPx, displayWidthInPx, maximizeFixedWidthBits, puzzle]);
 
   // Individual state variables
   const [judgment, setJudgment] = useState<FullJudgment>(new FullJudgment(false, BitSequence.empty(), []));
@@ -62,11 +72,11 @@ export function useBasePuzzle(
   const [updating, setUpdating] = useState<boolean>(false);
   const displayWidthInBitCount = useMemo(() => {
     if (displayWidthInPx && displayWidthInPx > 0) {
-      return Math.floor(displayWidthInPx / bitButtonWidthPx);
+      return Math.floor(displayWidthInPx / effectiveBitButtonWidthPx);
     }
     // Default to 13 bits if calculation fails.
     return 13;
-  }, [bitButtonWidthPx, displayWidthInPx]);
+  }, [effectiveBitButtonWidthPx, displayWidthInPx]);
 
   const winBits = useMemo(() => {
     if (!puzzle || !puzzle.winText) {
@@ -114,9 +124,19 @@ export function useBasePuzzle(
 
     updateDisplayWidth();
 
+    const element = displayMatrixRef.current?.getBitFieldElement?.();
+    const observer = element && typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(updateDisplayWidth)
+      : undefined;
+    if (element) {
+      observer?.observe(element);
+    }
     window.addEventListener("resize", updateDisplayWidth);
 
-    return () => window.removeEventListener("resize", updateDisplayWidth);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateDisplayWidth);
+    };
   }, []);
 
   // Judge setup
@@ -256,6 +276,7 @@ export function useBasePuzzle(
     setBitDisplayWidthPx: setDisplayWidthInPx,
     displayWidth: displayWidthInBitCount,
     judge,
-    isAutoWin
+    isAutoWin,
+    effectiveBitButtonWidthPx
   };
 }
