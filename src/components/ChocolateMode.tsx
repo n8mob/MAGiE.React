@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGA4 from "react-ga4";
 import { CorrectnessBitButton } from "./BitButton.tsx";
 import { PuzzleProps } from "./useBasePuzzle";
@@ -12,14 +12,16 @@ import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { WinScreen } from "./WinScreen.tsx";
 import "./Chocolate.css";
+import { useMaximizedBitSize, usePuzzleProseSizing } from "../hooks/usePuzzleDisplaySizing.ts";
 
 // The conveyor speeds up by scrollAccel rows/sec each time this many rows scroll off.
 const ACCEL_EVERY_ROWS = 10;
 const MIN_SCROLL_SPEED = 0.05;
-// Where the fixed judgment line sits, as a fraction of the belt height below the
-// HUD. A row is judged only once its BOTTOM edge rises past this line, so a row
-// still touching it is fair game. Tune by eye.
-const LINE_POSITION = 0.2;
+// Where the fixed judgment line sits, measured in letter-row pitches from the
+// top of the visible display. The HUD is allowed to consume some of that depth;
+// the line is never placed behind it. A row is judged only once its BOTTOM edge
+// rises past this line, so a row still touching it is fair game.
+const JUDGMENT_LINE_ROWS_FROM_TOP = 2;
 // How much the "cue" (fast-forward) button multiplies belt speed while held.
 const CUE_SPEED_MULTIPLIER = 12;
 // Rewind: after the run, the belt runs backwards to bring the clue into view.
@@ -166,6 +168,17 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const lossReported = useRef(false);
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
+  const bitSize = useMaximizedBitSize(mainDisplayRef, 5, 48, 40, 56);
+  const proseStyle = usePuzzleProseSizing(
+    mainDisplayRef,
+    [...clueLines, ...(puzzle.winMessage ?? [])]
+  );
+  useLayoutEffect(() => {
+    // Row pitch is part of the conveyor's scoring geometry, so a resize must
+    // invalidate the old measurement before the animation continues.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMeasured(false);
+  }, [bitSize]);
   const rowPitchRef = useRef(32);
   // judgedCount = floor(s + judgeOffset). Folds in the line depth and the runway
   // so that at s = 0 nothing is judged. Constant once measured.
@@ -310,9 +323,16 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
      * of it before the player looked.
      */
     const targetDepth = Math.max(Math.floor(beltRows) - 1, 1);
-    const minRunway = Math.max(Math.round(LINE_POSITION * beltRows), 1);
+    const lineTopPx = Math.min(
+      container.clientHeight,
+      Math.max(hudHeight, JUDGMENT_LINE_ROWS_FROM_TOP * pitch)
+    );
+    // Keep the long-clue fallback tied to the same measured line used for
+    // painting and scoring. ceil ensures the first clue row starts wholly above
+    // neither the line nor the visible belt origin.
+    const lineDepthRows = (lineTopPx - beltTopPx) / pitch;
+    const minRunway = Math.max(Math.ceil(lineDepthRows), 1);
     const runway = Math.max(targetDepth - clueRowCount, minRunway);
-    const lineTopPx = hudHeight + LINE_POSITION * conveyorVisibleHeight;
     rowPitchRef.current = pitch;
     // Runway and clue rows must both be exactly one pitch tall, or the
     // uniform-pitch transform model drifts by their combined error. Feed the
@@ -804,8 +824,12 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     <div id="game-content">
       <div
         id="main-display"
-        className={`display chocolate-display${conveyorDrivesView ? " conveyor-locked" : ""}`}
+        className={`display chocolate-display puzzle-fitted-display${conveyorDrivesView ? " conveyor-locked" : ""}`}
         ref={mainDisplayRef}
+        style={{
+          ...proseStyle,
+          "--chocolate-bit-size": `${bitSize}px`
+        } as CSSProperties}
         // Covers the HUD too, which sits outside the bit grid's own handler.
         onContextMenu={event => event.preventDefault()}
       >
