@@ -1,3 +1,5 @@
+const TUTORIAL = /tutorial/i;
+
 /**
  * Does this puzzle belong to the tutorial?
  *
@@ -23,8 +25,6 @@
  * carry one; the fourteen-odd puzzles that need it are listed in the #227
  * discussion.
  */
-const TUTORIAL = /tutorial/i;
-
 export function isTutorialContent(...candidates: (string | null | undefined)[]): boolean {
   return candidates.some(candidate => !!candidate && TUTORIAL.test(candidate));
 }
