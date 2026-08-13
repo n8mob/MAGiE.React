@@ -67,12 +67,19 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
   );
 
   const nextPuzzleIndex = puzzleIndex + 1;
+
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
 
   const linkAfterWin = { to: "", text: "" };
   if (isLastInLevel) {
-    linkAfterWin.to = `/${menuName}/${categoryIndex}`;
-    linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+    const isTutorialLevel = !!level && isTutorialContent(menuName, category?.name, level.levelName.join(" "), currentPuzzle?.slug);
+    if (isTutorialLevel) {
+      linkAfterWin.to = "/today";
+      linkAfterWin.text = "▶▶ Fast-Forward to Today's puzzle?";
+    } else {
+      linkAfterWin.to = `/${menuName}/${categoryIndex}`;
+      linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+    }
   } else {
     linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
     linkAfterWin.text = "Next ▶▶";
