@@ -54,7 +54,15 @@ function CategoryBrowser({ menuName }: { menuName: string }) {
 
     setHeaderContent(
       <div className={'menu-title'}>
-        <h3><Link to={`/${menuName}/`}>⏏&nbsp;</Link>{category?.name}</h3>
+        <h3 className="menu-title-row">
+          <Link
+            className="symbol-button puzzle-symbol-button"
+            to={`/${menuName}/`}
+            aria-label={`Back to ${menuName} menu`}
+          >⏏</Link>
+          <span>{category?.name}</span>
+          <span className="menu-title-balance" aria-hidden="true" />
+        </h3>
       </div>
     );
   }, [menuName, menu, categoryIndex, setHeaderContent, error, loading, categoryIndexParam, category?.name, category]);

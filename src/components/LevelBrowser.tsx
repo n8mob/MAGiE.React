@@ -33,9 +33,19 @@ function LevelBrowser({ menuName }: { menuName: string }) {
       return;
     }
 
-    setHeaderContent(<div className={'menu-title'}><h3><Link to={`/${menuName}/${categoryIndex}`}>{category.name}</Link></h3>
-      {level.levelName.map((nameLine, i) => <h3 key={i}>{nameLine}</h3>)}
-    </div>);
+    setHeaderContent(
+      <div className="menu-title">
+        <h3 className="menu-title-row">
+          <Link
+            className="symbol-button puzzle-symbol-button"
+            to={`/${menuName}/${categoryIndex}`}
+            aria-label={`Back to ${category.name}`}
+          >⏏</Link>
+          <span>{level.levelName.join(" ")}</span>
+          <span className="menu-title-balance" aria-hidden="true" />
+        </h3>
+      </div>
+    );
 
   }, [category, categoryIndex, level, levelNumber, menuName, setHeaderContent]);
 

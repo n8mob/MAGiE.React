@@ -387,20 +387,55 @@ input[data-correctness="incorrect"]:checked {
   flex-direction: column;
 }
 
+/* A neutral visual foundation shared by compact controls, whether their
+   semantic element is a button or a navigation link. Context classes below own
+   placement and shape; this class owns the family resemblance. */
+.symbol-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  text-shadow: inherit;
+  cursor: pointer;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3));
+}
+
+.symbol-button:hover {
+  color: inherit;
+  border-color: currentColor;
+}
+
+.symbol-button:focus-visible {
+  outline: 2px solid #dfed84;
+  outline-offset: 2px;
+}
+
+.puzzle-symbol-button {
+  min-width: 3rem;
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.4rem 0.65rem;
+}
+
 .activate-dialog {
   position: fixed;
   z-index: 1;
   top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  text-align: center;
-  overflow: hidden; /* clip overflow */
-  padding: 1rem;
+  padding: 0;
   width: 44px;
   height: 44px;
-  text-transform: none;
 }
 
 .activate-dialog.left {

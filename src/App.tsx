@@ -302,7 +302,7 @@ function App() {
       <div id="bezel-header">
         <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
         <h1 id="magie-title">MAGiE</h1>
-        <button type={"button"} aria-label={"open settings"} className="activate-dialog left" onClick={() => {
+        <button type={"button"} aria-label={"open settings"} className="symbol-button activate-dialog left" onClick={() => {
           setShowSettings(true);
           ReactGA4.event('open_settings_dialog', {
             source: 'activate_dialog',
@@ -312,7 +312,7 @@ function App() {
         </button>
         <button type={"button"}
                 aria-label={"show how-to information"}
-                className="activate-dialog right"
+                className="symbol-button activate-dialog right"
                 onClick={() => {
                   setShowHowTo(true);
                   ReactGA4.event('open_help_dialog', {

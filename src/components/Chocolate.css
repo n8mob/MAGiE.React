@@ -7,11 +7,12 @@
 }
 
 .chocolate-hud {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 2fr;
   font-size: smaller;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
+  padding: 0 0 1em;
   box-sizing: border-box;
   /* Stay visible while the player scrolls ahead of the conveyor edge. */
   position: sticky;
@@ -20,17 +21,18 @@
   z-index: 1;
 }
 
+.chocolate-hud > :first-child {
+  justify-self: start;
+}
+
+.chocolate-hud > :last-child {
+  justify-self: end;
+}
+
 /* Fast-forward ("cue") — hold to zoom the belt ahead. touch-action/user-select
    off so a press-and-hold doesn't select text or fire the long-press menu. */
 .chocolate-cue {
   font-size: small;
-  line-height: 1;
-  padding: 0.45em 0.6em;
-  cursor: pointer;
-  background: transparent;
-  border: 2px solid;
-  border-radius: 4px;
-  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
