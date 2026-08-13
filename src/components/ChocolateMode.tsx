@@ -36,7 +36,9 @@ const REWIND_MAX_MS = 1100;
 const SPACE_GLYPH = "_";
 
 /** Render a character that would otherwise be invisible. */
-const visibleChar = (char: string) => (char === " " || char === "" ? SPACE_GLYPH : char);
+const visibleChar = (char: string) => (
+  char === " " || char === "" ? SPACE_GLYPH : char
+);
 
 /**
  * Honour the OS "reduce motion" setting. The rewind is presentation, not
@@ -98,9 +100,12 @@ interface ChocolateModeProps extends PuzzleProps {
 
 const ChocolateMode: FC<ChocolateModeProps> = ({
   puzzle,
-  onWin = () => {},
-  onLose = () => {},
-  onRetry = () => {},
+  onWin = () => {
+  },
+  onLose = () => {
+  },
+  onRetry = () => {
+  },
   winActions,
 }) => {
   const clock = puzzle.clock ?? "scroll";
@@ -122,7 +127,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
    * The clue is prose, not ciphertext — it rides the belt as text instead.
    */
   const chocolateText = useMemo(
-    () => (puzzle.winText ?? "").replace(/\s+/g, " ").trim().toUpperCase(),
+    () => (
+      puzzle.winText ?? ""
+    ).replace(/\s+/g, " ").trim().toUpperCase(),
     [puzzle]
   );
 
@@ -131,7 +138,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
    * Encode and Decode already use, so authors control the line breaks.
    */
   const clueLines = useMemo(
-    () => (puzzle.clue ?? []).map(line => line.trim()).filter(line => line.length > 0),
+    () => (
+      puzzle.clue ?? []
+    ).map(line => line.trim()).filter(line => line.length > 0),
     [puzzle]
   );
 
@@ -171,7 +180,10 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const bitSize = useMaximizedBitSize(mainDisplayRef, 5, 48, 40, 56);
   const proseStyle = usePuzzleProseSizing(
     mainDisplayRef,
-    [...clueLines, ...(puzzle.winMessage ?? [])]
+    [...clueLines,
+      ...(
+        puzzle.winMessage ?? []
+      )]
   );
   useLayoutEffect(() => {
     // Row pitch is part of the conveyor's scoring geometry, so a resize must
@@ -330,7 +342,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     // Keep the long-clue fallback tied to the same measured line used for
     // painting and scoring. ceil ensures the first clue row starts wholly above
     // neither the line nor the visible belt origin.
-    const lineDepthRows = (lineTopPx - beltTopPx) / pitch;
+    const lineDepthRows = (
+      lineTopPx - beltTopPx
+    ) / pitch;
     const minRunway = Math.max(Math.ceil(lineDepthRows), 1);
     const runway = Math.max(targetDepth - clueRowCount, minRunway);
     rowPitchRef.current = pitch;
@@ -344,7 +358,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     // (at rendered row m + runway + clueRowCount) reaches lineTopPx. The clue is
     // counted in rows of the final pitch, which is why it belongs here and not
     // folded into beltTopPx.
-    judgeOffsetRef.current = (lineTopPx - beltTopPx) / pitch - runway - clueRowCount;
+    judgeOffsetRef.current = (
+      lineTopPx - beltTopPx
+    ) / pitch - runway - clueRowCount;
     setSpacerCount(runway);
     setLineTopPx(lineTopPx);
     setMeasured(true);
@@ -374,7 +390,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
         correctCount++;
       }
     }
-    const strikeCount = (judged - from) - correctCount;
+    const strikeCount = (
+      judged - from
+    ) - correctCount;
     scrolledRowsRef.current = judged;
     setScrolledRows(judged);
     if (correctCount > 0) {
@@ -410,7 +428,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       // effect recorded when it ran mid-frame, and a negative dt would drive the
       // belt backwards. Small in a browser, total in jsdom, where the animation
       // clock and performance.now() do not share an origin at all.
-      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.1);
+      const dt = Math.min(Math.max((
+        now - last
+      ) / 1000, 0), 0.1);
       last = now;
       const tier = Math.floor(scrolledRowsRef.current / ACCEL_EVERY_ROWS);
       const speed = Math.max(scrollSpeed + scrollAccel * tier, MIN_SCROLL_SPEED);
@@ -469,8 +489,12 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     let start = 0;
     const tick = (now: number) => {
       start = start || now;
-      const progress = Math.min((now - start) / duration, 1);
-      sRef.current = from + (to - from) * easeInOutCubic(progress);
+      const progress = Math.min((
+        now - start
+      ) / duration, 1);
+      sRef.current = from + (
+        to - from
+      ) * easeInOutCubic(progress);
       belt.style.transform = `translate3d(0, ${-sRef.current * rowPitchRef.current}px, 0)`;
       if (progress < 1) {
         raf = requestAnimationFrame(tick);
@@ -509,7 +533,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
     if (belt) {
       belt.style.transform = "";
     }
-    container.scrollTop = Math.max((sRef.current - spacerCount) * rowPitchRef.current, 0);
+    container.scrollTop = Math.max((
+      sRef.current - spacerCount
+    ) * rowPitchRef.current, 0);
   }, [clock, viewHandedOver, spacerCount]);
 
   const nextEditableBit = useCallback((fromBit: number) => {
@@ -739,7 +765,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
    * last bit lands would throw the beat away. The player-paced clocks have no
    * rewind to wait on, so for them the run being won is the whole cue.
    */
-  const winScreenReady = runState === "won" && (clock !== "scroll" || viewHandedOver);
+  const winScreenReady = runState === "won" && (
+    clock !== "scroll" || viewHandedOver
+  );
 
   /*
    * The message as the player actually received it, letter by letter (#227).
@@ -755,7 +783,9 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const gleanedAnswer = useMemo(() => displayRows.map((row, letterIndex) => (
     <span
       key={`gleaned-${letterIndex}`}
-      className={(letterResults[letterIndex] ?? isRowCorrect(letterIndex))
+      className={(
+        letterResults[letterIndex] ?? isRowCorrect(letterIndex)
+      )
         ? "answer-correct"
         : "answer-incorrect"}
     >
@@ -835,11 +865,10 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       >
         {clock === "scroll" && (
           <div className="chocolate-hud">
-            <span>SCORE {points}</span>
             {runState === "running" && (
               <button
                 type="button"
-                className={`chocolate-cue${cueActive ? " active" : ""}`}
+                className={`symbol-button puzzle-symbol-button chocolate-cue${cueActive ? " active" : ""}`}
                 aria-label="Fast forward — hold F or Space"
                 title="Hold to fast forward (F or Space)"
                 // Pointer capture keeps the hold alive if the finger drifts off
@@ -859,6 +888,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
                 ▶▶
               </button>
             )}
+            <span>SCORE {points}</span>
             <span>STRIKES {strikes}/{maxStrikes}</span>
           </div>
         )}

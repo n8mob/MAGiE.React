@@ -111,7 +111,15 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
     if (category?.name && level) {
       setHeaderContent(
         <div className={'menu-title'}>
-          <h3><Link to={`/${menuName}/${categoryIndex}`}>⏏&nbsp;</Link>{level.levelName.join(" ")}</h3>
+          <h3 className="menu-title-row">
+            <Link
+              className="symbol-button puzzle-symbol-button"
+              to={`/${menuName}/${categoryIndex}`}
+              aria-label={`Back to ${category.name}`}
+            >⏏</Link>
+            <span>{level.levelName.join(" ")}</span>
+            <span className="menu-title-balance" aria-hidden="true" />
+          </h3>
         </div>
       );
     }
