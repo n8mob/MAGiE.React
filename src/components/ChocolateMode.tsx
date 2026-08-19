@@ -9,6 +9,7 @@ import { PerLetterJudge } from "../judgment/PerLetterJudge.ts";
 import { DisplayRow } from "../encoding/DisplayRow.ts";
 import { chocolateEncoding } from "../encoding/FiveBitA1.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
+import { usePreloadBitSprites } from "../hooks/useBitSpritePreload.ts";
 import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { WinScreen } from "./WinScreen.tsx";
 import "./Chocolate.css";
@@ -112,6 +113,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const scrollSpeed = puzzle.scrollSpeed ?? 0.20;
   const scrollAccel = puzzle.scrollAccel ?? 0.04;
   const maxStrikes = puzzle.maxStrikes ?? 10;
+  usePreloadBitSprites();
 
   // PlayPuzzle already substitutes 5bA1 for non-fixed-width encodings; resolving
   // again here keeps the mode safe no matter how it's reached.
@@ -146,12 +148,27 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
 
   const targetChars = useMemo(() => [...chocolateText], [chocolateText]);
   const winBits = useMemo(() => encoding.encodeText(chocolateText), [encoding, chocolateText]);
-  const allOffBits = useCallback(
-    () => BitSequence.fromString("0".repeat(winBits.length)),
-    [winBits.length]
+
+  /*
+   * Starting bits, seeded from the puzzle's init like Encode and Decode already
+   * do. Chocolate's grid is one fixed row per target character rather than a
+   * free-form guess, so init is applied per character — padded or truncated to
+   * targetChars.length — instead of encoded wholesale. Space pads any shortfall
+   * and encodes to all-off in 5bA1, so an empty init still starts blank exactly
+   * as before.
+   */
+  const initChars = useMemo(
+    () => [...(
+      puzzle.init ?? ""
+    ).replace(/\s+/g, " ").trim().toUpperCase()],
+    [puzzle]
+  );
+  const initBits = useMemo(
+    () => encoding.encodeText(targetChars.map((_, i) => initChars[i] ?? " ").join("")),
+    [encoding, targetChars, initChars]
   );
 
-  const [guessBits, setGuessBits] = useState<BitSequence>(allOffBits);
+  const [guessBits, setGuessBits] = useState<BitSequence>(() => initBits);
   useBitSounds(guessBits);
   const [runState, setRunState] = useState<RunState>("running");
   const [cursor, setCursor] = useState(0);
@@ -723,7 +740,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   }, [runState, onWin, onLose]);
 
   const handleRetry = useCallback(() => {
-    setGuessBits(allOffBits());
+    setGuessBits(initBits);
     setCursor(0);
     setScrolledRows(0);
     scrolledRowsRef.current = 0;
@@ -751,7 +768,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
       mainDisplayRef.current.scrollTop = 0;
     }
     setRunState("running");
-  }, [allOffBits, onRetry]);
+  }, [initBits, onRetry]);
 
   // The game-over panel replaces the belt, so TRY AGAIN can land exactly where
   // the player's last bit tap was.
