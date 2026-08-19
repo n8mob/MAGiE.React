@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { ChocolateMode } from "./ChocolateMode.tsx";
-import { Puzzle } from "../model.ts";
+import { isAutoWinPuzzle, Puzzle } from "../model.ts";
 import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
@@ -166,7 +166,7 @@ const PlayPuzzle = ({
 
   const handleWin = () => {
     debug("PlayPuzzle detected winEvent");
-    const isAutoWin = puzzle.init === puzzle.winText;
+    const isAutoWin = isAutoWinPuzzle(puzzle);
     if (stopwatchRef.current) {
       stopwatchRef.current.stop();
       updateSolveTimeString();

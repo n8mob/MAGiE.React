@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Puzzle } from "../model.ts";
+import { isAutoWinPuzzle, Puzzle } from "../model.ts";
 import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
@@ -86,7 +86,7 @@ export function useBasePuzzle(
     return puzzle.encoding?.encodeText(puzzle.winText);
   }, [puzzle]);
 
-  const isAutoWin = useMemo(() => puzzle.init === puzzle.winText, [puzzle]);
+  const isAutoWin = useMemo(() => isAutoWinPuzzle(puzzle), [puzzle]);
 
   // Rows to render. Decode puzzles display the win bits (padded with any overflow
   // guess bits) so the full message is visible; encode puzzles display the guess.
