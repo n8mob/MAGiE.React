@@ -12,6 +12,8 @@ import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { usePreloadBitSprites } from "../hooks/useBitSpritePreload.ts";
 import { useActivationGuard } from "../hooks/useActivationGuard.ts";
 import { WinScreen } from "./WinScreen.tsx";
+import { AfterWinControls, InlineWinMessage } from "./InlineWin.tsx";
+import { isWinInline } from "../model.ts";
 import "./Chocolate.css";
 import { useMaximizedBitSize, usePuzzleProseSizing } from "../hooks/usePuzzleDisplaySizing.ts";
 
@@ -108,12 +110,21 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   onRetry = () => {
   },
   winActions,
+  winInline = false,
 }) => {
   const clock = puzzle.clock ?? "scroll";
   const scrollSpeed = puzzle.scrollSpeed ?? 0.20;
   const scrollAccel = puzzle.scrollAccel ?? 0.04;
   const maxStrikes = puzzle.maxStrikes ?? 10;
   usePreloadBitSprites();
+
+  /*
+   * Two roads to the same place as Encode and Decode: an auto-win screen
+   * arrives already solved, and its win text captions the bits rather than
+   * rewarding anything; a tutorial lesson points at those bits outright.
+   * Either way a modal would cover its own subject, so the win stays inline.
+   */
+  const winsInline = isWinInline(puzzle, winInline);
 
   // PlayPuzzle already substitutes 5bA1 for non-fixed-width encodings; resolving
   // again here keeps the mode safe no matter how it's reached.
@@ -868,93 +879,101 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   }
 
   return (
-    <div id="game-content">
-      <div
-        id="main-display"
-        className={`display chocolate-display puzzle-fitted-display${conveyorDrivesView ? " conveyor-locked" : ""}`}
-        ref={mainDisplayRef}
-        style={{
-          ...proseStyle,
-          "--chocolate-bit-size": `${bitSize}px`
-        } as CSSProperties}
-        // Covers the HUD too, which sits outside the bit grid's own handler.
-        onContextMenu={event => event.preventDefault()}
-      >
-        {clock === "scroll" && (
-          <div className="chocolate-hud">
-            {runState === "running" && (
-              <button
-                type="button"
-                className={`symbol-button puzzle-symbol-button chocolate-cue${cueActive ? " active" : ""}`}
-                aria-label="Fast forward — hold F or Space"
-                title="Hold to fast forward (F or Space)"
-                // Pointer capture keeps the hold alive if the finger drifts off
-                // the button; release/cancel/lost-capture all end it.
-                onPointerDown={event => {
-                  event.preventDefault();
-                  event.currentTarget.setPointerCapture(event.pointerId);
-                  startCue();
-                }}
-                onPointerUp={stopCue}
-                onPointerCancel={stopCue}
-                onLostPointerCapture={stopCue}
-                // Long-press fires contextmenu on Android/desktop; suppress it so
-                // the hold isn't interrupted by a menu.
-                onContextMenu={event => event.preventDefault()}
-              >
-                ▶▶
-              </button>
-            )}
-            <span>SCORE {points}</span>
-            <span>STRIKES {strikes}/{maxStrikes}</span>
-          </div>
-        )}
-        {/* Goes with the run, not with the belt: the rewind judges nothing. */}
-        {clock === "scroll" && runState === "running" && measured && (
-          <div className="chocolate-judgment-line" style={{ top: lineTopPx }} aria-hidden="true" />
-        )}
-        {runState === "lost" ? (
-          <div className="chocolate-game-over">
-            <p>The conveyor got ahead of you!</p>
-            <p>SCORE {points}</p>
-            <p>LETTERS GLEANED {letterResults.filter(Boolean).length}/{rowCount}</p>
-            <button type="button" {...retryControl}>TRY AGAIN</button>
-          </div>
-        ) : (
-          <DisplayMatrix
-            ref={displayMatrixRef}
-            displayRows={renderedRows}
-            showAnnotations={true}
-            rowClassName={rowClassName}
-            renderGutter={showsTargetGutter(clock) ? renderTarget : undefined}
-            renderBit={(bit, rowIndex) => (
-              <CorrectnessBitButton
-                key={`bit-${bit.index}`}
-                bit={bit}
-                correctness={isRowCorrect(rowIndex - beltOffset)
-                  ? Correctness.correct
-                  : Correctness.incorrect}
-                onBitToggle={handleBitToggle}
-                disabled={runState !== "running" || bit.index < minEditableBit}
-              />
-            )}
+    <>
+      <div id="game-content" className="puzzle-fitted-game">
+        <div
+          id="main-display"
+          className={`display chocolate-display puzzle-fitted-display${conveyorDrivesView ? " conveyor-locked" : ""}`}
+          ref={mainDisplayRef}
+          style={{
+            ...proseStyle,
+            "--chocolate-bit-size": `${bitSize}px`
+          } as CSSProperties}
+          // Covers the HUD too, which sits outside the bit grid's own handler.
+          onContextMenu={event => event.preventDefault()}
+        >
+          {clock === "scroll" && (
+            <div className="chocolate-hud">
+              {runState === "running" && (
+                <button
+                  type="button"
+                  className={`symbol-button puzzle-symbol-button chocolate-cue${cueActive ? " active" : ""}`}
+                  aria-label="Fast forward — hold F or Space"
+                  title="Hold to fast forward (F or Space)"
+                  // Pointer capture keeps the hold alive if the finger drifts off
+                  // the button; release/cancel/lost-capture all end it.
+                  onPointerDown={event => {
+                    event.preventDefault();
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    startCue();
+                  }}
+                  onPointerUp={stopCue}
+                  onPointerCancel={stopCue}
+                  onLostPointerCapture={stopCue}
+                  // Long-press fires contextmenu on Android/desktop; suppress it so
+                  // the hold isn't interrupted by a menu.
+                  onContextMenu={event => event.preventDefault()}
+                >
+                  ▶▶
+                </button>
+              )}
+              <span>SCORE {points}</span>
+              <span>STRIKES {strikes}/{maxStrikes}</span>
+            </div>
+          )}
+          {/* Goes with the run, not with the belt: the rewind judges nothing. */}
+          {clock === "scroll" && runState === "running" && measured && (
+            <div className="chocolate-judgment-line" style={{ top: lineTopPx }} aria-hidden="true" />
+          )}
+          {runState === "lost" ? (
+            <div className="chocolate-game-over">
+              <p>The conveyor got ahead of you!</p>
+              <p>SCORE {points}</p>
+              <p>LETTERS GLEANED {letterResults.filter(Boolean).length}/{rowCount}</p>
+              <button type="button" {...retryControl}>TRY AGAIN</button>
+            </div>
+          ) : (
+            <DisplayMatrix
+              ref={displayMatrixRef}
+              displayRows={renderedRows}
+              showAnnotations={true}
+              rowClassName={rowClassName}
+              renderGutter={showsTargetGutter(clock) ? renderTarget : undefined}
+              renderBit={(bit, rowIndex) => (
+                <CorrectnessBitButton
+                  key={`bit-${bit.index}`}
+                  bit={bit}
+                  correctness={isRowCorrect(rowIndex - beltOffset)
+                    ? Correctness.correct
+                    : Correctness.incorrect}
+                  onBitToggle={handleBitToggle}
+                  disabled={runState !== "running" || bit.index < minEditableBit}
+                />
+              )}
+            />
+          )}
+          {/* Same reasoning as Encode/Decode: an auto-win or tutorial puzzle
+              points at the bits above, which a modal would cover. */}
+          <InlineWinMessage show={winsInline && winScreenReady} winMessage={puzzle.winMessage ?? []} />
+        </div>
+        {!winsInline && (
+          <WinScreen
+            won={winScreenReady}
+            clue={clueLines}
+            answer={gleanedAnswer}
+            winMessage={puzzle.winMessage ?? []}
+            actions={winActions}
+            stats={clock === "scroll" ? (
+              <>
+                <span>SCORE {points}</span>
+                <span>GLEANED {letterResults.filter(Boolean).length}/{rowCount}</span>
+              </>
+            ) : undefined}
           />
         )}
       </div>
-      <WinScreen
-        won={winScreenReady}
-        clue={clueLines}
-        answer={gleanedAnswer}
-        winMessage={puzzle.winMessage ?? []}
-        actions={winActions}
-        stats={clock === "scroll" ? (
-          <>
-            <span>SCORE {points}</span>
-            <span>GLEANED {letterResults.filter(Boolean).length}/{rowCount}</span>
-          </>
-        ) : undefined}
-      />
-    </div>
+      <AfterWinControls show={winsInline && winScreenReady} actions={winActions} />
+    </>
   );
 };
 

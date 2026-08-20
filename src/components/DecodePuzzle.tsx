@@ -7,6 +7,8 @@ import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
 import { GuessDisplay } from "./GuessDisplay.tsx";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { WinScreen } from "./WinScreen.tsx";
+import { AfterWinControls, InlineWinMessage } from "./InlineWin.tsx";
+import { isWinInline } from "../model.ts";
 
 const LETTER_PATTERN = /^[a-z]$/i;
 const ALLOWED_PUNCTUATION = new Set<string>([",", ".", "!", "?", " "]);
@@ -71,7 +73,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
 
   // See EncodePuzzle: an already-solved screen and a tutorial lesson both talk
   // about the bits on display, which a modal would cover.
-  const winsInline = isAutoWin || winInline;
+  const winsInline = isWinInline(puzzle, winInline);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -192,12 +194,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
           {/* Same as Encode: on the tutorial's already-solved demo screens this
               text captions the bits above it rather than rewarding anything, so
               it stays inline instead of covering its own subject. */}
-          {hasWon && winsInline && (
-            <div id="win-message" className="display">
-              {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
-                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-            </div>
-          )}
+          <InlineWinMessage show={hasWon && winsInline} winMessage={puzzle.winMessage ?? []} />
         </div>
         {!winsInline && (
           <WinScreen
@@ -211,9 +208,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
       </div>
       {/* See EncodePuzzle: the demo screens keep the controls they had, and the
           flag must be useBasePuzzle's so a parent reset can't wipe it (#223). */}
-      {hasWon && winsInline && winActions && (
-        <div className="after-win-controls">{winActions}</div>
-      )}
+      <AfterWinControls show={hasWon && winsInline} actions={winActions} />
     </>
   );
 }

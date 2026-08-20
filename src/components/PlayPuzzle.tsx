@@ -10,7 +10,7 @@ import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
 import ReactGA4 from "react-ga4";
 import { PuzzlePlacement, resolvePuzzleContext, trackPuzzleEnd, trackPuzzleStart, } from "../analytics/puzzleAnalytics.ts";
-import { debug  } from "../Logger.ts";
+import { debug } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
@@ -63,7 +63,9 @@ const PlayPuzzle = ({
   const puzzle = useMemo<Puzzle>(() => {
     let p = rawPuzzle;
     if (p
-      && (asChocolate || searchParams.has("asChocolate"))
+      && (
+        asChocolate || searchParams.has("asChocolate")
+      )
       && p.type !== "Chocolate"
     ) {
       const clockParam = searchParams.get("asChocolate");
@@ -88,7 +90,9 @@ const PlayPuzzle = ({
   // puzzle_type and encoding come from the puzzle as *played*, after any
   // Chocolate coercion above — the route can't know either one.
   const analytics = useMemo(
-    () => (placement ? resolvePuzzleContext(placement, puzzle) : null),
+    () => (
+      placement ? resolvePuzzleContext(placement, puzzle) : null
+    ),
     [placement, puzzle]
   );
 
@@ -225,17 +229,17 @@ const PlayPuzzle = ({
         '\nShall we copy the share message to your clipboard?';
       if (window.confirm(shareViaClipboard)) {
         navigator.clipboard.writeText(`${shareText}\n\n` + window.location.href)
-          .then(() => {
-            ReactGA4.event('share_win_completed', {
-              puzzle_slug: puzzle.slug,
-              share_method: 'clipboard',
-            });
-            alert("The share message has been copied to your clipboard.");
-          })
-          .catch((error) => {
-            console.error("Failed to copy text: ", error);
-            alert("Sorry, we couldn't copy the text to your clipboard either.");
+        .then(() => {
+          ReactGA4.event('share_win_completed', {
+            puzzle_slug: puzzle.slug,
+            share_method: 'clipboard',
           });
+          alert("The share message has been copied to your clipboard.");
+        })
+        .catch((error) => {
+          console.error("Failed to copy text: ", error);
+          alert("Sorry, we couldn't copy the text to your clipboard either.");
+        });
       }
     } else {
       const message =
@@ -286,6 +290,7 @@ const PlayPuzzle = ({
           onRetry={handleRetry}
           onShareWin={handleShareWin}
           winActions={winActions}
+          winInline={winInline}
           bitButtonWidthPx={32}
         />
       }

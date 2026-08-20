@@ -32,12 +32,13 @@ const puzzle = (overrides: Partial<Puzzle> = {}): Puzzle => ({
   ...overrides,
 });
 
-const renderChocolate = (p: Puzzle) =>
-  render(<ChocolateMode puzzle={p} bitButtonWidthPx={40} />);
+const renderChocolate = (p: Puzzle, winActions?: React.ReactNode) =>
+  render(<ChocolateMode puzzle={p} bitButtonWidthPx={40} winActions={winActions} />);
 
 const winScreen = (container: HTMLElement) =>
   container.querySelector<HTMLDialogElement>("dialog.win-screen");
 const isShowing = (container: HTMLElement) => !!winScreen(container)?.hasAttribute("open");
+const inlineWinMessage = (container: HTMLElement) => container.querySelector("#win-message");
 // Runway and clue rows carry no bits, so restrict to the letter rows.
 const rowBits = (container: HTMLElement, rowIndex: number) =>
   [...container.querySelectorAll<HTMLInputElement>(".bit-field p.letter-correct, .bit-field p.letter-incorrect")][rowIndex]
@@ -48,6 +49,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.unstubAllGlobals());
+afterEach(() => vi.clearAllMocks());
 
 describe("chocolate init", () => {
   it("seeds the grid from a partial init, letter by letter", () => {
@@ -72,7 +74,40 @@ describe("chocolate init", () => {
   it("arrives already won when init matches winText", () => {
     const { container } = renderChocolate(puzzle({ init: "HI" }));
 
+    // Same reasoning as Encode/Decode's tutorial demo screens: a modal would
+    // cover the bits the win message is pointing at, so it stays inline.
+    expect(isShowing(container)).to.equal(false);
+    expect(inlineWinMessage(container)?.textContent).to.contain("WELL DONE");
+  });
+
+  it("keeps every bit visible and disabled behind an inline auto-win", () => {
+    const { container } = renderChocolate(puzzle({ init: "HI" }));
+
+    const bits = [...container.querySelectorAll<HTMLInputElement>(".bit-checkbox")];
+    expect(bits).to.have.lengthOf(fiveBitA1.encodeText("HI").length);
+    expect(bits.every(bit => bit.disabled)).to.equal(true);
+  });
+
+  it("still offers whatever the route wants to do next, inline", () => {
+    const { container } = renderChocolate(
+      puzzle({ init: "HI" }),
+      <button type="button">Next</button>
+    );
+
+    const controls = container.querySelector(".after-win-controls");
+    expect(controls?.textContent).to.contain("Next");
+  });
+
+  it("keeps a real win on the modal WinScreen, not inline", () => {
+    const { container } = renderChocolate(puzzle({ init: "", clock: "none" }));
+
+    const solveBits = fiveBitA1.encodeText("HI").toString();
+    for (const bit of solveBits) {
+      fireEvent.keyDown(window, { key: bit });
+    }
+
     expect(isShowing(container)).to.equal(true);
+    expect(inlineWinMessage(container)).to.equal(null);
   });
 
   it("does not fire a bit sound for bits placed by init", async () => {

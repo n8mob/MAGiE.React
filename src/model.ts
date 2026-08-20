@@ -50,6 +50,14 @@ export interface Puzzle {
  */
 export const isAutoWinPuzzle = (puzzle: Puzzle): boolean => puzzle.init === puzzle.winText;
 
+/**
+ * Whether a win renders inline instead of on WinScreen — an already-solved
+ * demo screen, or a tutorial lesson (the `winInline` prop) whose message
+ * points at bits a modal would cover. See InlineWin.tsx.
+ */
+export const isWinInline = (puzzle: Puzzle, winInline: boolean): boolean =>
+  isAutoWinPuzzle(puzzle) || winInline;
+
 export interface Level {
   levelName: string[];
   levelNumber: number;
