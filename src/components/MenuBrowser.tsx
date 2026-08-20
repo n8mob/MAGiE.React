@@ -6,6 +6,9 @@ import ReactGA4 from "react-ga4";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { areaTitle } from "../pageTitles.ts";
 
+/**
+ * Display a list of the categories for the given menu.
+ */
 function MenuBrowser({ menuName }: { menuName: string }) {
   const { setHeaderContent } = useHeader();
   const { menu } = useMenu(menuName, setHeaderContent);
