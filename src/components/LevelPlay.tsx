@@ -69,30 +69,42 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
   const nextPuzzleIndex = puzzleIndex + 1;
 
   const isLastInLevel = !!level && nextPuzzleIndex >= level.puzzles.length;
+  const isTutorialLevel = !!level && isTutorialContent(menuName, category?.name, level.levelName.join(" "), currentPuzzle?.slug);
+  // Finishing a tutorial level is a fork, not a dead end: offer more tutorial
+  // content alongside the way out, rather than only the way out.
+  const showTutorialChoice = isLastInLevel && isTutorialLevel;
 
-  const linkAfterWin = { to: "", text: "" };
+  const primaryLink = { to: "", text: "" };
   if (isLastInLevel) {
-    const isTutorialLevel = !!level && isTutorialContent(menuName, category?.name, level.levelName.join(" "), currentPuzzle?.slug);
     if (isTutorialLevel) {
-      linkAfterWin.to = "/today";
-      linkAfterWin.text = "▶▶ Fast-Forward to Today's puzzle?";
+      primaryLink.to = "/today";
+      primaryLink.text = "▶▶ Fast-Forward to Today's puzzle";
     } else {
-      linkAfterWin.to = `/${menuName}/${categoryIndex}`;
-      linkAfterWin.text = `Back to ${category?.name || "Category"}`;
+      primaryLink.to = `/${menuName}/${categoryIndex}`;
+      primaryLink.text = `Back to ${category?.name || "Category"}`;
     }
   } else {
-    linkAfterWin.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
-    linkAfterWin.text = "Next ▶▶";
+    primaryLink.to = `/${menuName}/${categoryIndex}/levels/${levelNumber}/puzzles/${nextPuzzleIndex}`;
+    primaryLink.text = "Next ▶▶";
   }
 
-  // This button appears the instant the winning bit goes down, often right under
-  // the finger that toggled it — so it must ignore that gesture's stray click.
+  // Only offered alongside primaryLink, when showTutorialChoice is true.
+  const moreTutorialsLink = { to: "/tutorial", text: "▶ More Tutorials" };
+
+  const afterWinEvent = (source: string) =>
+    ReactGA4.event('story_start_clicked', { source, puzzle_slug: currentPuzzle?.slug });
+
+  // These buttons appear the instant the winning bit goes down, often right
+  // under the finger that toggled it — so they must ignore that gesture's stray
+  // click.
   const afterWinControl = useActivationGuard(() => {
-    ReactGA4.event('story_start_clicked', {
-      source: 'post-win-link',
-      puzzle_slug: currentPuzzle?.slug,
-    });
-    navigate(linkAfterWin.to);
+    afterWinEvent('post-win-link');
+    navigate(primaryLink.to);
+  });
+
+  const moreTutorialsControl = useActivationGuard(() => {
+    afterWinEvent('post-win-link-deeper-tutorials');
+    navigate(moreTutorialsLink.to);
   });
 
   useEffect(() => {
@@ -160,7 +172,14 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
             onWin={handleWin}
             puzzleShareString={shareString}
             winActions={
-              <button type={"button"} {...afterWinControl}>{linkAfterWin.text}</button>
+              showTutorialChoice ? (
+                <>
+                  <button type={"button"} {...moreTutorialsControl}>{moreTutorialsLink.text}</button>
+                  <button type={"button"} {...afterWinControl}>{primaryLink.text}</button>
+                </>
+              ) : (
+                <button type={"button"} {...afterWinControl}>{primaryLink.text}</button>
+              )
             }
             winInline={isTutorialContent(
               menuName,
