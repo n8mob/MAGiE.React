@@ -42,6 +42,22 @@ export interface Puzzle {
   maxStrikes?: number;
 }
 
+/**
+ * A puzzle that arrives already solved: a demo screen rather than something to
+ * win. Every mode's win-text caption ("SEE HOW THE BIT WENT FROM PURPLE TO
+ * GREEN?", "IT IS .ON.") depends on this, since a modal covering the bits it
+ * points at would teach nothing.
+ */
+export const isAutoWinPuzzle = (puzzle: Puzzle): boolean => puzzle.init === puzzle.winText;
+
+/**
+ * Whether a win renders inline instead of on WinScreen — an already-solved
+ * demo screen, or a tutorial lesson (the `winInline` prop) whose message
+ * points at bits a modal would cover. See InlineWin.tsx.
+ */
+export const isWinInline = (puzzle: Puzzle, winInline: boolean): boolean =>
+  isAutoWinPuzzle(puzzle) || winInline;
+
 export interface Level {
   levelName: string[];
   levelNumber: number;

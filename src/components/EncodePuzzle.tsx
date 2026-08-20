@@ -8,6 +8,8 @@ import { BitSequence } from "../BitSequence.ts";
 import { Correctness } from "../judgment/BitJudgment.ts";
 import { useBitSounds } from "../hooks/useBitSounds.ts";
 import { WinScreen } from "./WinScreen.tsx";
+import { AfterWinControls, InlineWinMessage } from "./InlineWin.tsx";
+import { isWinInline } from "../model.ts";
 import { FixedWidthEncoder } from "../encoding/FixedWidthEncoder.ts";
 import { usePuzzleProseSizing } from "../hooks/usePuzzleDisplaySizing.ts";
 
@@ -56,7 +58,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
    * GREEN?"). Either way a modal would cover its own subject, so the win stays
    * inline and only an earned win outside the tutorial gets the screen.
    */
-  const winsInline = isAutoWin || winInline;
+  const winsInline = isWinInline(puzzle, winInline);
 
   const appendBit = useCallback((bit: "0" | "1") => {
     if (hasWon) {
@@ -164,12 +166,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
               "THIS IS A BIT" / "IT IS .ON." — not a reward. It stays inline,
               because a screen that covers its own subject teaches nothing. A win
               the player earned gets the WinScreen instead. */}
-          {hasWon && winsInline && (
-            <div id="win-message" className="display">
-              {[...(puzzle.winMessage ?? [])].map((winLine, winIndex) =>
-                <p key={`win-message-${winIndex}`}>{winLine}</p>)}
-            </div>
-          )}
+          <InlineWinMessage show={hasWon && winsInline} winMessage={puzzle.winMessage ?? []} />
         </div>
         {!winsInline && (
           <WinScreen
@@ -186,12 +183,9 @@ const EncodePuzzle: FC<PuzzleProps> = (
           copy gets cleared by its reset before the button ever renders (#223),
           which is why useBasePuzzle owns it and the component remounts per
           puzzle. Covered by levelPlayAutoWin.test.tsx. */}
-      {hasWon && winsInline && winActions && (
-        <div className="after-win-controls">{winActions}</div>
-      )}
+      <AfterWinControls show={hasWon && winsInline} actions={winActions} />
     </>
-  )
-    ;
+  );
 };
 
 export { EncodePuzzle };

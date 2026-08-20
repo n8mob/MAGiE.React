@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Puzzle } from "../model.ts";
+import { isAutoWinPuzzle, Puzzle } from "../model.ts";
 import { BinaryJudge } from "../judgment/BinaryJudge.ts";
 import { FullJudgment } from "../judgment/FullJudgment.ts";
 import { BitSequence } from "../BitSequence.ts";
@@ -11,6 +11,7 @@ import { VariableWidthEncodingJudge } from "../judgment/VariableWidthEncodingJud
 import { FixedWidthEncodingJudge } from "../judgment/FixedWidthEncodingJudge.ts";
 import { DisplayMatrixUpdate } from "./DisplayMatrix.tsx";
 import { debug } from "../Logger.ts";
+import { usePreloadBitSprites } from "../hooks/useBitSpritePreload.ts";
 
 export interface PuzzleProps {
   puzzle: Puzzle;
@@ -85,7 +86,7 @@ export function useBasePuzzle(
     return puzzle.encoding?.encodeText(puzzle.winText);
   }, [puzzle]);
 
-  const isAutoWin = useMemo(() => puzzle.init === puzzle.winText, [puzzle]);
+  const isAutoWin = useMemo(() => isAutoWinPuzzle(puzzle), [puzzle]);
 
   // Rows to render. Decode puzzles display the win bits (padded with any overflow
   // guess bits) so the full message is visible; encode puzzles display the guess.
@@ -99,20 +100,7 @@ export function useBasePuzzle(
     return Array.from(puzzle.encoding.splitForDisplay(displayBits, displayWidthInBitCount));
   }, [puzzle, guessBits, winBits, displayWidthInBitCount]);
 
-  // Preload images
-  useEffect(() => {
-    [
-      'assets/Bit_off_Yellow.png',
-      'assets/Bit_on_Yellow.png',
-      'assets/Bit_off_Teal.png',
-      'assets/Bit_on_Teal.png',
-      'assets/Bit_off_Purple.png',
-      'assets/Bit_on_Purple.png',
-    ].forEach(url => {
-      const img = new window.Image();
-      img.src = url;
-    });
-  }, []);
+  usePreloadBitSprites();
 
   // Update display width on resize
   useEffect(() => {
