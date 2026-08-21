@@ -82,7 +82,7 @@ interface MenuRouteOptions {
  * would fail at runtime.
  */
 const menuRoutes = (menuName: string, options: MenuRouteOptions = {}) => {
-  const { skipLevelBrowser = false, asChocolate = false } = options;
+  const { skipLevelBrowser = true, asChocolate = false } = options;
   const base = `/${menuName}`;
   return (
     <>
@@ -282,7 +282,7 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<Navigate to={"/tutorial/0/levels/116/puzzles/0"} replace={true} />} />
+      <Route path="/" element={<Navigate to={"/tutorial/0"} replace={true} />} />
       {features.includes('date') && (<>
         <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
         <Route path="/date/:year/:month/:day" element={<DatePlay />} />
