@@ -16,7 +16,7 @@ All colors used in the project, with their semantic roles and source files.
 | `error`          | `#962c2c` | Error messages (dark red)                       | `App.css`                         |
 | `focus-ring`     | `#dfed84` | Keyboard focus outlines (yellow-green)          | `App.css`, `OnScreenKeyboard.css` |
 | `panel-bg`       | `#d1d8d8` | Dialog / card background (slightly darker grey) | `Dialog.css`                      |
-| `title`          | `silver`  | MAGiE title text (`h1#magie-title`)             | `App.css`                         |
+| `title`          | `silver`  | Bezel text: MAGiE title, and the `Aa` / `?` buttons beside it | `App.css`           |
 
 ---
 
