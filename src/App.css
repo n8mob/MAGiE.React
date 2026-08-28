@@ -429,6 +429,9 @@ input[data-correctness="incorrect"]:checked {
   padding: 0.4rem 0.65rem;
 }
 
+/* These two sit on the dark bezel beside the MAGiE title, not on the app
+   background, so they take the title's color rather than the body's. The
+   border comes along for free: .symbol-button draws it with currentColor. */
 .activate-dialog {
   position: fixed;
   z-index: 1;
@@ -436,6 +439,14 @@ input[data-correctness="incorrect"]:checked {
   padding: 0;
   width: 44px;
   height: 44px;
+  color: silver;
+}
+
+/* .symbol-button:hover resets color to inherit, and outranks the rule above
+   (a pseudo-class counts as a class). Restate it so the pair doesn't snap back
+   to the body color under the cursor. */
+.activate-dialog:hover {
+  color: silver;
 }
 
 .activate-dialog.left {
