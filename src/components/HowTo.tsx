@@ -1,27 +1,96 @@
-import JudgmentLegend from "./JudgmentLegend.tsx";
+import { Link } from "react-router-dom";
+import BitLegend from "./BitLegend.tsx";
 
 export default function FirstTimeContent() {
   return (
     <>
-      <h2>Welcome to <span className="magie-case">MAGiE</span></h2>
-      <p><em>A retro-future puzzle game with bits and a totally rad mall!</em></p>
-
-      <h3>🔍 How it works</h3>
+      <h2>Welcome to <span className="magie-case">MAGiE</span>!</h2>
+      <p>It's a puzzle game.
+        It's set in a totally rad mall! But we didn't draw that part yet. (Art is hard!)</p>
+      <BitLegend />
+      <h3>NEW MODE!</h3>
+      <h4>Code name: "Chocolate"</h4>
       <ul>
-        <li>Each puzzle hides a secret message—your job is to figure it out.</li>
-        <li>Decode-type puzzles show you bits; you decode and type the message.</li>
+        <li>Bits scroll up automatically.</li>
+        <li>Your job is to encode the letter on each row.</li>
+        <li>The letter to encode is on the left.</li>
+        <li>The letter currently encoded by the row is on the right. (That's helpful!)</li>
+        <li>When the row is correctly encoded, it turns teal.</li>
+        <li>Rows encode the space character by default. So, if there is a space in the message, you get that row for
+          free. (You will see that it is already teal.)
+        </li>
+        <li>An example:
+          <div className="bit-field">
+            <p className="letter-correct"><span className="row-gutter">C</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="0" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="1" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="2" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="3" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="4" type="checkbox" readOnly={true} checked={true} />
+              <span className="annotation">&nbsp;C</span></p>
+            <p className="letter-correct"><span className="row-gutter">A</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="5" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="6" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="7" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="8" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="9" type="checkbox" readOnly={true} checked={true} />
+              <span className="annotation">&nbsp;A</span></p>
+            <p className="letter-correct"><span className="row-gutter">R</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="10" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="11" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="12" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="13" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="14" type="checkbox" readOnly={true} checked={false} />
+              <span className="annotation">&nbsp;R</span></p>
+            <p className="letter-correct"><span className="row-gutter">D</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="15" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="16" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="17" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="18" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="19" type="checkbox" readOnly={true} checked={false} />
+              <span className="annotation">&nbsp;D</span></p>
+            <p className="letter-correct"><span className="row-gutter">_</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="20" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="21" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="22" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="23" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="24" type="checkbox" readOnly={true} checked={false} />
+              <span className="annotation">&nbsp; </span></p>
+            <p className="letter-correct"><span className="row-gutter">R</span>
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="25" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="26" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="27" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="28" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="correct" data-bit-index="29" type="checkbox" readOnly={true} checked={false} />
+              <span className="annotation">&nbsp;R</span></p>
+            <p className="letter-incorrect"><span className="row-gutter">E</span>
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="40" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="41" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="42" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="43" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="44" type="checkbox" readOnly={true} checked={false} />
+              <span className="annotation">&nbsp;_</span></p>
+            <p className="letter-incorrect"><span className="row-gutter">A</span>
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="30" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="31" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="32" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="33" type="checkbox" readOnly={true} checked={true} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="34" type="checkbox" readOnly={true} checked={true} />
+              <span className="annotation">&nbsp;G</span></p>
+            <p className="letter-incorrect focused-row"><span className="row-gutter">D</span>
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="35" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="36" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="37" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="38" type="checkbox" readOnly={true} checked={false} />
+              <input className="bit-checkbox" data-correctness="incorrect" data-bit-index="39" type="checkbox" readOnly={true} checked={true} />
+              <span className="annotation">&nbsp;A</span></p>
+          </div>
+        </li>
       </ul>
-
-      <JudgmentLegend />
-      <h3>🕹️ Tips</h3>
-      <ul>
-        <li>Guess as many times as you like—no penalty for wrong guesses.</li>
-        <li>New puzzles appear daily—you can also revisit previous days.</li>
-      </ul>
-
-      <div className="coming-soon">
-        <h3>🛍️ Coming Soon: more puzzle types!</h3>
-      </div>
+      <h3>📅 Daily Puzzles </h3>
+      <p>Each day we'll post a puzzle at:
+        <Link  to={"/today"}>magiegame.com/today</Link>
+      </p>
     </>
   );
 }
