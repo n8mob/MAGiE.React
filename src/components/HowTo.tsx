@@ -21,41 +21,6 @@ export default function FirstTimeContent() {
         </li>
         <li>An example:
           <div className="bit-field">
-            <p className="letter-correct"><span className="row-gutter">C</span>
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="0" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="1" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="2" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="3" type="checkbox" readOnly={true} checked={true} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="4" type="checkbox" readOnly={true} checked={true} />
-              <span className="annotation">&nbsp;C</span></p>
-            <p className="letter-correct"><span className="row-gutter">A</span>
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="5" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="6" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="7" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="8" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="9" type="checkbox" readOnly={true} checked={true} />
-              <span className="annotation">&nbsp;A</span></p>
-            <p className="letter-correct"><span className="row-gutter">R</span>
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="10" type="checkbox" readOnly={true} checked={true} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="11" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="12" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="13" type="checkbox" readOnly={true} checked={true} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="14" type="checkbox" readOnly={true} checked={false} />
-              <span className="annotation">&nbsp;R</span></p>
-            <p className="letter-correct"><span className="row-gutter">D</span>
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="15" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="16" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="17" type="checkbox" readOnly={true} checked={true} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="18" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="19" type="checkbox" readOnly={true} checked={false} />
-              <span className="annotation">&nbsp;D</span></p>
-            <p className="letter-correct"><span className="row-gutter">_</span>
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="20" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="21" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="22" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="23" type="checkbox" readOnly={true} checked={false} />
-              <input className="bit-checkbox" data-correctness="correct" data-bit-index="24" type="checkbox" readOnly={true} checked={false} />
-              <span className="annotation">&nbsp; </span></p>
             <p className="letter-correct"><span className="row-gutter">R</span>
               <input className="bit-checkbox" data-correctness="correct" data-bit-index="25" type="checkbox" readOnly={true} checked={true} />
               <input className="bit-checkbox" data-correctness="correct" data-bit-index="26" type="checkbox" readOnly={true} checked={false} />
