@@ -1,6 +1,6 @@
 import './App.css'
 import scrollCover from './assets/ScrollCover.png'
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -236,7 +236,7 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-      <Route path="/" element={<Navigate to={"/tutorial/0/levels/116/puzzles/0"} replace={true} />} />
+      <Route path="/" element={<Navigate to={"/tutorial"} replace={true} />} />
       {features.includes('date') && (<>
         <Route path="/today" element={<DatePlay initialDate={new Date()} />} />
         <Route path="/date/:year/:month/:day" element={<DatePlay />} />
@@ -301,7 +301,7 @@ function App() {
       {showTouchDiagnostics && <TouchDiagnostics />}
       <div id="bezel-header">
         <img src={scrollCover} alt="" style={{ width: '100%', display: 'block' }} />
-        <h1 id="magie-title">MAGiE</h1>
+        <h1 id="magie-title"><Link to="/">MAGiE</Link></h1>
         <button type={"button"} aria-label={"open settings"} className="symbol-button activate-dialog left" onClick={() => {
           setShowSettings(true);
           ReactGA4.event('open_settings_dialog', {
