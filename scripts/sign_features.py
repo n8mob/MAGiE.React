@@ -50,8 +50,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     key_path = sys.argv[1]
-    challenge = sys.argv[2]
-    features = sys.argv[3:] if len(sys.argv) > 3 else ["tutorial"]
+    challenge_arg = sys.argv[2]
+    features_arg = sys.argv[3:] if len(sys.argv) > 3 else ["tutorial"]
 
-    token = make_jwt(key_path, challenge, features)
+    token = make_jwt(key_path, challenge_arg, features_arg)
     print(token)
