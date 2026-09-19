@@ -1,0 +1,91 @@
+.dual-channel {
+  /* The strip is pinned to an edge, so the tuned channel takes what is left. */
+  justify-content: space-between;
+}
+
+.channel-heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.75em;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+/*
+ * The other channel, bleeding through. It is a real button so that Enter and
+ * Space work and screen readers announce it, but it is styled as a sliver of
+ * the screen you are not watching — inset, dimmed, and clipped to one line.
+ */
+.channel-strip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  border: 2px solid rgba(0, 0, 0, 0.32);
+  border-radius: 6px;
+  background: rgba(20, 33, 36, 0.12);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.8em;
+  text-align: left;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.channel-strip:hover,
+.channel-strip:focus-visible {
+  opacity: 1;
+  border-color: #008080;
+}
+
+.channel-strip-label {
+  flex: 0 0 auto;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+/* One line, always. Reading the other channel has to cost a tune. */
+.channel-strip-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+.channel-strip-signal .channel-strip-preview {
+  letter-spacing: 0.15em;
+}
+
+.channel-strip-indicator {
+  flex: 0 0 auto;
+  color: #008080;
+}
+
+/*
+ * An unread channel has to ask for attention — this blink is the only thing
+ * that tells a first-time player there is somewhere else to be.
+ */
+.channel-strip.unread {
+  opacity: 0.9;
+  border-color: #008080;
+}
+
+.channel-strip.unread .channel-strip-indicator {
+  animation: channel-blink 1.1s steps(1, end) infinite;
+}
+
+@keyframes channel-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .channel-strip.unread .channel-strip-indicator {
+    animation: none;
+  }
+}

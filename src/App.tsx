@@ -20,6 +20,7 @@ import { StoryPage } from "./components/StoryPage.tsx";
 import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
 import { TouchDiagnostics } from "./components/TouchDiagnostics.tsx";
+import { DualChannel } from "./components/DualChannel.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
@@ -271,6 +272,8 @@ function App() {
         <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
                element={<LevelPlay menuName="bigGame" />} />
       </>)}
+      {/* Ungated while dual-channel is a proof of concept, like /chocolate2. */}
+      <Route path="/channels" element={<DualChannel />} />
       <Route path="/chocolate2" element={<MenuBrowser menuName="chocolate2" />} />
       <Route path="/chocolate2/:categoryIndex" element={<CategoryBrowser menuName="chocolate2" />} />
       <Route path="/chocolate2/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate2" />} />

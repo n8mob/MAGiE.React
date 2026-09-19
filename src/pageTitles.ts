@@ -47,5 +47,8 @@ export const storyTitle = (storyName?: string) =>
 /** `MAGiE Door Lock` */
 export const doorLockTitle = () => `${BRAND} Door Lock`;
 
+/** `MAGiE Channels` */
+export const dualChannelTitle = () => `${BRAND} Channels`;
+
 /** `MAGiE: Page Not Found` */
 export const notFoundTitle = () => `${BRAND}: Page Not Found`;
