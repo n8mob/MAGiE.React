@@ -1,7 +1,7 @@
 export default function WelcomeContent() {
   return (
     <>
-      <h2>Welcome to <span className="magie-case">MAGiE</span>!</h2>
+      <h2>Welcome to MAGiE!</h2>
       <p>A puzzle game!</p>
 
       <p>The first few levels will have you decoding messages.</p>

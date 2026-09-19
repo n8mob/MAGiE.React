@@ -3,7 +3,7 @@ import JudgmentLegend from "./JudgmentLegend.tsx";
 export default function FirstTimeContent() {
   return (
     <>
-      <h2>Welcome to <span className="magie-case">MAGiE</span></h2>
+      <h2>Welcome to MAGiE</h2>
       <p><em>A retro-future puzzle game with bits and a totally rad mall!</em></p>
 
       <h3>🔍 How it works</h3>
