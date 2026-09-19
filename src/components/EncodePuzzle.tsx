@@ -20,6 +20,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
     onShareWin = () => {},
     winActions,
     winInline = false,
+    textElsewhere = false,
     bitButtonWidthPx = 32
   }) => {
   const [guessBits, setGuessBits] = useState(puzzle?.encoding?.encodeText(puzzle?.init) || BitSequence.empty());
@@ -131,9 +132,12 @@ const EncodePuzzle: FC<PuzzleProps> = (
           className="display puzzle-fitted-display"
           ref={mainDisplayRef}
         >
-          <div id="clue-text">
-            {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-          </div>
+          {/* On CH 2 the clue is on the other channel, so the bits stand alone. */}
+          {!textElsewhere && (
+            <div id="clue-text">
+              {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+            </div>
+          )}
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
@@ -166,9 +170,9 @@ const EncodePuzzle: FC<PuzzleProps> = (
               "THIS IS A BIT" / "IT IS .ON." — not a reward. It stays inline,
               because a screen that covers its own subject teaches nothing. A win
               the player earned gets the WinScreen instead. */}
-          <InlineWinMessage show={hasWon && winsInline} winMessage={puzzle.winMessage ?? []} />
+          <InlineWinMessage show={hasWon && winsInline && !textElsewhere} winMessage={puzzle.winMessage ?? []} />
         </div>
-        {!winsInline && (
+        {!winsInline && !textElsewhere && (
           <WinScreen
             won={hasWon}
             clue={puzzle.clue ?? []}
@@ -183,7 +187,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
           copy gets cleared by its reset before the button ever renders (#223),
           which is why useBasePuzzle owns it and the component remounts per
           puzzle. Covered by levelPlayAutoWin.test.tsx. */}
-      <AfterWinControls show={hasWon && winsInline} actions={winActions} />
+      <AfterWinControls show={hasWon && winsInline && !textElsewhere} actions={winActions} />
     </>
   );
 };

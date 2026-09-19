@@ -47,6 +47,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
     onShareWin = () => {},
     winActions,
     winInline = false,
+    textElsewhere = false,
     bitButtonWidthPx = 32
   }) => {
   const [guessText, setGuessText] = useState<string>(() => sanitizeGuessText(puzzle.init));
@@ -158,9 +159,12 @@ const DecodePuzzle: FC<PuzzleProps> = (
     <>
       <div id="game-content">
         <div id="main-display" className="display" ref={mainDisplayRef}>
-          <div id="clue-text">
-            {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
-          </div>
+          {/* On CH 2 the clue is on the other channel, so the bits stand alone. */}
+          {!textElsewhere && (
+            <div id="clue-text">
+              {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}
+            </div>
+          )}
           <DisplayMatrix
             ref={displayMatrixRef}
             displayRows={displayRows}
@@ -194,9 +198,9 @@ const DecodePuzzle: FC<PuzzleProps> = (
           {/* Same as Encode: on the tutorial's already-solved demo screens this
               text captions the bits above it rather than rewarding anything, so
               it stays inline instead of covering its own subject. */}
-          <InlineWinMessage show={hasWon && winsInline} winMessage={puzzle.winMessage ?? []} />
+          <InlineWinMessage show={hasWon && winsInline && !textElsewhere} winMessage={puzzle.winMessage ?? []} />
         </div>
-        {!winsInline && (
+        {!winsInline && !textElsewhere && (
           <WinScreen
             won={hasWon}
             clue={puzzle.clue ?? []}
@@ -208,7 +212,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
       </div>
       {/* See EncodePuzzle: the demo screens keep the controls they had, and the
           flag must be useBasePuzzle's so a parent reset can't wipe it (#223). */}
-      <AfterWinControls show={hasWon && winsInline} actions={winActions} />
+      <AfterWinControls show={hasWon && winsInline && !textElsewhere} actions={winActions} />
     </>
   );
 }

@@ -89,3 +89,60 @@
     animation: none;
   }
 }
+
+/*
+ * Split play: the shell around a real puzzle.
+ *
+ * Both channels stay mounted the whole time. Unmounting the puzzle to look at
+ * its clue would throw away the player's guess, so the channel you are not
+ * tuned to is pulled out of the flow and made invisible instead of removed.
+ *
+ * `visibility: hidden` rather than `display: none` on purpose: useBasePuzzle
+ * measures the bit field to decide how many bits fit on a row, and a
+ * display:none element measures zero, which would collapse the grid to its
+ * 13-bit fallback every time the player read the clue. A hidden element still
+ * has a box. The absolute positioning is what keeps that box from taking up
+ * space, and `inset: 0` gives it the same width it will have when shown.
+ */
+.dual-channel-play {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.channel-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.channel-pane-hidden {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* CH 1 is prose, so it gets the display surface the modes use for their own. */
+.channel-text {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  text-align: left;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.channel-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0.5em 0 1em;
+}

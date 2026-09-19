@@ -14,6 +14,17 @@ import { debug } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { DualChannelPlay } from "./DualChannelPlay.tsx";
+
+/**
+ * One line of CH 2 for its strip, chosen so it never gives the puzzle away.
+ * A Decode puzzle's bits are already on display, so they can bleed through; an
+ * Encode puzzle's are the answer, so it gets a texture instead of data.
+ */
+const signalPreview = (puzzle: Puzzle): string =>
+  puzzle.type === "Decode"
+    ? (puzzle.encoding?.encodeText(puzzle.winText)?.toPlainString() ?? "")
+    : "\u00b7 ".repeat(24).trim();
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -36,6 +47,12 @@ interface PlayPuzzleProps {
   /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
   asChocolate?: boolean;
   /**
+   * Split this puzzle across the two communications channels: the clue and the
+   * win transcript on CH 1, the bits on CH 2. Chocolate is excluded — its clue
+   * rides the conveyor as prose (#231), so there is nothing to lift off it.
+   */
+  dualChannel?: boolean;
+  /**
    * Where this puzzle sits in the content, from whichever route loaded it.
    * Omit to play without emitting funnel events.
    */
@@ -50,6 +67,7 @@ const PlayPuzzle = ({
   winActions,
   winInline = false,
   asChocolate = false,
+  dualChannel = false,
   placement,
 }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
@@ -86,6 +104,24 @@ const PlayPuzzle = ({
   }, [rawPuzzle, asChocolate, searchParams]);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
+
+  // Like ?asChocolate, so any existing puzzle can be played split without a
+  // route of its own. Chocolate opts out: it has no clue to lift off the belt.
+  const playsSplit = (dualChannel || searchParams.has("dualChannel"))
+    && puzzle?.type !== "Chocolate";
+
+  /*
+   * A copy of the win, purely so the shell knows when to tune back to CH 1.
+   * useBasePuzzle's own hasWon stays the flag that decides what a *mode* draws
+   * (#223) — this one decides nothing inside the mode, and is keyed to the slug
+   * so moving to the next puzzle starts over.
+   */
+  const [wonForChannel, setWonForChannel] = useState(false);
+  const [renderedSlug, setRenderedSlug] = useState(puzzle?.slug);
+  if (puzzle?.slug !== renderedSlug) {
+    setRenderedSlug(puzzle?.slug);
+    setWonForChannel(false);
+  }
 
   // puzzle_type and encoding come from the puzzle as *played*, after any
   // Chocolate coercion above — the route can't know either one.
@@ -183,6 +219,7 @@ const PlayPuzzle = ({
       playSound(SOUNDS.win);
     }
     endAttempt("won");
+    setWonForChannel(true);
     if (onWin) {
       onWin(stopwatchRef.current!);
     }
@@ -255,20 +292,18 @@ const PlayPuzzle = ({
     return <div>Loading...</div>;
   }
 
-  return (
+  // Split play hands the clue, the transcript and the after-win controls to the
+  // shell, so the mode itself is asked for nothing but the machine.
+  const mode = (
     <>
-      <Stopwatch
-        ref={stopwatchRef}
-        onDisplayChange={setStopwatchDisplay}
-        visible={false}
-      />
       {puzzle.type === "Encode" &&
         <EncodePuzzle
           puzzle={puzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
-          winActions={winActions}
+          winActions={playsSplit ? undefined : winActions}
           winInline={winInline}
+          textElsewhere={playsSplit}
           bitButtonWidthPx={32}
         />
       }
@@ -277,8 +312,9 @@ const PlayPuzzle = ({
           puzzle={puzzle}
           onWin={handleWin}
           onShareWin={handleShareWin}
-          winActions={winActions}
+          winActions={playsSplit ? undefined : winActions}
           winInline={winInline}
+          textElsewhere={playsSplit}
           bitButtonWidthPx={32}
         />
       }
@@ -294,6 +330,30 @@ const PlayPuzzle = ({
           bitButtonWidthPx={32}
         />
       }
+    </>
+  );
+
+  return (
+    <>
+      <Stopwatch
+        ref={stopwatchRef}
+        onDisplayChange={setStopwatchDisplay}
+        visible={false}
+      />
+      {playsSplit
+        ? (
+          <DualChannelPlay
+            key={puzzle.slug}
+            puzzle={puzzle}
+            won={wonForChannel}
+            isAutoWin={isAutoWinPuzzle(puzzle)}
+            signalPreview={signalPreview(puzzle)}
+            winActions={winActions}
+          >
+            {mode}
+          </DualChannelPlay>
+        )
+        : mode}
     </>
   );
 };

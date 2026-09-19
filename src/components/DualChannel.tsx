@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { BitButton } from "./BitButton.tsx";
 import { DisplayMatrix } from "./DisplayMatrix.tsx";
 import { fiveBitA1 } from "../encoding/FiveBitA1.ts";
+import { ChannelStrip, CHANNEL_LABEL, ChannelId, OTHER } from "./ChannelStrip.tsx";
 import { TRANSMISSIONS } from "../dualChannel/transmissions.ts";
 import { usePageTitle } from "../hooks/usePageTitle.ts";
 import { dualChannelTitle } from "../pageTitles.ts";
@@ -21,23 +22,6 @@ import "./DualChannel.css";
  * whichever one you are tuned to. Tuning never moves a channel across the
  * screen, so the gesture stays the same one every time.
  */
-
-type ChannelId = "admin" | "signal";
-
-const CHANNEL_LABEL: Record<ChannelId, string> = {
-  admin: "CH 1 · MALL PA",
-  // Unlabelled on purpose: the mall's directory does not admit this one exists.
-  signal: "CH 2 · · · · · ·",
-};
-
-/**
- * What the strip calls a channel. Shorter than the heading, because the strip's
- * job is to show the other channel's *content* — a wide label would crowd out
- * the very thing that proves something is happening over there.
- */
-const CHANNEL_TAG: Record<ChannelId, string> = { admin: "CH 1", signal: "CH 2" };
-
-const OTHER: Record<ChannelId, ChannelId> = { admin: "signal", signal: "admin" };
 
 /**
  * The built-in 5bA1 — the encoding the tutorial teaches and Chocolate falls back
@@ -99,16 +83,12 @@ const DualChannel = () => {
     : secretBits.toPlainString().slice(0, STRIP_BIT_COUNT);
 
   const strip = (
-    <button
-      type="button"
-      className={`channel-strip channel-strip-${strippedChannel}${isUnread ? " unread" : ""}`}
-      onClick={() => tune(strippedChannel)}
-      aria-label={`Tune to ${CHANNEL_LABEL[strippedChannel]}${isUnread ? ", new transmission waiting" : ""}`}
-    >
-      <span className="channel-strip-label">{CHANNEL_TAG[strippedChannel]}</span>
-      <span className="channel-strip-preview">{stripPreview}</span>
-      <span className="channel-strip-indicator" aria-hidden="true">{isUnread ? "▌" : ""}</span>
-    </button>
+    <ChannelStrip
+      channel={strippedChannel}
+      preview={stripPreview}
+      unread={isUnread}
+      onTune={tune}
+    />
   );
 
   return (

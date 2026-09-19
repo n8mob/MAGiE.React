@@ -32,6 +32,14 @@ export interface PuzzleProps {
    * puzzles take this path regardless, for the same reason.
    */
   winInline?: boolean;
+  /**
+   * Someone outside the mode is showing this puzzle's words — the clue above
+   * the bits, and the whole win transcript. The mode then draws only the
+   * machine and still reports the win through `onWin`; it just doesn't say
+   * anything about it. Set by the dual-channel shell, which puts all of that
+   * prose on CH 1. See DualChannelPlay.
+   */
+  textElsewhere?: boolean;
   bitButtonWidthPx: number;
 }
 

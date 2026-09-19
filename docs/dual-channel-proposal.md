@@ -68,3 +68,25 @@ what turns this from a shell into a puzzle area. The `Decoder` toggle on CH 2 is
 scaffolding for checking content, not a shipped feature.
 
 Route: `/channels`, ungated like `/chocolate2` while it is a proof of concept.
+
+# v2: real puzzles, split
+
+`?dualChannel` on any existing puzzle URL plays it across the two channels, the
+same way `?asChocolate` coerces a puzzle into Chocolate. CH 1 gets the clue;
+CH 2 gets the puzzle as already implemented, minus the clue.
+
+The win screen stops being an overlay. A win tunes back up to CH 1, which shows
+the same transcript the modal used to — clue, then the answer, then the win
+message — with the route's Next/Share controls under it. The way back down to
+the finished puzzle is the CH 2 strip, so "admire puzzle" stops being a button
+and becomes the same gesture as everything else on this screen.
+
+Chocolate is left out. Its clue rides the conveyor as prose (#231), so there is
+no clue to lift onto CH 1 without unpicking the belt.
+
+Still open:
+- Typing while CH 1 is tuned still reaches the hidden Decode keyboard listener.
+- Nothing authored for split play yet. The clue does double duty as the
+  Administrator's instruction, which is fine for testing and thin for fiction —
+  the point of authoring new puzzles is to write CH 1 as a voice rather than a
+  caption.

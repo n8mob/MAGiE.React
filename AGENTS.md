@@ -126,6 +126,58 @@ The other kind is auto-win puzzles (`init === winText`). They are the tutorial's
 
 Note: jsdom implements `<dialog>` without `showModal()`, so the component falls back to the `open` attribute in tests. Visibility still works (jsdom applies `dialog:not([open]) { display: none }`, so `queryByRole` correctly excludes a closed screen) but the top layer and focus trap only exist in a real browser.
 
+### Dual channel (`ChannelStrip.tsx`, `DualChannelPlay.tsx`, `DualChannel.tsx`)
+
+Two communications channels sharing one screen. CH 1 is the Administrator in
+the clear — clue going in, win transcript coming out. CH 2 is the MAGiE device,
+where everything is bits. The player is tuned to exactly one at a time.
+
+The **strip** is the whole feature: the channel you are not tuned to stays on
+screen as one clipped line at the edge, and tapping it is the switch. There is
+no other control, so it teaches itself with an in-fiction tag (`CH 2`) and a
+blink whenever its channel holds something unseen. Showing both channels at once
+was rejected deliberately — the binary would sit beside its own plain-text
+answer with nothing to make anyone look at it. See `docs/dual-channel-proposal.md`.
+
+Each channel keeps its home edge: text above, bits below, whichever is tuned, so
+the strip never moves across the screen.
+
+**Split play** (`DualChannelPlay`) wraps a real puzzle. `PlayPuzzle` turns it on
+via the `dualChannel` prop or a `?dualChannel` query param — the same shape as
+`?asChocolate`, so any existing puzzle URL can be played split. Chocolate is
+excluded: its clue rides the conveyor as prose (#231), so there is nothing to
+lift off it.
+
+- The mode is rendered with **`textElsewhere`** (`PuzzleProps`), which suppresses
+  its `#clue-text`, its `WinScreen`, its `InlineWinMessage` and its
+  `AfterWinControls`. The mode still reports the win through `onWin`; it just
+  draws nothing about it. This is the third win surface, alongside the screen and
+  the inline panel.
+- **The win transcript replaces the WinScreen overlay.** A win tunes back to CH 1
+  on its own, where clue → answer → `winMessage` and the route's `winActions`
+  render as ordinary content. "Admire puzzle" is no longer a button: tapping the
+  CH 2 strip is the round trip.
+- Auto-win puzzles do *not* auto-tune. They open already solved and teach by
+  pointing at the bits, so yanking them to CH 1 on arrival would hide the subject.
+- **The hidden channel is hidden, not unmounted** — unmounting the mode would
+  throw away the player's guess every time they read the clue. `.channel-pane-hidden`
+  uses `position: absolute; inset: 0; visibility: hidden` rather than
+  `display: none`, because `useBasePuzzle` measures the bit field to decide how
+  many bits fit a row and a `display: none` element measures zero.
+- `PlayPuzzle` keeps its own `wonForChannel` copy purely to drive the tuning, and
+  adjusts it during render rather than in an effect (the same pattern `WinScreen`
+  uses for its dismissal). `useBasePuzzle`'s `hasWon` remains the flag that
+  decides what a *mode* draws (#223).
+- The CH 2 strip preview never leaks an answer: a Decode puzzle's bits are
+  already on display so they bleed through, while an Encode puzzle gets a dotted
+  texture instead of data.
+- Known gap: `DecodePuzzle`'s window `keydown` listener stays live while CH 2 is
+  hidden, so typing while reading CH 1 still enters letters.
+
+`/channels` is a separate scripted demo of the same shell — the Administrator's
+five-beat broadcast from `src/dualChannel/transmissions.ts`, with no puzzle and
+no guessing loop. Ungated like `/chocolate2` while this is a proof of concept.
+
 ### Story mode (`src/components/StoryPage.tsx`, `StoryIndex.tsx`)
 
 A paginated text reader for narrative content stored as Markdown files in `src/assets/story/`. The story list is defined in `src/stories.ts`. Routes: `/story` (index) and `/story/:slug` (individual chapter).
