@@ -136,7 +136,17 @@ A paginated text reader for narrative content stored as Markdown files in `src/a
 - **Navigation** — arrow keys / spacebar / click advances pages; `▲`/`▼` buttons and prev/next story links are in the `<nav>`.
 - **`#main-display.paginated`** must have `flex: 1; min-height: 0` so `ResizeObserver` doesn't fire spuriously when font size changes (which would cause an infinite measurement loop).
 
-The `text-transform: uppercase` global on `#root` is suppressed for the whole story page via `text-transform: none` on `.story-page`.
+Story prose renders in whatever case the Markdown gives it; nothing transforms it.
+
+### Text casing
+
+There is no global `text-transform`. Displayed case is whatever the source gives:
+puzzle content (`clue`, `winText`, `init`, `winMessage`, `levelName`) arrives from
+the API already uppercase, while menu titles, puzzle names and UI prose are written
+in sentence case and render that way. Case-sensitivity that actually matters is
+enforced in JS, not CSS — `DecodePuzzle`'s `normalizeDecodeCharacter` uppercases
+typed letters and `ChocolateMode` uppercases its conveyor text — so encodings with
+no lowercase are safe regardless of styling.
 
 ### Colors
 

@@ -116,8 +116,8 @@ seam, easy to stub in tests, and the natural home for the `version` migration
 when a second field arrives.
 
 Normalize on commit: uppercase, trim, collapse internal runs of spaces. 5bA1 has
-no lowercase and `#root` sets `text-transform: uppercase`, so a stored
-lowercase name would be a lie the display quietly covers up.
+no lowercase, so a stored lowercase name would be a lie the encoding cannot
+represent.
 
 ### 3. The screen
 
