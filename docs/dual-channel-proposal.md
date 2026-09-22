@@ -77,6 +77,22 @@ The player will get to the yet-to-be-implemented card-wallet view with a
 we can add a notes or reference view to the left. (We previously did some
 experiments with a 5-Bit, A=1 reference note.)
 
+# Tutorial Presentation
+The way we have this implemented in v1 does not work well with our existing
+tutorial levels - the way it displays bits, clues, and win messages all on the
+same screen so they can reference each other ("see how the bits are like this?"
+etc.).
+
+Perhaps, once the player has found the secret channel, The Administrator will
+provide Proti with a deck of mag-stripe cards that are a kind of program
+for MAGiE. This makes a lot of sense in-universe. MAGiE is intended
+for students, so it makes sense that it would have some ability to present some
+basic interactive lesson features.
+
+So, we can leave the tutorial levels as they currently are, even if Dual Channel
+takes over the main UI of the game. We'll just need to create some narrative
+path to the special mode.
+
 # Settled design (v1)
 
 ## Tuned channel + bleed strip
