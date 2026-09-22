@@ -1,6 +1,6 @@
 import './App.css'
 import scrollCover from './assets/ScrollCover.png'
-import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 import ReactGA4 from 'react-ga4';
 import { DatePlay } from "./components/DatePlay.tsx";
 import { usePageTracking } from "./hooks/usePageTracking.ts";
@@ -10,17 +10,14 @@ import HowTo from './components/HowTo.tsx';
 import WelcomeContent from './components/WelcomeContent.tsx';
 import SettingsContent from './components/SettingsContent.tsx';
 import { useHeader } from "./hooks/useHeader.ts";
-import { MenuBrowser } from './components/MenuBrowser.tsx';
-import { CategoryBrowser } from './components/CategoryBrowser.tsx';
-import LevelPlay from "./components/LevelPlay.tsx";
 import { PageNotFound } from "./components/PageNotFound.tsx";
-import { LevelBrowser } from "./components/LevelBrowser.tsx";
 import { useFeatureFlags } from "./hooks/useFeatureFlags.ts";
 import { StoryPage } from "./components/StoryPage.tsx";
 import { StoryIndex } from "./components/StoryIndex.tsx";
 import { DoorLock } from "./components/DoorLock.tsx";
 import { TouchDiagnostics } from "./components/TouchDiagnostics.tsx";
 import { DualChannel } from "./components/DualChannel.tsx";
+import { MENU_AREAS, menuAreaRoutes } from "./menuAreas.tsx";
 import { VariableWidthEncoder } from "./encoding/VariableWidthEncoder.ts";
 
 const doorLockEncoder = new VariableWidthEncoder({ "0": { "a": "0" }, "1": { "b": "1" } });
@@ -52,10 +49,6 @@ if (debugMode) {
   ReactGA4.event("debug_mode_enabled", { debug_mode: debugMode });
 }
 
-function RedirectLevelRootToPuzzle0() {
-  const { categoryIndex, levelNumber } = useParams();
-  return <Navigate to={`/tutorial/${categoryIndex}/levels/${levelNumber}/puzzles/0`} replace={true} />;
-}
 
 function App() {
   usePageTracking();
@@ -249,53 +242,14 @@ function App() {
       {features.includes('doorLock') && (<>
         <Route path="/doorLock" element={<DoorLock encoder={doorLockEncoder} presets={["1", "10", "11"]} />} />
       </>)}
-      {features.includes('tutorial') && (<>
-        <Route path="/tutorial" element={<MenuBrowser menuName="tutorial" />} />
-        <Route path="/tutorial/:categoryIndex" element={<CategoryBrowser menuName="tutorial" />} />
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber" element={
-          <RedirectLevelRootToPuzzle0 />
-        } />
-        <Route path="/tutorial/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="tutorial" />} />
-      </>)}
-      {features.includes('vintage') && (<>
-        <Route path="/vintage" element={<MenuBrowser menuName="vintage" />} />
-        <Route path="/vintage/:categoryIndex" element={<CategoryBrowser menuName="vintage" />} />
-        <Route path="/vintage/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="vintage" />} />
-        <Route path="/vintage/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="vintage" />} />
-      </>)}
-      {features.includes('bigGameRoutes') && (<>
-        <Route path="/bigGame" element={<MenuBrowser menuName="bigGame" />} />
-        <Route path="/bigGame/:categoryIndex" element={<CategoryBrowser menuName="bigGame" />} />
-        <Route path="/bigGame/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="bigGame" />} />
-        <Route path="/bigGame/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="bigGame" />} />
-      </>)}
       {/* Ungated while dual-channel is a proof of concept, like /chocolate2. */}
       <Route path="/channels" element={<DualChannel />} />
-      <Route path="/chocolate2" element={<MenuBrowser menuName="chocolate2" />} />
-      <Route path="/chocolate2/:categoryIndex" element={<CategoryBrowser menuName="chocolate2" />} />
-      <Route path="/chocolate2/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate2" />} />
-      <Route path="/chocolate2/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-             element={<LevelPlay menuName="chocolate2" />} />
-      {features.includes('chocolate') && (<>
-        {/* MENU_NAME_MAP aliases "chocolate" to the mall's API menu, so these
-            routes browse mall content while links stay under /chocolate. */}
-        <Route path="/letErRoll" element={<Navigate to={"/chocolate/0/levels/4/puzzles/0"}/>} />
-        <Route path="/chocolate" element={<MenuBrowser menuName="chocolate" />} />
-        <Route path="/chocolate/:categoryIndex" element={<CategoryBrowser menuName="chocolate" />} />
-        <Route path="/chocolate/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate" />} />
-        <Route path="/chocolate/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="chocolate" asChocolate={true} />} />
-      </>)}
-      {features.includes('mall') && (<>
-        <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex" element={<CategoryBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="mall" />} />
-        <Route path="/mall/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="mall" />} />
-      </>)}
+      {MENU_AREAS
+        .filter(area => !area.feature || features.includes(area.feature))
+        .map(area => menuAreaRoutes(area))}
+      {features.includes('chocolate') && (
+        <Route path="/letErRoll" element={<Navigate to={"/chocolate/0/levels/4/puzzles/0"} />} />
+      )}
       <Route path={"*"} element={<PageNotFound />} />
     </Routes>), [features]);
 

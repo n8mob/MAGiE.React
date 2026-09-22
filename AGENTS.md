@@ -209,3 +209,15 @@ See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-
 Most routes are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source.
 
 The default set is `NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate']`, so without a token you get the daily puzzle (`/today`, `/date/...`), the tutorial, Door Lock, and the whole `chocolate` group — which includes `/letErRoll` as well as `/chocolate/...`. A token is needed for `story`, `vintage`, `mall`, and `bigGameRoutes` — note that last flag is *not* named after its `/bigGame` path. `/chocolate2` is deliberately ungated as a test route.
+
+**Unlock an area locally with `VITE_EXTRA_FEATURES`**, not by editing `NORMAL_FEATURES`. It is a comma-separated list read from `.env.local` (already gitignored, like `VITE_MAGIE_PUZZLE_API`), so local testing never becomes a commit that can reach production — which it did once, shipping `mall` to everyone on a shared branch. The extras are *unioned* with whatever is in force, a verified token's set included, since a token otherwise replaces the whole list and would silently switch them off. A rejected token still clears everything, so that path stays observable.
+
+```
+VITE_EXTRA_FEATURES=mall,vintage,bigGameRoutes
+```
+
+### Menu area routes (`src/menuAreas.tsx`)
+
+Every menu area has the same four routes — menu, category, level, puzzle — under its own path, so they are a table (`MENU_AREAS`) rather than six near-identical blocks in `App.tsx`. A row carries the `menuName` (which is also the path prefix), the `feature` that unlocks it (omitted when it is always on), whether its level root lists puzzles or jumps to the first one, and whether the area forces Chocolate mode.
+
+`menuAreaRoutes` is a plain function, not a component: `<Routes>` reads its children looking for `<Route>` elements and recurses into Fragments, so a fragment of routes works where a `<MenuRoutes>` component would be rejected outright. Anything an area needs beyond the four (chocolate's `/letErRoll` shortcut) stays written out in `App.tsx`.
