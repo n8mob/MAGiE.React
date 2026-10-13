@@ -3,6 +3,8 @@ MAGiE: Your MAGnetic interactive Explorer
 React Version
 -------------------------------------------------
 
+> 🎮 **Play the live game at [magiegame.com](https://magiegame.com)**
+
 # Long story short
 
 This is a binary-encoding puzzle game implemented as a React single-page application.
@@ -17,19 +19,28 @@ But for now I, Nate Grigg, retain the copyright: all rights reserved.
 Please contact me for any use cases which fall outside of "tinkering with" and "playing" the game.
 
 # To Play
-I'm just learning React and Node, so I'm not sure how hard or easy it will be for you to run the game.
 
-I _believe_ that if you already have Node and npm installed,
-then all you need to do is clone the repo, navigate to the directory, and run `npm start`.
+The easiest way to play is directly on the web at [https://magiegame.com](https://magiegame.com).
 
-The one thing that will bite you is that I have a separate project to generate menu files that contain the puzzles.
+## Running locally
 
-That project can be found in my [puzzleeditor2020 repository](https://github.com/n8mob/puzzleeditor2020).
+If you want to run the project locally or tinker with the code:
 
-But you'll need to run that Django project and then add some puzzles for it to work.
+1. Clone the repo and install dependencies:
+   ```bash
+   npm install
+   ```
 
-If you'd like to contribute to this project, I think a good first step would be to modify the React app 
-to allow a choice between a static JSON file, or an API for the puzzles.
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   This will start the Vite dev server at `http://localhost:5173` (or `http://magiegame.local:5173` if configured in your `/etc/hosts`).
+
+3. Other scripts:
+   - `npm run build` — TypeScript compile and Vite production build
+   - `npm run lint` — Run ESLint
+   - `npx vitest` — Run tests
 
 ## Narrow output
 
