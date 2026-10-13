@@ -206,13 +206,7 @@ const ChocolateMode: FC<ChocolateModeProps> = ({
   const displayMatrixRef = useRef<DisplayMatrixUpdate>(null);
   const mainDisplayRef = useRef<HTMLDivElement>(null);
   const bitSize = useMaximizedBitSize(mainDisplayRef, 5, 48, 40, 56);
-  const proseStyle = usePuzzleProseSizing(
-    mainDisplayRef,
-    [...clueLines,
-      ...(
-        puzzle.winMessage ?? []
-      )]
-  );
+  const proseStyle = usePuzzleProseSizing(mainDisplayRef);
   useLayoutEffect(() => {
     // Row pitch is part of the conveyor's scoring geometry, so a resize must
     // invalidate the old measurement before the animation continues.

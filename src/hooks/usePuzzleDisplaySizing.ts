@@ -1,4 +1,10 @@
-import { CSSProperties, RefObject, useLayoutEffect, useMemo, useState } from "react";
+import { CSSProperties, RefObject, useLayoutEffect, useState } from "react";
+
+// Prose is sized so this many characters span the display, whatever the puzzle
+// says (#261). Sizing to each message's own longest line let a short one like
+// LOADING balloon, and letters changing size between screens spoils the
+// pixel-display illusion. Every authored line fits within it.
+export const PROSE_COLUMNS = 24;
 
 const MIN_PROSE_PX = 12;
 // A modest step up from the normal 16px text. Four-bit encodings can make bits
@@ -43,22 +49,15 @@ export function useMaximizedBitSize(
   return bitSize;
 }
 
-/** Fit authored lines to the display while preserving their deliberate breaks. */
+/** Size prose so PROSE_COLUMNS characters fit the display, independent of content. */
 export function usePuzzleProseSizing(
-  containerRef: RefObject<HTMLElement | null>,
-  lines: string[]
+  containerRef: RefObject<HTMLElement | null>
 ): PuzzleSizingStyle {
   const [proseSize, setProseSize] = useState<number>();
-  const lineKey = lines.join("\u0000");
-  const authoredLines = useMemo(
-    () => lineKey.split("\u0000").filter(Boolean),
-    [lineKey]
-  );
 
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container || authoredLines.length === 0) {
-      setProseSize(undefined);
+    if (!container) {
       return;
     }
 
@@ -81,15 +80,10 @@ export function usePuzzleProseSizing(
       probe.style.fontStretch = computed.fontStretch;
       probe.style.letterSpacing = computed.letterSpacing;
       probe.style.textTransform = computed.textTransform;
-      for (const line of authoredLines) {
-        const lineProbe = document.createElement("div");
-        lineProbe.textContent = line;
-        probe.appendChild(lineProbe);
-      }
+      // The font is monospaced, so any run of the right length measures the same.
+      probe.textContent = "M".repeat(PROSE_COLUMNS);
       document.body.appendChild(probe);
-      const measuredWidth = Math.max(
-        ...Array.from(probe.children, child => child.getBoundingClientRect().width)
-      );
+      const measuredWidth = probe.getBoundingClientRect().width;
       probe.remove();
       if (measuredWidth === 0) {
         return;
@@ -109,7 +103,7 @@ export function usePuzzleProseSizing(
       observer?.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [authoredLines, containerRef]);
+  }, [containerRef]);
 
   return proseSize === undefined ? {} : { "--puzzle-prose-size": `${proseSize}px` };
 }
