@@ -138,6 +138,12 @@ A paginated text reader for narrative content stored as Markdown files in `src/a
 
 The `text-transform: uppercase` global on `#root` is suppressed for the whole story page via `text-transform: none` on `.story-page`.
 
+### Prose sizing (`src/hooks/usePuzzleDisplaySizing.ts`)
+
+Puzzle prose (clue, win message) is sized so `PROSE_COLUMNS` (24) characters span the display, whatever the text says (#261). Sizing to each message's own longest line made short ones balloon, and letters changing size between screens spoils the pixel-display illusion. Every authored line is 24 characters or fewer.
+
+The size then snaps down to a multiple of `7 / devicePixelRatio` CSS px. The HD44780 font draws on a 7-pixel em with a hairline gap between dots, so at any other size the dots land on fractional device pixels and the gaps smear unevenly into a moiré, visible on 3× phones as well as 1× monitors. Browser zoom changes `devicePixelRatio` and fires `resize`, which re-snaps. There is no px cap, since the column count already bounds the size; a 12px floor rounds *up* to the next snapped size.
+
 ### Colors
 
 See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-based bit-state color system.

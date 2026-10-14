@@ -7,15 +7,31 @@ import { CSSProperties, RefObject, useLayoutEffect, useState } from "react";
 export const PROSE_COLUMNS = 24;
 
 const MIN_PROSE_PX = 12;
-// A modest step up from the normal 16px text. Four-bit encodings can make bits
-// enormous, but prose should not follow them into headline territory.
-const MAX_PROSE_PX = 20;
+// The HD44780 font draws on a 7-pixel em: each font pixel is 1/7 of the font
+// size, with a hairline gap between dots. At any other size dots land on
+// fractional device pixels and the gaps smear unevenly into a moiré, so prose
+// snaps to sizes where one font pixel is a whole number of device pixels.
+const FONT_PIXELS_PER_EM = 7;
 // Exact-fit text is prone to losing its final glyph to fractional-pixel font
 // metrics, scrollbars, and small differences in mobile font rasterization.
 const TEXT_SAFETY_PX = 16;
 const TEXT_FIT_RATIO = 0.98;
 
 type PuzzleSizingStyle = CSSProperties & { "--puzzle-prose-size"?: string };
+
+/**
+ * The largest size at or below `fitPx` whose font pixels land on whole device
+ * pixels, or the smallest such size at or above MIN_PROSE_PX if that is larger.
+ */
+export function snapProseSize(fitPx: number, devicePixelRatio: number): number {
+  const step = FONT_PIXELS_PER_EM / (devicePixelRatio > 0 ? devicePixelRatio : 1);
+  // The epsilon keeps an exact multiple from flooring a step short on float error.
+  const steps = Math.max(
+    Math.floor(fitPx / step + 1e-6),
+    Math.ceil(MIN_PROSE_PX / step - 1e-6)
+  );
+  return steps * step;
+}
 
 /** Maximize a known-width bit row, reserving its fixed text gutters. */
 export function useMaximizedBitSize(
@@ -88,10 +104,11 @@ export function usePuzzleProseSizing(
       if (measuredWidth === 0) {
         return;
       }
-      setProseSize(Math.min(MAX_PROSE_PX, Math.max(
-        MIN_PROSE_PX,
-        baseSize * availableWidth / measuredWidth * TEXT_FIT_RATIO
-      )));
+      // Zoom changes devicePixelRatio and fires resize, so this re-snaps with it.
+      setProseSize(snapProseSize(
+        baseSize * availableWidth / measuredWidth * TEXT_FIT_RATIO,
+        window.devicePixelRatio
+      ));
     };
 
     measure();
