@@ -46,10 +46,7 @@ const EncodePuzzle: FC<PuzzleProps> = (
     bitButtonWidthPx,
     maximizeFixedWidthBits: puzzle.encoding instanceof FixedWidthEncoder
   });
-  const proseStyle = usePuzzleProseSizing(
-    mainDisplayRef,
-    [...(puzzle.clue ?? []), ...(puzzle.winMessage ?? [])]
-  );
+  const proseStyle = usePuzzleProseSizing(mainDisplayRef);
 
   /*
    * Two roads to the same place. An auto-win screen arrives already solved, so

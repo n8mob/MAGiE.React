@@ -1,7 +1,7 @@
 import { PuzzleProps, useBasePuzzle } from "./useBasePuzzle";
 import { DisplayMatrix } from "./DisplayMatrix";
 import { CorrectnessBitButton } from "./BitButton.tsx";
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, useCallback, useEffect, useMemo, useState } from "react";
 import { BitSequence } from "../BitSequence";
 import { OnScreenKeyboard } from "./OnScreenKeyboard.tsx";
 import { GuessDisplay } from "./GuessDisplay.tsx";
@@ -9,6 +9,7 @@ import { Correctness } from "../judgment/BitJudgment.ts";
 import { WinScreen } from "./WinScreen.tsx";
 import { AfterWinControls, InlineWinMessage } from "./InlineWin.tsx";
 import { isWinInline } from "../model.ts";
+import { usePuzzleProseSizing } from "../hooks/usePuzzleDisplaySizing.ts";
 
 const LETTER_PATTERN = /^[a-z]$/i;
 const ALLOWED_PUNCTUATION = new Set<string>([",", ".", "!", "?", " "]);
@@ -70,6 +71,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
     onShareWin,
     bitButtonWidthPx,
   });
+  const proseStyle = usePuzzleProseSizing(mainDisplayRef);
 
   // See EncodePuzzle: an already-solved screen and a tutorial lesson both talk
   // about the bits on display, which a modal would cover.
@@ -156,7 +158,7 @@ const DecodePuzzle: FC<PuzzleProps> = (
 
   return (
     <>
-      <div id="game-content">
+      <div id="game-content" className="puzzle-fitted-game" style={proseStyle as CSSProperties}>
         <div id="main-display" className="display" ref={mainDisplayRef}>
           <div id="clue-text">
             {[...puzzle.clue].map((clueLine, clueIndex) => <p key={clueIndex}>{clueLine}</p>)}

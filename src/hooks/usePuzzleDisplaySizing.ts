@@ -1,15 +1,37 @@
-import { CSSProperties, RefObject, useLayoutEffect, useMemo, useState } from "react";
+import { CSSProperties, RefObject, useLayoutEffect, useState } from "react";
+
+// Prose is sized so this many characters span the display, whatever the puzzle
+// says (#261). Sizing to each message's own longest line let a short one like
+// LOADING balloon, and letters changing size between screens spoils the
+// pixel-display illusion. Every authored line fits within it.
+export const PROSE_COLUMNS = 24;
 
 const MIN_PROSE_PX = 12;
-// A modest step up from the normal 16px text. Four-bit encodings can make bits
-// enormous, but prose should not follow them into headline territory.
-const MAX_PROSE_PX = 20;
+// The HD44780 font draws on a 7-pixel em: each font pixel is 1/7 of the font
+// size, with a hairline gap between dots. At any other size dots land on
+// fractional device pixels and the gaps smear unevenly into a moiré, so prose
+// snaps to sizes where one font pixel is a whole number of device pixels.
+const FONT_PIXELS_PER_EM = 7;
 // Exact-fit text is prone to losing its final glyph to fractional-pixel font
 // metrics, scrollbars, and small differences in mobile font rasterization.
 const TEXT_SAFETY_PX = 16;
 const TEXT_FIT_RATIO = 0.98;
 
 type PuzzleSizingStyle = CSSProperties & { "--puzzle-prose-size"?: string };
+
+/**
+ * The largest size at or below `fitPx` whose font pixels land on whole device
+ * pixels, or the smallest such size at or above MIN_PROSE_PX if that is larger.
+ */
+export function snapProseSize(fitPx: number, devicePixelRatio: number): number {
+  const step = FONT_PIXELS_PER_EM / (devicePixelRatio > 0 ? devicePixelRatio : 1);
+  // The epsilon keeps an exact multiple from flooring a step short on float error.
+  const steps = Math.max(
+    Math.floor(fitPx / step + 1e-6),
+    Math.ceil(MIN_PROSE_PX / step - 1e-6)
+  );
+  return steps * step;
+}
 
 /** Maximize a known-width bit row, reserving its fixed text gutters. */
 export function useMaximizedBitSize(
@@ -43,22 +65,15 @@ export function useMaximizedBitSize(
   return bitSize;
 }
 
-/** Fit authored lines to the display while preserving their deliberate breaks. */
+/** Size prose so PROSE_COLUMNS characters fit the display, independent of content. */
 export function usePuzzleProseSizing(
-  containerRef: RefObject<HTMLElement | null>,
-  lines: string[]
+  containerRef: RefObject<HTMLElement | null>
 ): PuzzleSizingStyle {
   const [proseSize, setProseSize] = useState<number>();
-  const lineKey = lines.join("\u0000");
-  const authoredLines = useMemo(
-    () => lineKey.split("\u0000").filter(Boolean),
-    [lineKey]
-  );
 
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container || authoredLines.length === 0) {
-      setProseSize(undefined);
+    if (!container) {
       return;
     }
 
@@ -81,23 +96,19 @@ export function usePuzzleProseSizing(
       probe.style.fontStretch = computed.fontStretch;
       probe.style.letterSpacing = computed.letterSpacing;
       probe.style.textTransform = computed.textTransform;
-      for (const line of authoredLines) {
-        const lineProbe = document.createElement("div");
-        lineProbe.textContent = line;
-        probe.appendChild(lineProbe);
-      }
+      // The font is monospaced, so any run of the right length measures the same.
+      probe.textContent = "M".repeat(PROSE_COLUMNS);
       document.body.appendChild(probe);
-      const measuredWidth = Math.max(
-        ...Array.from(probe.children, child => child.getBoundingClientRect().width)
-      );
+      const measuredWidth = probe.getBoundingClientRect().width;
       probe.remove();
       if (measuredWidth === 0) {
         return;
       }
-      setProseSize(Math.min(MAX_PROSE_PX, Math.max(
-        MIN_PROSE_PX,
-        baseSize * availableWidth / measuredWidth * TEXT_FIT_RATIO
-      )));
+      // Zoom changes devicePixelRatio and fires resize, so this re-snaps with it.
+      setProseSize(snapProseSize(
+        baseSize * availableWidth / measuredWidth * TEXT_FIT_RATIO,
+        window.devicePixelRatio
+      ));
     };
 
     measure();
@@ -109,7 +120,7 @@ export function usePuzzleProseSizing(
       observer?.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [authoredLines, containerRef]);
+  }, [containerRef]);
 
   return proseSize === undefined ? {} : { "--puzzle-prose-size": `${proseSize}px` };
 }
