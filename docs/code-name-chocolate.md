@@ -129,6 +129,4 @@ seed the mode.
 1. Root-level `/chocolate` area with the same MenuBrowser → CategoryBrowser → LevelBrowser → LevelPlay structure as vintage/mall/bigGame.
 2. All four routes pass `menuName="chocolate"`; `MENU_NAME_MAP` aliases that key to the mall's API menu (`AbandonedMall-March2025`), so the area browses mall content while links stay under `/chocolate/...`. Swap the alias (or add a real chocolate menu) server-side without touching routes.
 3. Gated by the `chocolate` feature flag, which is in `NORMAL_FEATURES` (on by default).
-4. `PlayPuzzle` has a third clause for `type === "Chocolate"`, and two ways to force the mode on a non-Chocolate puzzle:
-   - `asChocolate` prop (threaded through `LevelPlay`; set on the `/chocolate` play route). Kept out of `MENU_NAME_MAP` on purpose — that map stays naming/presentation data.
-   - `?asChocolate` query param on any puzzle URL, for ad-hoc testing. An optional value picks the clock: `?asChocolate=none|advance|scroll`.
+4. `PlayPuzzle` has a third clause for `type === "Chocolate"`. Only puzzles authored as Chocolate play in the mode; the old `asChocolate` prop and `?asChocolate` query param that coerced Encode/Decode puzzles were removed, so the `/chocolate` area needs Chocolate-typed content from the API.

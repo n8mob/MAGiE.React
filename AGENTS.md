@@ -18,7 +18,7 @@ The dev config (`vite.config.local.ts`) expects `magiegame.local` to resolve in 
 
 MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router v6. There are three gameplay modes:
 - **Daily puzzle** (`/today`, `/date/:year/:month/:day`) — fetches from the puzzle API by date
-- **Menu-based play** (`/tutorial/...`, `/vintage/...`, `/bigGame/...`, `/mall/...`, `/chocolate/...`) — navigates Menu → Category → Level → Puzzle. All of these mount the same `LevelPlay` with a different `menuName`; `/chocolate` additionally passes `asChocolate`, which forces every puzzle in the area into Chocolate mode.
+- **Menu-based play** (`/tutorial/...`, `/vintage/...`, `/bigGame/...`, `/mall/...`, `/chocolate/...`) — navigates Menu → Category → Level → Puzzle. All of these mount the same `LevelPlay` with a different `menuName`.
 - **Door Lock** (`/doorLock`) — standalone generative/random puzzle mode; see below
 
 ### Data flow
@@ -26,7 +26,7 @@ MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router
 1. `PuzzleApi.ts` fetches `Menu` or `PuzzleForDate` from the API (with `localStorage` caching and `If-Modified-Since` headers).
 2. `model.ts` defines the shape: `Menu` → `Category` → `Level` → `Puzzle`. `Menu` instantiates `encodingProviders` (a map of encoding name → `BinaryEncoder`) from the raw JSON.
 3. Route components (`LevelPlay`, `DatePlay`) use hooks (`useMenu`, `useCategory`, `useLevel`) to load data, then pass a `Puzzle` down to `PlayPuzzle`.
-4. `PlayPuzzle` dispatches to `EncodePuzzle`, `DecodePuzzle` or `ChocolateMode` depending on `puzzle.type`. It also resolves the type: the `asChocolate` prop (the `/chocolate` area) or an `?asChocolate[=none|advance|scroll]` query param coerces any puzzle into Chocolate, swapping a variable-width encoding for 5bA1 on the way. Nothing above this layer knows which mode actually rendered, which is why the route's after-win controls are handed down as `winActions` rather than rendered by the route.
+4. `PlayPuzzle` dispatches to `EncodePuzzle`, `DecodePuzzle` or `ChocolateMode` depending on `puzzle.type`. A Chocolate puzzle with a variable-width encoding is swapped to 5bA1 on the way. Nothing above this layer knows which mode actually rendered, which is why the route's after-win controls are handed down as `winActions` rather than rendered by the route.
 
 ### Core bit types (`src/`)
 

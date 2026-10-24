@@ -17,11 +17,9 @@ import { debug } from "../Logger.ts";
 
 interface LevelPlayProps {
   menuName?: string;
-  /** Force every puzzle in this area to play in Chocolate mode. */
-  asChocolate?: boolean;
 }
 
-const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
+const LevelPlay: FC<LevelPlayProps> = ({ menuName }) => {
   const navigate = useNavigate();
   const { menu, loading, error } = useMenu(menuName);
   const { categoryIndex, levelNumber, puzzleIndex: puzzleIndexParam } = useParams();
@@ -188,7 +186,6 @@ const LevelPlay: FC<LevelPlayProps> = ({ menuName, asChocolate = false }) => {
               level?.levelName?.join(" "),
               currentPuzzle?.slug,
             )}
-            asChocolate={asChocolate}
             placement={placement}
           />
         )}
