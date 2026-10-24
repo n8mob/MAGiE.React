@@ -284,7 +284,7 @@ function App() {
         <Route path="/chocolate/:categoryIndex" element={<CategoryBrowser menuName="chocolate" />} />
         <Route path="/chocolate/:categoryIndex/levels/:levelNumber" element={<LevelBrowser menuName="chocolate" />} />
         <Route path="/chocolate/:categoryIndex/levels/:levelNumber/puzzles/:puzzleIndex"
-               element={<LevelPlay menuName="chocolate" asChocolate={true} />} />
+               element={<LevelPlay menuName="chocolate" />} />
       </>)}
       {features.includes('mall') && (<>
         <Route path="/mall" element={<MenuBrowser menuName="mall" />} />
