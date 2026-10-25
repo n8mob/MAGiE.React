@@ -60,6 +60,14 @@ The player types bits into the staging area and presses Enter to "swipe" the vir
 
 `DoorLock` accepts a `BinaryEncoder` and an optional `presets?: string[]` prop. Win sequences are drawn from `presets` in order; once exhausted (or if no presets are provided), new sequences are generated randomly. The win audio (`/sounds/big-ta-da.wav`) is preloaded on mount with `preload = "auto"` and rewound to `currentTime = 0` before each play to support replays.
 
+### Two-shot experiment (`src/components/TwoShotPuzzle.tsx`, `src/twoShot.ts`)
+
+Behind the `twoShot` flag, `PlayPuzzle` hands every Encode/Decode puzzle to `TwoShotPuzzle` instead. It is a sequencer, not a new mode: `splitIntoShots()` turns the one API puzzle into two ordinary `Puzzle`s, played one after the other by the existing `DecodePuzzle` and `EncodePuzzle`.
+- **Decode shot** — the clue lines joined into one string (whitespace collapsed) is the `winText`, under generic first-draft copy for the clue and win message. Its win offers a `Next shot ▶` button instead of the route's `winActions`, and does not report to `PlayPuzzle`.
+- **Final shot** — the original puzzle as an Encode, original clue and all, so the clue reads as the message the player just decoded. Only this win reaches `PlayPuzzle`'s `onWin`.
+
+The decode shot is skipped when the clue holds characters the decode keyboard can't type (digits, mostly), and auto-win demo screens pass through untouched. Analytics still count one attempt, under the final shot's `puzzle_type`.
+
 ### Bit button components (`src/components/BitButton.tsx`)
 
 Two components share the same `<input type="checkbox" className="bit-checkbox">` base. Both set `data-bit-index={bit.index}` on the input, which the handlers read via `event.target.dataset.bitIndex` to identify which bit was toggled.
@@ -152,4 +160,4 @@ See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-
 
 Most routes are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source.
 
-The default set is `NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate']`, so without a token you get the daily puzzle (`/today`, `/date/...`), the tutorial, Door Lock, and the whole `chocolate` group — which includes `/letErRoll` as well as `/chocolate/...`. A token is needed for `story`, `vintage`, `mall`, and `bigGameRoutes` — note that last flag is *not* named after its `/bigGame` path. `/chocolate2` is deliberately ungated as a test route.
+The default set is `NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate', 'story', 'twoShot']`, so without a token you get the daily puzzle (`/today`, `/date/...`), the tutorial, Door Lock, story mode, the two-shot experiment, and the whole `chocolate` group — which includes `/letErRoll` as well as `/chocolate/...`. A token is needed for `vintage`, `mall`, and `bigGameRoutes` — note that last flag is *not* named after its `/bigGame` path. `/chocolate2` is deliberately ungated as a test route.

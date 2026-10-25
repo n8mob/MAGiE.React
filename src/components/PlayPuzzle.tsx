@@ -4,6 +4,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { ChocolateMode } from "./ChocolateMode.tsx";
+import { TwoShotPuzzle } from "./TwoShotPuzzle.tsx";
 import { isAutoWinPuzzle, Puzzle } from "../model.ts";
 import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
@@ -13,6 +14,7 @@ import { debug } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { useFeatureFlags } from "../hooks/useFeatureFlags.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -49,6 +51,8 @@ const PlayPuzzle = ({
   placement,
 }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
+  // Experiment: play every Encode/Decode puzzle as a decode shot then an encode shot.
+  const twoShot = useFeatureFlags().includes("twoShot");
   // Chocolate requires a fixed-width encoding; variable-width (alpha-length)
   // and missing encodings fall back to the built-in 5bA1.
   const puzzle = useMemo<Puzzle>(() => {
@@ -237,7 +241,18 @@ const PlayPuzzle = ({
         onDisplayChange={setStopwatchDisplay}
         visible={false}
       />
-      {puzzle.type === "Encode" &&
+      {twoShot && (puzzle.type === "Encode" || puzzle.type === "Decode") &&
+        <TwoShotPuzzle
+          key={puzzle.slug}
+          puzzle={puzzle}
+          onWin={handleWin}
+          onShareWin={handleShareWin}
+          winActions={winActions}
+          winInline={winInline}
+          bitButtonWidthPx={32}
+        />
+      }
+      {!twoShot && puzzle.type === "Encode" &&
         <EncodePuzzle
           puzzle={puzzle}
           onWin={handleWin}
@@ -247,7 +262,7 @@ const PlayPuzzle = ({
           bitButtonWidthPx={32}
         />
       }
-      {puzzle.type === "Decode" &&
+      {!twoShot && puzzle.type === "Decode" &&
         <DecodePuzzle
           puzzle={puzzle}
           onWin={handleWin}
