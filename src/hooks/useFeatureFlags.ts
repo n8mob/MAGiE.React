@@ -52,7 +52,7 @@ function getOrCreateSessionChallenge(): string {
 
 export function useFeatureFlags() {
   const NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate', 'story'];
-  const [features, setFeatures] = useState<string[]>(NORMAL_FEATURES);
+  const [features, setFeatures] = useState<string[]>(withLocalFeatures(NORMAL_FEATURES));
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

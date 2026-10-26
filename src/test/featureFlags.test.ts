@@ -31,7 +31,7 @@ afterEach(() => {
 describe("feature flags", () => {
   it("ships the normal set when nothing is set locally", async () => {
     const features = await flagsWith();
-    expect([...features].sort()).toEqual(["chocolate", "date", "doorLock", "tutorial"]);
+    expect([...features].sort()).toEqual(["chocolate", "date", "doorLock", "story", "tutorial"]);
     // The gated areas stay gated — this is what production gets.
     expect(features).not.toContain("mall");
     expect(features).not.toContain("vintage");
