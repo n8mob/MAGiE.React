@@ -1,10 +1,10 @@
 // noinspection DuplicatedCode
 
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { EncodePuzzle } from "./EncodePuzzle.tsx";
 import { DecodePuzzle } from "./DecodePuzzle.tsx";
 import { ChocolateMode } from "./ChocolateMode.tsx";
+import { TwoShotPuzzle } from "./TwoShotPuzzle.tsx";
 import { isAutoWinPuzzle, Puzzle } from "../model.ts";
 import { chocolateEncoding, FIVE_BIT_A1_NAME } from "../encoding/FiveBitA1.ts";
 import { Stopwatch, StopwatchHandle } from "./Stopwatch.tsx";
@@ -14,6 +14,7 @@ import { debug } from "../Logger.ts";
 import { useHeader } from "../hooks/useHeader.ts";
 import { loadSound, playSound } from "../audio/SoundPlayer.ts";
 import { SOUNDS } from "../audio/sounds.ts";
+import { useFeatureFlags } from "../hooks/useFeatureFlags.ts";
 
 interface PlayPuzzleProps {
   puzzle: Puzzle;
@@ -33,8 +34,6 @@ interface PlayPuzzleProps {
    * inline win to fall back to and always uses the screen.
    */
   winInline?: boolean;
-  /** Play this puzzle in Chocolate mode regardless of its type (e.g. the /chocolate area). */
-  asChocolate?: boolean;
   /**
    * Where this puzzle sits in the content, from whichever route loaded it.
    * Omit to play without emitting funnel events.
@@ -49,46 +48,26 @@ const PlayPuzzle = ({
   onShareWin,
   winActions,
   winInline = false,
-  asChocolate = false,
   placement,
 }: PlayPuzzleProps) => {
   const { setStopwatchDisplay } = useHeader();
-  const [searchParams] = useSearchParams();
-
-  // Existing Encode/Decode puzzles double as Chocolate content, forced either by
-  // the asChocolate prop (the /chocolate area) or by the ?asChocolate query param
-  // (ad-hoc testing on any route). The query param's optional value picks the
-  // clock (?asChocolate=none|advance|scroll); otherwise the ChocolateMode
-  // default applies.
+  // Experiment: play every Encode/Decode puzzle as a decode shot then an encode shot.
+  const twoShot = useFeatureFlags().includes("twoShot");
+  // Chocolate requires a fixed-width encoding; variable-width (alpha-length)
+  // and missing encodings fall back to the built-in 5bA1.
   const puzzle = useMemo<Puzzle>(() => {
-    let p = rawPuzzle;
-    if (p
-      && (
-        asChocolate || searchParams.has("asChocolate")
-      )
-      && p.type !== "Chocolate"
-    ) {
-      const clockParam = searchParams.get("asChocolate");
-      const clock = clockParam === "none" || clockParam === "advance" || clockParam === "scroll"
-        ? clockParam
-        : undefined;
-      p = { ...p, type: "Chocolate", clock };
-    }
-    // Chocolate requires a fixed-width encoding; variable-width (alpha-length)
-    // and missing encodings fall back to the built-in 5bA1.
-    if (p && p.type === "Chocolate") {
-      const encoding = chocolateEncoding(p.encoding);
-      if (encoding !== p.encoding) {
-        p = { ...p, encoding, encoding_name: FIVE_BIT_A1_NAME };
+    if (rawPuzzle && rawPuzzle.type === "Chocolate") {
+      const encoding = chocolateEncoding(rawPuzzle.encoding);
+      if (encoding !== rawPuzzle.encoding) {
+        return { ...rawPuzzle, encoding, encoding_name: FIVE_BIT_A1_NAME };
       }
     }
-    return p;
-  }, [rawPuzzle, asChocolate, searchParams]);
+    return rawPuzzle;
+  }, [rawPuzzle]);
   const [solveTimeString, setSolveTimeString] = useState("");
   const stopwatchRef = useRef<StopwatchHandle | null>(null);
 
-  // puzzle_type and encoding come from the puzzle as *played*, after any
-  // Chocolate coercion above — the route can't know either one.
+  // encoding comes from the puzzle as *played*, after any 5bA1 fallback above.
   const analytics = useMemo(
     () => (
       placement ? resolvePuzzleContext(placement, puzzle) : null
@@ -262,7 +241,18 @@ const PlayPuzzle = ({
         onDisplayChange={setStopwatchDisplay}
         visible={false}
       />
-      {puzzle.type === "Encode" &&
+      {twoShot && (puzzle.type === "Encode" || puzzle.type === "Decode") &&
+        <TwoShotPuzzle
+          key={puzzle.slug}
+          puzzle={puzzle}
+          onWin={handleWin}
+          onShareWin={handleShareWin}
+          winActions={winActions}
+          winInline={winInline}
+          bitButtonWidthPx={32}
+        />
+      }
+      {!twoShot && puzzle.type === "Encode" &&
         <EncodePuzzle
           puzzle={puzzle}
           onWin={handleWin}
@@ -272,7 +262,7 @@ const PlayPuzzle = ({
           bitButtonWidthPx={32}
         />
       }
-      {puzzle.type === "Decode" &&
+      {!twoShot && puzzle.type === "Decode" &&
         <DecodePuzzle
           puzzle={puzzle}
           onWin={handleWin}

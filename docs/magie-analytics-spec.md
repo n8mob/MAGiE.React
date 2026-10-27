@@ -35,14 +35,10 @@ Sent on both `puzzle_start` and `puzzle_end`.
 
 ### `puzzle_type` is the played type, not the authored type
 
-`PlayPuzzle` coerces Encode/Decode puzzles into Chocolate mode — either from the route (the `/chocolate`
-area) or from an ad-hoc `?asChocolate` query param. `puzzle_type` reports what the player actually got,
-so `puzzle_slug` → `puzzle_type` is **not** 1:1: the same slug can report `decode` in one area and
-`chocolate` in another. That's the intended behavior for "where do they stall," but it means never treat
-`puzzle_type` as a property of the puzzle.
-
-Corollary: `?asChocolate` is a testing affordance, so it will mint real `chocolate` rows from dev
-traffic. Filter dev traffic out of the reporting view, or accept the noise knowingly.
+`puzzle_type` reports what the player actually got. `PlayPuzzle` used to coerce Encode/Decode puzzles
+into Chocolate mode (the `asChocolate` prop on the `/chocolate` area and an ad-hoc `?asChocolate` query
+param), so older data can show one slug reporting `decode` in one area and `chocolate` in another. That
+coercion has been removed; it is still safer never to treat `puzzle_type` as a property of the puzzle.
 
 ### `content_version` is derived, not curated
 
@@ -219,7 +215,7 @@ report on day one is not a bug. Sequencing is in [Before alpha testing](#before-
 
 `debug_mode` routes events to DebugView. It does **not** keep them out of standard reports — debug
 traffic lands in the same funnel as everything else. `VITE_GA_DEBUG=true` sitting in a dev run
-configuration therefore pollutes alpha data on every local session, as does `?asChocolate` testing. The
+configuration therefore pollutes alpha data on every local session. The
 "dev-day spikes" in the dashboard are this, not real players.
 
 `debug_mode` and `traffic_type` are independent, and they act at different stages: `debug_mode` routes an

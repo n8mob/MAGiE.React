@@ -18,7 +18,7 @@ The dev config (`vite.config.local.ts`) expects `magiegame.local` to resolve in 
 
 MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router v6. There are three gameplay modes:
 - **Daily puzzle** (`/today`, `/date/:year/:month/:day`) — fetches from the puzzle API by date
-- **Menu-based play** (`/tutorial/...`, `/vintage/...`, `/bigGame/...`, `/mall/...`, `/chocolate/...`) — navigates Menu → Category → Level → Puzzle. All of these mount the same `LevelPlay` with a different `menuName`; `/chocolate` additionally passes `asChocolate`, which forces every puzzle in the area into Chocolate mode.
+- **Menu-based play** (`/tutorial/...`, `/vintage/...`, `/bigGame/...`, `/mall/...`, `/chocolate/...`) — navigates Menu → Category → Level → Puzzle. All of these mount the same `LevelPlay` with a different `menuName`.
 - **Door Lock** (`/doorLock`) — standalone generative/random puzzle mode; see below
 
 ### Data flow
@@ -26,7 +26,7 @@ MAGiE is a binary-encoding puzzle game built as a React 18 SPA with React Router
 1. `PuzzleApi.ts` fetches `Menu` or `PuzzleForDate` from the API (with `localStorage` caching and `If-Modified-Since` headers).
 2. `model.ts` defines the shape: `Menu` → `Category` → `Level` → `Puzzle`. `Menu` instantiates `encodingProviders` (a map of encoding name → `BinaryEncoder`) from the raw JSON.
 3. Route components (`LevelPlay`, `DatePlay`) use hooks (`useMenu`, `useCategory`, `useLevel`) to load data, then pass a `Puzzle` down to `PlayPuzzle`.
-4. `PlayPuzzle` dispatches to `EncodePuzzle`, `DecodePuzzle` or `ChocolateMode` depending on `puzzle.type`. It also resolves the type: the `asChocolate` prop (the `/chocolate` area) or an `?asChocolate[=none|advance|scroll]` query param coerces any puzzle into Chocolate, swapping a variable-width encoding for 5bA1 on the way. Nothing above this layer knows which mode actually rendered, which is why the route's after-win controls are handed down as `winActions` rather than rendered by the route.
+4. `PlayPuzzle` dispatches to `EncodePuzzle`, `DecodePuzzle` or `ChocolateMode` depending on `puzzle.type`. A Chocolate puzzle with a variable-width encoding is swapped to 5bA1 on the way. Nothing above this layer knows which mode actually rendered, which is why the route's after-win controls are handed down as `winActions` rather than rendered by the route.
 
 ### Core bit types (`src/`)
 
@@ -59,6 +59,14 @@ A self-contained puzzle mode with a simple state machine (`idle → entering →
 The player types bits into the staging area and presses Enter to "swipe" the virtual card. Judgment runs against `cardBits`, not `stagingBits`. Individual staging bits can be toggled by clicking them. On a wrong guess, the hint shows the signed numeric difference (`WIN - GUESS`) to guide the player.
 
 `DoorLock` accepts a `BinaryEncoder` and an optional `presets?: string[]` prop. Win sequences are drawn from `presets` in order; once exhausted (or if no presets are provided), new sequences are generated randomly. The win audio (`/sounds/big-ta-da.wav`) is preloaded on mount with `preload = "auto"` and rewound to `currentTime = 0` before each play to support replays.
+
+### Two-shot experiment (`src/components/TwoShotPuzzle.tsx`, `src/twoShot.ts`)
+
+Behind the `twoShot` flag, `PlayPuzzle` hands every Encode/Decode puzzle to `TwoShotPuzzle` instead. It is a sequencer, not a new mode: `splitIntoShots()` turns the one API puzzle into two ordinary `Puzzle`s, played one after the other by the existing `DecodePuzzle` and `EncodePuzzle`.
+- **Decode shot** — the clue lines joined into one string (whitespace collapsed) is the `winText`, under generic first-draft copy for the clue and win message. Its win offers a `Next shot ▶` button instead of the route's `winActions`, and does not report to `PlayPuzzle`.
+- **Final shot** — the original puzzle as an Encode, original clue and all, so the clue reads as the message the player just decoded. Only this win reaches `PlayPuzzle`'s `onWin`.
+
+The decode shot is skipped when the clue holds characters the decode keyboard can't type (digits, mostly), and auto-win demo screens pass through untouched. Analytics still count one attempt, under the final shot's `puzzle_type`.
 
 ### Bit button components (`src/components/BitButton.tsx`)
 
@@ -152,7 +160,7 @@ See [COLORS.md](COLORS.md) for the full palette, semantic roles, and the sprite-
 
 Most routes are gated by `useFeatureFlags()` (`src/hooks/useFeatureFlags.ts`). Flags are delivered as a signed JWT (`?features=<token>`) verified against an RSA public key embedded in the source.
 
-The default set is `NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate']`, so without a token you get the daily puzzle (`/today`, `/date/...`), the tutorial, Door Lock, and the whole `chocolate` group — which includes `/letErRoll` as well as `/chocolate/...`. A token is needed for `story`, `vintage`, `mall`, and `bigGameRoutes` — note that last flag is *not* named after its `/bigGame` path. `/chocolate2` is deliberately ungated as a test route.
+The default set is `NORMAL_FEATURES = ['tutorial', 'doorLock', 'date', 'chocolate', 'story', 'twoShot']`, so without a token you get the daily puzzle (`/today`, `/date/...`), the tutorial, Door Lock, story mode, the two-shot experiment, and the whole `chocolate` group — which includes `/letErRoll` as well as `/chocolate/...`. A token is needed for `vintage`, `mall`, and `bigGameRoutes` — note that last flag is *not* named after its `/bigGame` path. `/chocolate2` is deliberately ungated as a test route.
 
 **Unlock an area locally with `VITE_EXTRA_FEATURES`**, not by editing `NORMAL_FEATURES`. It is a comma-separated list read from `.env.local` (already gitignored, like `VITE_MAGIE_PUZZLE_API`), so local testing never becomes a commit that can reach production — which it did once, shipping `mall` to everyone on a shared branch. The extras are *unioned* with whatever is in force, a verified token's set included, since a token otherwise replaces the whole list and would silently switch them off. A rejected token still clears everything, so that path stays observable.
 
